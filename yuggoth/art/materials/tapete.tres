@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_dus5k"]
+[ext_resource type="Texture2D" path="res://art/textures/tapete.png" id="2_ht1p1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_dus5k")
+shader_parameter/albedo_tex = ExtResource("2_ht1p1")
+shader_parameter/albedo_color = null
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = null
+shader_parameter/tiles_per_meter = null
+shader_parameter/snap_scale = null
+shader_parameter/affine_near = null
+shader_parameter/affine_far = null
+shader_parameter/affine_max_error = null
+shader_parameter/alpha_cut = null

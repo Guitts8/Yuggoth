@@ -1,0 +1,73 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/document_reader.gd" id="1_reader"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
+content_margin_left = 64.0
+content_margin_top = 56.0
+content_margin_right = 64.0
+content_margin_bottom = 40.0
+bg_color = Color(0.85, 0.8, 0.68, 1)
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 24
+
+[node name="DocumentReader" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_reader")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.78)
+
+[node name="Paper" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -480.0
+offset_right = 400.0
+offset_bottom = 480.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_paper")
+
+[node name="VBox" type="VBoxContainer" parent="Paper"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="Paper/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.28, 0.22, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Body" type="RichTextLabel" parent="Paper/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.13, 0.1, 0.08, 1)
+theme_override_font_sizes/normal_font_size = 27
+bbcode_enabled = true
+scroll_active = false
+
+[node name="Footer" type="Label" parent="Paper/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.34, 0.28, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 2

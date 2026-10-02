@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_2_cautelosa"
+title = "Minha resposta a Akeley — 28 de maio"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+28 de maio de 1928[/right]
+
+Prezado Sr. Akeley,
+
+As fotografias me deixaram uma sensação curiosa de medo e de proximidade com coisas proibidas. São fotografias de verdade — elos ópticos com o que retratam, produto de um processo impessoal, sem preconceito, sem erro e sem mentira.
+
+Não sei ainda o que pensar da sua carta. Mas comparemos as nossas notas: suspeito que os seus seres e o Mi-Go do Himalaia sejam da mesma ordem. Guardarei silêncio, como pede — nem ao Prof. Dexter direi uma palavra.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_3_cautelosa"
+title = "Minha resposta a Akeley — 3 de julho"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+3 de julho de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Toquei o disco muitas vezes. A primeira voz é de um homem educado, de sotaque vagamente bostoniano, e certamente não de alguém nascido nas colinas de Vermont. A segunda, não sei descrever: é como o zumbido de algum inseto gigantesco e repugnante, moldado à força na fala articulada de uma espécie estranha.
+
+Comparemos as notas. Não toquei o disco para ninguém, como o senhor pediu.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

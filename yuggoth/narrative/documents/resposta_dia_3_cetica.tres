@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_3_cetica"
+title = "Minha resposta a Akeley — 3 de julho"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+3 de julho de 1928[/right]
+
+Prezado Sr. Akeley,
+
+O disco chegou inteiro, e eu o toquei numa máquina da administração. Ouvi a voz humana — culta, de sotaque quase bostoniano, certamente não de um homem destas colinas — e ouvi a outra. Admito que me perturbou. Mas um ditafone grava o que um homem quiser pôr diante dele, e uma voz humana treinada pode imitar muita coisa numa noite de Sabá.
+
+Quem era o homem de Boston? Comece por ele.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

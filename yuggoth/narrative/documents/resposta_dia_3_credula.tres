@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_3_credula"
+title = "Minha resposta a Akeley — 3 de julho"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+3 de julho de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Ouvi. E creio que encontramos uma pista da origem de alguns dos costumes primordiais mais repulsivos das religiões ocultas mais antigas da humanidade — e de antigas e elaboradas alianças entre as criaturas escondidas de fora e certos membros da raça humana.
+
+Mande-me a pedra. Quero ver esses hieróglifos com os meus próprios olhos.
+
+Com estima,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

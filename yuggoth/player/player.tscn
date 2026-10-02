@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://player/lamp.gd" id="2_lamp"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_1.wav" id="3_passo1"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_2.wav" id="4_passo2"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_3.wav" id="5_passo3"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.3
+height = 1.75
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_player")
+footstep_sounds = Array[AudioStream]([ExtResource("3_passo1"), ExtResource("4_passo2"), ExtResource("5_passo3")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = true
+fov = 70.0
+near = 0.03
+
+[node name="InteractRay" type="RayCast3D" parent="Head/Camera3D"]
+target_position = Vector3(0, 0, -2)
+collision_mask = 3
+collide_with_areas = true
+
+[node name="Lamp" type="OmniLight3D" parent="Head/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, -0.28, -0.3)
+light_color = Color(1, 0.72, 0.45, 1)
+shadow_enabled = true
+omni_range = 5.0
+script = ExtResource("2_lamp")

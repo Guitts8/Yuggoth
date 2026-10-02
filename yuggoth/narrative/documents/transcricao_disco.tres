@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"transcricao_disco"
+title = "Transcrição de Akeley — o disco de 1915"
+style = 0
+pages = PackedStringArray("Gravado por volta da 1 hora da manhã de 1º de maio de 1915, perto da boca fechada de uma caverna, onde a encosta oeste da Montanha Escura, coberta de mata, se ergue do Pântano de Lee. O lugar sempre foi atormentado por vozes estranhas; por isso levei o fonógrafo, o ditafone e o cilindro virgem. A véspera de maio — a noite do Sabá das lendas subterrâneas da Europa — haveria de ser mais fértil que qualquer outra data. Não me enganei. Nunca mais ouvi vozes naquele lugar.", "(SONS INDISTINGUÍVEIS)
+
+(UMA VOZ HUMANA, MASCULINA, CULTA)
+
+...é o Senhor dos Bosques, até mesmo aos... e os presentes dos homens de Leng... assim, dos poços da noite aos abismos do espaço, e dos abismos do espaço aos poços da noite, sempre os louvores do Grande Cthulhu, de Tsathoggua e d'Aquele que não deve ser Nomeado. Sempre os Seus louvores, e abundância ao Bode Negro dos Bosques. Iä! Shub-Niggurath! O Bode com Mil Crias!", "(UMA IMITAÇÃO ZUMBIDA DA FALA HUMANA)
+
+Iä! Shub-Niggurath! O Bode Negro dos Bosques com Mil Crias!
+
+(VOZ HUMANA)
+
+E aconteceu que o Senhor dos Bosques, sendo... sete e nove, descendo os degraus de ônix... (tri)butos a Ele no Abismo, Azathoth, Aquele de Quem Tu nos ensinaste maravi(lhas)... nas asas da noite, para além do espaço, para além d... Àquilo de que Yuggoth é o filho mais novo, rolando sozinho no éter negro, na borda...", "(VOZ ZUMBIDA)
+
+...sair entre os homens e achar os caminhos deles, para que Ele no Abismo saiba. A Nyarlathotep, Poderoso Mensageiro, todas as coisas devem ser contadas. E Ele vestirá a semelhança dos homens, a máscara de cera e o manto que esconde, e descerá do mundo dos Sete Sóis para zombar...
+
+(VOZ HUMANA)
+
+...(Nyarl)athotep, Grande Mensageiro, portador de estranha alegria a Yuggoth através do vazio, Pai do Milhão de Favorecidos, Espreitador entre...
+
+(FALA CORTADA PELO FIM DO DISCO)")
+exposure_on_read = 0.05

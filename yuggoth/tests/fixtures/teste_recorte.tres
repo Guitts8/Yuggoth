@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"teste_recorte"
+title = "Recorte — Brattleboro Reformer"
+style = 2
+pages = PackedStringArray("[center][b]COISAS VISTAS NOS RIOS CHEIOS[/b]
+[font_size=20]Moradores de Windham relatam formas estranhas levadas pela correnteza[/font_size][/center]
+
+Passadas as enchentes de 3 de novembro, multiplicam-se nas fazendas do condado relatos de corpos que não seriam de homem nem de animal conhecido, vistos boiando no West River e no Passumpsic.
+
+Descrevem-nos como rosados, de um metro e meio de comprimento, com muitos pares de membros e algo como asas membranosas. Nenhum foi recuperado.
+
+Os mais velhos lembram antigas histórias das colinas e pedem que ninguém suba a Montanha Escura sozinho.")

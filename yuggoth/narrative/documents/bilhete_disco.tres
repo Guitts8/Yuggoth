@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"bilhete_disco"
+title = "Bilhete de Akeley que veio com o disco"
+style = 0
+pages = PackedStringArray("[right]Brattleboro, Vt.
+fim de junho de 1928[/right]
+
+Wilmarth —
+
+Despacho o disco daqui de Brattleboro: não confio nas condições do ramal ao norte. Vim de Ford pelas estradas de trás, e confesso que começo a ter medo delas. Já não vou nem a Townshend buscar mantimentos, a não ser em plena luz do dia.", "Não compensa saber demais — repito sempre —, a não ser que se esteja muito longe destas colinas silenciosas e problemáticas. Logo irei para a Califórnia, morar com meu filho, embora seja duro deixar um lugar onde se concentram todas as nossas lembranças e todos os sentimentos dos antepassados.", "Desconfio, mais que de todos, de Walter Brown — o lavrador carrancudo que mora sozinho num sítio decadente na encosta, perto da mata funda, e que vive vadiando pelas esquinas de Brattleboro, Bellows Falls, Newfane e South Londonderry, do modo mais inexplicável. Estou convencido de que a voz dele foi uma das que ouvi certa vez, numa conversa terrível.
+
+E encontrei, perto da casa dele, uma marca de garra que pode ter o significado mais sinistro: estava curiosamente perto das pegadas do próprio Brown — pegadas viradas para ela.
+
+[right]H. W. A.[/right]")
+exposure_on_read = 0.0

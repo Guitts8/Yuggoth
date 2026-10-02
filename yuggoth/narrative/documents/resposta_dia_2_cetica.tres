@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_2_cetica"
+title = "Minha resposta a Akeley — 28 de maio"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+28 de maio de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Recebi as fotografias e a sua carta. Não duvido de que sejam fotografias verdadeiras — os seixos e as folhas de grama dão a escala, e não vejo truque de dupla exposição. Mas uma fotografia verdadeira de uma marca na lama prova a marca, não o bicho; e o resto da carta repete o que lhe contou um homem que acabou por se matar.
+
+Continuo à sua disposição, mas peço-lhe prudência.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

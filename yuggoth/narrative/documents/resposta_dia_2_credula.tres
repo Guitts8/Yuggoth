@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_2_credula"
+title = "Minha resposta a Akeley — 28 de maio"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+28 de maio de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Li a sua carta por três horas seguidas e, quando a deixei de lado, entendi os medos que o senhor passou a ter. Onde antes eu tentava explicar as coisas, agora começo a acreditar.
+
+Farei o que estiver ao meu alcance para manter as pessoas longe dessas colinas. O meu debate nos jornais está encerrado. E creio, como o senhor, que os seus visitantes e o Mi-Go do Himalaia são uma só ordem de pesadelo encarnado.
+
+Com estima,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_1_cautelosa"
+title = "Minha resposta a Akeley — 9 de maio"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+9 de maio de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Recebi a sua carta e guardarei a discrição que me pede: nem o seu nome nem as suas palavras sairão desta sala.
+
+Não o tomo por louco. Mas um homem de estudo como o senhor há de entender que preciso ver antes de crer. Peço-lhe mais detalhes — os lugares, as datas, as circunstâncias — e, se puder, as fotografias de que fala no pós-escrito. Eu as examinarei com toda a seriedade.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

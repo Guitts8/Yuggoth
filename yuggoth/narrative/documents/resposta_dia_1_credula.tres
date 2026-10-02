@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_1_credula"
+title = "Minha resposta a Akeley — 9 de maio"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+9 de maio de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Li a sua carta três vezes. Há nela algo que nenhum mentiroso escreveria, e que nenhum louco saberia conter.
+
+Acredito no senhor — ou, ao menos, acredito que viu e ouviu o que diz. Farei o que pede: deixarei o debate morrer nos jornais. Mande-me as fotografias, a gravação e a pedra, se puder. E tenha cuidado com esse Brown.
+
+Com estima,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

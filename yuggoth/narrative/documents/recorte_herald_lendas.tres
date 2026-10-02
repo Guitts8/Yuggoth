@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"recorte_herald_lendas"
+title = "Recorte — Rutland Herald: o debate das enchentes"
+style = 2
+pages = PackedStringArray("[center][b]O DEBATE DAS ENCHENTES[/b]
+[font_size=20]Trechos das cartas dos dois lados, publicadas no [i]Arkham Advertiser[/i][/font_size][/center]
+
+[b]Dos que defendem as histórias:[/b] as lendas antigas têm uma persistência e uma uniformidade significativas, e a natureza praticamente inexplorada das colinas de Vermont torna imprudente ser dogmático sobre o que pode ou não habitar entre elas. Mesmo sem a herança das lendas, os relatos recentes são claros, coerentes, minuciosos e prosaicos demais na maneira de contar para serem simplesmente ignorados.", "[b]Do Sr. Wilmarth, da Universidade Miskatonic:[/b] os mitos de Vermont pouco diferem, em essência, das lendas universais de personificação da natureza que encheram o mundo antigo de faunos, dríades e sátiros, sugeriram os [i]kallikanzari[/i] da Grécia moderna e deram ao País de Gales e à Irlanda selvagens as suas sombrias alusões a raças escondidas, estranhas, pequenas e terríveis, de trogloditas e cavadores. Não menos semelhante é a crença das tribos das montanhas do Nepal no temido Mi-Go, o “Abominável Homem das Neves”, que espreita entre o gelo e os picos de rocha do Himalaia.")
+exposure_on_read = 0.0

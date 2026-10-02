@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"recorte_reformer_enchentes"
+title = "Recorte — Brattleboro Reformer, novembro de 1927"
+style = 2
+pages = PackedStringArray("[center][b]COISAS VISTAS NOS RIOS CHEIOS[/b]
+[font_size=20]Lavradores de três condados relatam formas que não seriam humanas[/font_size][/center]
+
+Em meio aos relatos de privação, sofrimento e socorro que se seguiram às enchentes de 3 de novembro, circulam estranhas histórias de coisas encontradas boiando nos rios transbordados: no Winooski, perto de Montpelier; no West, no condado de Windham, além de Newfane; e no Passumpsic, no condado de Caledonia, acima de Lyndonville.", "As testemunhas, gente simples do interior, têm certeza de que não eram corpos humanos, apesar de certas semelhanças superficiais de tamanho e contorno; nem qualquer animal conhecido em Vermont. Eram, dizem, coisas rosadas, de cerca de um metro e meio de comprimento, com corpos de crustáceo que traziam enormes pares de barbatanas dorsais ou asas membranosas e vários conjuntos de membros articulados — e, onde normalmente estaria a cabeça, uma espécie de elipsoide enrugado, coberto de uma multidão de antenas muito curtas.
+
+Os mais velhos ligam as visões a um ciclo antigo, meio esquecido, de lendas sussurradas.")
+exposure_on_read = 0.0

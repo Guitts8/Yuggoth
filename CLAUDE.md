@@ -1,0 +1,73 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Projeto
+
+Jogo de terror psicológico em primeira pessoa (visual PS1, sem combate, ~75 min) baseado em *The Whisperer in Darkness*. O design completo está em `docs/GDD.md` — consulte a seção citada nos comentários do código (ex.: "GDD §6.3") antes de mudar comportamento narrativo. O projeto Godot fica em `yuggoth/` (Godot 4.7, Forward+, Jolt, D3D12 no Windows).
+
+O escopo é deliberadamente pequeno ("jogo mais simples pra sair do papel"): resista a adicionar sistemas que o GDD não pede. Produção é **por lugar, em ordem**: escritório → Ato II → fazenda (Interlúdio + Ato III + finais juntos). A demo pública vai do Prólogo ao Dia 6 (GDD §12). **Fidelidade ao livro:** as situações do livro acontecem no jogo, não resumidas — o mapa situação por situação está em `docs/FIDELIDADE.md`; o GDD (v0.4) segue esse mapa. M0 e a fundação do marco **E — Escritório** concluídos; o Prólogo e os Dias 1–3 estão jogáveis (arte provisória). Próximo: Dia 4 (a pedra que não chega: telefone, Keene, "Stanley Adams"). O que vale a pena modelar à mão está em `docs/ARTE.md`.
+
+## Comandos
+
+O Godot não está no PATH. Binário (4.7.2): `C:\Users\raul.silva\Downloads\Godot_v4.7.2-stable_win64.exe\` — atenção: isso é uma **pasta** com nome de `.exe`; os executáveis estão dentro dela. Use a versão `_console` para ver a saída e o código de retorno.
+
+```powershell
+$godot = "C:\Users\raul.silva\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe"
+
+# Teste de fumaça (sai com código = número de falhas)
+& $godot --headless --path yuggoth res://tests/smoke_test.tscn
+
+# Rodar o jogo
+& $godot --path yuggoth
+```
+
+Documentos e falas usados só pelos testes ficam em `tests/fixtures/` (ids `teste_*`), separados da narrativa. `tests/_tmp_shot.*` é um script descartável de captura de tela (lê `SHOT_DIR` do ambiente), não um teste.
+
+**Geradores** (arte e sons provisórios, determinísticos; rodar de `yuggoth/`):
+```powershell
+& $godot --headless --path . --script res://tools/gerar_assets.gd   # texturas em art/textures, sons em audio/placeholder
+& $godot --headless --path . --import                               # importar o que foi gerado
+& $godot --headless --path . res://tools/gerar_escritorio.tscn      # materiais em art/materials + levels/escritorio/escritorio.tscn
+```
+`gerar_escritorio` é uma cena (não `--script`) porque os componentes precisam dos autoloads. Ele **sobrescreve** `escritorio.tscn`: enquanto a sala for gerada, mude o gerador, não a cena; quando a cena passar a ser editada à mão, pare de rodá-lo.
+
+## Idioma e convenções
+
+- Código, comentários, nomes de ações do Input Map (`mover_frente`, `interagir`, `lamparina_mais`, `dossie`...), chaves de estado e textos de jogo são em **PT-BR**. Mantenha assim.
+- GDScript tipado, chaves de estado como `StringName` (`&"crenca"`), comentários de documentação com `##`.
+- Camadas de física: 1 = `mundo`, 2 = `interacao`.
+
+## Arquitetura
+
+**Raiz e renderização** — `main/game_root.tscn` é a cena principal. O mundo 3D roda dentro de `WorldContainer/World` (SubViewport) com `stretch_shrink` calculado para ~270 px de altura; a UI (`UI` CanvasLayer: HUD, Dossier, DocumentReader) fica em resolução nativa para o texto continuar legível. Fases são instanciadas dentro do SubViewport via `load_level()`. O jogo abre no `MainMenu` (CanvasLayer `Menus`, com `PauseMenu` no Esc e um `OptionsMenu` compartilhado); `boot_to_menu = false` pula o menu e começa um jogo novo (testes). O GameRoot orquestra `new_game()`, `continue_game()` e `quit_to_menu()` com fade; os menus só emitem pedidos. `ConfirmBox` (`ui/menu/`) é a pergunta sim/não reutilizável: `if await confirm.ask(texto, botoes): ...`. O pós-processamento (`shaders/psx_post.gdshader`, material do WorldContainer) recebe `exposure`, que persegue suavemente `GameState.exposicao`; materiais 3D usam `shaders/psx_lit.gdshader` (ou `psx_unlit` para paisagens atrás de janelas e brilhos), ambos sobre `psx_common.gdshaderinc`. Com `world_uv` + `tiles_per_meter` a UV vem do espaço do mundo, para paredes e móveis feitos de primitivas terem densidade de textura constante. Tremor de vértices e textura afim são shader globals (`psx_jitter`, `psx_affine`, `psx_dream`) que o GameRoot interpola por `dream_level` = maior entre `exposicao²` e `GameState.sonho` (`jitter_range`/`affine_range`/`vignette_range`): realidade firme e sóbria por padrão; a estética crua do PS1 volta quando a realidade quebra (exposição alta) ou quando uma sequência onírica anima `sonho` de 0 a 1 (Prólogo, transição do Dia 4...). Com `psx_dream` baixo o afim some perto da câmera (`affine_near`/`affine_far`) e tem teto de erro; com `psx_dream` = 1 essas proteções caem de propósito. **Modele superfícies grandes subdivididas (~0,5–1 m)**: polígonos gigantes torcem o afim e estragam a iluminação por vértice; CSG serve só para colisão (invisível), como na sala de teste.
+
+**Autoloads**
+- `GameState` — única fonte do estado narrativo: valores/flags (`dia`, `crenca`, `exposicao`, `suspeita`, `drogado`...), grampeados por `RANGES`, e o dossiê de `DocumentData`. `add()` preserva o tipo (int continua int). `to_dict`/`from_dict` são a base do save futuro. Emite `value_changed`.
+- `Events` — barramento de sinais sem estado (exceto o espelho `is_modal_open`). Não coloque estado narrativo aqui.
+- `SceneDirector` — único jeito de trocar de fase: `change_level(path, spawn, fade)`. Uma fase pode abrir em tela preta (ex.: cartão do Prólogo) marcando `hold_black = true` no `_ready()` — `fade_in()` não faz nada até `release_black()`; a troca e o `clear_level()` zeram isso. Pausa a árvore durante a troca, carrega em thread e posiciona o nó do grupo `player` no `Marker3D` do grupo `spawn` cujo nome é o id. `fade_out()`/`fade_in()` também servem a sequências que trocam o cenário no escuro; `clear_level()` descarrega sem trocar (volta ao menu). O GameRoot se registra com `register_root()`.
+- `SaveSystem` — um slot só (`user://save.json`), checkpoint automático em todo `level_changed`. Salva fase + spawn + `GameState` (não a posição exata), via `JSON.from_native` para preservar int/float/StringName. Subir `VERSION` invalida saves antigos (ex.: da demo). Testes trocam `save_path`.
+- `Settings` — preferências do jogador (`volume_<bus>`, `sensibilidade`, `inverter_y`, `tela_cheia`) em `user://settings.cfg`, separadas do save. Aplica volumes direto no `AudioServer`; o Player lê sensibilidade/inversão. Testes trocam `settings_path`.
+- `AudioDirector` — buses em `default_bus_layout.tres` (`Master → Music, Ambience, SFX, Voice, Whisper`, GDD §9). `play_ambience(stream)` faz crossfade entre dois players; `set_hum(stream)` liga o zumbido no bus `Whisper`, cujo volume, low-pass, distorção e pitch seguem `exposicao` (mudo até alguém ligar — no escritório, depois do disco). `play_sfx()` para sons 2D avulsos; sons posicionais ficam nas fases. Roda com a árvore pausada. Não há slider para `Whisper` de propósito.
+
+**Props** (`props/`, `@tool`) — `Envelope` (papel, selos, carimbo e endereços em Label3D) e `Fotografia` (cartão + imagem; `pos_na_imagem(uv)` posiciona `ExamineHotspot`). Peças geradas têm nome começando com `_` e não vão para o .tscn; um filho chamado `Modelo` substitui o visual provisório (para os .glb do artista).
+
+**Fluxo de interação** — `Player` faz raycast na camada `interacao` e encontra `Interactable` (Area3D). Todo `Interactable` tem `condition` (só aparece quando vale); o Player reavisa o HUD quando o `prompt` do alvo muda. `Examinable` pode marcar `flag` e somar `exposure` na primeira vez. Subclasses sobrescrevem `_on_interact()`: `DocumentPickup` (adiciona ao dossiê e emite `Events.document_requested`), `StateInteractable` (aplica `changes` em `GameState`; `narration` opcional). `Examinable` emite `Events.examine_requested`; o `ExamineViewer` (UI) mostra uma **cópia** do visual (sem `CollisionObject3D`) num SubViewport com mundo próprio e o mesmo pós PSX. Detalhes escondidos são `ExamineHotspot` (Marker3D, face = -Z local) filhos do visual: achados ao ficarem no centro da tela, virados para a câmera, com zoom ≥ `min_zoom`, por 0,6 s → marcam `flag`. Qualquer UI modal deve emitir `Events.modal_changed(true/false)` — é isso que bloqueia o input do player e libera o mouse.
+
+**Documentos e condições** — `DocumentData` (`.tres` em `narrative/documents/`) tem `pages` em BBCode e `variants: Array[DocumentVariant]`; a primeira variante cuja `Condition` é satisfeita vence, sem aviso ao jogador. Condições (`ValueCondition`, `CompositeCondition`, base `Condition` com `negate`) leem `GameState` e devem ser reutilizadas por diálogo, narrador e gatilhos — não crie outro sistema de condição. Na primeira leitura o leitor marca a flag `leu_<id>` e soma `exposure_on_read` a `exposicao`. Fontes por estilo (com [i]/[b]) saem de `DocumentData.apply_fonts()`. O leitor pagina sozinho: página que não cabe no papel é dividida por parágrafo (linha em branco) — por isso uma tag BBCode não pode atravessar parágrafos. `DocumentPickup` com `remove_visual = false` guarda no dossiê mas deixa o objeto no lugar (recortes no quadro); com `true`, o objeto não reaparece se o documento já estiver no dossiê.
+
+**Respostas a Akeley** — `ReplyData` (`.tres` em `narrative/replies/`, id `resposta_dia_<N>`) com 3 `ReplyOption` (tom −1/0/+1, frase de abertura, `DocumentData` da carta inteira). O `WriteReply` (Interactable, com `condition` — normalmente ter lido a carta do dia) emite `Events.reply_requested`; o `ReplyWriter` (UI) mostra as aberturas, escreve a escolhida com som de pena e, ao selar, `ReplyData.apply()`: `crenca += tom`, `GameState[id] = tom` (cartas seguintes variam com `ValueCondition` sobre esse id), flag `escreveu_<id>` e a carta no dossiê.
+
+**Narrador** — `NarrationLine` (`.tres` em `narrative/narration/`) tem texto + variantes, no mesmo padrão dos documentos. `await Narrator.say(linha, estilo)` mostra uma linha por vez (fila), como `LEGENDA` (no alto, pausa com modal aberto) ou `CARTAO` (centralizado, para tela preta; o `NarrationView` fica numa CanvasLayer acima do fade). Discrepâncias (GDD §6.5): se `exposicao ≥ discrepancy_exposure` e ainda houver orçamento (`MAX_DISCREPANCIES` = 6, contado em `discrepancias`), o Narrator marca `discrepancia_<id>` e a cena reage — normalmente com um `ConditionalNode`, que mostra/esconde (e tira da física) o nó pai conforme uma `Condition`. `NarrationTrigger` (Area3D) fala uma linha quando o player entra. `Narrator.cancel()` apaga a linha na tela e descarta a fila; o SceneDirector chama na hora da troca de fase e no `clear_level()`. Sequências com `await` numa fase checam `is_inside_tree()` depois de cada espera.
+
+**Escritório** (`levels/escritorio/`) — uma planta (5 × 6 m, janela ao norte sobre a escrivaninha, lareira a leste, estante e quadro a oeste, porta e relógio ao sul) com dois vestidos: `Gabinete1930` (Prólogo/Molduras: o gabinete de casa em 1930, noite e chuva) e `Miskatonic` (os Dias). `Escritorio._vestir()` liga um e desliga o outro (visível + `process_mode`), troca o `Environment` e o ambiente sonoro. Sem `prologo_concluido`, `_ready()` roda o Prólogo: cartão em tela preta, Wilmarth sentado (`Player.sit()`; tentar andar levanta), e ao fechar o exame da caixa de cartas o `sonho` sobe, as luzes morrem, os vestidos trocam no escuro, cartão "Maio de 1928" e a tarde entra (`dia` = 1, checkpoint). Loop dos dias: conteúdo de cada dia num grupo `Miskatonic/DiaN` com `ConditionalNode` (`dia == N`) — inclusive a luz e a vista da janela do dia; `ambientes_dia[N]` troca o `Environment`; o relógio para a partir do Dia 2; o que persiste entre dias (as fotografias) fica num grupo com condição própria (`dia >= 2`). Fechar um documento pela primeira vez faz o narrador dizer `narrative/narration/ao_ler_<id>.tres`, se existir; `linhas_correio[N]` é dita ao começar o dia; ao sair pela porta, falas pendentes do dia são descartadas (`Narrator.cancel()`) antes do cartão; a **porta** (`%SairPorta`, "Ir para casa") só encerra o dia depois de `escreveu_resposta_dia_<N>` — fade, `dia += 1`, jogador na marca `Porta`, `cartoes_dia[N]` em tela preta, checkpoint. A lamparina da mão fica desligada no escritório (`Lamp.available = false`).
+
+**Fonógrafo e gravações** — `Gravacao` (`.tres` em `narrative/gravacoes/`): trechos com início, tipo de voz (ruído/humana/zumbida) e legenda; o áudio provisório é sintetizado a partir dos mesmos tempos (`gerar_assets` lê os .tres). `Fonografo` (Interactable) exige as peças (`fono_corneta/manivela/agulha`) e o cilindro (`fono_cilindro`), toca com controle total, emite `Events.subtitle_requested` (legendas de som no HUD, embaixo), pulsa a luz e treme os papéis na voz zumbida, e na primeira audição liga o zumbido permanente (`AudioDirector.set_hum`). Da segunda vez toca a gravação longa.
+
+**Texto corrompido** — tag BBCode `[sussurro]…[/sussurro]` (`ui/effects/whisper_text_effect.gd`), com intensidade global estática `WhisperTextEffect.intensity` ligada a `exposicao`. `[ilegivel legivel=0.12]…[/ilegivel]` (`IllegibleTextEffect`) é letra cerrada que não se lê (fixa, não treme) — para o que o livro diz que existia e Wilmarth se recusa a transcrever (a 2ª carta).
+
+## Regras de design que o código deve respeitar
+
+- Variáveis ocultas nunca aparecem na tela (sem barra de sanidade); `exposicao` só se comunica por áudio/imagem.
+- Máximo de 2 jumpscares no jogo inteiro; nenhum game over por captura.
+- Textos do jogo usam as frases do próprio conto: **tradução nossa e fiel** do original inglês (domínio público, em `docs/fonte/the_whisperer_in_darkness_1931.txt`). Cartas que o livro transcreve (ex.: a de Akeley de 5 de maio) entram na íntegra. O que o livro não transcreve (respostas de Wilmarth, recortes de jornal) é composto a partir de frases do conto. **Nunca copiar traduções publicadas** — a do PDF de Antonio Fontoura (2019) tem direitos reservados; serve só de referência de enredo.

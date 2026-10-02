@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"relato_folha_1"
+title = "O relato — primeira folha"
+style = 0
+pages = PackedStringArray("Tenham bem em mente que, no fim, eu não vi nenhum horror visual de fato. Dizer que foi um choque mental a causa do que deduzi — a gota d'água que me fez sair em disparada da solitária casa de fazenda de Akeley e atravessar à noite as colinas abauladas e selvagens de Vermont, num automóvel tomado à força — é ignorar os fatos mais evidentes da minha experiência final.", "Pois, afinal, o desaparecimento de Akeley não prova nada. As pessoas não encontraram nada de errado na casa dele, apesar das marcas de bala do lado de fora e do lado de dentro. Era como se ele tivesse simplesmente saído para um passeio pelas colinas e não tivesse voltado.
+
+Tudo começou, no que me diz respeito, com as históricas e inéditas enchentes de Vermont, de 3 de novembro de 1927.")
+exposure_on_read = 0.0

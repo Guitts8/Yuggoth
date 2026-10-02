@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_opositor"
+title = "Carta de um leitor do Arkham Advertiser"
+style = 1
+pages = PackedStringArray("[right]Arkham, 19 de maio de 1928[/right]
+
+Prezado Professor,
+
+O senhor insiste que os mitos de Vermont seguem um padrão comum a quase toda a humanidade. Pois bem: se são tão universais, não seria isso sinal de alguma historicidade real? De alguma estranha raça mais antiga da terra, obrigada a esconder-se depois da chegada do homem, que poderia muito bem ter sobrevivido, em número reduzido, até tempos relativamente recentes — ou até hoje?", "Leia o Sr. Charles Fort. Os viajantes de outros mundos e do espaço exterior visitaram a terra mais vezes do que a ciência oficial admite.
+
+Aguardo a sua resposta no [i]Advertiser[/i].
+
+[right]Um leitor[/right]")
+exposure_on_read = 0.0

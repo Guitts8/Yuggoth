@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"recorte_reformer_pendrifter"
+title = "Recorte — Brattleboro Reformer, 23 de abril de 1928"
+style = 2
+pages = PackedStringArray("[center][b]O FOLCLORE DAS COLINAS[/b]
+[font_size=20]Resumo histórico e mitológico do Sr. Albert N. Wilmarth, reproduzido na íntegra, com os comentários do “Pendrifter”[/font_size][/center]
+
+O folclore antigo insinua uma raça escondida de seres monstruosos que espreitam em algum lugar entre as colinas mais remotas — nas matas fundas dos picos mais altos e nos vales escuros onde os riachos escorrem de nascentes desconhecidas. Raramente vistos, deixariam pegadas ou marcas de garras na lama das margens, e curiosos círculos de pedras, com a grama gasta em volta.", "Os mitos dos Pennacook ensinavam que os Alados vinham da Grande Ursa, no céu, e tinham minas em nossas colinas terrestres, de onde tiravam um tipo de pedra que não conseguiam obter em nenhum outro mundo. Não era bom ouvir o que sussurravam à noite na floresta, com vozes de abelha que tentavam se parecer com as vozes dos homens.
+
+[i]O Pendrifter[/i]: Eis o melhor tratamento que o assunto recebeu até agora. Acompanhamos o professor em suas conclusões céticas e o aplaudimos: são histórias de avós, e assim devem ser lidas.")
+exposure_on_read = 0.0

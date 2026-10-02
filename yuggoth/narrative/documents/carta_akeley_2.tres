@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_2"
+title = "Segunda carta de H. W. Akeley — 22 de maio"
+style = 0
+pages = PackedStringArray("[right]Townshend, Vt.
+22 de maio de 1928[/right]
+
+Prezado Sr. Wilmarth,
+
+Como prometi, seguem as fotografias.
+
+[color=#5b4a6e][i]Das fotografias passei à própria carta, volumosa, de letra cerrada; e pelas três horas seguintes fiquei imerso num abismo de horror indizível. Onde antes Akeley dera apenas contornos, agora entrava em detalhes minuciosos.[/i][/color]", "[color=#5b4a6e][i]Longas transcrições de palavras ouvidas na mata, à noite:[/i][/color]
+
+[ilegivel legivel=0.12]Na noite de 1º de maio, perto da boca fechada da caverna, ouvi de novo. Uma voz de homem, culta: é o Senhor dos Bosques, até mesmo aos presentes dos homens de Leng; assim, dos poços da noite aos abismos do espaço, e dos abismos do espaço aos poços da noite, sempre os louvores do Grande Cthulhu, de Tsathoggua e d'Aquele que não deve ser Nomeado. E a outra voz respondia, zumbindo, imitando a fala dos homens, com boa gramática e sotaque de erudito.[/ilegivel]
+
+[ilegivel legivel=0.12]Na noite de 1º de maio, perto da boca fechada da caverna, ouvi de novo. Uma voz de homem, culta: é o Senhor dos Bosques, até mesmo aos presentes dos homens de Leng; assim, dos poços da noite aos abismos do espaço, e dos abismos do espaço aos poços da noite, sempre os louvores do Grande Cthulhu, de Tsathoggua e d'Aquele que não deve ser Nomeado. E a outra voz respondia, zumbindo, imitando a fala dos homens, com boa gramática e sotaque de erudito.[/ilegivel]", "[color=#5b4a6e][i]Longos relatos de monstruosas formas rosadas, entrevistas nos matagais ao crepúsculo, nas colinas:[/i][/color]
+
+[ilegivel legivel=0.12]Eram como enormes caranguejos de um vermelho-claro, com muitos pares de pernas e duas grandes asas de morcego no meio das costas. Às vezes andavam com todas as pernas, às vezes só com o último par, usando as outras para levar objetos grandes de natureza indeterminada. Uma vez os vi em bom número, um destacamento atravessando um riacho raso da mata, três lado a lado, numa formação evidentemente disciplinada.[/ilegivel]
+
+[ilegivel legivel=0.12]Eram como enormes caranguejos de um vermelho-claro, com muitos pares de pernas e duas grandes asas de morcego no meio das costas. Às vezes andavam com todas as pernas, às vezes só com o último par, usando as outras para levar objetos grandes de natureza indeterminada. Uma vez os vi em bom número, um destacamento atravessando um riacho raso da mata, três lado a lado, numa formação evidentemente disciplinada.[/ilegivel]", "[color=#5b4a6e][i]E uma terrível narrativa cósmica, tirada da aplicação de uma erudição profunda e variada aos intermináveis discursos do espião louco que se matara:[/i][/color]
+
+[ilegivel legivel=0.12]Yuggoth é um orbe estranho e escuro na própria beira do nosso sistema solar, ainda desconhecido dos astrônomos da terra. Há lá cidades poderosas, grandes fileiras de torres em terraços, feitas de pedra negra como a que encontrei em Round Hill. O sol brilha ali não mais que uma estrela, mas os seres não precisam de luz. Rios negros de piche correm sob misteriosas pontes ciclópicas, construídas por alguma raça mais antiga, extinta e esquecida antes de os seres chegarem a Yuggoth dos vazios supremos.[/ilegivel]
+
+[ilegivel legivel=0.12]Yuggoth é um orbe estranho e escuro na própria beira do nosso sistema solar, ainda desconhecido dos astrônomos da terra. Há lá cidades poderosas, grandes fileiras de torres em terraços, feitas de pedra negra como a que encontrei em Round Hill. O sol brilha ali não mais que uma estrela, mas os seres não precisam de luz. Rios negros de piche correm sob misteriosas pontes ciclópicas, construídas por alguma raça mais antiga, extinta e esquecida antes de os seres chegarem a Yuggoth dos vazios supremos.[/ilegivel]", "[sussurro forca=0.35]Yuggoth, o Grande Cthulhu, Tsathoggua, Yog-Sothoth, R'lyeh, Nyarlathotep, Azathoth, Hastur, Yian, Leng, o Lago de Hali, Bethmoora, o Signo Amarelo, L'mur-Kathulos, Bran e o Magnum Innominandum[/sussurro]
+
+[color=#5b4a6e][i]Vi-me diante de nomes e termos que eu já ouvira em outros lugares, nas ligações mais medonhas, e fui arrastado de volta por éons sem nome e dimensões inconcebíveis, a mundos de entidade antiga e exterior que o autor enlouquecido do [i]Necronomicon[/i] só adivinhara do modo mais vago.[/i][/color]", "[ilegivel legivel=0.12]Yuggoth é um orbe estranho e escuro na própria beira do nosso sistema solar, ainda desconhecido dos astrônomos da terra. Há lá cidades poderosas, grandes fileiras de torres em terraços, feitas de pedra negra como a que encontrei em Round Hill. O sol brilha ali não mais que uma estrela, mas os seres não precisam de luz. Rios negros de piche correm sob misteriosas pontes ciclópicas, construídas por alguma raça mais antiga, extinta e esquecida antes de os seres chegarem a Yuggoth dos vazios supremos.[/ilegivel]
+
+[color=#5b4a6e][i]Falou-me dos poços da vida primordial e dos rios que deles escorreram; e, por fim, do regato minúsculo de um desses rios que se emaranhara nos destinos da nossa própria terra.[/i][/color]", "[color=#5b4a6e][i]Quando pus de lado a carta medonha, eu entendia os medos que ele passara a ter, e estava pronto a fazer tudo ao meu alcance para manter as pessoas longe daquelas colinas selvagens e assombradas.[/i][/color]
+
+[color=#5b4a6e][i]Há coisas nessa carta de Akeley que eu não citaria — nem formaria em palavras no papel.[/i][/color]
+
+[right]H. W. A.[/right]")
+exposure_on_read = 0.2

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Gravacao" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://narrative/gravacao.gd" id="1_grav"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/disco_longo.wav" id="2_audio"]
+
+[resource]
+script = ExtResource("1_grav")
+audio = ExtResource("2_audio")
+inicios = PackedFloat32Array(0.0, 4.0, 9.5, 17.0, 23.0, 29.0, 36.0, 44.0, 51.0, 57.0, 63.5)
+tipos = PackedInt32Array(0, 1, 1, 1, 2, 1, 1, 2, 2, 1, 2)
+legendas = PackedStringArray("(SONS INDISTINGUÍVEIS)", "(VOZ HUMANA, CULTA)
+...é o Senhor dos Bosques, até mesmo aos... e os presentes dos homens de Leng...", "...assim, dos poços da noite aos abismos do espaço, e dos abismos do espaço aos poços da noite, sempre os louvores do Grande Cthulhu, de Tsathoggua e d'Aquele que não deve ser Nomeado.", "Sempre os Seus louvores, e abundância ao Bode Negro dos Bosques. Iä! Shub-Niggurath! O Bode com Mil Crias!", "(UMA IMITAÇÃO ZUMBIDA DA FALA HUMANA)
+Iä! Shub-Niggurath! O Bode Negro dos Bosques com Mil Crias!", "(VOZ HUMANA)
+E aconteceu que o Senhor dos Bosques, sendo... sete e nove, descendo os degraus de ônix... (tri)butos a Ele no Abismo, Azathoth,", "Aquele de Quem Tu nos ensinaste maravi(lhas)... nas asas da noite, para além do espaço... Àquilo de que Yuggoth é o filho mais novo, rolando sozinho no éter negro, na borda...", "(VOZ ZUMBIDA)
+...sair entre os homens e achar os caminhos deles, para que Ele no Abismo saiba. A Nyarlathotep, Poderoso Mensageiro, todas as coisas devem ser contadas.", "E Ele vestirá a semelhança dos homens, a máscara de cera e o manto que esconde, e descerá do mundo dos Sete Sóis para zombar...", "(VOZ HUMANA)
+...(Nyarl)athotep, Grande Mensageiro, portador de estranha alegria a Yuggoth através do vazio, Pai do Milhão de Favorecidos, Espreitador entre...", "(VOZ ZUMBIDA)
+...Wil... marth...")
+duracao = 68.0

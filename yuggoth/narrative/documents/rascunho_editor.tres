@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"rascunho_editor"
+title = "Rascunho — carta ao Arkham Advertiser"
+style = 0
+pages = PackedStringArray("Ao Editor do [i]Arkham Advertiser[/i],
+
+Os meus opositores [s]insistem[/s] voltam ao ataque. Quando lhes mostro que os mitos de Vermont seguem um padrão bem conhecido, comum à maior parte da humanidade, eles viram o argumento contra mim: dizem que, se a crença é tão universal, deve haver alguma verdade histórica por trás dela — alguma raça [s]anterior[/s] mais antiga da terra, obrigada a se esconder depois da chegada do homem, e que teria sobrevivido em número reduzido até tempos recentes. Ou até hoje.
+
+Quanto mais rio dessas teorias, mais eles as afirmam. Dois ou três [s]lunáticos[/s] fanáticos chegam a citar os livros extravagantes de Charles Fort; os demais são apenas românticos, que querem transportar para a vida real o folclore do “povo pequeno” que [s]Machen[/s] a magnífica ficção de horror de Arthur Machen popularizou.
+
+Não há")
+exposure_on_read = 0.0

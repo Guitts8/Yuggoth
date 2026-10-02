@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"teste_quarto_vazio"
+text = "O quarto estava vazio. Eu me lembro disso com clareza."
+discrepancy_exposure = 0.5

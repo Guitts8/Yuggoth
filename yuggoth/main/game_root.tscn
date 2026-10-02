@@ -1,0 +1,70 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://main/game_root.gd" id="1_root"]
+[ext_resource type="Shader" path="res://shaders/psx_post.gdshader" id="2_post"]
+[ext_resource type="PackedScene" path="res://levels/escritorio/escritorio.tscn" id="3_test"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://ui/document_reader.tscn" id="5_reader"]
+[ext_resource type="PackedScene" path="res://ui/dossier.tscn" id="6_dossier"]
+[ext_resource type="PackedScene" path="res://ui/examine_viewer.tscn" id="7_examine"]
+[ext_resource type="PackedScene" path="res://ui/narration_view.tscn" id="8_narration"]
+[ext_resource type="PackedScene" path="res://ui/menu/main_menu.tscn" id="9_main_menu"]
+[ext_resource type="PackedScene" path="res://ui/menu/pause_menu.tscn" id="10_pause_menu"]
+[ext_resource type="PackedScene" path="res://ui/menu/options_menu.tscn" id="11_options_menu"]
+[ext_resource type="PackedScene" path="res://ui/reply_writer.tscn" id="12_reply"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
+shader = ExtResource("2_post")
+shader_parameter/color_levels = 32.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/vignette = 0.35
+shader_parameter/exposure = 0.0
+
+[node name="GameRoot" type="Node"]
+script = ExtResource("1_root")
+start_level = ExtResource("3_test")
+
+[node name="WorldContainer" type="SubViewportContainer" parent="."]
+texture_filter = 1
+material = SubResource("ShaderMaterial_post")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+stretch_shrink = 4
+
+[node name="World" type="SubViewport" parent="WorldContainer"]
+handle_input_locally = false
+audio_listener_enable_3d = true
+size = Vector2i(480, 270)
+render_target_update_mode = 4
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UI" instance=ExtResource("4_hud")]
+
+[node name="Dossier" parent="UI" instance=ExtResource("6_dossier")]
+
+[node name="DocumentReader" parent="UI" instance=ExtResource("5_reader")]
+
+[node name="ExamineViewer" parent="UI" instance=ExtResource("7_examine")]
+
+[node name="ReplyWriter" parent="UI" instance=ExtResource("12_reply")]
+
+[node name="Narration" type="CanvasLayer" parent="."]
+layer = 110
+
+[node name="NarrationView" parent="Narration" instance=ExtResource("8_narration")]
+
+[node name="Menus" type="CanvasLayer" parent="."]
+layer = 50
+
+[node name="MainMenu" parent="Menus" node_paths=PackedStringArray("options_menu") instance=ExtResource("9_main_menu")]
+options_menu = NodePath("../OptionsMenu")
+
+[node name="PauseMenu" parent="Menus" node_paths=PackedStringArray("options_menu") instance=ExtResource("10_pause_menu")]
+options_menu = NodePath("../OptionsMenu")
+
+[node name="OptionsMenu" parent="Menus" instance=ExtResource("11_options_menu")]

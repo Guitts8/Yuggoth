@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"prologo_maio"
+text = "Maio de 1928."

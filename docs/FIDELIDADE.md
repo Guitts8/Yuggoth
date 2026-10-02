@@ -1,0 +1,120 @@
+# Fidelidade ao livro
+
+Regra (decidida em 2026-10-02): **as situações do livro acontecem no jogo**, jogadas
+ou vistas — não resumidas. O que o GDD inventa (Interlúdio, finais alternativos,
+mecânicas) continua valendo onde **não contradiz** o livro; onde contradiz, o livro vence.
+
+Fonte: `docs/fonte/the_whisperer_in_darkness_1931.txt` (original inglês, domínio
+público). Textos do jogo são tradução nossa e fiel desse texto.
+
+Legenda: ✅ já no GDD/jogo · ➕ falta, entra · ⚠️ GDD diverge do livro · 💭 invenção do GDD, mantida (não contradiz)
+
+---
+
+## Cap. I — As enchentes e o debate
+| Situação no livro | No jogo |
+|---|---|
+| Enchentes de 3/11/1927; coisas rosadas boiando no Winooski, no West e no Passumpsic | ✅ recorte no quadro (Dia 1) |
+| O folclore: Davenport, os Pennacook, os "Alados" da Grande Ursa, Mi-Go do Himalaia | ✅ recortes (Dia 1) |
+| Wilmarth debate com amigos e nos jornais (Arkham Advertiser → Rutland Herald, Brattleboro Reformer, coluna do Pendrifter) | ✅ recortes + rascunho na mesa (Dia 1) |
+
+## Cap. II — A primeira carta e as fotografias
+| Situação no livro | No jogo |
+|---|---|
+| Carta de Akeley de 5 de maio, na íntegra | ✅ Dia 1 |
+| Wilmarth responde "com interesse amigável, pedindo detalhes" | ✅ resposta (tom cauteloso = o do livro) |
+| Segunda carta, quase por volta do correio, com **fotografias**: a pegada-garra; a boca de caverna fechada por pedra (com **lupa**, rastros iguais à pegada); o círculo de pedras (nada, nem com a lupa); a **pedra negra** sobre a mesa de Akeley (livros, **busto de Milton**); três cenas de pântano e colina; a marca perto da casa depois de uma noite de latidos; **a casa de Akeley**, com os cães e Akeley segurando a pera do disparador | ✅ Dia 2: as nove fotos, examináveis; lupa na caverna, no círculo, na pedra; "a pior de todas era a pegada" |
+| A carta "enciclopédica": três horas de leitura, nomes (Yuggoth, Cthulhu, Tsathoggua…); Wilmarth **se recusa a transcrever** partes | ✅ Dia 2: 11 páginas de letra cerrada ilegível, com as notas de Wilmarth |
+| "Com a leitura daquela carta, meu debate público acabou para sempre" | ✅ Dia 2: "Deixar sem resposta" as cartas dos opositores |
+| Correspondência constante em maio e junho; cartas que se perdem | ➕ cartão/narração entre dias |
+
+## Cap. III — O disco e a pedra perdida
+| Situação no livro | No jogo |
+|---|---|
+| O disco chega no fim de junho, despachado de Brattleboro, com bilhete (medo das estradas; suspeita de **Walter Brown**) | ✅ Dia 3: pacote do expresso + bilhete |
+| Wilmarth **pega emprestada a máquina** do prédio da administração da universidade | ✅ Dia 3: caixote da administração; montar corneta, manivela e agulha |
+| Antes de tocar, relê a **transcrição** de Akeley (1º de maio de 1915, 1h, caverna da encosta oeste da Montanha Escura, Pântano de Lee) | ✅ Dia 3 |
+| Toca o disco: voz humana bostoniana, depois a voz zumbida; ouve "muitas outras vezes" | ✅ Dia 3: tocar e parar à vontade; legendas; luz pulsa; zumbido permanente depois |
+| Negociação para mandar a pedra; homem suspeito na agência de expresso de Brattleboro; cartas de Wilmarth extraviadas; correio passa a ser posta-restante em Brattleboro; foto do "exército" de pegadas diante das pegadas dos cães | ➕ Dia 3/4: carta + fotografia |
+| **18 de julho: telegrama** — a pedra vai no trem 5508. Wilmarth **espera a manhã inteira**; **telefona** à agência de expresso; **interurbano** para a North Station, em Boston; manda telegrama noturno a Akeley | ➕ **novo dia jogável**: a pedra não chega (telefone na mesa) |
+| O relato de Boston: o funcionário de Keene, o homem magro e ruivo "**Stanley Adams**", de voz grossa e zumbida que dava tontura e sono | ➕ ligação/relatório nesse dia |
+| Wilmarth vai a Boston interrogar o funcionário; passa a noite escrevendo cartas (Akeley, expresso, polícia de Keene); nada se descobre | ➕ cartão + documentos |
+
+## Cap. IV — O cerco (em cartas)
+| Situação no livro | No jogo |
+|---|---|
+| Agosto: tronco atravessado na estrada (2/8), tiro de raspão no carro (5–6/8) | ➕ carta |
+| 15/8: carta frenética — tiros na noite de 12–13, **3 dos 12 cães** mortos, pegadas de Brown entre as garras, cabo telefônico cortado | ✅ Dia 4 do GDD ("cartas desesperadas, cães mortos") — ⚠️ GDD diz 4 cães; livro: 12 |
+| Wilmarth responde oferecendo ir a Vermont e chamar as autoridades | ➕ resposta desse dia |
+| **Telegrama de Bellows Falls**: "COMPREENDO SUA POSIÇÃO MAS NADA POSSO FAZER…" assinado **AKELY** (sem o segundo E) | ✅ "telegrama estranho" (GDD) — ➕ a assinatura errada é o detalhe a comparar |
+| Bilhete de Akeley: ele **nunca mandou** o telegrama; quem mandou foi um homem ruivo de voz zumbida | ➕ |
+| 28/8: quer "uma saída digna"; lua cheia segura as criaturas | ➕ carta |
+| **5/9 (segunda)**: algo pousa no telhado, briga dos cães, zumbido, cheiro, tiros pela janela, poças de sangue e **gosma verde**, 5 cães mortos (um por ele mesmo) | ➕ carta — e é a noite do Interlúdio (abaixo) |
+| **6/9 (terça)**: "Falaram comigo"; "Fique fora disso, Wilmarth"; Yuggoth e além; quebre o disco | ➕ carta |
+| **7/9 (quarta)**: carta datilografada *deles*; tocou numa das coisas mortas — **evaporou no galpão de lenha**; fotografou e **o filme não mostra nada**; Walter Brown sumiu; o filho George (176 Pleasant St., San Diego); gás venenoso e máscaras; o xerife | ➕ carta — a última manuscrita (entrada do Interlúdio) |
+
+## Cap. V — A carta datilografada
+| Situação no livro | No jogo |
+|---|---|
+| 8/9 (sábado): a carta calma, datilografada numa Corona nova, convidando; pede o disco, todas as cartas e as fotos | ✅ Dia 5 |
+| Wilmarth nota a mudança de estilo, de vocabulário, de grafia | ✅ comparar com as cartas antigas |
+| Noite em claro; domingo telegrafa; troca o trem para chegar à luz do dia; resposta: "COMBINAÇÃO SATISFATÓRIA… NÃO ESQUEÇA DISCO CARTAS FOTOS" | ➕ |
+| Leva **tudo** na valise; não conta a ninguém | ⚠️ GDD §6.4 (esconder itens) contradiz "levou tudo" — decidir |
+
+## Cap. VI — A viagem
+| Situação no livro | No jogo |
+|---|---|
+| Trem: Boston → Waltham, Concord, Ayer, Fitchburg, Gardner, Athol → Greenfield (conexão segurada) | ✅ Cena A (vagão) — ➕ estações nas placas/anúncios |
+| O rio Connecticut; o condutor manda **atrasar o relógio uma hora** ("como voltar o calendário um século"); o monte Wantastiquet | ➕ |
+| Estação de Brattleboro; **Noyes** em vez de Akeley ("crise de asma"); voz cultivada, vagamente familiar; carro novo com placa de Massachusetts | ✅ Cena B |
+| Estrada: o **West River** ("foi aqui que viram uma das coisas"), pontes cobertas, Newfane como último elo; Noyes sonda o que Wilmarth sabe | ✅ Cena C |
+| Chegada: casa branca, caixa de correio com o nome de Akeley; Noyes entra para avisar | ✅ |
+| Na poeira da estrada, junto ao caminho da casa: **pegadas-garra frescas** | ➕ (o GDD as põe na margem do rio) |
+| Nenhum cão; **silêncio total** — nem galinhas, nem porcos; o Ford velho de Akeley no galpão; cheiro estranho no vestíbulo | ✅ parcialmente — ⚠️ ver "cães" |
+
+## Cap. VII — Akeley no escuro
+| Situação no livro | No jogo |
+|---|---|
+| Escritório escuro, cheiro, vibração; Akeley na poltrona, roupão, **lenço amarelo** na cabeça; sussurro; rosto rígido, mãos sem vida | ✅ Cena A |
+| Pede que ponha cartas, fotos e disco na mesa; fonógrafo no canto | ✅ (o GDD faz disso uma escolha — ver §6.4) |
+| Fala de Einstein, Yuggoth, torres de pedra negra, rios de piche | ✅ |
+| Lanche: sanduíches, bolo, queijo, garrafa térmica; **o café amargo** — uma colherada, joga fora ao lavar a louça | ✅ Cena C (escolha) |
+| Acende uma pequena lamparina, chama baixa, sobre a estante **ao lado do busto de Milton** | ✅ lamparina |
+| Os cilindros na prateleira; os aparelhos (lentes; válvulas e caixa de som; disco de metal); o cilindro **B-67**; subir na cadeira Windsor; "não mexa no **cilindro novo e brilhante, com o meu nome**" | ✅ puzzle — ⚠️ GDD diz cilindro **sem etiqueta**; livro: **com o nome de Akeley** |
+| A voz mecânica: Round Hill, o Himalaia, 37 corpos celestes; **"Noyes… o senhor reconheceu a voz dele no disco"** | ➕ a revelação vem da voz do cilindro (o GDD só sugere) |
+| Desliga os interruptores (o das lentes por último); sobe com a lamparina; revólver na mão direita, lanterna na esquerda | ➕ |
+
+## Cap. VIII — A noite
+| Situação no livro | No jogo |
+|---|---|
+| Tábuas rangendo no corredor, **alguém mexe no trinco** da porta do quarto | ➕ |
+| A conferência lá embaixo: duas vozes zumbidas, a voz mecânica, um homem rústico, Noyes; passos de casco; fragmentos (texto do livro) | ✅ Cena D (vozes) |
+| Bater de asas; um carro parte; silêncio; o relógio; alguém ronca | ➕ |
+| Desce para acordar Akeley e fugir no Ford: quem ronca no sofá da sala **é Noyes** | ➕ |
+| Na mesa, o cilindro com o nome de Akeley, com visão e audição ligadas — **Wilmarth não liga a fala, e se arrepende** | ✅ isto é o "e se" do jogo: ligar é o caminho do Final Testemunha |
+| A poltrona vazia: roupão, lenço, ataduras; o cheiro sumiu; a luz volta ao assento: **o rosto e as mãos** | ✅ Cena E |
+| Grito; foge no Ford até Townshend | ✅ Cena F |
+| Depois: o xerife não acha nada; uma semana em Brattleboro; Brown desaparecido; **Plutão** descoberto | ✅ epílogo — ⚠️ ver ano da moldura |
+
+---
+
+## Divergências a resolver
+1. **Ano da moldura.** O relato é escrito "mais de dois anos" depois, já com Plutão descoberto (1930). O GDD põe a moldura em 1928.
+2. **O cilindro de Akeley.** Livro: "com o meu nome". GDD: "sem etiqueta" (pista "procure o que não tiver nome").
+3. **Os cães.** Livro: doze cães policiais, mortos aos poucos. GDD: quatro com nome.
+4. **A pasta (§6.4).** Livro: leva tudo. GDD: pode esconder itens no escritório.
+5. **O fonógrafo.** Livro: emprestado da administração. GDD: no escritório, desmontado.
+
+## Consequência no Ato I
+O livro tem mais "momentos de escritório" do que os 5 dias do GDD:
+1. 5 de maio — a primeira carta ✅
+2. fim de maio — fotografias e a carta enciclopédica; fim do debate
+3. fim de junho — o disco
+4. 18–19 de julho — a pedra não chega (telefone, Keene, Stanley Adams)
+5. agosto — a carta frenética, o telegrama "AKELY", o bilhete desmentindo
+6. 5–7 de setembro — as três últimas cartas manuscritas → Interlúdio
+7. 8–10 de setembro — a carta datilografada, os telegramas, a valise
+
+O **Interlúdio** (jogado como Akeley) passa a ser as noites dessas cartas: a briga no
+telhado, o cão que ele mesmo acerta, a coisa morta que evapora no galpão, a foto
+que sai vazia, as máscaras de gás.

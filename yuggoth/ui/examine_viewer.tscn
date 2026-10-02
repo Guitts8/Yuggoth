@@ -1,0 +1,115 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://ui/examine_viewer.gd" id="1_viewer"]
+[ext_resource type="Shader" path="res://shaders/psx_post.gdshader" id="2_post"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
+shader = ExtResource("2_post")
+shader_parameter/color_levels = 32.0
+shader_parameter/dither_strength = 1.0
+shader_parameter/vignette = 0.9
+shader_parameter/exposure = 0.0
+
+[sub_resource type="Environment" id="Environment_examine"]
+background_mode = 1
+background_color = Color(0.025, 0.022, 0.02, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.3, 0.28, 0.25, 1)
+
+[node name="ExamineViewer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_viewer")
+
+[node name="View" type="SubViewportContainer" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+material = SubResource("ShaderMaterial_post")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+stretch_shrink = 4
+
+[node name="SubViewport" type="SubViewport" parent="View"]
+own_world_3d = true
+handle_input_locally = false
+size = Vector2i(480, 270)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="View/SubViewport"]
+environment = SubResource("Environment_examine")
+
+[node name="Key" type="DirectionalLight3D" parent="View/SubViewport"]
+transform = Transform3D(0.866, -0.25, 0.433, 0, 0.866, 0.5, -0.5, -0.433, 0.75, 0, 0, 0)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 1.2
+
+[node name="Pivot" type="Node3D" parent="View/SubViewport"]
+unique_name_in_owner = true
+
+[node name="Camera" type="Camera3D" parent="View/SubViewport"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+fov = 40.0
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 48.0
+offset_bottom = 88.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.85, 0.8, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Caption" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 320.0
+offset_top = -190.0
+offset_right = -320.0
+offset_bottom = -90.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.85, 0.8, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Hints" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -64.0
+offset_right = -48.0
+offset_bottom = -32.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.55, 0.5, 0.42, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 18
+text = "[arrastar] girar    [roda] aproximar    [E] devolver"
+horizontal_alignment = 2

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_1_cetica"
+title = "Minha resposta a Akeley — 9 de maio"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+9 de maio de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Agradeço a carta e a confiança, e guardarei a discrição que me pede. Mas o senhor me lembra que [i]ex nihilo nihil fit[/i]; permita-me lembrar, por minha vez, que de muito pouco se faz muito quando o medo ajuda. Pegadas na lama, uma pedra gasta e vozes ouvidas à noite numa mata deserta admitem explicações bem mais simples do que a que o senhor sugere — e o homem que lhe contou essas coisas, pelo que o senhor mesmo diz, acabou por se matar.
+
+Ainda assim, ouvirei a gravação, se ma mandar.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0
