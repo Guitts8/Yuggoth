@@ -8,6 +8,8 @@ extends Resource
 @export var id: StringName
 @export var destinatario := "Ao Sr. Henry W. Akeley"
 @export var options: Array[ReplyOption] = []
+## Dita depois de selar, no lugar da fala padrão do escritório.
+@export var narracao_depois: NarrationLine
 
 
 func get_done_flag() -> StringName:

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Ligacao" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://narrative/ligacao.gd" id="1_lig"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="2_cond"]
+[ext_resource type="Resource" path="res://narrative/narration/depois_boston.tres" id="3_narr"]
+
+[sub_resource type="Resource" id="Resource_cond"]
+script = ExtResource("2_cond")
+key = &"ligou_agencia_arkham"
+op = 3
+value = 1.0
+
+[resource]
+script = ExtResource("1_lig")
+id = &"boston"
+prompt = "Pedir um interurbano para Boston"
+condition = SubResource("Resource_cond")
+recebida = false
+falas = PackedStringArray("Telefonista: Número, por favor.", "Wilmarth: Um interurbano para Boston — a agência do expresso na North Station.", "Boston: North Station, expresso.", "Boston: O 5508? Chegou ontem com só trinta e cinco minutos de atraso, professor. Mas não havia nele nenhuma caixa endereçada ao senhor.", "Boston: Vamos abrir uma investigação minuciosa. Telefono assim que souber de alguma coisa.")
+narracao_depois = ExtResource("3_narr")

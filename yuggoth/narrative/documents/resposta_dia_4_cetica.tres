@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_4_cetica"
+title = "Minha carta a Akeley — 21 de julho"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+21 de julho de 1928[/right]
+
+Prezado Sr. Akeley,
+
+A pedra não chegou. Já escrevi à companhia do expresso, à polícia e ao agente da estação de Keene. Caixas pesadas se extraviam todos os dias, e um vigarista que leu o seu nome numa etiqueta pode muito bem ter tentado a sorte em Keene. Quanto à voz do homem e à sonolência do funcionário, um dia de calor e um trem parado explicam muita coisa.
+
+Não perca a esperança: a companhia há de achar a caixa.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

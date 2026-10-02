@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"telegrama_pedra"
+title = "Telegrama de Bellows Falls — 18 de julho"
+style = 3
+pages = PackedStringArray("WESTERN UNION
+BELLOWS FALLS VT 18 JUL 1928
+
+PROF A N WILMARTH
+118 SALTONSTALL ST ARKHAM MASS
+
+DESPACHO PEDRA NEGRA PELO B E M TREM NUMERO 5508 SAI BELLOWS FALLS 12H15 HORA PADRAO CHEGA NORTH STATION BOSTON 16H12
+
+AKELEY")
+exposure_on_read = 0.0

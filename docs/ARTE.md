@@ -68,6 +68,7 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 | **Janela de guilhotina** | Caixilho de madeira com vidraças; a vista é um plano atrás. |
 | **Relógio de parede** | Ponteiros e pêndulo como peças separadas (o relógio **para** no Dia 2). |
 | **Porta** | Com almofadas, batente e maçaneta; não precisa abrir. |
+| **Telefone de parede** | Caixa de madeira com duas campainhas de latão, bocal, fone no gancho e manivela (Dia 4). Fone e manivela como peças separadas. |
 
 ### C — a caixa provisória aguenta
 

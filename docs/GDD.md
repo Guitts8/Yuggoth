@@ -152,7 +152,7 @@ Beats:
 - 💭 Se o jogador parar e tocar de novo, a gravação **dura mais** — um trecho novo no fim: a voz zumbida diz "Wilmarth". (O livro: ele tocou "muitas outras vezes".)
 - A voz humana do disco é a **mesma voz de Noyes** — no livro, quem revela isso é a voz do cilindro, no Ato III.
 
-**Escolha de resposta (Dias 1, 2, 3, 5 e 6):** Wilmarth escreve a Akeley escolhendo o tom. O tom do livro é sempre uma das opções.
+**Escolha de resposta (Dias 1 a 6):** (no Dia 4, as cartas da noite em claro, depois do relato de Keene) Wilmarth escreve a Akeley escolhendo o tom. O tom do livro é sempre uma das opções.
 - *Cético* → `crenca -1` · *Cauteloso* → `crenca 0` · *Crédulo* → `crenca +1`
 
 Isso altera o conteúdo das cartas seguintes (Akeley responde ao que foi dito — sem contradizer os fatos do livro) e, principalmente, **como "Akeley" trata o jogador no Ato III**.

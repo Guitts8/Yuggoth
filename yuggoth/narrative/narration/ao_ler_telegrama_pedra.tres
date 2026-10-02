@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"ao_ler_telegrama_pedra"
+text = "Pelos meus cálculos, a pedra chegaria a Arkham no máximo ao meio-dia seguinte. Fiquei a quinta-feira inteira de manhã à espera dela — mas o meio-dia chegou e passou."

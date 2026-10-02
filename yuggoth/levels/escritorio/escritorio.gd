@@ -187,8 +187,8 @@ func _entrar_pela_porta() -> void:
 		player.global_transform = marker.global_transform
 
 
-func _on_reply_written(_reply: ReplyData, _option: ReplyOption) -> void:
-	Narrator.say(linha_resposta_selada)
+func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
+	Narrator.say(reply.narracao_depois if reply.narracao_depois else linha_resposta_selada)
 
 
 func _on_porta(_by: Node) -> void:

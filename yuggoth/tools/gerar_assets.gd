@@ -57,6 +57,7 @@ func _texturas() -> void:
 	_save(_foto_pantano(53, false), "foto_pantano_2")
 	_save(_foto_marca(), "foto_marca")
 	_save(_foto_casa(), "foto_casa")
+	_save(_foto_exercito(), "foto_exercito")
 
 
 func _save(img: Image, name: String) -> void:
@@ -688,6 +689,28 @@ func _foto_casa() -> Image:
 	return _revelar(img, 55)
 
 
+## Julho (cap. III): "um verdadeiro exército de pegadas, em fila, de frente para
+## uma linha igualmente cerrada e resoluta de pegadas de cães".
+func _foto_exercito() -> Image:
+	var img := _foto(0.5)
+	_ruido(img, 56, 0.08, 0.14)
+	_ruido(img, 57, 0.5, 0.06)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 56
+	for fila in 2:  # duas filas de garras, à esquerda
+		for i in 7:
+			var c := Vector2(30 + fila * 12 + rng.randf_range(-2, 2), 12 + i * 12 + rng.randf_range(-2, 2))
+			_garra(img, c, 0.28, 0.2)
+	for fila in 2:  # duas filas de patas de cão, à direita, de frente
+		for i in 8:
+			var c := Vector2(86 + fila * 11 + rng.randf_range(-2, 2), 10 + i * 11 + rng.randf_range(-2, 2))
+			_elipse(img, c, Vector2(2.6, 3.0), 0.22)
+			for d in 4:
+				var a := -PI * 0.5 + (d - 1.5) * 0.5
+				_elipse(img, c + Vector2(cos(a) * 4.0 - 3.0, sin(a) * 4.0), Vector2(1.1, 1.1), 0.22)
+	return _revelar(img, 56)
+
+
 ## Risco de chuva (para partículas): branco translúcido vertical.
 func _gota() -> Image:
 	var img := _img(4, 16)
@@ -713,6 +736,7 @@ func _sons() -> void:
 	_wav(_disco("res://narrative/gravacoes/disco_1915.tres", 60), "disco", false)
 	_wav(_disco("res://narrative/gravacoes/disco_1915_longo.tres", 60), "disco_longo", false)
 	_wav(_zumbido(), "zumbido", true)
+	_wav(_campainha(), "campainha", true)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -945,6 +969,18 @@ func _zumbido() -> PackedFloat32Array:
 		b[i] = (serra * 0.35 + sin(TAU * 110.0 * t) * 0.25) * asa * (0.8 + 0.2 * sin(t * 0.9))
 	_lowpass(b, 400.0)
 	return _seamless(b, 0.5)
+
+
+## Campainha de telefone de 1928: duas sinetas batidas por um martelo (~20 Hz),
+## dois segundos tocando, três de silêncio (em loop).
+func _campainha() -> PackedFloat32Array:
+	var b := _buf(5.0)
+	for i in int(2.0 * RATE):
+		var t := float(i) / RATE
+		var golpe := 0.5 + 0.5 * signf(sin(TAU * 20.0 * t))
+		var sino := sin(TAU * 1180.0 * t) * 0.5 + sin(TAU * 1460.0 * t) * 0.35 + sin(TAU * 2950.0 * t) * 0.15
+		b[i] = sino * (0.4 + 0.6 * golpe) * 0.6 * minf(1.0, (2.0 - t) * 8.0)
+	return b
 
 
 func _passo(seed: int) -> PackedFloat32Array:

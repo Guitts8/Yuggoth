@@ -37,7 +37,7 @@ func _ready() -> void:
 	cena.set_script(load("res://levels/escritorio/escritorio.gd"))
 	cena.set("env_1930", _env_1930())
 	cena.set("env_dia", _env_dia())
-	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite()]
+	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite(), cena.get("env_dia")]
 	cena.set("ambientes_dia", ambientes)
 	cena.set("som_chuva", load(SFX_DIR + "chuva.wav"))
 	cena.set("som_tarde", load(SFX_DIR + "tarde.wav"))
@@ -48,12 +48,14 @@ func _ready() -> void:
 		load("res://narrative/narration/prologo_maio.tres"),
 		load("res://narrative/narration/cartao_dia_2.tres"),
 		load("res://narrative/narration/cartao_dia_3.tres"),
-		load("res://narrative/narration/cartao_dia_4.tres")]
+		load("res://narrative/narration/cartao_dia_4.tres"),
+		load("res://narrative/narration/cartao_dia_5.tres")]
 	cena.set("cartoes_dia", cartoes)
 	var correio: Array[NarrationLine] = [null,
 		load("res://narrative/narration/dia1_correio.tres"),
 		load("res://narrative/narration/dia2_correio.tres"),
-		load("res://narrative/narration/dia3_correio.tres")]
+		load("res://narrative/narration/dia3_correio.tres"),
+		load("res://narrative/narration/dia4_correio.tres")]
 	cena.set("linhas_correio", correio)
 	cena.set("linha_resposta_selada", load("res://narrative/narration/resposta_selada.tres"))
 
@@ -655,6 +657,64 @@ func _dias(parent: Node) -> void:
 	_dia_2(parent)
 	var dia3 := _dia_3(parent)
 	_fonografo(parent, dia3)
+	_dia_4(parent)
+	_telefone(parent)
+
+
+## Dia 4 (cap. III): a pedra que não chega. O telegrama de quarta-feira, a carta
+## ansiosa de julho com a foto do "exército" de pegadas, e o telefone.
+func _dia_4(parent: Node) -> void:
+	var g := _grupo_do_dia(parent, 4)
+	_luz(g, "vista_dia", Color(1.0, 0.9, 0.7), 7.5, Vector3(-0.3, 0, 0.4), Vector3(0.6, 3.6, -D - 1.5), 1.1)
+	var telegrama := _box(g, "Telegrama", Vector3(0.2, 0.003, 0.14), Vector3(0.02, MESA + 0.0015, -2.12), "envelope")
+	telegrama.rotation_degrees.y = -4
+	var ler := _area(telegrama, DocumentPickup.new(), "Ler", Vector3(0.24, 0.06, 0.18)) as DocumentPickup
+	ler.prompt = "Ler o telegrama"
+	ler.remove_visual = false
+	ler.document = load("res://narrative/documents/telegrama_pedra.tres")
+	_folha(g, "CartaJulho", Vector3(0.36, MESA + 0.003, -2.02), 10, "carta_akeley_julho", "Ler a carta", false)
+	var env := _envelope(g, "Envelope", Vector3(-0.2, MESA, -2.47), 7, {
+		remetente = "H. W. Akeley\nGeneral Delivery, Brattleboro, Vt.",
+		carimbo_cidade = "BRATTLEBORO",
+		carimbo_data = "JUL 12\n1928",
+	})
+	_examinavel(env, Vector3(0.2, 0.04, 0.12), "Examinar o envelope", "Envelope de Brattleboro",
+		"A letra de Akeley, mais trêmula. Carimbo de Brattleboro, 12 de julho — ele já não confia no correio de Townshend.")
+	_escrever(g, "resposta_dia_4", &"ligou_relato_keene")
+
+	# A foto de julho fica junto das outras, dali em diante.
+	var julho := _grupo_se(parent, "FotografiaJulho", _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, 4))
+	var foto := Fotografia.new()
+	foto.name = "Foto10"
+	foto.imagem = load(TEX_DIR + "foto_exercito.png")
+	foto.position = Vector3(-0.25, MESA + Fotografia.ESPESSURA * 0.5, -2.33)
+	foto.rotation_degrees.y = 6
+	_add(julho, foto)
+	var ex := _examinavel(foto, Vector3(0.13, 0.03, 0.1), "Examinar a fotografia", "Fotografia — o exército de pegadas",
+		"Repulsivamente perturbadora: um verdadeiro exército de pegadas em fila, de frente para uma linha igualmente cerrada e resoluta de pegadas de cães. Tirada depois de uma noite em que os cães se superaram em latidos e uivos.")
+	ex.flag = &"viu_foto_exercito"
+	ex.exposure = 0.04
+
+
+## Telefone de parede (caixa de madeira, manivela, fone no gancho), na parede
+## leste, ao lado da escrivaninha. Só se usa quando há ligação disponível.
+func _telefone(parent: Node) -> void:
+	var g := _group(parent, "TelefoneParede", Vector3(W - 0.07, 1.45, -2.25), 90)
+	_box(g, "Caixa", Vector3(0.24, 0.38, 0.12), Vector3.ZERO, "madeira_clara")
+	for s in [-1, 1]:
+		var sineta := _cyl(g, "Sineta%d" % s, 0.035, 0.035, 0.03, Vector3(s * 0.05, 0.14, -0.075), "latao", 8)
+		sineta.rotation_degrees.x = 90
+	var bocal := _cyl(g, "Bocal", 0.03, 0.015, 0.08, Vector3(0, 0.0, -0.1), "ferro", 8)
+	bocal.rotation_degrees.x = 90
+	_cyl(g, "Fone", 0.018, 0.022, 0.12, Vector3(-0.15, -0.02, -0.02), "ferro", 8)
+	_box(g, "Manivela", Vector3(0.012, 0.08, 0.012), Vector3(0.14, 0.02, -0.03), "ferro")
+	var tel := _area(g, Telefone.new(), "Telefone", Vector3(0.36, 0.45, 0.3), Vector3(0, 0, -0.08)) as Telefone
+	tel.unique_name_in_owner = true
+	tel.campainha = load(SFX_DIR + "campainha.wav")
+	var ligs: Array[Ligacao] = []
+	for id in ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene"]:
+		ligs.append(load("res://narrative/ligacoes/%s.tres" % id))
+	tel.ligacoes = ligs
 
 
 func _flag(chave: StringName, negar := false) -> ValueCondition:

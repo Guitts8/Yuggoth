@@ -35,10 +35,10 @@ Legenda: ✅ já no GDD/jogo · ➕ falta, entra · ⚠️ GDD diverge do livro 
 | Wilmarth **pega emprestada a máquina** do prédio da administração da universidade | ✅ Dia 3: caixote da administração; montar corneta, manivela e agulha |
 | Antes de tocar, relê a **transcrição** de Akeley (1º de maio de 1915, 1h, caverna da encosta oeste da Montanha Escura, Pântano de Lee) | ✅ Dia 3 |
 | Toca o disco: voz humana bostoniana, depois a voz zumbida; ouve "muitas outras vezes" | ✅ Dia 3: tocar e parar à vontade; legendas; luz pulsa; zumbido permanente depois |
-| Negociação para mandar a pedra; homem suspeito na agência de expresso de Brattleboro; cartas de Wilmarth extraviadas; correio passa a ser posta-restante em Brattleboro; foto do "exército" de pegadas diante das pegadas dos cães | ➕ Dia 3/4: carta + fotografia |
-| **18 de julho: telegrama** — a pedra vai no trem 5508. Wilmarth **espera a manhã inteira**; **telefona** à agência de expresso; **interurbano** para a North Station, em Boston; manda telegrama noturno a Akeley | ➕ **novo dia jogável**: a pedra não chega (telefone na mesa) |
-| O relato de Boston: o funcionário de Keene, o homem magro e ruivo "**Stanley Adams**", de voz grossa e zumbida que dava tontura e sono | ➕ ligação/relatório nesse dia |
-| Wilmarth vai a Boston interrogar o funcionário; passa a noite escrevendo cartas (Akeley, expresso, polícia de Keene); nada se descobre | ➕ cartão + documentos |
+| Negociação para mandar a pedra; homem suspeito na agência de expresso de Brattleboro; cartas de Wilmarth extraviadas; correio passa a ser posta-restante em Brattleboro; foto do "exército" de pegadas diante das pegadas dos cães | ✅ Dia 4: carta de julho + a foto (fica nos dias seguintes) |
+| **18 de julho: telegrama** — a pedra vai no trem 5508. Wilmarth **espera a manhã inteira**; **telefona** à agência de expresso; **interurbano** para a North Station, em Boston; manda telegrama noturno a Akeley | ✅ Dia 4: telegrama; telefone de parede — agência, interurbano, telegrama noturno |
+| O relato de Boston: o funcionário de Keene, o homem magro e ruivo "**Stanley Adams**", de voz grossa e zumbida que dava tontura e sono | ✅ Dia 4: o telefone toca na sexta-feira |
+| Wilmarth vai a Boston interrogar o funcionário; passa a noite escrevendo cartas (Akeley, expresso, polícia de Keene); nada se descobre | ✅ Dia 4: cartão + as cartas da noite em claro (resposta) + "minhas investigações não deram em nada" |
 
 ## Cap. IV — O cerco (em cartas)
 | Situação no livro | No jogo |

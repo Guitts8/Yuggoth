@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_4_cautelosa"
+title = "Minha carta a Akeley — 21 de julho"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+21 de julho de 1928[/right]
+
+Prezado Sr. Akeley,
+
+A pedra não chegou. Fui a Boston falar com o funcionário do 5508 — um rapaz franco, que nada pôde acrescentar. Escrevi a noite toda: à companhia, à polícia e ao agente da estação de Keene. Esse homem de voz estranha que tanto afetou o funcionário há de ter um lugar central neste negócio sinistro, e espero que os empregados da estação e os registros do telégrafo nos digam alguma coisa sobre ele.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

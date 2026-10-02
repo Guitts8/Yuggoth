@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_4_credula"
+title = "Minha carta a Akeley — 21 de julho"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+21 de julho de 1928[/right]
+
+Prezado Sr. Akeley,
+
+A pedra não chegou, e o senhor já sabe por quê antes de eu dizer. Um homem magro e ruivo em Keene, de voz grossa e zumbida, que fazia o funcionário cair num sono de olhos abertos. Escrevi à companhia, à polícia e ao agente da estação, mas não espero nada deles.
+
+Eles leem as nossas cartas. Tenha cuidado nas estradas.
+
+Com estima,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

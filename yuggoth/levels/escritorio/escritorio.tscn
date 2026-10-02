@@ -1,92 +1,105 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://levels/escritorio/escritorio.gd" id="1_v2xkw"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/chuva.wav" id="2_idu2d"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/tarde.wav" id="3_3ss4r"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/pena.wav" id="4_r5tib"]
-[ext_resource type="Resource" path="res://narrative/narration/prologo_abertura.tres" id="5_itakx"]
-[ext_resource type="Resource" path="res://narrative/narration/prologo_cartas.tres" id="6_qdmlg"]
-[ext_resource type="Script" path="res://narrative/narration_line.gd" id="7_aa2ji"]
-[ext_resource type="Resource" path="res://narrative/narration/prologo_maio.tres" id="8_4japi"]
-[ext_resource type="Resource" path="res://narrative/narration/cartao_dia_2.tres" id="9_jmgnm"]
-[ext_resource type="Resource" path="res://narrative/narration/cartao_dia_3.tres" id="10_ea43y"]
-[ext_resource type="Resource" path="res://narrative/narration/cartao_dia_4.tres" id="11_1b2pn"]
-[ext_resource type="Resource" path="res://narrative/narration/dia1_correio.tres" id="12_kdma7"]
-[ext_resource type="Resource" path="res://narrative/narration/dia2_correio.tres" id="13_7fn04"]
-[ext_resource type="Resource" path="res://narrative/narration/dia3_correio.tres" id="14_hvpim"]
-[ext_resource type="Resource" path="res://narrative/narration/resposta_selada.tres" id="15_cddvi"]
-[ext_resource type="Material" path="res://art/materials/piso.tres" id="16_4eduv"]
-[ext_resource type="Material" path="res://art/materials/teto.tres" id="17_b11rw"]
-[ext_resource type="Material" path="res://art/materials/parede.tres" id="18_oyru7"]
-[ext_resource type="Material" path="res://art/materials/madeira_escura.tres" id="19_8s7on"]
-[ext_resource type="Material" path="res://art/materials/madeira_clara.tres" id="20_mfkew"]
-[ext_resource type="Material" path="res://art/materials/porta.tres" id="21_tt3ad"]
-[ext_resource type="Material" path="res://art/materials/latao.tres" id="22_mx1ja"]
-[ext_resource type="Material" path="res://art/materials/mostrador.tres" id="23_g813i"]
-[ext_resource type="Material" path="res://art/materials/ferro.tres" id="24_cai74"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/relogio.wav" id="25_bl5ai"]
-[ext_resource type="Material" path="res://art/materials/lombadas.tres" id="26_f8r8f"]
-[ext_resource type="Material" path="res://art/materials/tijolo.tres" id="27_ff3v7"]
-[ext_resource type="Material" path="res://art/materials/cinzas.tres" id="28_mer0s"]
-[ext_resource type="Material" path="res://art/materials/estofado.tres" id="29_ij0fk"]
-[ext_resource type="Material" path="res://art/materials/tapete.tres" id="30_pold6"]
-[ext_resource type="Material" path="res://art/materials/vista_noite.tres" id="31_qhsms"]
-[ext_resource type="Texture2D" path="res://art/textures/gota.png" id="32_hximp"]
-[ext_resource type="Material" path="res://art/materials/caixa_cartas.tres" id="33_7f5fr"]
-[ext_resource type="Script" path="res://components/examinable.gd" id="34_3x7uq"]
-[ext_resource type="Material" path="res://art/materials/papel.tres" id="35_g0xy8"]
-[ext_resource type="Script" path="res://components/document_pickup.gd" id="36_8kdnc"]
-[ext_resource type="Resource" path="res://narrative/documents/relato_folha_1.tres" id="37_dvck4"]
-[ext_resource type="Material" path="res://art/materials/lencol.tres" id="38_hayjy"]
-[ext_resource type="Material" path="res://art/materials/vidro_aceso.tres" id="39_ej1ob"]
-[ext_resource type="Script" path="res://components/state_interactable.gd" id="40_aqt7o"]
-[ext_resource type="Material" path="res://art/materials/cortica.tres" id="41_fbj4s"]
-[ext_resource type="Resource" path="res://narrative/documents/recorte_reformer_enchentes.tres" id="42_8x1ux"]
-[ext_resource type="Resource" path="res://narrative/documents/recorte_herald_lendas.tres" id="43_2q1j2"]
-[ext_resource type="Resource" path="res://narrative/documents/recorte_reformer_pendrifter.tres" id="44_xn04v"]
-[ext_resource type="Script" path="res://components/conditional_node.gd" id="45_2aytg"]
-[ext_resource type="Script" path="res://narrative/conditions/condition.gd" id="46_3pkmm"]
-[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="47_tadcj"]
-[ext_resource type="Script" path="res://narrative/conditions/composite_condition.gd" id="48_gkd3n"]
-[ext_resource type="Resource" path="res://narrative/documents/rascunho_editor.tres" id="49_dc867"]
-[ext_resource type="Resource" path="res://narrative/documents/carta_opositor.tres" id="50_5jj00"]
-[ext_resource type="Script" path="res://props/envelope.gd" id="51_sla21"]
-[ext_resource type="Resource" path="res://narrative/narration/debate_encerrado.tres" id="52_1xrtw"]
-[ext_resource type="Script" path="res://props/fotografia.gd" id="53_5r322"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_pegada.png" id="54_85dnd"]
-[ext_resource type="Script" path="res://components/examine_hotspot.gd" id="55_8tob6"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_caverna.png" id="56_seohc"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_circulo.png" id="57_8mjql"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_pedra.png" id="58_u34ej"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_pantano_1.png" id="59_3b3gi"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_colina.png" id="60_kjjxk"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_pantano_2.png" id="61_wanbn"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_marca.png" id="62_gjx86"]
-[ext_resource type="Texture2D" path="res://art/textures/foto_casa.png" id="63_yeddb"]
-[ext_resource type="Material" path="res://art/materials/vista_dia.tres" id="64_e47o4"]
-[ext_resource type="Resource" path="res://narrative/documents/carta_akeley_1.tres" id="65_jo3l1"]
-[ext_resource type="Script" path="res://components/write_reply.gd" id="66_dhgyq"]
-[ext_resource type="Resource" path="res://narrative/replies/resposta_dia_1.tres" id="67_vufhw"]
-[ext_resource type="Material" path="res://art/materials/vista_entardecer.tres" id="68_sfqqn"]
-[ext_resource type="Resource" path="res://narrative/documents/carta_akeley_2.tres" id="69_3w0tl"]
-[ext_resource type="Resource" path="res://narrative/replies/resposta_dia_2.tres" id="70_xt4y3"]
-[ext_resource type="Resource" path="res://narrative/documents/bilhete_disco.tres" id="71_p8tpq"]
-[ext_resource type="Resource" path="res://narrative/documents/transcricao_disco.tres" id="72_pudrh"]
-[ext_resource type="Material" path="res://art/materials/envelope.tres" id="73_xtatu"]
-[ext_resource type="Resource" path="res://narrative/replies/resposta_dia_3.tres" id="74_8xwfm"]
-[ext_resource type="Script" path="res://components/fonografo.gd" id="75_efmkv"]
-[ext_resource type="Resource" path="res://narrative/gravacoes/disco_1915.tres" id="76_g5d0x"]
-[ext_resource type="Resource" path="res://narrative/gravacoes/disco_1915_longo.tres" id="77_dbm0j"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/zumbido.wav" id="78_lij66"]
-[ext_resource type="Resource" path="res://narrative/narration/depois_do_disco.tres" id="79_hodvx"]
-[ext_resource type="Script" path="res://components/interactable.gd" id="80_decim"]
-[ext_resource type="PackedScene" path="res://player/player.tscn" id="81_diu4e"]
-[ext_resource type="Script" path="res://player/player.gd" id="82_v4vjt"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_1.wav" id="83_3q0q2"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_2.wav" id="84_fdkl7"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_3.wav" id="85_25lu3"]
+[ext_resource type="Script" path="res://levels/escritorio/escritorio.gd" id="1_hvpim"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/chuva.wav" id="2_cddvi"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/tarde.wav" id="3_4eduv"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/pena.wav" id="4_b11rw"]
+[ext_resource type="Resource" path="res://narrative/narration/prologo_abertura.tres" id="5_oyru7"]
+[ext_resource type="Resource" path="res://narrative/narration/prologo_cartas.tres" id="6_8s7on"]
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="7_mfkew"]
+[ext_resource type="Resource" path="res://narrative/narration/prologo_maio.tres" id="8_tt3ad"]
+[ext_resource type="Resource" path="res://narrative/narration/cartao_dia_2.tres" id="9_mx1ja"]
+[ext_resource type="Resource" path="res://narrative/narration/cartao_dia_3.tres" id="10_g813i"]
+[ext_resource type="Resource" path="res://narrative/narration/cartao_dia_4.tres" id="11_cai74"]
+[ext_resource type="Resource" path="res://narrative/narration/cartao_dia_5.tres" id="12_bl5ai"]
+[ext_resource type="Resource" path="res://narrative/narration/dia1_correio.tres" id="13_f8r8f"]
+[ext_resource type="Resource" path="res://narrative/narration/dia2_correio.tres" id="14_ff3v7"]
+[ext_resource type="Resource" path="res://narrative/narration/dia3_correio.tres" id="15_mer0s"]
+[ext_resource type="Resource" path="res://narrative/narration/dia4_correio.tres" id="16_ij0fk"]
+[ext_resource type="Resource" path="res://narrative/narration/resposta_selada.tres" id="17_pold6"]
+[ext_resource type="Material" path="res://art/materials/piso.tres" id="18_qhsms"]
+[ext_resource type="Material" path="res://art/materials/teto.tres" id="19_hximp"]
+[ext_resource type="Material" path="res://art/materials/parede.tres" id="20_7f5fr"]
+[ext_resource type="Material" path="res://art/materials/madeira_escura.tres" id="21_3x7uq"]
+[ext_resource type="Material" path="res://art/materials/madeira_clara.tres" id="22_g0xy8"]
+[ext_resource type="Material" path="res://art/materials/porta.tres" id="23_8kdnc"]
+[ext_resource type="Material" path="res://art/materials/latao.tres" id="24_dvck4"]
+[ext_resource type="Material" path="res://art/materials/mostrador.tres" id="25_hayjy"]
+[ext_resource type="Material" path="res://art/materials/ferro.tres" id="26_ej1ob"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/relogio.wav" id="27_aqt7o"]
+[ext_resource type="Material" path="res://art/materials/lombadas.tres" id="28_fbj4s"]
+[ext_resource type="Material" path="res://art/materials/tijolo.tres" id="29_8x1ux"]
+[ext_resource type="Material" path="res://art/materials/cinzas.tres" id="30_2q1j2"]
+[ext_resource type="Material" path="res://art/materials/estofado.tres" id="31_xn04v"]
+[ext_resource type="Material" path="res://art/materials/tapete.tres" id="32_2aytg"]
+[ext_resource type="Material" path="res://art/materials/vista_noite.tres" id="33_3pkmm"]
+[ext_resource type="Texture2D" path="res://art/textures/gota.png" id="34_tadcj"]
+[ext_resource type="Material" path="res://art/materials/caixa_cartas.tres" id="35_gkd3n"]
+[ext_resource type="Script" path="res://components/examinable.gd" id="36_dc867"]
+[ext_resource type="Material" path="res://art/materials/papel.tres" id="37_5jj00"]
+[ext_resource type="Script" path="res://components/document_pickup.gd" id="38_sla21"]
+[ext_resource type="Resource" path="res://narrative/documents/relato_folha_1.tres" id="39_1xrtw"]
+[ext_resource type="Material" path="res://art/materials/lencol.tres" id="40_5r322"]
+[ext_resource type="Material" path="res://art/materials/vidro_aceso.tres" id="41_85dnd"]
+[ext_resource type="Script" path="res://components/state_interactable.gd" id="42_8tob6"]
+[ext_resource type="Material" path="res://art/materials/cortica.tres" id="43_seohc"]
+[ext_resource type="Resource" path="res://narrative/documents/recorte_reformer_enchentes.tres" id="44_8mjql"]
+[ext_resource type="Resource" path="res://narrative/documents/recorte_herald_lendas.tres" id="45_u34ej"]
+[ext_resource type="Resource" path="res://narrative/documents/recorte_reformer_pendrifter.tres" id="46_3b3gi"]
+[ext_resource type="Script" path="res://components/conditional_node.gd" id="47_kjjxk"]
+[ext_resource type="Script" path="res://narrative/conditions/condition.gd" id="48_wanbn"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="49_gjx86"]
+[ext_resource type="Script" path="res://narrative/conditions/composite_condition.gd" id="50_yeddb"]
+[ext_resource type="Resource" path="res://narrative/documents/rascunho_editor.tres" id="51_e47o4"]
+[ext_resource type="Resource" path="res://narrative/documents/carta_opositor.tres" id="52_jo3l1"]
+[ext_resource type="Script" path="res://props/envelope.gd" id="53_dhgyq"]
+[ext_resource type="Resource" path="res://narrative/narration/debate_encerrado.tres" id="54_vufhw"]
+[ext_resource type="Script" path="res://props/fotografia.gd" id="55_sfqqn"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_pegada.png" id="56_3w0tl"]
+[ext_resource type="Script" path="res://components/examine_hotspot.gd" id="57_xt4y3"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_caverna.png" id="58_p8tpq"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_circulo.png" id="59_pudrh"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_pedra.png" id="60_xtatu"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_pantano_1.png" id="61_8xwfm"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_colina.png" id="62_efmkv"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_pantano_2.png" id="63_g5d0x"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_marca.png" id="64_dbm0j"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_casa.png" id="65_lij66"]
+[ext_resource type="Material" path="res://art/materials/vista_dia.tres" id="66_hodvx"]
+[ext_resource type="Resource" path="res://narrative/documents/carta_akeley_1.tres" id="67_decim"]
+[ext_resource type="Script" path="res://components/write_reply.gd" id="68_diu4e"]
+[ext_resource type="Resource" path="res://narrative/replies/resposta_dia_1.tres" id="69_v4vjt"]
+[ext_resource type="Material" path="res://art/materials/vista_entardecer.tres" id="70_3q0q2"]
+[ext_resource type="Resource" path="res://narrative/documents/carta_akeley_2.tres" id="71_fdkl7"]
+[ext_resource type="Resource" path="res://narrative/replies/resposta_dia_2.tres" id="72_25lu3"]
+[ext_resource type="Resource" path="res://narrative/documents/bilhete_disco.tres" id="73_gvc0l"]
+[ext_resource type="Resource" path="res://narrative/documents/transcricao_disco.tres" id="74_b2f5e"]
+[ext_resource type="Material" path="res://art/materials/envelope.tres" id="75_ip1yw"]
+[ext_resource type="Resource" path="res://narrative/replies/resposta_dia_3.tres" id="76_i37l6"]
+[ext_resource type="Script" path="res://components/fonografo.gd" id="77_di310"]
+[ext_resource type="Resource" path="res://narrative/gravacoes/disco_1915.tres" id="78_rkvtt"]
+[ext_resource type="Resource" path="res://narrative/gravacoes/disco_1915_longo.tres" id="79_jhtsh"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/zumbido.wav" id="80_b056n"]
+[ext_resource type="Resource" path="res://narrative/narration/depois_do_disco.tres" id="81_plv2r"]
+[ext_resource type="Resource" path="res://narrative/documents/telegrama_pedra.tres" id="82_r2ix2"]
+[ext_resource type="Resource" path="res://narrative/documents/carta_akeley_julho.tres" id="83_0vsgr"]
+[ext_resource type="Resource" path="res://narrative/replies/resposta_dia_4.tres" id="84_m8u08"]
+[ext_resource type="Texture2D" path="res://art/textures/foto_exercito.png" id="85_wnghe"]
+[ext_resource type="Script" path="res://components/telefone.gd" id="86_5b0bg"]
+[ext_resource type="Script" path="res://narrative/ligacao.gd" id="87_3koal"]
+[ext_resource type="Resource" path="res://narrative/ligacoes/agencia_arkham.tres" id="88_0ehhf"]
+[ext_resource type="Resource" path="res://narrative/ligacoes/boston.tres" id="89_mdxk4"]
+[ext_resource type="Resource" path="res://narrative/ligacoes/telegrama_noturno.tres" id="90_fmekf"]
+[ext_resource type="Resource" path="res://narrative/ligacoes/relato_keene.tres" id="91_g6bsg"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/campainha.wav" id="92_mfx7i"]
+[ext_resource type="Script" path="res://components/interactable.gd" id="93_d7k2f"]
+[ext_resource type="PackedScene" path="res://player/player.tscn" id="94_autmv"]
+[ext_resource type="Script" path="res://player/player.gd" id="95_olup4"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_1.wav" id="96_4ueoc"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_2.wav" id="97_virye"]
+[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_3.wav" id="98_72j8q"]
 
-[sub_resource type="Environment" id="Environment_gvc0l"]
+[sub_resource type="Environment" id="Environment_uarni"]
 background_mode = 1
 ambient_light_source = 2
 ambient_light_color = Color(0.11, 0.115, 0.16, 1)
@@ -97,7 +110,7 @@ fog_density = 1.0
 fog_depth_begin = 2.0
 fog_depth_end = 10.0
 
-[sub_resource type="Environment" id="Environment_b2f5e"]
+[sub_resource type="Environment" id="Environment_qbsog"]
 background_mode = 1
 background_color = Color(0.6, 0.66, 0.72, 1)
 ambient_light_source = 2
@@ -109,7 +122,7 @@ fog_density = 0.6
 fog_depth_begin = 5.0
 fog_depth_end = 18.0
 
-[sub_resource type="Environment" id="Environment_ip1yw"]
+[sub_resource type="Environment" id="Environment_8nk4w"]
 background_mode = 1
 background_color = Color(0.5, 0.35, 0.3, 1)
 ambient_light_source = 2
@@ -121,7 +134,7 @@ fog_density = 0.6
 fog_depth_begin = 5.0
 fog_depth_end = 18.0
 
-[sub_resource type="Environment" id="Environment_i37l6"]
+[sub_resource type="Environment" id="Environment_x1n1h"]
 background_mode = 1
 ambient_light_source = 2
 ambient_light_color = Color(0.15, 0.14, 0.17, 1)
@@ -132,399 +145,399 @@ fog_density = 1.0
 fog_depth_begin = 2.0
 fog_depth_end = 10.0
 
-[sub_resource type="QuadMesh" id="QuadMesh_di310"]
+[sub_resource type="QuadMesh" id="QuadMesh_t5krm"]
 size = Vector2(5, 6)
 subdivide_width = 10
 subdivide_depth = 12
 
-[sub_resource type="QuadMesh" id="QuadMesh_rkvtt"]
+[sub_resource type="QuadMesh" id="QuadMesh_tpem5"]
 size = Vector2(5, 6)
 subdivide_width = 10
 subdivide_depth = 12
 
-[sub_resource type="QuadMesh" id="QuadMesh_jhtsh"]
+[sub_resource type="QuadMesh" id="QuadMesh_qbs67"]
 size = Vector2(6, 3)
 subdivide_width = 12
 subdivide_depth = 6
 
-[sub_resource type="QuadMesh" id="QuadMesh_b056n"]
+[sub_resource type="QuadMesh" id="QuadMesh_gwnui"]
 size = Vector2(6, 3)
 subdivide_width = 12
 subdivide_depth = 6
 
-[sub_resource type="QuadMesh" id="QuadMesh_plv2r"]
+[sub_resource type="QuadMesh" id="QuadMesh_4uydo"]
 size = Vector2(5, 3)
 subdivide_width = 10
 subdivide_depth = 6
 
-[sub_resource type="BoxMesh" id="BoxMesh_r2ix2"]
+[sub_resource type="BoxMesh" id="BoxMesh_sr5lc"]
 size = Vector3(1.7, 3, 0.2)
 subdivide_width = 3
 subdivide_height = 6
 
-[sub_resource type="BoxMesh" id="BoxMesh_0vsgr"]
+[sub_resource type="BoxMesh" id="BoxMesh_ctt7l"]
 size = Vector3(1.7, 3, 0.2)
 subdivide_width = 3
 subdivide_height = 6
 
-[sub_resource type="BoxMesh" id="BoxMesh_m8u08"]
+[sub_resource type="BoxMesh" id="BoxMesh_5tibg"]
 size = Vector3(1.6, 0.9, 0.2)
 subdivide_width = 3
 subdivide_height = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_wnghe"]
+[sub_resource type="BoxMesh" id="BoxMesh_ym51c"]
 size = Vector3(1.6, 0.5999999, 0.2)
 subdivide_width = 3
 subdivide_height = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_5b0bg"]
+[sub_resource type="BoxMesh" id="BoxMesh_2uxqt"]
 size = Vector3(0.03, 0.12, 6)
 subdivide_depth = 12
 
-[sub_resource type="BoxMesh" id="BoxMesh_3koal"]
+[sub_resource type="BoxMesh" id="BoxMesh_ndtbk"]
 size = Vector3(0.03, 0.12, 6)
 subdivide_depth = 12
 
-[sub_resource type="BoxMesh" id="BoxMesh_0ehhf"]
+[sub_resource type="BoxMesh" id="BoxMesh_8ekn0"]
 size = Vector3(5, 0.12, 0.03)
 subdivide_width = 10
 
-[sub_resource type="BoxMesh" id="BoxMesh_mdxk4"]
+[sub_resource type="BoxMesh" id="BoxMesh_2goib"]
 size = Vector3(5, 0.12, 0.03)
 subdivide_width = 10
 
-[sub_resource type="BoxMesh" id="BoxMesh_fmekf"]
+[sub_resource type="BoxMesh" id="BoxMesh_yqtum"]
 size = Vector3(1.8, 0.06, 0.26)
 subdivide_width = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_g6bsg"]
+[sub_resource type="BoxMesh" id="BoxMesh_8b3ix"]
 size = Vector3(1.7, 0.1, 0.14)
 subdivide_width = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_mfx7i"]
+[sub_resource type="BoxMesh" id="BoxMesh_ngwme"]
 size = Vector3(0.08, 1.5000001, 0.14)
 subdivide_height = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_d7k2f"]
+[sub_resource type="BoxMesh" id="BoxMesh_m6fsa"]
 size = Vector3(0.08, 1.5000001, 0.14)
 subdivide_height = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_autmv"]
+[sub_resource type="BoxMesh" id="BoxMesh_tje32"]
 size = Vector3(0.04, 1.5000001, 0.04)
 subdivide_height = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_olup4"]
+[sub_resource type="BoxMesh" id="BoxMesh_bbvm5"]
 size = Vector3(1.6, 0.04, 0.04)
 subdivide_width = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_4ueoc"]
+[sub_resource type="BoxMesh" id="BoxMesh_ngcy4"]
 size = Vector3(0.92, 2.1, 0.05)
 subdivide_width = 1
 subdivide_height = 4
 
-[sub_resource type="QuadMesh" id="QuadMesh_virye"]
+[sub_resource type="QuadMesh" id="QuadMesh_4tjt7"]
 size = Vector2(0.92, 2.1)
 subdivide_width = 1
 subdivide_depth = 4
 
-[sub_resource type="BoxMesh" id="BoxMesh_72j8q"]
+[sub_resource type="BoxMesh" id="BoxMesh_keto5"]
 size = Vector3(0.05, 0.05, 0.06)
 
-[sub_resource type="BoxMesh" id="BoxMesh_uarni"]
+[sub_resource type="BoxMesh" id="BoxMesh_64gbe"]
 size = Vector3(0.08, 2.2, 0.06)
 subdivide_height = 4
 
-[sub_resource type="BoxMesh" id="BoxMesh_qbsog"]
+[sub_resource type="BoxMesh" id="BoxMesh_1ss76"]
 size = Vector3(0.08, 2.2, 0.06)
 subdivide_height = 4
 
-[sub_resource type="BoxMesh" id="BoxMesh_8nk4w"]
+[sub_resource type="BoxMesh" id="BoxMesh_utpkc"]
 size = Vector3(1.08, 0.08, 0.06)
 subdivide_width = 2
 
-[sub_resource type="BoxMesh" id="BoxMesh_x1n1h"]
+[sub_resource type="BoxMesh" id="BoxMesh_mweyb"]
 size = Vector3(0.36, 0.64, 0.12)
 subdivide_height = 1
 
-[sub_resource type="QuadMesh" id="QuadMesh_t5krm"]
+[sub_resource type="QuadMesh" id="QuadMesh_w07f5"]
 size = Vector2(0.26, 0.26)
 
-[sub_resource type="BoxMesh" id="BoxMesh_tpem5"]
+[sub_resource type="BoxMesh" id="BoxMesh_jx4k3"]
 size = Vector3(0.012, 0.07, 0.01)
 
-[sub_resource type="BoxMesh" id="BoxMesh_qbs67"]
+[sub_resource type="BoxMesh" id="BoxMesh_7q75u"]
 size = Vector3(0.01, 0.1, 0.01)
 
-[sub_resource type="BoxMesh" id="BoxMesh_gwnui"]
+[sub_resource type="BoxMesh" id="BoxMesh_msb35"]
 size = Vector3(0.05, 0.05, 0.01)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4uydo"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_ec77b"]
 size = Vector3(5, 0.2, 6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_sr5lc"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_jgxkl"]
 size = Vector3(5, 0.2, 6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ctt7l"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_riicy"]
 size = Vector3(0.2, 3, 6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5tibg"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_c5yui"]
 size = Vector3(0.2, 3, 6)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ym51c"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_me5ht"]
 size = Vector3(5, 3, 0.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_2uxqt"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_shpv7"]
 size = Vector3(5, 3, 0.2)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ndtbk"]
+[sub_resource type="BoxMesh" id="BoxMesh_c8bv4"]
 size = Vector3(1.6, 0.06, 0.8)
 subdivide_width = 3
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_8ekn0"]
+[sub_resource type="BoxMesh" id="BoxMesh_33xe4"]
 size = Vector3(0.42, 0.72, 0.74)
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_2goib"]
+[sub_resource type="BoxMesh" id="BoxMesh_eega8"]
 size = Vector3(0.08, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yqtum"]
+[sub_resource type="BoxMesh" id="BoxMesh_u1htw"]
 size = Vector3(0.08, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_8b3ix"]
+[sub_resource type="BoxMesh" id="BoxMesh_lbeiw"]
 size = Vector3(0.08, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ngwme"]
+[sub_resource type="BoxMesh" id="BoxMesh_fgeta"]
 size = Vector3(0.42, 0.72, 0.74)
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_m6fsa"]
+[sub_resource type="BoxMesh" id="BoxMesh_y5tuw"]
 size = Vector3(0.08, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_tje32"]
+[sub_resource type="BoxMesh" id="BoxMesh_etli7"]
 size = Vector3(0.08, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_bbvm5"]
+[sub_resource type="BoxMesh" id="BoxMesh_nx76v"]
 size = Vector3(0.08, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ngcy4"]
+[sub_resource type="BoxMesh" id="BoxMesh_k8dht"]
 size = Vector3(0.72, 0.5, 0.03)
 subdivide_width = 1
 subdivide_height = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4tjt7"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8e22h"]
 size = Vector3(1.6, 0.78, 0.8)
 
-[sub_resource type="BoxMesh" id="BoxMesh_keto5"]
+[sub_resource type="BoxMesh" id="BoxMesh_goxia"]
 size = Vector3(0.46, 0.05, 0.44)
 
-[sub_resource type="BoxMesh" id="BoxMesh_64gbe"]
+[sub_resource type="BoxMesh" id="BoxMesh_gasv4"]
 size = Vector3(0.04, 0.46, 0.04)
 
-[sub_resource type="BoxMesh" id="BoxMesh_1ss76"]
+[sub_resource type="BoxMesh" id="BoxMesh_v1bkb"]
 size = Vector3(0.04, 0.46, 0.04)
 
-[sub_resource type="BoxMesh" id="BoxMesh_utpkc"]
+[sub_resource type="BoxMesh" id="BoxMesh_5mdqe"]
 size = Vector3(0.04, 0.46, 0.04)
 
-[sub_resource type="BoxMesh" id="BoxMesh_mweyb"]
+[sub_resource type="BoxMesh" id="BoxMesh_qn04k"]
 size = Vector3(0.04, 0.46, 0.04)
 
-[sub_resource type="BoxMesh" id="BoxMesh_w07f5"]
+[sub_resource type="BoxMesh" id="BoxMesh_u3pvs"]
 size = Vector3(0.46, 0.42, 0.04)
 
-[sub_resource type="BoxMesh" id="BoxMesh_jx4k3"]
+[sub_resource type="BoxMesh" id="BoxMesh_wfgvv"]
 size = Vector3(0.36, 2.3, 0.04)
 subdivide_height = 4
 
-[sub_resource type="BoxMesh" id="BoxMesh_7q75u"]
+[sub_resource type="BoxMesh" id="BoxMesh_lasxe"]
 size = Vector3(0.36, 2.3, 0.04)
 subdivide_height = 4
 
-[sub_resource type="BoxMesh" id="BoxMesh_msb35"]
+[sub_resource type="BoxMesh" id="BoxMesh_mtwe8"]
 size = Vector3(0.02, 2.3, 1.56)
 subdivide_height = 4
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_ec77b"]
+[sub_resource type="BoxMesh" id="BoxMesh_4ppqi"]
 size = Vector3(0.36, 0.04, 1.52)
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_jgxkl"]
+[sub_resource type="BoxMesh" id="BoxMesh_eees3"]
 size = Vector3(0.36, 0.04, 1.52)
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_riicy"]
+[sub_resource type="BoxMesh" id="BoxMesh_upykv"]
 size = Vector3(0.36, 0.04, 1.52)
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_c5yui"]
+[sub_resource type="BoxMesh" id="BoxMesh_abadd"]
 size = Vector3(0.36, 0.04, 1.52)
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_me5ht"]
+[sub_resource type="BoxMesh" id="BoxMesh_hb0we"]
 size = Vector3(0.36, 0.04, 1.52)
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_shpv7"]
+[sub_resource type="BoxMesh" id="BoxMesh_hn71n"]
 size = Vector3(0.36, 0.04, 1.52)
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_c8bv4"]
+[sub_resource type="BoxMesh" id="BoxMesh_qydb7"]
 size = Vector3(0.24, 0.34, 1.5)
 subdivide_depth = 3
 
-[sub_resource type="QuadMesh" id="QuadMesh_33xe4"]
+[sub_resource type="QuadMesh" id="QuadMesh_cnbna"]
 size = Vector2(1.5, 0.34)
 subdivide_width = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_eega8"]
+[sub_resource type="BoxMesh" id="BoxMesh_kdjjg"]
 size = Vector3(0.24, 0.34, 1.5)
 subdivide_depth = 3
 
-[sub_resource type="QuadMesh" id="QuadMesh_u1htw"]
+[sub_resource type="QuadMesh" id="QuadMesh_be2vq"]
 size = Vector2(1.5, 0.34)
 subdivide_width = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_lbeiw"]
+[sub_resource type="BoxMesh" id="BoxMesh_mo367"]
 size = Vector3(0.24, 0.34, 1.05)
 subdivide_depth = 2
 
-[sub_resource type="QuadMesh" id="QuadMesh_fgeta"]
+[sub_resource type="QuadMesh" id="QuadMesh_u4kdt"]
 size = Vector2(1.05, 0.34)
 subdivide_width = 2
 
-[sub_resource type="BoxMesh" id="BoxMesh_y5tuw"]
+[sub_resource type="BoxMesh" id="BoxMesh_0lsbs"]
 size = Vector3(0.24, 0.34, 1.5)
 subdivide_depth = 3
 
-[sub_resource type="QuadMesh" id="QuadMesh_etli7"]
+[sub_resource type="QuadMesh" id="QuadMesh_tpi6h"]
 size = Vector2(1.5, 0.34)
 subdivide_width = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_nx76v"]
+[sub_resource type="BoxMesh" id="BoxMesh_skwmv"]
 size = Vector3(0.24, 0.34, 1.5)
 subdivide_depth = 3
 
-[sub_resource type="QuadMesh" id="QuadMesh_k8dht"]
+[sub_resource type="QuadMesh" id="QuadMesh_js1s0"]
 size = Vector2(1.5, 0.34)
 subdivide_width = 3
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8e22h"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_31r54"]
 size = Vector3(0.36, 2.3, 1.6)
 
-[sub_resource type="BoxMesh" id="BoxMesh_goxia"]
+[sub_resource type="BoxMesh" id="BoxMesh_fwnaf"]
 size = Vector3(0.4, 0.85, 0.4)
 subdivide_height = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_gasv4"]
+[sub_resource type="BoxMesh" id="BoxMesh_fnlyh"]
 size = Vector3(0.4, 0.85, 0.4)
 subdivide_height = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_v1bkb"]
+[sub_resource type="BoxMesh" id="BoxMesh_j6gqa"]
 size = Vector3(0.4, 2.15, 1.6)
 subdivide_height = 4
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_5mdqe"]
+[sub_resource type="BoxMesh" id="BoxMesh_n3ny6"]
 size = Vector3(0.05, 0.85, 0.8)
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_qn04k"]
+[sub_resource type="BoxMesh" id="BoxMesh_85g3k"]
 size = Vector3(0.6, 0.05, 1.8)
 subdivide_width = 1
 subdivide_depth = 3
 
-[sub_resource type="BoxMesh" id="BoxMesh_u3pvs"]
+[sub_resource type="BoxMesh" id="BoxMesh_x0jgl"]
 size = Vector3(0.3, 0.06, 0.5)
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_wfgvv"]
+[sub_resource type="BoxMesh" id="BoxMesh_y3ly2"]
 size = Vector3(0.3, 0.12, 0.55)
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_lasxe"]
+[sub_resource type="BoxMesh" id="BoxMesh_fjn7i"]
 size = Vector3(0.56, 0.08, 1.9)
 subdivide_width = 1
 subdivide_depth = 3
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_mtwe8"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_r3ju6"]
 top_radius = 0.025
 bottom_radius = 0.04
 height = 0.2
 radial_segments = 6
 rings = 1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_4ppqi"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_7h8fm"]
 top_radius = 0.025
 bottom_radius = 0.04
 height = 0.2
 radial_segments = 6
 rings = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_eees3"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_2to44"]
 size = Vector3(0.7, 3, 1.9)
 
-[sub_resource type="BoxMesh" id="BoxMesh_upykv"]
+[sub_resource type="BoxMesh" id="BoxMesh_rndge"]
 size = Vector3(0.75, 0.42, 0.72)
 subdivide_width = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_abadd"]
+[sub_resource type="BoxMesh" id="BoxMesh_onpjw"]
 size = Vector3(0.75, 0.9, 0.14)
 subdivide_width = 1
 subdivide_height = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_hb0we"]
+[sub_resource type="BoxMesh" id="BoxMesh_jfsj8"]
 size = Vector3(0.12, 0.62, 0.72)
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_hn71n"]
+[sub_resource type="BoxMesh" id="BoxMesh_j04qk"]
 size = Vector3(0.12, 0.62, 0.72)
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_qydb7"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_14xp5"]
 size = Vector3(0.9, 1, 0.8)
 
-[sub_resource type="QuadMesh" id="QuadMesh_cnbna"]
+[sub_resource type="QuadMesh" id="QuadMesh_xvrxi"]
 size = Vector2(2.4, 1.8)
 subdivide_width = 4
 subdivide_depth = 3
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_kdjjg"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_otq47"]
 top_radius = 0.02
 bottom_radius = 0.02
 height = 1.8
 radial_segments = 6
 rings = 1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_be2vq"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_nx4qv"]
 top_radius = 0.02
 bottom_radius = 0.22
 height = 0.08
 radial_segments = 6
 rings = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_mo367"]
+[sub_resource type="BoxMesh" id="BoxMesh_gwhvx"]
 size = Vector3(0.18, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_u4kdt"]
+[sub_resource type="BoxMesh" id="BoxMesh_e0vvd"]
 size = Vector3(0.18, 0.02, 0.02)
 
-[sub_resource type="BoxMesh" id="BoxMesh_0lsbs"]
+[sub_resource type="BoxMesh" id="BoxMesh_85aop"]
 size = Vector3(0.18, 0.02, 0.02)
 
-[sub_resource type="QuadMesh" id="QuadMesh_tpi6h"]
+[sub_resource type="QuadMesh" id="QuadMesh_241fq"]
 size = Vector2(5, 3)
 subdivide_width = 10
 subdivide_depth = 6
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_skwmv"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_q07st"]
 emission_shape = 3
 emission_box_extents = Vector3(1.8, 0.1, 0.4)
 direction = Vector3(0.05, -1, 0)
@@ -532,1268 +545,1346 @@ spread = 2.0
 initial_velocity_min = 6.0
 initial_velocity_max = 7.5
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_js1s0"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5pl7q"]
 transparency = 1
 shading_mode = 0
 albedo_color = Color(0.55, 0.6, 0.75, 0.7)
-albedo_texture = ExtResource("32_hximp")
+albedo_texture = ExtResource("34_tadcj")
 texture_filter = 0
 billboard_mode = 2
 billboard_keep_scale = true
 
-[sub_resource type="QuadMesh" id="QuadMesh_31r54"]
-material = SubResource("StandardMaterial3D_js1s0")
+[sub_resource type="QuadMesh" id="QuadMesh_peny2"]
+material = SubResource("StandardMaterial3D_5pl7q")
 size = Vector2(0.015, 0.22)
 
-[sub_resource type="BoxMesh" id="BoxMesh_fwnaf"]
+[sub_resource type="BoxMesh" id="BoxMesh_8ie7g"]
 size = Vector3(0.32, 0.12, 0.24)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_fnlyh"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_a075y"]
 size = Vector3(0.4, 0.2, 0.32)
 
-[sub_resource type="BoxMesh" id="BoxMesh_j6gqa"]
+[sub_resource type="BoxMesh" id="BoxMesh_hnh88"]
 size = Vector3(0.24, 0.006, 0.32)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_n3ny6"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_6ann7"]
 size = Vector3(0.3, 0.06, 0.36)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_85g3k"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_onwdx"]
 top_radius = 0.03
 bottom_radius = 0.035
 height = 0.05
 radial_segments = 6
 rings = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_x0jgl"]
+[sub_resource type="BoxMesh" id="BoxMesh_01x03"]
 size = Vector3(0.01, 0.01, 0.2)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_y3ly2"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_1yx2f"]
 top_radius = 0.07
 bottom_radius = 0.08
 height = 0.03
 radial_segments = 8
 rings = 1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_fjn7i"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_1dlop"]
 top_radius = 0.06
 bottom_radius = 0.06
 height = 0.08
 radial_segments = 8
 rings = 1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_r3ju6"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_ewfep"]
 top_radius = 0.03
 bottom_radius = 0.04
 height = 0.16
 radial_segments = 6
 rings = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_7h8fm"]
+[sub_resource type="BoxMesh" id="BoxMesh_tqbpe"]
 size = Vector3(0.75, 0.42, 0.72)
 subdivide_width = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_2to44"]
+[sub_resource type="BoxMesh" id="BoxMesh_rgd8f"]
 size = Vector3(0.75, 0.9, 0.14)
 subdivide_width = 1
 subdivide_height = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_rndge"]
+[sub_resource type="BoxMesh" id="BoxMesh_ypya0"]
 size = Vector3(0.12, 0.62, 0.72)
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_onpjw"]
+[sub_resource type="BoxMesh" id="BoxMesh_0rcoq"]
 size = Vector3(0.12, 0.62, 0.72)
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jfsj8"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8xf7d"]
 size = Vector3(0.9, 1, 0.8)
 
-[sub_resource type="BoxMesh" id="BoxMesh_j04qk"]
+[sub_resource type="BoxMesh" id="BoxMesh_mfe1j"]
 size = Vector3(0.9, 0.04, 0.85)
 subdivide_width = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_14xp5"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_qs074"]
 size = Vector3(0.5, 0.8, 0.9)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_xvrxi"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_7hhhv"]
 size = Vector3(1.6, 1.5, 0.2)
 
-[sub_resource type="BoxMesh" id="BoxMesh_otq47"]
+[sub_resource type="BoxMesh" id="BoxMesh_2wp0o"]
 size = Vector3(0.04, 0.95, 1.45)
 subdivide_height = 1
 subdivide_depth = 2
 
-[sub_resource type="QuadMesh" id="QuadMesh_nx4qv"]
+[sub_resource type="QuadMesh" id="QuadMesh_f6jq1"]
 size = Vector2(1.35, 0.85)
 subdivide_width = 2
 subdivide_depth = 1
 
-[sub_resource type="QuadMesh" id="QuadMesh_gwhvx"]
+[sub_resource type="QuadMesh" id="QuadMesh_dxd03"]
 size = Vector2(0.22, 0.3)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_e0vvd"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_df3uh"]
 size = Vector3(0.22, 0.3, 0.06)
 
-[sub_resource type="QuadMesh" id="QuadMesh_85aop"]
+[sub_resource type="QuadMesh" id="QuadMesh_de845"]
 size = Vector2(0.3, 0.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_241fq"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_0h42e"]
 size = Vector3(0.3, 0.2, 0.06)
 
-[sub_resource type="QuadMesh" id="QuadMesh_q07st"]
+[sub_resource type="QuadMesh" id="QuadMesh_mi22v"]
 size = Vector2(0.18, 0.26)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5pl7q"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_ta26u"]
 size = Vector3(0.18, 0.26, 0.06)
 
-[sub_resource type="QuadMesh" id="QuadMesh_peny2"]
+[sub_resource type="QuadMesh" id="QuadMesh_6ufk8"]
 size = Vector2(0.26, 0.18)
 
-[sub_resource type="QuadMesh" id="QuadMesh_8ie7g"]
+[sub_resource type="QuadMesh" id="QuadMesh_lmtrg"]
 size = Vector2(0.2, 0.22)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_a075y"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_2u7su"]
 top_radius = 0.03
 bottom_radius = 0.035
 height = 0.05
 radial_segments = 6
 rings = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_hnh88"]
+[sub_resource type="BoxMesh" id="BoxMesh_qemql"]
 size = Vector3(0.01, 0.01, 0.2)
 
-[sub_resource type="BoxMesh" id="BoxMesh_6ann7"]
+[sub_resource type="BoxMesh" id="BoxMesh_c58h5"]
 size = Vector3(0.5, 0.008, 0.36)
 subdivide_width = 1
 
-[sub_resource type="Resource" id="Resource_onwdx"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_ju7yb"]
+script = ExtResource("49_gjx86")
 key = &"dia"
 op = 5
 value = 2.0
 
-[sub_resource type="Resource" id="Resource_01x03"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_yglg1"]
+script = ExtResource("49_gjx86")
 key = &"debate_encerrado"
 negate = true
 
-[sub_resource type="Resource" id="Resource_1yx2f"]
-script = ExtResource("48_gkd3n")
-conditions = Array[ExtResource("46_3pkmm")]([SubResource("Resource_onwdx"), SubResource("Resource_01x03")])
-
-[sub_resource type="BoxMesh" id="BoxMesh_1dlop"]
-size = Vector3(0.22, 0.006, 0.3)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_ewfep"]
-size = Vector3(0.28, 0.08, 0.34)
-
-[sub_resource type="Resource" id="Resource_tqbpe"]
-script = ExtResource("47_tadcj")
-key = &"dia"
-op = 0
-value = 2.0
-
-[sub_resource type="BoxMesh" id="BoxMesh_rgd8f"]
-size = Vector3(0.22, 0.006, 0.3)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_ypya0"]
-size = Vector3(0.28, 0.08, 0.34)
-
-[sub_resource type="Resource" id="Resource_0rcoq"]
-script = ExtResource("47_tadcj")
-key = &"leu_carta_akeley_2"
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_8xf7d"]
-size = Vector3(0.22, 0.05, 0.14)
-
-[sub_resource type="Resource" id="Resource_mfe1j"]
-script = ExtResource("47_tadcj")
-key = &"dia"
-value = 2.0
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_qs074"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_7hhhv"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_2wp0o"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_f6jq1"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_dxd03"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_df3uh"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_de845"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_0h42e"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_mi22v"]
-size = Vector3(0.13, 0.03, 0.1)
-
-[sub_resource type="Resource" id="Resource_ta26u"]
-script = ExtResource("47_tadcj")
-key = &"dia"
-op = 0
-
-[sub_resource type="QuadMesh" id="QuadMesh_6ufk8"]
-size = Vector2(5, 3)
-subdivide_width = 10
-subdivide_depth = 6
-
-[sub_resource type="BoxMesh" id="BoxMesh_lmtrg"]
-size = Vector3(0.22, 0.006, 0.3)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_2u7su"]
-size = Vector3(0.28, 0.08, 0.34)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_qemql"]
-size = Vector3(0.2, 0.04, 0.12)
-
-[sub_resource type="Resource" id="Resource_c58h5"]
-script = ExtResource("47_tadcj")
-key = &"leu_carta_akeley_1"
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_ju7yb"]
-size = Vector3(0.36, 0.2, 0.36)
-
-[sub_resource type="Resource" id="Resource_yglg1"]
-script = ExtResource("47_tadcj")
-key = &"dia"
-op = 0
-value = 2.0
-
-[sub_resource type="QuadMesh" id="QuadMesh_sacia"]
-size = Vector2(5, 3)
-subdivide_width = 10
-subdivide_depth = 6
+[sub_resource type="Resource" id="Resource_sacia"]
+script = ExtResource("50_yeddb")
+conditions = Array[ExtResource("48_wanbn")]([SubResource("Resource_ju7yb"), SubResource("Resource_yglg1")])
 
 [sub_resource type="BoxMesh" id="BoxMesh_0qfp4"]
-size = Vector3(0.22, 0.014, 0.3)
+size = Vector3(0.22, 0.006, 0.3)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_318nv"]
 size = Vector3(0.28, 0.08, 0.34)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_wyl48"]
-size = Vector3(0.2, 0.05, 0.12)
-
-[sub_resource type="Resource" id="Resource_l5tpe"]
-script = ExtResource("47_tadcj")
-key = &"leu_carta_akeley_2"
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_4syca"]
-size = Vector3(0.36, 0.2, 0.36)
-
-[sub_resource type="Resource" id="Resource_1advv"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_wyl48"]
+script = ExtResource("49_gjx86")
 key = &"dia"
 op = 0
-value = 3.0
+value = 2.0
 
-[sub_resource type="QuadMesh" id="QuadMesh_j7f4g"]
+[sub_resource type="BoxMesh" id="BoxMesh_l5tpe"]
+size = Vector3(0.22, 0.006, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4syca"]
+size = Vector3(0.28, 0.08, 0.34)
+
+[sub_resource type="Resource" id="Resource_1advv"]
+script = ExtResource("49_gjx86")
+key = &"leu_carta_akeley_2"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_j7f4g"]
+size = Vector3(0.22, 0.05, 0.14)
+
+[sub_resource type="Resource" id="Resource_tkkmq"]
+script = ExtResource("49_gjx86")
+key = &"dia"
+value = 2.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g1yr6"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hdxvp"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ir3qp"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rpvfo"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1k73y"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vm0le"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d3fhx"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gdkvx"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nvvhq"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="Resource" id="Resource_kdtr7"]
+script = ExtResource("49_gjx86")
+key = &"dia"
+op = 0
+
+[sub_resource type="QuadMesh" id="QuadMesh_e20wy"]
 size = Vector2(5, 3)
 subdivide_width = 10
 subdivide_depth = 6
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_tkkmq"]
+[sub_resource type="BoxMesh" id="BoxMesh_axe0r"]
+size = Vector3(0.22, 0.006, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mmd0p"]
+size = Vector3(0.28, 0.08, 0.34)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dyx7d"]
+size = Vector3(0.2, 0.04, 0.12)
+
+[sub_resource type="Resource" id="Resource_rd8o8"]
+script = ExtResource("49_gjx86")
+key = &"leu_carta_akeley_1"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_e6yjn"]
+size = Vector3(0.36, 0.2, 0.36)
+
+[sub_resource type="Resource" id="Resource_qdk26"]
+script = ExtResource("49_gjx86")
+key = &"dia"
+op = 0
+value = 2.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_3ne7b"]
+size = Vector2(5, 3)
+subdivide_width = 10
+subdivide_depth = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_c67ct"]
+size = Vector3(0.22, 0.014, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ido38"]
+size = Vector3(0.28, 0.08, 0.34)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c1avs"]
+size = Vector3(0.2, 0.05, 0.12)
+
+[sub_resource type="Resource" id="Resource_tu07q"]
+script = ExtResource("49_gjx86")
+key = &"leu_carta_akeley_2"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v1njp"]
+size = Vector3(0.36, 0.2, 0.36)
+
+[sub_resource type="Resource" id="Resource_kvexj"]
+script = ExtResource("49_gjx86")
+key = &"dia"
+op = 0
+value = 3.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_oeok0"]
+size = Vector2(5, 3)
+subdivide_width = 10
+subdivide_depth = 6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wrwcd"]
 top_radius = 0.07
 bottom_radius = 0.08
 height = 0.03
 radial_segments = 8
 rings = 1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_g1yr6"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_nsbot"]
 top_radius = 0.012
 bottom_radius = 0.012
 height = 0.3
 radial_segments = 6
 rings = 1
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_hdxvp"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_xpn1v"]
 top_radius = 0.06
 bottom_radius = 0.14
 height = 0.12
 radial_segments = 10
 rings = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_ir3qp"]
+[sub_resource type="BoxMesh" id="BoxMesh_clcxi"]
 size = Vector3(0.22, 0.006, 0.3)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rpvfo"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_g5ckq"]
 size = Vector3(0.28, 0.08, 0.34)
 
-[sub_resource type="BoxMesh" id="BoxMesh_1k73y"]
+[sub_resource type="BoxMesh" id="BoxMesh_q7fmg"]
 size = Vector3(0.22, 0.006, 0.3)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_vm0le"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_og5g8"]
 size = Vector3(0.28, 0.08, 0.34)
 
-[sub_resource type="BoxMesh" id="BoxMesh_d3fhx"]
+[sub_resource type="BoxMesh" id="BoxMesh_svs2y"]
 size = Vector3(0.24, 0.1, 0.16)
 
-[sub_resource type="Resource" id="Resource_gdkvx"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_87r48"]
+script = ExtResource("49_gjx86")
 key = &"fono_cilindro"
 negate = true
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_nvvhq"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_55m3t"]
 top_radius = 0.03
 bottom_radius = 0.03
 height = 0.11
 radial_segments = 10
 rings = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_kdtr7"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_7cw7m"]
 size = Vector3(0.13, 0.07, 0.07)
 
-[sub_resource type="BoxMesh" id="BoxMesh_e20wy"]
+[sub_resource type="BoxMesh" id="BoxMesh_rp3r7"]
 size = Vector3(0.5, 0.02, 0.38)
 subdivide_width = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_axe0r"]
+[sub_resource type="BoxMesh" id="BoxMesh_ni1p8"]
 size = Vector3(0.02, 0.3, 0.38)
 
-[sub_resource type="BoxMesh" id="BoxMesh_mmd0p"]
+[sub_resource type="BoxMesh" id="BoxMesh_1o8cm"]
 size = Vector3(0.5, 0.3, 0.02)
 subdivide_width = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_dyx7d"]
+[sub_resource type="BoxMesh" id="BoxMesh_4cuce"]
 size = Vector3(0.02, 0.3, 0.38)
 
-[sub_resource type="BoxMesh" id="BoxMesh_rd8o8"]
+[sub_resource type="BoxMesh" id="BoxMesh_3jm4y"]
 size = Vector3(0.5, 0.3, 0.02)
 subdivide_width = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_e6yjn"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_3yimc"]
 size = Vector3(0.5, 0.3, 0.38)
 
-[sub_resource type="Resource" id="Resource_qdk26"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_2lvok"]
+script = ExtResource("49_gjx86")
 key = &"fono_corneta"
 negate = true
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_3ne7b"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_swftu"]
 top_radius = 0.12
 bottom_radius = 0.015
 height = 0.3
 radial_segments = 10
 rings = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_c67ct"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_itxmb"]
 size = Vector3(0.22, 0.15, 0.22)
 
-[sub_resource type="Resource" id="Resource_ido38"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_b0t78"]
+script = ExtResource("49_gjx86")
 key = &"fono_manivela"
 negate = true
 
-[sub_resource type="BoxMesh" id="BoxMesh_c1avs"]
+[sub_resource type="BoxMesh" id="BoxMesh_rywxl"]
 size = Vector3(0.14, 0.012, 0.012)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_tu07q"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_v1wb8"]
 top_radius = 0.01
 bottom_radius = 0.01
 height = 0.05
 radial_segments = 6
 rings = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_v1njp"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_cuf86"]
 size = Vector3(0.22, 0.15, 0.22)
 
-[sub_resource type="Resource" id="Resource_kvexj"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_a742c"]
+script = ExtResource("49_gjx86")
 key = &"fono_agulha"
 negate = true
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_oeok0"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_dee1b"]
 top_radius = 0.025
 bottom_radius = 0.025
 height = 0.012
 radial_segments = 8
 rings = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_wrwcd"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_lbjrt"]
 size = Vector3(0.22, 0.15, 0.22)
 
-[sub_resource type="Resource" id="Resource_nsbot"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_s7uxd"]
+script = ExtResource("49_gjx86")
 key = &"tocou_disco"
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_xpn1v"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_ou03d"]
 size = Vector3(0.36, 0.2, 0.36)
 
-[sub_resource type="Resource" id="Resource_clcxi"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_0ypf1"]
+script = ExtResource("49_gjx86")
 key = &"dia"
 value = 3.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_g5ckq"]
+[sub_resource type="BoxMesh" id="BoxMesh_dggvn"]
 size = Vector3(0.34, 0.14, 0.24)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_q7fmg"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_epca1"]
 top_radius = 0.028
 bottom_radius = 0.028
 height = 0.15
 radial_segments = 10
 rings = 1
 
-[sub_resource type="Resource" id="Resource_og5g8"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_jgm02"]
+script = ExtResource("49_gjx86")
 key = &"fono_cilindro"
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_svs2y"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_0sw0x"]
 top_radius = 0.032
 bottom_radius = 0.032
 height = 0.11
 radial_segments = 10
 rings = 1
 
-[sub_resource type="Resource" id="Resource_87r48"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_mg7yy"]
+script = ExtResource("49_gjx86")
 key = &"fono_corneta"
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_55m3t"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_er0ef"]
 top_radius = 0.16
 bottom_radius = 0.015
 height = 0.4
 radial_segments = 10
 rings = 1
 
-[sub_resource type="Resource" id="Resource_7cw7m"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_57tj7"]
+script = ExtResource("49_gjx86")
 key = &"fono_manivela"
 
-[sub_resource type="BoxMesh" id="BoxMesh_rp3r7"]
+[sub_resource type="BoxMesh" id="BoxMesh_d7uny"]
 size = Vector3(0.012, 0.12, 0.012)
 
-[sub_resource type="Resource" id="Resource_ni1p8"]
-script = ExtResource("47_tadcj")
+[sub_resource type="Resource" id="Resource_87w8c"]
+script = ExtResource("49_gjx86")
 key = &"fono_agulha"
 
-[sub_resource type="BoxMesh" id="BoxMesh_1o8cm"]
+[sub_resource type="BoxMesh" id="BoxMesh_i3iur"]
 size = Vector3(0.05, 0.03, 0.05)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4cuce"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_atri0"]
 size = Vector3(0.4, 0.35, 0.35)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3jm4y"]
+[sub_resource type="Resource" id="Resource_cgedl"]
+script = ExtResource("49_gjx86")
+key = &"dia"
+op = 0
+value = 4.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_n4fq7"]
+size = Vector2(5, 3)
+subdivide_width = 10
+subdivide_depth = 6
+
+[sub_resource type="BoxMesh" id="BoxMesh_cxxq7"]
+size = Vector3(0.2, 0.003, 0.14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r4dy5"]
+size = Vector3(0.24, 0.06, 0.18)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mfgu8"]
+size = Vector3(0.22, 0.006, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tiwti"]
+size = Vector3(0.28, 0.08, 0.34)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ykxw0"]
+size = Vector3(0.2, 0.04, 0.12)
+
+[sub_resource type="Resource" id="Resource_8nenu"]
+script = ExtResource("49_gjx86")
+key = &"ligou_relato_keene"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mkynx"]
+size = Vector3(0.36, 0.2, 0.36)
+
+[sub_resource type="Resource" id="Resource_kvxd6"]
+script = ExtResource("49_gjx86")
+key = &"dia"
+value = 4.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sbhjr"]
+size = Vector3(0.13, 0.03, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cuqml"]
+size = Vector3(0.24, 0.38, 0.12)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7ofwg"]
+top_radius = 0.035
+bottom_radius = 0.035
+height = 0.03
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_17fyp"]
+top_radius = 0.035
+bottom_radius = 0.035
+height = 0.03
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6bfku"]
+top_radius = 0.03
+bottom_radius = 0.015
+height = 0.08
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_llccv"]
+top_radius = 0.018
+bottom_radius = 0.022
+height = 0.12
+radial_segments = 8
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_dx03x"]
+size = Vector3(0.012, 0.08, 0.012)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5ury0"]
+size = Vector3(0.36, 0.45, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hins6"]
 size = Vector3(0.9, 2, 0.2)
 
-[sub_resource type="BoxMesh" id="BoxMesh_3yimc"]
+[sub_resource type="BoxMesh" id="BoxMesh_b23sm"]
 size = Vector3(0.8, 0.9, 0.5)
 subdivide_width = 1
 subdivide_height = 1
 subdivide_depth = 1
 
-[sub_resource type="BoxMesh" id="BoxMesh_2lvok"]
+[sub_resource type="BoxMesh" id="BoxMesh_k7pvx"]
 size = Vector3(0.01, 0.8, 0.01)
 subdivide_height = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_swftu"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_svl82"]
 size = Vector3(0.8, 0.9, 0.5)
 
-[node name="Escritorio" type="Node3D" unique_id=58754613]
-script = ExtResource("1_v2xkw")
-env_1930 = SubResource("Environment_gvc0l")
-env_dia = SubResource("Environment_b2f5e")
-ambientes_dia = Array[Environment]([null, SubResource("Environment_b2f5e"), SubResource("Environment_ip1yw"), SubResource("Environment_i37l6")])
-som_chuva = ExtResource("2_idu2d")
-som_tarde = ExtResource("3_3ss4r")
-som_pena = ExtResource("4_r5tib")
-linha_abertura = ExtResource("5_itakx")
-linha_cartas = ExtResource("6_qdmlg")
-cartoes_dia = Array[ExtResource("7_aa2ji")]([null, ExtResource("8_4japi"), ExtResource("9_jmgnm"), ExtResource("10_ea43y"), ExtResource("11_1b2pn")])
-linhas_correio = Array[ExtResource("7_aa2ji")]([null, ExtResource("12_kdma7"), ExtResource("13_7fn04"), ExtResource("14_hvpim")])
-linha_resposta_selada = ExtResource("15_cddvi")
+[node name="Escritorio" type="Node3D" unique_id=1683170779]
+script = ExtResource("1_hvpim")
+env_1930 = SubResource("Environment_uarni")
+env_dia = SubResource("Environment_qbsog")
+ambientes_dia = Array[Environment]([null, SubResource("Environment_qbsog"), SubResource("Environment_8nk4w"), SubResource("Environment_x1n1h"), SubResource("Environment_qbsog")])
+som_chuva = ExtResource("2_cddvi")
+som_tarde = ExtResource("3_4eduv")
+som_pena = ExtResource("4_b11rw")
+linha_abertura = ExtResource("5_oyru7")
+linha_cartas = ExtResource("6_8s7on")
+cartoes_dia = Array[ExtResource("7_mfkew")]([null, ExtResource("8_tt3ad"), ExtResource("9_mx1ja"), ExtResource("10_g813i"), ExtResource("11_cai74"), ExtResource("12_bl5ai")])
+linhas_correio = Array[ExtResource("7_mfkew")]([null, ExtResource("13_f8r8f"), ExtResource("14_ff3v7"), ExtResource("15_mer0s"), ExtResource("16_ij0fk")])
+linha_resposta_selada = ExtResource("17_pold6")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1414511481]
-environment = SubResource("Environment_gvc0l")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1880880633]
+environment = SubResource("Environment_uarni")
 
-[node name="Estrutura" type="Node3D" parent="." unique_id=1266530158]
+[node name="Estrutura" type="Node3D" parent="." unique_id=115466115]
 
-[node name="Piso" type="MeshInstance3D" parent="Estrutura" unique_id=282341925]
+[node name="Piso" type="MeshInstance3D" parent="Estrutura" unique_id=1828728249]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
-material_override = ExtResource("16_4eduv")
-mesh = SubResource("QuadMesh_di310")
-
-[node name="Teto" type="MeshInstance3D" parent="Estrutura" unique_id=2077199542]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 3, 0)
-material_override = ExtResource("17_b11rw")
-mesh = SubResource("QuadMesh_rkvtt")
-
-[node name="ParedeOeste" type="MeshInstance3D" parent="Estrutura" unique_id=1462469876]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2.5, 1.5, 0)
-material_override = ExtResource("18_oyru7")
-mesh = SubResource("QuadMesh_jhtsh")
-
-[node name="ParedeLeste" type="MeshInstance3D" parent="Estrutura" unique_id=1645268794]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2.5, 1.5, 0)
-material_override = ExtResource("18_oyru7")
-mesh = SubResource("QuadMesh_b056n")
-
-[node name="ParedeSul" type="MeshInstance3D" parent="Estrutura" unique_id=567128333]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1.5, 3)
-material_override = ExtResource("18_oyru7")
-mesh = SubResource("QuadMesh_plv2r")
-
-[node name="ParedeNorteO" type="MeshInstance3D" parent="Estrutura" unique_id=1099285547]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 1.5, -3.1)
-material_override = ExtResource("18_oyru7")
-mesh = SubResource("BoxMesh_r2ix2")
-
-[node name="ParedeNorteL" type="MeshInstance3D" parent="Estrutura" unique_id=1613878405]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.65, 1.5, -3.1)
-material_override = ExtResource("18_oyru7")
-mesh = SubResource("BoxMesh_0vsgr")
-
-[node name="ParedeNorteBaixo" type="MeshInstance3D" parent="Estrutura" unique_id=618166356]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -3.1)
-material_override = ExtResource("18_oyru7")
-mesh = SubResource("BoxMesh_m8u08")
-
-[node name="ParedeNorteAlto" type="MeshInstance3D" parent="Estrutura" unique_id=98125267]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -3.1)
-material_override = ExtResource("18_oyru7")
-mesh = SubResource("BoxMesh_wnghe")
-
-[node name="RodapeOeste" type="MeshInstance3D" parent="Estrutura" unique_id=1250452567]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.485, 0.06, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_5b0bg")
-
-[node name="RodapeLeste" type="MeshInstance3D" parent="Estrutura" unique_id=1551759283]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.485, 0.06, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_3koal")
-
-[node name="RodapeSul" type="MeshInstance3D" parent="Estrutura" unique_id=1001653486]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 2.985)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_0ehhf")
-
-[node name="RodapeNorte" type="MeshInstance3D" parent="Estrutura" unique_id=1322757289]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -2.985)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_mdxk4")
-
-[node name="Janela" type="Node3D" parent="Estrutura" unique_id=702537419]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
-
-[node name="Peitoril" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=173264570]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0.02)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_fmekf")
-
-[node name="Verga" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=871869030]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.45, -0.05)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_g6bsg")
-
-[node name="BatenteO" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=1540572844]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.82, 1.6500001, -0.05)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_mfx7i")
-
-[node name="BatenteL" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=2122607057]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.82, 1.6500001, -0.05)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_d7k2f")
-
-[node name="TravessaV" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=1895574417]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6500001, -0.1)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_autmv")
-
-[node name="TravessaH" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=1737974264]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.1)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_olup4")
-
-[node name="Porta" type="Node3D" parent="Estrutura" unique_id=170437272]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
-
-[node name="Folha" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=207993123]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -0.03)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_4ueoc")
-
-[node name="Frente" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=1457097740]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1.05, -0.06)
-material_override = ExtResource("21_tt3ad")
-mesh = SubResource("QuadMesh_virye")
-
-[node name="Macaneta" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=1547536905]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 1, -0.1)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_72j8q")
-
-[node name="BatenteO" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=357299399]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.1, -0.03)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_uarni")
-
-[node name="BatenteL" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=1437553718]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.1, -0.03)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_qbsog")
-
-[node name="BatenteAlto" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=757157937]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.18, -0.03)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_8nk4w")
-
-[node name="Relogio" type="Node3D" parent="Estrutura" unique_id=1275462601]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 1.85, 3)
-
-[node name="Caixa" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=2110954153]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.06)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_x1n1h")
-
-[node name="Mostrador" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=1344227666]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.12, -0.125)
-material_override = ExtResource("23_g813i")
+material_override = ExtResource("18_qhsms")
 mesh = SubResource("QuadMesh_t5krm")
 
-[node name="PonteiroHora" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=449389220]
+[node name="Teto" type="MeshInstance3D" parent="Estrutura" unique_id=1997469426]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 3, 0)
+material_override = ExtResource("19_hximp")
+mesh = SubResource("QuadMesh_tpem5")
+
+[node name="ParedeOeste" type="MeshInstance3D" parent="Estrutura" unique_id=186491340]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2.5, 1.5, 0)
+material_override = ExtResource("20_7f5fr")
+mesh = SubResource("QuadMesh_qbs67")
+
+[node name="ParedeLeste" type="MeshInstance3D" parent="Estrutura" unique_id=381170047]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2.5, 1.5, 0)
+material_override = ExtResource("20_7f5fr")
+mesh = SubResource("QuadMesh_gwnui")
+
+[node name="ParedeSul" type="MeshInstance3D" parent="Estrutura" unique_id=1278030266]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1.5, 3)
+material_override = ExtResource("20_7f5fr")
+mesh = SubResource("QuadMesh_4uydo")
+
+[node name="ParedeNorteO" type="MeshInstance3D" parent="Estrutura" unique_id=209856619]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.65, 1.5, -3.1)
+material_override = ExtResource("20_7f5fr")
+mesh = SubResource("BoxMesh_sr5lc")
+
+[node name="ParedeNorteL" type="MeshInstance3D" parent="Estrutura" unique_id=1219685893]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.65, 1.5, -3.1)
+material_override = ExtResource("20_7f5fr")
+mesh = SubResource("BoxMesh_ctt7l")
+
+[node name="ParedeNorteBaixo" type="MeshInstance3D" parent="Estrutura" unique_id=769952825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -3.1)
+material_override = ExtResource("20_7f5fr")
+mesh = SubResource("BoxMesh_5tibg")
+
+[node name="ParedeNorteAlto" type="MeshInstance3D" parent="Estrutura" unique_id=1757387235]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -3.1)
+material_override = ExtResource("20_7f5fr")
+mesh = SubResource("BoxMesh_ym51c")
+
+[node name="RodapeOeste" type="MeshInstance3D" parent="Estrutura" unique_id=961939200]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.485, 0.06, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_2uxqt")
+
+[node name="RodapeLeste" type="MeshInstance3D" parent="Estrutura" unique_id=1002082545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.485, 0.06, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_ndtbk")
+
+[node name="RodapeSul" type="MeshInstance3D" parent="Estrutura" unique_id=50400561]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 2.985)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_8ekn0")
+
+[node name="RodapeNorte" type="MeshInstance3D" parent="Estrutura" unique_id=21891890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -2.985)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_2goib")
+
+[node name="Janela" type="Node3D" parent="Estrutura" unique_id=1122811604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+
+[node name="Peitoril" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=2106545932]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0.02)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_yqtum")
+
+[node name="Verga" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=1674628660]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.45, -0.05)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_8b3ix")
+
+[node name="BatenteO" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=2063417912]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.82, 1.6500001, -0.05)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_ngwme")
+
+[node name="BatenteL" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=1712688559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.82, 1.6500001, -0.05)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_m6fsa")
+
+[node name="TravessaV" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=429015282]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6500001, -0.1)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_tje32")
+
+[node name="TravessaH" type="MeshInstance3D" parent="Estrutura/Janela" unique_id=777485895]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -0.1)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_bbvm5")
+
+[node name="Porta" type="Node3D" parent="Estrutura" unique_id=1760122235]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
+
+[node name="Folha" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=666239165]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, -0.03)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_ngcy4")
+
+[node name="Frente" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=162083695]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1.05, -0.06)
+material_override = ExtResource("23_8kdnc")
+mesh = SubResource("QuadMesh_4tjt7")
+
+[node name="Macaneta" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=959212048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 1, -0.1)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_keto5")
+
+[node name="BatenteO" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=1783217909]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.1, -0.03)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_64gbe")
+
+[node name="BatenteL" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=1310913513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.1, -0.03)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_1ss76")
+
+[node name="BatenteAlto" type="MeshInstance3D" parent="Estrutura/Porta" unique_id=1486443174]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.18, -0.03)
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_utpkc")
+
+[node name="Relogio" type="Node3D" parent="Estrutura" unique_id=1606092926]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 1.85, 3)
+
+[node name="Caixa" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=62555261]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.06)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_mweyb")
+
+[node name="Mostrador" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=1683801217]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.12, -0.125)
+material_override = ExtResource("25_hayjy")
+mesh = SubResource("QuadMesh_w07f5")
+
+[node name="PonteiroHora" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=1190322856]
 transform = Transform3D(0.64278764, -0.76604444, 0, 0.76604444, 0.64278764, 0, 0, 0, 1, -0.02, 0.15, -0.13)
-material_override = ExtResource("24_cai74")
-mesh = SubResource("BoxMesh_tpem5")
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("BoxMesh_jx4k3")
 
-[node name="PonteiroMinuto" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=277582163]
+[node name="PonteiroMinuto" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=38226918]
 transform = Transform3D(0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 0, 0, 1, 0.03, 0.16, -0.13)
-material_override = ExtResource("24_cai74")
-mesh = SubResource("BoxMesh_qbs67")
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("BoxMesh_7q75u")
 
-[node name="Pendulo" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=1390147496]
+[node name="Pendulo" type="MeshInstance3D" parent="Estrutura/Relogio" unique_id=1983368234]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, -0.13)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_gwnui")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_msb35")
 
-[node name="Tique" type="AudioStreamPlayer3D" parent="Estrutura/Relogio" unique_id=136982425]
-stream = ExtResource("25_bl5ai")
+[node name="Tique" type="AudioStreamPlayer3D" parent="Estrutura/Relogio" unique_id=58204292]
+stream = ExtResource("27_aqt7o")
 volume_db = -12.0
 unit_size = 2.0
 autoplay = true
 bus = &"SFX"
 
-[node name="Colisao" type="StaticBody3D" parent="Estrutura" unique_id=2010029530]
+[node name="Colisao" type="StaticBody3D" parent="Estrutura" unique_id=1521603347]
 
-[node name="Forma0" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=1060149684]
+[node name="Forma0" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=901060382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-shape = SubResource("BoxShape3D_4uydo")
+shape = SubResource("BoxShape3D_ec77b")
 
-[node name="Forma1" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=1155861779]
+[node name="Forma1" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=45214062]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.1, 0)
-shape = SubResource("BoxShape3D_sr5lc")
+shape = SubResource("BoxShape3D_jgxkl")
 
-[node name="Forma2" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=591099770]
+[node name="Forma2" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=323029144]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 1.5, 0)
-shape = SubResource("BoxShape3D_ctt7l")
+shape = SubResource("BoxShape3D_riicy")
 
-[node name="Forma3" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=394990555]
+[node name="Forma3" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=1275806546]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 1.5, 0)
-shape = SubResource("BoxShape3D_5tibg")
+shape = SubResource("BoxShape3D_c5yui")
 
-[node name="Forma4" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=1391627748]
+[node name="Forma4" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=1776011906]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3.1)
-shape = SubResource("BoxShape3D_ym51c")
+shape = SubResource("BoxShape3D_me5ht")
 
-[node name="Forma5" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=130836167]
+[node name="Forma5" type="CollisionShape3D" parent="Estrutura/Colisao" unique_id=1897155093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3.1)
-shape = SubResource("BoxShape3D_2uxqt")
+shape = SubResource("BoxShape3D_shpv7")
 
-[node name="Mobilia" type="Node3D" parent="." unique_id=572891608]
+[node name="Mobilia" type="Node3D" parent="." unique_id=689897806]
 
-[node name="Escrivaninha" type="Node3D" parent="Mobilia" unique_id=68306704]
+[node name="Escrivaninha" type="Node3D" parent="Mobilia" unique_id=1749186084]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.2)
 
-[node name="Tampo" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=202488827]
+[node name="Tampo" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=87161194]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_ndtbk")
-
-[node name="GaveteiroO" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=1219746063]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.36, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_8ekn0")
-
-[node name="PuxadorO0" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=721818402]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.6, 0.38)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_2goib")
-
-[node name="PuxadorO1" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=450637433]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.38, 0.38)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_yqtum")
-
-[node name="PuxadorO2" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=1194260842]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.16, 0.38)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_8b3ix")
-
-[node name="GaveteiroL" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=324234379]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.36, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_ngwme")
-
-[node name="PuxadorL0" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=2090324187]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.6, 0.38)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_m6fsa")
-
-[node name="PuxadorL1" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=767496991]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.38, 0.38)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_tje32")
-
-[node name="PuxadorL2" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=1803287641]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.16, 0.38)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_bbvm5")
-
-[node name="Fundo" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=1908306844]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, -0.3)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_ngcy4")
-
-[node name="Colisao" type="StaticBody3D" parent="Mobilia/Escrivaninha" unique_id=530820188]
-
-[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Escrivaninha/Colisao" unique_id=555844917]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39, 0)
-shape = SubResource("BoxShape3D_4tjt7")
-
-[node name="Cadeira" type="Node3D" parent="Mobilia" unique_id=95307354]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.3)
-
-[node name="Assento" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1150173685]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_keto5")
-
-[node name="Perna-1-1" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=828053916]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.23, -0.19)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_64gbe")
-
-[node name="Perna-11" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1368706912]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.23, 0.19)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_1ss76")
-
-[node name="Perna1-1" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=337652797]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.23, -0.19)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_utpkc")
-
-[node name="Perna11" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1048422703]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.23, 0.19)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_mweyb")
-
-[node name="Encosto" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1925432191]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74, 0.2)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_w07f5")
-
-[node name="Estante" type="Node3D" parent="Mobilia" unique_id=862822395]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.32, 0, -2)
-
-[node name="LadoN" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1403205602]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, -0.78)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_jx4k3")
-
-[node name="LadoS" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=851613619]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.78)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_7q75u")
-
-[node name="Fundo" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1425603827]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17, 1.15, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_msb35")
-
-[node name="Prateleira0" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1932305381]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_ec77b")
-
-[node name="Prateleira1" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=324825766]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_jgxkl")
-
-[node name="Prateleira2" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1779688455]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_riicy")
-
-[node name="Prateleira3" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1334442482]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_c5yui")
-
-[node name="Prateleira4" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=482805731]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_me5ht")
-
-[node name="Prateleira5" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1472781168]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.28, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_shpv7")
-
-[node name="Livros0" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1418741398]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 0.25, 0)
-material_override = ExtResource("19_8s7on")
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_c8bv4")
 
-[node name="Lombadas0" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1350491449]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 0.25, 0)
-material_override = ExtResource("26_f8r8f")
-mesh = SubResource("QuadMesh_33xe4")
+[node name="GaveteiroO" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=1908450764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.36, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_33xe4")
 
-[node name="Livros1" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=116454448]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 0.69, 0)
-material_override = ExtResource("19_8s7on")
+[node name="PuxadorO0" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=450243631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.6, 0.38)
+material_override = ExtResource("24_dvck4")
 mesh = SubResource("BoxMesh_eega8")
 
-[node name="Lombadas1" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1447660057]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 0.69, 0)
-material_override = ExtResource("26_f8r8f")
-mesh = SubResource("QuadMesh_u1htw")
+[node name="PuxadorO1" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=1311271597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.38, 0.38)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_u1htw")
 
-[node name="Livros2" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1580332540]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 1.13, -0.22)
-material_override = ExtResource("19_8s7on")
+[node name="PuxadorO2" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=126980484]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.57, 0.16, 0.38)
+material_override = ExtResource("24_dvck4")
 mesh = SubResource("BoxMesh_lbeiw")
 
-[node name="Lombadas2" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1615544970]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 1.13, -0.22)
-material_override = ExtResource("26_f8r8f")
-mesh = SubResource("QuadMesh_fgeta")
+[node name="GaveteiroL" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=2102569811]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.36, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_fgeta")
 
-[node name="Livros3" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=631308290]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 1.57, 0)
-material_override = ExtResource("19_8s7on")
+[node name="PuxadorL0" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=854141897]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.6, 0.38)
+material_override = ExtResource("24_dvck4")
 mesh = SubResource("BoxMesh_y5tuw")
 
-[node name="Lombadas3" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1421845913]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 1.57, 0)
-material_override = ExtResource("26_f8r8f")
-mesh = SubResource("QuadMesh_etli7")
+[node name="PuxadorL1" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=892808637]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.38, 0.38)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_etli7")
 
-[node name="Livros4" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=505606886]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 2.01, 0)
-material_override = ExtResource("19_8s7on")
+[node name="PuxadorL2" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=568123846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.57, 0.16, 0.38)
+material_override = ExtResource("24_dvck4")
 mesh = SubResource("BoxMesh_nx76v")
 
-[node name="Lombadas4" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=228024827]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 2.01, 0)
-material_override = ExtResource("26_f8r8f")
-mesh = SubResource("QuadMesh_k8dht")
+[node name="Fundo" type="MeshInstance3D" parent="Mobilia/Escrivaninha" unique_id=27162523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, -0.3)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_k8dht")
 
-[node name="Colisao" type="StaticBody3D" parent="Mobilia/Estante" unique_id=679013867]
+[node name="Colisao" type="StaticBody3D" parent="Mobilia/Escrivaninha" unique_id=1893379619]
 
-[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Estante/Colisao" unique_id=108920562]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Escrivaninha/Colisao" unique_id=2020920857]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39, 0)
 shape = SubResource("BoxShape3D_8e22h")
 
-[node name="Lareira" type="Node3D" parent="Mobilia" unique_id=1970115549]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -0.6)
+[node name="Cadeira" type="Node3D" parent="Mobilia" unique_id=531665398]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.3)
 
-[node name="PilarN" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1367445743]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.425, -0.6)
-material_override = ExtResource("27_ff3v7")
+[node name="Assento" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=278329745]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
+material_override = ExtResource("22_g0xy8")
 mesh = SubResource("BoxMesh_goxia")
 
-[node name="PilarS" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1545703792]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.425, 0.6)
-material_override = ExtResource("27_ff3v7")
+[node name="Perna-1-1" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=687875004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.23, -0.19)
+material_override = ExtResource("22_g0xy8")
 mesh = SubResource("BoxMesh_gasv4")
 
-[node name="Chamine" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1036969348]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 1.925, 0)
-material_override = ExtResource("27_ff3v7")
+[node name="Perna-11" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1752036996]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.23, 0.19)
+material_override = ExtResource("22_g0xy8")
 mesh = SubResource("BoxMesh_v1bkb")
 
-[node name="FundoFogo" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=154253272]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03, 0.425, 0)
-material_override = ExtResource("28_mer0s")
+[node name="Perna1-1" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1940022990]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.23, -0.19)
+material_override = ExtResource("22_g0xy8")
 mesh = SubResource("BoxMesh_5mdqe")
 
-[node name="Lareiro" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=2103146796]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.025, 0)
-material_override = ExtResource("27_ff3v7")
+[node name="Perna11" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1718427771]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.23, 0.19)
+material_override = ExtResource("22_g0xy8")
 mesh = SubResource("BoxMesh_qn04k")
 
-[node name="Cinzas" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=487116608]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.08, 0)
-material_override = ExtResource("28_mer0s")
+[node name="Encosto" type="MeshInstance3D" parent="Mobilia/Cadeira" unique_id=1220336406]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74, 0.2)
+material_override = ExtResource("22_g0xy8")
 mesh = SubResource("BoxMesh_u3pvs")
 
-[node name="Grelha" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=44700536]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.22, 0.12, 0)
-material_override = ExtResource("24_cai74")
+[node name="Estante" type="Node3D" parent="Mobilia" unique_id=164534736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.32, 0, -2)
+
+[node name="LadoN" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=580614542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, -0.78)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_wfgvv")
 
-[node name="Consolo" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=89848684]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 1.15, 0)
-material_override = ExtResource("19_8s7on")
+[node name="LadoS" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1688579265]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.78)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_lasxe")
 
-[node name="Castical-1" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=102247857]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1.29, -0.7)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_mtwe8")
+[node name="Fundo" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1259455669]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17, 1.15, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_mtwe8")
 
-[node name="Castical1" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1174846733]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1.29, 0.7)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_4ppqi")
+[node name="Prateleira0" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=305850937]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_4ppqi")
 
-[node name="Colisao" type="StaticBody3D" parent="Mobilia/Lareira" unique_id=1543506604]
+[node name="Prateleira1" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1810923980]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_eees3")
 
-[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Lareira/Colisao" unique_id=1980124950]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 1.5, 0)
-shape = SubResource("BoxShape3D_eees3")
-
-[node name="Poltrona" type="Node3D" parent="Mobilia" unique_id=1569216624]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.6, 0, 0.9)
-
-[node name="Assento" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=1075296195]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
-material_override = ExtResource("29_ij0fk")
+[node name="Prateleira2" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=781383959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.94, 0)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_upykv")
 
-[node name="Encosto" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=176044118]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.33)
-material_override = ExtResource("29_ij0fk")
+[node name="Prateleira3" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1660142098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_abadd")
 
-[node name="Braco-1" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=2011334420]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 0.31, 0)
-material_override = ExtResource("29_ij0fk")
+[node name="Prateleira4" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1162441968]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.82, 0)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_hb0we")
 
-[node name="Braco1" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=1989393357]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.31, 0)
-material_override = ExtResource("29_ij0fk")
+[node name="Prateleira5" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=444792634]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.28, 0)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_hn71n")
 
-[node name="Colisao" type="StaticBody3D" parent="Mobilia/Poltrona" unique_id=1887011786]
+[node name="Livros0" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1781984794]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 0.25, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_qydb7")
 
-[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Poltrona/Colisao" unique_id=162917865]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.05)
-shape = SubResource("BoxShape3D_qydb7")
-
-[node name="Tapete" type="MeshInstance3D" parent="Mobilia" unique_id=664198348]
-transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.006, 0.3)
-material_override = ExtResource("30_pold6")
+[node name="Lombadas0" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1999672592]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 0.25, 0)
+material_override = ExtResource("28_fbj4s")
 mesh = SubResource("QuadMesh_cnbna")
 
-[node name="Cabideiro" type="Node3D" parent="Mobilia" unique_id=1456284172]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 0, 2.6)
+[node name="Livros1" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=806171067]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 0.69, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_kdjjg")
 
-[node name="Haste" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=178431152]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("CylinderMesh_kdjjg")
+[node name="Lombadas1" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1392431273]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 0.69, 0)
+material_override = ExtResource("28_fbj4s")
+mesh = SubResource("QuadMesh_be2vq")
 
-[node name="Pe" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=1263662735]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("CylinderMesh_be2vq")
-
-[node name="Gancho0" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=210241475]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.72, 0)
-material_override = ExtResource("22_mx1ja")
+[node name="Livros2" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1841699310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 1.13, -0.22)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_mo367")
 
-[node name="Gancho1" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=1833908307]
-transform = Transform3D(0.49999997, 0, 0.86602545, 0, 1, 0, -0.86602545, 0, 0.49999997, 0, 1.72, 0)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_u4kdt")
+[node name="Lombadas2" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=559220849]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 1.13, -0.22)
+material_override = ExtResource("28_fbj4s")
+mesh = SubResource("QuadMesh_u4kdt")
 
-[node name="Gancho2" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=862356725]
-transform = Transform3D(-0.50000006, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, -0.50000006, 0, 1.72, 0)
-material_override = ExtResource("22_mx1ja")
+[node name="Livros3" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=347446258]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 1.57, 0)
+material_override = ExtResource("21_3x7uq")
 mesh = SubResource("BoxMesh_0lsbs")
 
-[node name="Gabinete1930" type="Node3D" parent="." unique_id=266002373]
-
-[node name="Vista" type="MeshInstance3D" parent="Gabinete1930" unique_id=861375180]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -4.2)
-material_override = ExtResource("31_qhsms")
+[node name="Lombadas3" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1754837672]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 1.57, 0)
+material_override = ExtResource("28_fbj4s")
 mesh = SubResource("QuadMesh_tpi6h")
 
-[node name="Chuva" type="GPUParticles3D" parent="Gabinete1930" unique_id=159715081]
+[node name="Livros4" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=1495563543]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 2.01, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_skwmv")
+
+[node name="Lombadas4" type="MeshInstance3D" parent="Mobilia/Estante" unique_id=594504176]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.081, 2.01, 0)
+material_override = ExtResource("28_fbj4s")
+mesh = SubResource("QuadMesh_js1s0")
+
+[node name="Colisao" type="StaticBody3D" parent="Mobilia/Estante" unique_id=2138098038]
+
+[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Estante/Colisao" unique_id=1612944248]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+shape = SubResource("BoxShape3D_31r54")
+
+[node name="Lareira" type="Node3D" parent="Mobilia" unique_id=148084715]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -0.6)
+
+[node name="PilarN" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=560889064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.425, -0.6)
+material_override = ExtResource("29_8x1ux")
+mesh = SubResource("BoxMesh_fwnaf")
+
+[node name="PilarS" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=134975967]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.425, 0.6)
+material_override = ExtResource("29_8x1ux")
+mesh = SubResource("BoxMesh_fnlyh")
+
+[node name="Chamine" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=344213381]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 1.925, 0)
+material_override = ExtResource("29_8x1ux")
+mesh = SubResource("BoxMesh_j6gqa")
+
+[node name="FundoFogo" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1145622550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03, 0.425, 0)
+material_override = ExtResource("30_2q1j2")
+mesh = SubResource("BoxMesh_n3ny6")
+
+[node name="Lareiro" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=376880698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.025, 0)
+material_override = ExtResource("29_8x1ux")
+mesh = SubResource("BoxMesh_85g3k")
+
+[node name="Cinzas" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1056522824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.08, 0)
+material_override = ExtResource("30_2q1j2")
+mesh = SubResource("BoxMesh_x0jgl")
+
+[node name="Grelha" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1201433801]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.22, 0.12, 0)
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("BoxMesh_y3ly2")
+
+[node name="Consolo" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1223013629]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 1.15, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_fjn7i")
+
+[node name="Castical-1" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=929925799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1.29, -0.7)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_r3ju6")
+
+[node name="Castical1" type="MeshInstance3D" parent="Mobilia/Lareira" unique_id=1433318164]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 1.29, 0.7)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_7h8fm")
+
+[node name="Colisao" type="StaticBody3D" parent="Mobilia/Lareira" unique_id=2045666866]
+
+[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Lareira/Colisao" unique_id=775950375]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 1.5, 0)
+shape = SubResource("BoxShape3D_2to44")
+
+[node name="Poltrona" type="Node3D" parent="Mobilia" unique_id=1376293433]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.6, 0, 0.9)
+
+[node name="Assento" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=1803636009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
+material_override = ExtResource("31_xn04v")
+mesh = SubResource("BoxMesh_rndge")
+
+[node name="Encosto" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=198212051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.33)
+material_override = ExtResource("31_xn04v")
+mesh = SubResource("BoxMesh_onpjw")
+
+[node name="Braco-1" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=20127190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 0.31, 0)
+material_override = ExtResource("31_xn04v")
+mesh = SubResource("BoxMesh_jfsj8")
+
+[node name="Braco1" type="MeshInstance3D" parent="Mobilia/Poltrona" unique_id=1180220824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.31, 0)
+material_override = ExtResource("31_xn04v")
+mesh = SubResource("BoxMesh_j04qk")
+
+[node name="Colisao" type="StaticBody3D" parent="Mobilia/Poltrona" unique_id=933794894]
+
+[node name="Forma0" type="CollisionShape3D" parent="Mobilia/Poltrona/Colisao" unique_id=648171907]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.05)
+shape = SubResource("BoxShape3D_14xp5")
+
+[node name="Tapete" type="MeshInstance3D" parent="Mobilia" unique_id=760790915]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.006, 0.3)
+material_override = ExtResource("32_2aytg")
+mesh = SubResource("QuadMesh_xvrxi")
+
+[node name="Cabideiro" type="Node3D" parent="Mobilia" unique_id=417700945]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1, 0, 2.6)
+
+[node name="Haste" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=130820002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("CylinderMesh_otq47")
+
+[node name="Pe" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=1984408924]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("CylinderMesh_nx4qv")
+
+[node name="Gancho0" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=20728227]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.72, 0)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_gwhvx")
+
+[node name="Gancho1" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=1278233252]
+transform = Transform3D(0.49999997, 0, 0.86602545, 0, 1, 0, -0.86602545, 0, 0.49999997, 0, 1.72, 0)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_e0vvd")
+
+[node name="Gancho2" type="MeshInstance3D" parent="Mobilia/Cabideiro" unique_id=1663087304]
+transform = Transform3D(-0.50000006, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, -0.50000006, 0, 1.72, 0)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_85aop")
+
+[node name="Gabinete1930" type="Node3D" parent="." unique_id=632023183]
+
+[node name="Vista" type="MeshInstance3D" parent="Gabinete1930" unique_id=1817771412]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -4.2)
+material_override = ExtResource("33_3pkmm")
+mesh = SubResource("QuadMesh_241fq")
+
+[node name="Chuva" type="GPUParticles3D" parent="Gabinete1930" unique_id=767335000]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, -3.7)
 amount = 160
 lifetime = 0.7
 visibility_aabb = AABB(-2, -4, -1, 4, 5, 2)
-process_material = SubResource("ParticleProcessMaterial_skwmv")
-draw_pass_1 = SubResource("QuadMesh_31r54")
+process_material = SubResource("ParticleProcessMaterial_q07st")
+draw_pass_1 = SubResource("QuadMesh_peny2")
 
-[node name="Caixa" type="MeshInstance3D" parent="Gabinete1930" unique_id=47624972]
+[node name="Caixa" type="MeshInstance3D" parent="Gabinete1930" unique_id=1377187496]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.84, -2.25)
-material_override = ExtResource("33_7f5fr")
-mesh = SubResource("BoxMesh_fwnaf")
+material_override = ExtResource("35_gkd3n")
+mesh = SubResource("BoxMesh_8ie7g")
 
-[node name="CaixaCartas" type="Area3D" parent="Gabinete1930/Caixa" unique_id=1756122666]
+[node name="CaixaCartas" type="Area3D" parent="Gabinete1930/Caixa" unique_id=567695013]
 unique_name_in_owner = true
-script = ExtResource("34_3x7uq")
+script = ExtResource("36_dc867")
 title = "As cartas de Henry Akeley"
 description = "Amarradas com barbante. O papel ainda cheira a terra úmida."
 initial_rotation = Vector3(25, 20, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/Caixa/CaixaCartas" unique_id=629954085]
-shape = SubResource("BoxShape3D_fnlyh")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/Caixa/CaixaCartas" unique_id=713865529]
+shape = SubResource("BoxShape3D_a075y")
 
-[node name="Folha" type="MeshInstance3D" parent="Gabinete1930" unique_id=1973473296]
+[node name="Folha" type="MeshInstance3D" parent="Gabinete1930" unique_id=1986698423]
 transform = Transform3D(0.99026805, 0, -0.1391731, 0, 1, 0, 0.1391731, 0, 0.99026805, 0.12, 0.783, -2.1)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("BoxMesh_j6gqa")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_hnh88")
 
-[node name="Ler" type="Area3D" parent="Gabinete1930/Folha" unique_id=1973758179]
-script = ExtResource("36_8kdnc")
-document = ExtResource("37_dvck4")
+[node name="Ler" type="Area3D" parent="Gabinete1930/Folha" unique_id=1707336586]
+script = ExtResource("38_sla21")
+document = ExtResource("39_1xrtw")
 take = false
 prompt = "Ler"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/Folha/Ler" unique_id=1171820926]
-shape = SubResource("BoxShape3D_n3ny6")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/Folha/Ler" unique_id=684581014]
+shape = SubResource("BoxShape3D_6ann7")
 
-[node name="Tinteiro" type="MeshInstance3D" parent="Gabinete1930" unique_id=982516729]
+[node name="Tinteiro" type="MeshInstance3D" parent="Gabinete1930" unique_id=18663422]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 0.805, -2.32)
-material_override = ExtResource("24_cai74")
-mesh = SubResource("CylinderMesh_85g3k")
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("CylinderMesh_onwdx")
 
-[node name="Pena" type="MeshInstance3D" parent="Gabinete1930" unique_id=936262674]
+[node name="Pena" type="MeshInstance3D" parent="Gabinete1930" unique_id=812257198]
 transform = Transform3D(0.90630776, 0, 0.42261827, 0, 1, 0, -0.42261827, 0, 0.90630776, 0.3, 0.79, -2.12)
-material_override = ExtResource("38_hayjy")
-mesh = SubResource("BoxMesh_x0jgl")
+material_override = ExtResource("40_5r322")
+mesh = SubResource("BoxMesh_01x03")
 
-[node name="LamparinaMesa" type="Node3D" parent="Gabinete1930" unique_id=1043011387]
+[node name="LamparinaMesa" type="Node3D" parent="Gabinete1930" unique_id=373547263]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.58, 0.78, -2.42)
 
-[node name="Base" type="MeshInstance3D" parent="Gabinete1930/LamparinaMesa" unique_id=1260220372]
+[node name="Base" type="MeshInstance3D" parent="Gabinete1930/LamparinaMesa" unique_id=1898521582]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_y3ly2")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_1yx2f")
 
-[node name="Tanque" type="MeshInstance3D" parent="Gabinete1930/LamparinaMesa" unique_id=1469695188]
+[node name="Tanque" type="MeshInstance3D" parent="Gabinete1930/LamparinaMesa" unique_id=1650883884]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_fjn7i")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_1dlop")
 
-[node name="Chamine" type="MeshInstance3D" parent="Gabinete1930/LamparinaMesa" unique_id=672456359]
+[node name="Chamine" type="MeshInstance3D" parent="Gabinete1930/LamparinaMesa" unique_id=1733064136]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 0)
-material_override = ExtResource("39_ej1ob")
-mesh = SubResource("CylinderMesh_r3ju6")
+material_override = ExtResource("41_85dnd")
+mesh = SubResource("CylinderMesh_ewfep")
 
-[node name="Luz" type="OmniLight3D" parent="Gabinete1930/LamparinaMesa" unique_id=1172690879]
+[node name="Luz" type="OmniLight3D" parent="Gabinete1930/LamparinaMesa" unique_id=788432698]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.28, 0.1)
 light_color = Color(1, 0.72, 0.45, 1)
 light_energy = 1.8
 omni_range = 5.5
 
-[node name="LuzLua" type="OmniLight3D" parent="Gabinete1930" unique_id=1827174044]
+[node name="LuzLua" type="OmniLight3D" parent="Gabinete1930" unique_id=1162571588]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2.5)
 light_color = Color(0.5, 0.6, 0.9, 1)
 light_energy = 0.7
 omni_range = 6.0
 
-[node name="PoltronaCoberta" type="Node3D" parent="Gabinete1930" unique_id=1035988117]
+[node name="PoltronaCoberta" type="Node3D" parent="Gabinete1930" unique_id=1635461792]
 transform = Transform3D(-0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, -0.70710677, -1.9, 0, 2.2)
 
-[node name="Assento" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=452599531]
+[node name="Assento" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=1926626143]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.21, 0)
-material_override = ExtResource("38_hayjy")
-mesh = SubResource("BoxMesh_7h8fm")
+material_override = ExtResource("40_5r322")
+mesh = SubResource("BoxMesh_tqbpe")
 
-[node name="Encosto" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=2068579449]
+[node name="Encosto" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=1888807284]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.33)
-material_override = ExtResource("38_hayjy")
-mesh = SubResource("BoxMesh_2to44")
+material_override = ExtResource("40_5r322")
+mesh = SubResource("BoxMesh_rgd8f")
 
-[node name="Braco-1" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=766566094]
+[node name="Braco-1" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=1305053751]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38, 0.31, 0)
-material_override = ExtResource("38_hayjy")
-mesh = SubResource("BoxMesh_rndge")
+material_override = ExtResource("40_5r322")
+mesh = SubResource("BoxMesh_ypya0")
 
-[node name="Braco1" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=2138077692]
+[node name="Braco1" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=1629658561]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.31, 0)
-material_override = ExtResource("38_hayjy")
-mesh = SubResource("BoxMesh_onpjw")
+material_override = ExtResource("40_5r322")
+mesh = SubResource("BoxMesh_0rcoq")
 
-[node name="Colisao" type="StaticBody3D" parent="Gabinete1930/PoltronaCoberta" unique_id=248626773]
+[node name="Colisao" type="StaticBody3D" parent="Gabinete1930/PoltronaCoberta" unique_id=1702862287]
 
-[node name="Forma0" type="CollisionShape3D" parent="Gabinete1930/PoltronaCoberta/Colisao" unique_id=845864994]
+[node name="Forma0" type="CollisionShape3D" parent="Gabinete1930/PoltronaCoberta/Colisao" unique_id=1321853272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.05)
-shape = SubResource("BoxShape3D_jfsj8")
+shape = SubResource("BoxShape3D_8xf7d")
 
-[node name="Caimento" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=588938934]
+[node name="Caimento" type="MeshInstance3D" parent="Gabinete1930/PoltronaCoberta" unique_id=264400701]
 transform = Transform3D(1, 0, 0, 0, 0.95105654, -0.309017, 0, 0.309017, 0.95105654, 0, 0.96, 0.15)
-material_override = ExtResource("38_hayjy")
-mesh = SubResource("BoxMesh_j04qk")
+material_override = ExtResource("40_5r322")
+mesh = SubResource("BoxMesh_mfe1j")
 
-[node name="OlharLareira" type="Area3D" parent="Gabinete1930" unique_id=246921975]
+[node name="OlharLareira" type="Area3D" parent="Gabinete1930" unique_id=374747001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0.45, -0.6)
-script = ExtResource("40_aqt7o")
+script = ExtResource("42_8tob6")
 notice = "As cinzas estão frias. Não acendo a lareira desde que voltei."
 prompt = "Olhar"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/OlharLareira" unique_id=872306854]
-shape = SubResource("BoxShape3D_14xp5")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/OlharLareira" unique_id=1899984005]
+shape = SubResource("BoxShape3D_qs074")
 
-[node name="OlharJanela" type="Area3D" parent="Gabinete1930" unique_id=1376261308]
+[node name="OlharJanela" type="Area3D" parent="Gabinete1930" unique_id=2136846390]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, -3)
-script = ExtResource("40_aqt7o")
+script = ExtResource("42_8tob6")
 notice = "Chove sobre Arkham desde o fim da tarde."
 prompt = "Olhar"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/OlharJanela" unique_id=1651096541]
-shape = SubResource("BoxShape3D_xvrxi")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Gabinete1930/OlharJanela" unique_id=123430151]
+shape = SubResource("BoxShape3D_7hhhv")
 
-[node name="Miskatonic" type="Node3D" parent="." unique_id=765775931]
+[node name="Miskatonic" type="Node3D" parent="." unique_id=2031803558]
 
-[node name="QuadroCortica" type="Node3D" parent="Miskatonic" unique_id=1085539092]
+[node name="QuadroCortica" type="Node3D" parent="Miskatonic" unique_id=1560820298]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.45, 0.7)
 
-[node name="Moldura" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=859725886]
+[node name="Moldura" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=1027304125]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.02, 0, 0)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_otq47")
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_2wp0o")
 
-[node name="Cortica" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=1137370363]
+[node name="Cortica" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=56563176]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.045, 0, 0)
-material_override = ExtResource("41_fbj4s")
-mesh = SubResource("QuadMesh_nx4qv")
+material_override = ExtResource("43_seohc")
+mesh = SubResource("QuadMesh_f6jq1")
 
-[node name="Recorte0" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=301024735]
+[node name="Recorte0" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=391325322]
 transform = Transform3D(-4.371139e-08, 0.06975647, 0.9975641, 0, 0.9975641, -0.06975647, -1, -3.0491523e-09, -4.360491e-08, 0.05, 0.15, -0.45)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("QuadMesh_gwhvx")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("QuadMesh_dxd03")
 
-[node name="Ler" type="Area3D" parent="Miskatonic/QuadroCortica/Recorte0" unique_id=984654947]
-script = ExtResource("36_8kdnc")
-document = ExtResource("42_8x1ux")
+[node name="Ler" type="Area3D" parent="Miskatonic/QuadroCortica/Recorte0" unique_id=1396176227]
+script = ExtResource("38_sla21")
+document = ExtResource("44_8mjql")
 remove_visual = false
 prompt = "Ler o recorte"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/QuadroCortica/Recorte0/Ler" unique_id=129632628]
-shape = SubResource("BoxShape3D_e0vvd")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/QuadroCortica/Recorte0/Ler" unique_id=1648317479]
+shape = SubResource("BoxShape3D_df3uh")
 
-[node name="Recorte1" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=932371679]
+[node name="Recorte1" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=244923224]
 transform = Transform3D(-4.371139e-08, -0.05233596, 0.9986295, 0, 0.9986295, 0.05233596, -1, 2.2876774e-09, -4.3651482e-08, 0.05, 0.22, -0.1)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("QuadMesh_85aop")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("QuadMesh_de845")
 
-[node name="Ler" type="Area3D" parent="Miskatonic/QuadroCortica/Recorte1" unique_id=418931867]
-script = ExtResource("36_8kdnc")
-document = ExtResource("43_2q1j2")
+[node name="Ler" type="Area3D" parent="Miskatonic/QuadroCortica/Recorte1" unique_id=889229557]
+script = ExtResource("38_sla21")
+document = ExtResource("45_u34ej")
 remove_visual = false
 prompt = "Ler o recorte"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/QuadroCortica/Recorte1/Ler" unique_id=985041722]
-shape = SubResource("BoxShape3D_241fq")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/QuadroCortica/Recorte1/Ler" unique_id=945087026]
+shape = SubResource("BoxShape3D_0h42e")
 
-[node name="Recorte2" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=900284180]
+[node name="Recorte2" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=1915540615]
 transform = Transform3D(-4.371139e-08, 0.104528464, 0.9945219, 0, 0.9945219, -0.104528464, -1, -4.5690842e-09, -4.3471935e-08, 0.05, 0.1, 0.25)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("QuadMesh_q07st")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("QuadMesh_mi22v")
 
-[node name="Ler" type="Area3D" parent="Miskatonic/QuadroCortica/Recorte2" unique_id=1604453147]
-script = ExtResource("36_8kdnc")
-document = ExtResource("44_xn04v")
+[node name="Ler" type="Area3D" parent="Miskatonic/QuadroCortica/Recorte2" unique_id=1113707459]
+script = ExtResource("38_sla21")
+document = ExtResource("46_3b3gi")
 remove_visual = false
 prompt = "Ler o recorte"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/QuadroCortica/Recorte2/Ler" unique_id=2131089150]
-shape = SubResource("BoxShape3D_5pl7q")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/QuadroCortica/Recorte2/Ler" unique_id=2053595433]
+shape = SubResource("BoxShape3D_ta26u")
 
-[node name="Recorte3" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=2055673447]
+[node name="Recorte3" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=2108703493]
 transform = Transform3D(-4.371139e-08, -0.08715574, 0.9961947, 0, 0.9961947, 0.08715574, -1, 3.8096983e-09, -4.3545054e-08, 0.05, -0.2, 0.45)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("QuadMesh_peny2")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("QuadMesh_6ufk8")
 
-[node name="Recorte4" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=1984168529]
+[node name="Recorte4" type="MeshInstance3D" parent="Miskatonic/QuadroCortica" unique_id=780422622]
 transform = Transform3D(-4.371139e-08, 0.034899496, 0.99939084, 0, 0.99939084, -0.034899496, -1, -1.5255054e-09, -4.368476e-08, 0.05, -0.22, -0.3)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("QuadMesh_8ie7g")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("QuadMesh_lmtrg")
 
-[node name="Tinteiro" type="MeshInstance3D" parent="Miskatonic" unique_id=522395665]
+[node name="Tinteiro" type="MeshInstance3D" parent="Miskatonic" unique_id=1290590510]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 0.805, -2.32)
-material_override = ExtResource("24_cai74")
-mesh = SubResource("CylinderMesh_a075y")
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("CylinderMesh_2u7su")
 
-[node name="Pena" type="MeshInstance3D" parent="Miskatonic" unique_id=1897098063]
+[node name="Pena" type="MeshInstance3D" parent="Miskatonic" unique_id=1054092599]
 transform = Transform3D(0.90630776, 0, 0.42261827, 0, 1, 0, -0.42261827, 0, 0.90630776, 0.3, 0.79, -2.12)
-material_override = ExtResource("38_hayjy")
-mesh = SubResource("BoxMesh_hnh88")
+material_override = ExtResource("40_5r322")
+mesh = SubResource("BoxMesh_qemql")
 
-[node name="MataBorrao" type="MeshInstance3D" parent="Miskatonic" unique_id=110612493]
+[node name="MataBorrao" type="MeshInstance3D" parent="Miskatonic" unique_id=1210165159]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0.784, -2.12)
-material_override = ExtResource("29_ij0fk")
-mesh = SubResource("BoxMesh_6ann7")
+material_override = ExtResource("31_xn04v")
+mesh = SubResource("BoxMesh_c58h5")
 
-[node name="Debate" type="Node3D" parent="Miskatonic" unique_id=1621477364]
+[node name="Debate" type="Node3D" parent="Miskatonic" unique_id=2039670956]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Debate" unique_id=1384961063]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_1yx2f")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Debate" unique_id=1299789695]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_sacia")
 
-[node name="Rascunho" type="MeshInstance3D" parent="Miskatonic/Debate" unique_id=1508874893]
+[node name="Rascunho" type="MeshInstance3D" parent="Miskatonic/Debate" unique_id=350116614]
 transform = Transform3D(0.9396926, 0, -0.34202012, 0, 1, 0, 0.34202012, 0, 0.9396926, 0.62, 0.785, -2.05)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("BoxMesh_1dlop")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_0qfp4")
 
-[node name="Ler" type="Area3D" parent="Miskatonic/Debate/Rascunho" unique_id=725251454]
-script = ExtResource("36_8kdnc")
-document = ExtResource("49_dc867")
+[node name="Ler" type="Area3D" parent="Miskatonic/Debate/Rascunho" unique_id=1912998961]
+script = ExtResource("38_sla21")
+document = ExtResource("51_e47o4")
 remove_visual = false
 prompt = "Ler o rascunho"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Debate/Rascunho/Ler" unique_id=2074465379]
-shape = SubResource("BoxShape3D_ewfep")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Debate/Rascunho/Ler" unique_id=2019887051]
+shape = SubResource("BoxShape3D_318nv")
 
-[node name="Opositores" type="Node3D" parent="Miskatonic/Debate" unique_id=85970055]
+[node name="Opositores" type="Node3D" parent="Miskatonic/Debate" unique_id=2080275850]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Debate/Opositores" unique_id=454376831]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_tqbpe")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Debate/Opositores" unique_id=1108296509]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_wyl48")
 
-[node name="CartaLeitor" type="MeshInstance3D" parent="Miskatonic/Debate/Opositores" unique_id=1784164730]
+[node name="CartaLeitor" type="MeshInstance3D" parent="Miskatonic/Debate/Opositores" unique_id=929194537]
 transform = Transform3D(0.9702957, 0, 0.2419219, 0, 1, 0, -0.2419219, 0, 0.9702957, 0.42, 0.785, -2.42)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("BoxMesh_rgd8f")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_l5tpe")
 
-[node name="Ler" type="Area3D" parent="Miskatonic/Debate/Opositores/CartaLeitor" unique_id=788441878]
-script = ExtResource("36_8kdnc")
-document = ExtResource("50_5jj00")
+[node name="Ler" type="Area3D" parent="Miskatonic/Debate/Opositores/CartaLeitor" unique_id=79171741]
+script = ExtResource("38_sla21")
+document = ExtResource("52_jo3l1")
 remove_visual = false
 prompt = "Ler a carta do leitor"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Debate/Opositores/CartaLeitor/Ler" unique_id=1503092647]
-shape = SubResource("BoxShape3D_ypya0")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Debate/Opositores/CartaLeitor/Ler" unique_id=2046193550]
+shape = SubResource("BoxShape3D_4syca")
 
-[node name="Opositor0" type="Node3D" parent="Miskatonic/Debate/Opositores" unique_id=1390224690]
+[node name="Opositor0" type="Node3D" parent="Miskatonic/Debate/Opositores" unique_id=2087076965]
 transform = Transform3D(0.99026805, 0, -0.1391731, 0, 1, 0, 0.1391731, 0, 0.99026805, 0.66, 0.78199995, -2.44)
-script = ExtResource("51_sla21")
+script = ExtResource("53_dhgyq")
 destinatario = "Prof. A. N. Wilmarth
 Miskatonic University
 Arkham, Mass."
@@ -1801,9 +1892,9 @@ carimbo_cidade = "ARKHAM"
 carimbo_data = "MAY 17
 1928"
 
-[node name="Opositor1" type="Node3D" parent="Miskatonic/Debate/Opositores" unique_id=425808659]
+[node name="Opositor1" type="Node3D" parent="Miskatonic/Debate/Opositores" unique_id=1715685171]
 transform = Transform3D(0.9998477, 0, 0.017452406, 0, 1, 0, -0.017452406, 0, 0.9998477, 0.66, 0.7865, -2.44)
-script = ExtResource("51_sla21")
+script = ExtResource("53_dhgyq")
 destinatario = "Prof. A. N. Wilmarth
 Miskatonic University
 Arkham, Mass."
@@ -1811,9 +1902,9 @@ carimbo_cidade = "ARKHAM"
 carimbo_data = "MAY 18
 1928"
 
-[node name="Opositor2" type="Node3D" parent="Miskatonic/Debate/Opositores" unique_id=337354871]
+[node name="Opositor2" type="Node3D" parent="Miskatonic/Debate/Opositores" unique_id=977317129]
 transform = Transform3D(0.9848077, 0, 0.17364818, 0, 1, 0, -0.17364818, 0, 0.9848077, 0.66, 0.79099995, -2.44)
-script = ExtResource("51_sla21")
+script = ExtResource("53_dhgyq")
 destinatario = "Prof. A. N. Wilmarth
 Miskatonic University
 Arkham, Mass."
@@ -1821,33 +1912,33 @@ carimbo_cidade = "ARKHAM"
 carimbo_data = "MAY 19
 1928"
 
-[node name="DeixarSemResposta" type="Area3D" parent="Miskatonic/Debate/Opositores" unique_id=1451678207]
+[node name="DeixarSemResposta" type="Area3D" parent="Miskatonic/Debate/Opositores" unique_id=959798569]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, 0.8, -2.44)
-script = ExtResource("40_aqt7o")
+script = ExtResource("42_8tob6")
 changes = Dictionary[StringName, float]({
 &"debate_encerrado": 1.0
 })
 additive = false
-narration = ExtResource("52_1xrtw")
+narration = ExtResource("54_vufhw")
 prompt = "Deixar sem resposta"
-condition = SubResource("Resource_0rcoq")
+condition = SubResource("Resource_1advv")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Debate/Opositores/DeixarSemResposta" unique_id=550677372]
-shape = SubResource("BoxShape3D_8xf7d")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Debate/Opositores/DeixarSemResposta" unique_id=1532055538]
+shape = SubResource("BoxShape3D_j7f4g")
 
-[node name="Fotografias" type="Node3D" parent="Miskatonic" unique_id=1540779726]
+[node name="Fotografias" type="Node3D" parent="Miskatonic" unique_id=411820288]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Fotografias" unique_id=645779825]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_mfe1j")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Fotografias" unique_id=1255027701]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_tkkmq")
 
-[node name="Foto1" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1940345335]
+[node name="Foto1" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1930875830]
 transform = Transform3D(0.99796945, 0, 0.063694224, 0, 1, 0, -0.063694224, 0, 0.99796945, -0.7, 0.78125, -2.47)
-script = ExtResource("53_5r322")
-imagem = ExtResource("54_85dnd")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("56_3w0tl")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto1" unique_id=1730151548]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto1" unique_id=2069111180]
+script = ExtResource("36_dc867")
 title = "Fotografia — a pegada"
 description = "A pior de todas. Tirada onde o sol batia num trecho de lama, em algum planalto deserto. Não é falsificação barata: os seixos e as folhas de grama dão a escala e não deixam possibilidade de truque de dupla exposição."
 initial_rotation = Vector3(90, 0, 0)
@@ -1855,275 +1946,275 @@ flag = &"viu_foto_pegada"
 exposure = 0.05
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto1/Examinar" unique_id=309831736]
-shape = SubResource("BoxShape3D_qs074")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto1/Examinar" unique_id=994243040]
+shape = SubResource("BoxShape3D_g1yr6")
 
-[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto1" unique_id=1484183718]
+[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto1" unique_id=671813370]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.00185, 0)
-script = ExtResource("55_8tob6")
+script = ExtResource("57_xt4y3")
 flag = &"viu_garra_foto"
 text = "Chamei-a de pegada, mas “marca de garra” seria melhor. Era horrivelmente parecida com a de um caranguejo: de uma almofada central, pares de pinças serrilhadas se projetavam em direções opostas — e havia uma ambiguidade quanto à direção."
 min_zoom = 0.5
 exposure = 0.05
 
-[node name="Foto2" type="Node3D" parent="Miskatonic/Fotografias" unique_id=946846158]
+[node name="Foto2" type="Node3D" parent="Miskatonic/Fotografias" unique_id=2101654522]
 transform = Transform3D(0.99998146, 0, 0.00608437, 0, 1, 0, -0.00608437, 0, 0.99998146, -0.55, 0.78175, -2.47)
-script = ExtResource("53_5r322")
-imagem = ExtResource("56_seohc")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("58_p8tpq")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto2" unique_id=1600214486]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto2" unique_id=1587314128]
+script = ExtResource("36_dc867")
 title = "Fotografia — a caverna"
 description = "Uma exposição longa, em sombra funda: a boca de uma caverna na mata, entupida por um matacão de uma regularidade arredondada."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto2/Examinar" unique_id=1421077851]
-shape = SubResource("BoxShape3D_7hhhv")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto2/Examinar" unique_id=757173107]
+shape = SubResource("BoxShape3D_hdxvp")
 
-[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto2" unique_id=990372722]
+[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto2" unique_id=587731773]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.00185, 0.030450001)
-script = ExtResource("55_8tob6")
+script = ExtResource("57_xt4y3")
 flag = &"viu_rastros_caverna"
 text = "Com a lupa: no chão nu diante da caverna, uma rede densa de rastros curiosos — iguais ao da outra fotografia."
 min_zoom = 0.85
 exposure = 0.03
 
-[node name="Foto3" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1240688413]
+[node name="Foto3" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1882283755]
 transform = Transform3D(0.99595135, 0, -0.08989378, 0, 1, 0, 0.08989378, 0, 0.99595135, -0.4, 0.78125, -2.47)
-script = ExtResource("53_5r322")
-imagem = ExtResource("57_8mjql")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("59_pudrh")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto3" unique_id=657081537]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto3" unique_id=298971021]
+script = ExtResource("36_dc867")
 title = "Fotografia — o círculo de pedras"
 description = "Um círculo de pedras de pé, como de druidas, no alto de uma colina selvagem. Ao fundo, um verdadeiro mar de montanhas desabitadas."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto3/Examinar" unique_id=981936415]
-shape = SubResource("BoxShape3D_2wp0o")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto3/Examinar" unique_id=494169682]
+shape = SubResource("BoxShape3D_ir3qp")
 
-[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto3" unique_id=2016670321]
+[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto3" unique_id=2119921699]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.00185, 0.0261)
-script = ExtResource("55_8tob6")
+script = ExtResource("57_xt4y3")
 flag = &"viu_circulo"
 text = "Em volta do círculo a grama está muito batida e gasta. Nem com a lupa encontro uma única pegada."
 min_zoom = 0.85
 
-[node name="Foto4" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1612391390]
+[node name="Foto4" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1634928508]
 transform = Transform3D(0.98964435, 0, 0.14354119, 0, 1, 0, -0.14354119, 0, 0.98964435, -0.7, 0.78175, -2.33)
-script = ExtResource("53_5r322")
-imagem = ExtResource("58_u34ej")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("60_xtatu")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto4" unique_id=734696949]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto4" unique_id=919178544]
+script = ExtResource("36_dc867")
 title = "Fotografia — a pedra negra"
 description = "A grande pedra negra de Round Hill, sobre a mesa do escritório de Akeley: fileiras de livros e um busto de Milton ao fundo. Que princípios geométricos guiaram o corte dela, eu não saberia dizer."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto4/Examinar" unique_id=493032420]
-shape = SubResource("BoxShape3D_f6jq1")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto4/Examinar" unique_id=771028579]
+shape = SubResource("BoxShape3D_rpvfo")
 
-[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto4" unique_id=1107290241]
+[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto4" unique_id=36757584]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.009279998, 0.00185, 0.004350001)
-script = ExtResource("55_8tob6")
+script = ExtResource("57_xt4y3")
 flag = &"viu_hieroglifos"
 text = "Distingo poucos hieróglifos, mas um ou dois me dão um choque: o estudo me ensinou a ligá-los aos sussurros mais blasfemos — de coisas que tiveram uma espécie de meia-existência louca antes de a terra ser feita."
 min_zoom = 0.85
 exposure = 0.05
 
-[node name="Foto5" type="Node3D" parent="Miskatonic/Fotografias" unique_id=115755201]
+[node name="Foto5" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1873897201]
 transform = Transform3D(0.9971352, 0, -0.07563958, 0, 1, 0, 0.07563958, 0, 0.9971352, -0.55, 0.78125, -2.33)
-script = ExtResource("53_5r322")
-imagem = ExtResource("59_3b3gi")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("61_8xwfm")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto5" unique_id=1357109643]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto5" unique_id=461644502]
+script = ExtResource("36_dc867")
 title = "Fotografia — pântano"
 description = "Uma cena de pântano que parece trazer marcas de uma ocupação escondida e malsã."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto5/Examinar" unique_id=315629256]
-shape = SubResource("BoxShape3D_dxd03")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto5/Examinar" unique_id=2126162294]
+shape = SubResource("BoxShape3D_1k73y")
 
-[node name="Foto6" type="Node3D" parent="Miskatonic/Fotografias" unique_id=900361934]
+[node name="Foto6" type="Node3D" parent="Miskatonic/Fotografias" unique_id=948992922]
 transform = Transform3D(0.9999334, 0, 0.011537324, 0, 1, 0, -0.011537324, 0, 0.9999334, -0.4, 0.78175, -2.33)
-script = ExtResource("53_5r322")
-imagem = ExtResource("60_kjjxk")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("62_efmkv")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto6" unique_id=401834909]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto6" unique_id=1815168615]
+script = ExtResource("36_dc867")
 title = "Fotografia — colina"
 description = "Uma cena de colina que parece trazer marcas de uma ocupação escondida e malsã."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto6/Examinar" unique_id=1064558760]
-shape = SubResource("BoxShape3D_df3uh")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto6/Examinar" unique_id=1776298021]
+shape = SubResource("BoxShape3D_vm0le")
 
-[node name="Foto7" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1987228835]
+[node name="Foto7" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1120619029]
 transform = Transform3D(0.9902375, 0, -0.1393908, 0, 1, 0, 0.1393908, 0, 0.9902375, -0.7, 0.78125, -2.19)
-script = ExtResource("53_5r322")
-imagem = ExtResource("61_wanbn")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("63_g5d0x")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto7" unique_id=1965685084]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto7" unique_id=556141838]
+script = ExtResource("36_dc867")
 title = "Fotografia — pântano"
 description = "Outra cena de pântano, com as mesmas marcas de uma ocupação escondida e malsã."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto7/Examinar" unique_id=1193322924]
-shape = SubResource("BoxShape3D_de845")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto7/Examinar" unique_id=597466413]
+shape = SubResource("BoxShape3D_d3fhx")
 
-[node name="Foto8" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1187921283]
+[node name="Foto8" type="Node3D" parent="Miskatonic/Fotografias" unique_id=1068136461]
 transform = Transform3D(0.99989825, 0, 0.014266502, 0, 1, 0, -0.014266502, 0, 0.99989825, -0.55, 0.78175, -2.19)
-script = ExtResource("53_5r322")
-imagem = ExtResource("62_gjx86")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("64_dbm0j")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto8" unique_id=1689789367]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto8" unique_id=22444846]
+script = ExtResource("36_dc867")
 title = "Fotografia — marca perto da casa"
 description = "Uma marca estranha no chão, bem perto da casa de Akeley, fotografada na manhã seguinte a uma noite em que os cães latiram mais do que nunca. Muito borrada."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto8/Examinar" unique_id=1110477168]
-shape = SubResource("BoxShape3D_0h42e")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto8/Examinar" unique_id=651328337]
+shape = SubResource("BoxShape3D_gdkvx")
 
-[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto8" unique_id=346602851]
+[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto8" unique_id=2031040293]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.0023199976, 0.00185, 0.0069599985)
-script = ExtResource("55_8tob6")
+script = ExtResource("57_xt4y3")
 flag = &"viu_marca_casa"
 text = "Não dá para tirar conclusão segura — mas ela parece diabolicamente com a outra marca de garra, a do planalto deserto."
 exposure = 0.02
 
-[node name="Foto9" type="Node3D" parent="Miskatonic/Fotografias" unique_id=995189588]
+[node name="Foto9" type="Node3D" parent="Miskatonic/Fotografias" unique_id=940647330]
 transform = Transform3D(0.99785525, 0, -0.0654592, 0, 1, 0, 0.0654592, 0, 0.99785525, -0.4, 0.78125, -2.19)
-script = ExtResource("53_5r322")
-imagem = ExtResource("63_yeddb")
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("65_lij66")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto9" unique_id=48846342]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Fotografias/Foto9" unique_id=513475447]
+script = ExtResource("36_dc867")
 title = "Fotografia — a casa de Akeley"
 description = "Uma casa branca e bem cuidada, de dois andares e sótão, com cerca de um século e um quarto; gramado aparado, caminho ladeado de pedras, uma porta georgiana de bom gosto."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar a fotografia"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto9/Examinar" unique_id=1773097810]
-shape = SubResource("BoxShape3D_mi22v")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Fotografias/Foto9/Examinar" unique_id=368629748]
+shape = SubResource("BoxShape3D_nvvhq")
 
-[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto9" unique_id=1111035644]
+[node name="Detalhe" type="Marker3D" parent="Miskatonic/Fotografias/Foto9" unique_id=354628749]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.009279998, 0.00185, 0.019140001)
-script = ExtResource("55_8tob6")
+script = ExtResource("57_xt4y3")
 flag = &"viu_akeley_foto"
 text = "No gramado, vários cães policiais enormes, sentados junto a um homem de rosto agradável e barba grisalha aparada — o próprio Akeley, seu próprio fotógrafo: a pera do disparador na mão direita."
 
-[node name="Dia1" type="Node3D" parent="Miskatonic" unique_id=1807712315]
+[node name="Dia1" type="Node3D" parent="Miskatonic" unique_id=1743974327]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia1" unique_id=235057581]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_ta26u")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia1" unique_id=1420793240]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_kdtr7")
 
-[node name="Vista" type="MeshInstance3D" parent="Miskatonic/Dia1" unique_id=1774685758]
+[node name="Vista" type="MeshInstance3D" parent="Miskatonic/Dia1" unique_id=1950417396]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -4.2)
-material_override = ExtResource("64_e47o4")
-mesh = SubResource("QuadMesh_6ufk8")
+material_override = ExtResource("66_hodvx")
+mesh = SubResource("QuadMesh_e20wy")
 
-[node name="Sol" type="SpotLight3D" parent="Miskatonic/Dia1" unique_id=617403236]
+[node name="Sol" type="SpotLight3D" parent="Miskatonic/Dia1" unique_id=1385816355]
 transform = Transform3D(-0.9734171, -0.12468122, 0.19212916, 0, 0.8388478, 0.54436594, -0.22903934, 0.5298951, -0.8165489, 0.8, 3.4, -4.5)
 light_color = Color(1, 0.86, 0.62, 1)
 light_energy = 7.0
 spot_range = 11.0
 spot_angle = 30.0
 
-[node name="Preenchimento" type="OmniLight3D" parent="Miskatonic/Dia1" unique_id=306395615]
+[node name="Preenchimento" type="OmniLight3D" parent="Miskatonic/Dia1" unique_id=76961792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0.6)
 light_color = Color(1, 0.896, 0.728, 1)
 omni_range = 7.0
 
-[node name="Carta" type="MeshInstance3D" parent="Miskatonic/Dia1" unique_id=1692912043]
+[node name="Carta" type="MeshInstance3D" parent="Miskatonic/Dia1" unique_id=1320743729]
 transform = Transform3D(0.9781476, 0, 0.2079117, 0, 1, 0, -0.2079117, 0, 0.9781476, -0.22, 0.787, -2.12)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("BoxMesh_lmtrg")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_axe0r")
 
-[node name="Ler" type="Area3D" parent="Miskatonic/Dia1/Carta" unique_id=400479972]
-script = ExtResource("36_8kdnc")
-document = ExtResource("65_jo3l1")
+[node name="Ler" type="Area3D" parent="Miskatonic/Dia1/Carta" unique_id=2081963526]
+script = ExtResource("38_sla21")
+document = ExtResource("67_decim")
 prompt = "Ler a carta"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia1/Carta/Ler" unique_id=1768760105]
-shape = SubResource("BoxShape3D_2u7su")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia1/Carta/Ler" unique_id=1094471036]
+shape = SubResource("BoxShape3D_mmd0p")
 
-[node name="Envelope" type="Node3D" parent="Miskatonic/Dia1" unique_id=602292549]
+[node name="Envelope" type="Node3D" parent="Miskatonic/Dia1" unique_id=1123049228]
 transform = Transform3D(0.9848077, 0, 0.17364818, 0, 1, 0, -0.17364818, 0, 0.9848077, -0.5, 0.78199995, -2.32)
-script = ExtResource("51_sla21")
+script = ExtResource("53_dhgyq")
 remetente = "H. W. Akeley
 R.F.D. #2, Townshend, Vt."
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Dia1/Envelope" unique_id=2034823212]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Dia1/Envelope" unique_id=202523521]
+script = ExtResource("36_dc867")
 title = "Envelope de Townshend"
 description = "Uma letra apertada, de aparência arcaica — de quem obviamente não se misturou muito com o mundo. Selo de dois centavos; carimbo de Townshend, 5 de maio."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar o envelope"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia1/Envelope/Examinar" unique_id=1803883688]
-shape = SubResource("BoxShape3D_qemql")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia1/Envelope/Examinar" unique_id=761424404]
+shape = SubResource("BoxShape3D_dyx7d")
 
-[node name="Escrever" type="Area3D" parent="Miskatonic/Dia1" unique_id=412047568]
+[node name="Escrever" type="Area3D" parent="Miskatonic/Dia1" unique_id=217415293]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, 0.85, -2.22)
-script = ExtResource("66_dhgyq")
-reply = ExtResource("67_vufhw")
+script = ExtResource("68_diu4e")
+reply = ExtResource("69_v4vjt")
 prompt = "Escrever a Akeley"
-condition = SubResource("Resource_c58h5")
+condition = SubResource("Resource_rd8o8")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia1/Escrever" unique_id=210716058]
-shape = SubResource("BoxShape3D_ju7yb")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia1/Escrever" unique_id=1278146449]
+shape = SubResource("BoxShape3D_e6yjn")
 
-[node name="Dia2" type="Node3D" parent="Miskatonic" unique_id=1691791409]
+[node name="Dia2" type="Node3D" parent="Miskatonic" unique_id=1609546111]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia2" unique_id=1202879680]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_yglg1")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia2" unique_id=522922192]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_qdk26")
 
-[node name="Vista" type="MeshInstance3D" parent="Miskatonic/Dia2" unique_id=114026381]
+[node name="Vista" type="MeshInstance3D" parent="Miskatonic/Dia2" unique_id=256514133]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -4.2)
-material_override = ExtResource("68_sfqqn")
-mesh = SubResource("QuadMesh_sacia")
+material_override = ExtResource("70_3q0q2")
+mesh = SubResource("QuadMesh_3ne7b")
 
-[node name="Sol" type="SpotLight3D" parent="Miskatonic/Dia2" unique_id=813045484]
+[node name="Sol" type="SpotLight3D" parent="Miskatonic/Dia2" unique_id=726860102]
 transform = Transform3D(-0.96152395, -0.06899434, 0.26591632, 0, 0.96795, 0.2511432, -0.27472115, 0.24148019, -0.9307071, 1.2, 2.2, -4.5)
 light_color = Color(1, 0.58, 0.32, 1)
 light_energy = 5.5
 spot_range = 11.0
 spot_angle = 30.0
 
-[node name="Preenchimento" type="OmniLight3D" parent="Miskatonic/Dia2" unique_id=997904239]
+[node name="Preenchimento" type="OmniLight3D" parent="Miskatonic/Dia2" unique_id=691470562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0.6)
 light_color = Color(1, 0.784, 0.608, 1)
 light_energy = 0.55
 omni_range = 7.0
 
-[node name="Carta" type="MeshInstance3D" parent="Miskatonic/Dia2" unique_id=480370810]
+[node name="Carta" type="MeshInstance3D" parent="Miskatonic/Dia2" unique_id=377330621]
 transform = Transform3D(0.9945219, 0, -0.104528464, 0, 1, 0, 0.104528464, 0, 0.9945219, 0, 0.791, -2.1)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("BoxMesh_0qfp4")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_c67ct")
 
-[node name="Ler" type="Area3D" parent="Miskatonic/Dia2/Carta" unique_id=145193030]
-script = ExtResource("36_8kdnc")
-document = ExtResource("69_3w0tl")
+[node name="Ler" type="Area3D" parent="Miskatonic/Dia2/Carta" unique_id=1462050984]
+script = ExtResource("38_sla21")
+document = ExtResource("71_fdkl7")
 prompt = "Ler a carta"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia2/Carta/Ler" unique_id=1425254593]
-shape = SubResource("BoxShape3D_318nv")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia2/Carta/Ler" unique_id=2096608702]
+shape = SubResource("BoxShape3D_ido38")
 
-[node name="Envelope" type="Node3D" parent="Miskatonic/Dia2" unique_id=350135253]
+[node name="Envelope" type="Node3D" parent="Miskatonic/Dia2" unique_id=800790428]
 transform = Transform3D(0.9945219, 0, 0.104528464, 0, 1, 0, -0.104528464, 0, 0.9945219, -0.2, 0.78599995, -2.47)
-script = ExtResource("51_sla21")
+script = ExtResource("53_dhgyq")
 remetente = "H. W. Akeley
 R.F.D. #2, Townshend, Vt."
 carimbo_data = "MAY 22
@@ -2131,105 +2222,105 @@ carimbo_data = "MAY 22
 selos = 2
 volumoso = true
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Dia2/Envelope" unique_id=1788581862]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Dia2/Envelope" unique_id=285693113]
+script = ExtResource("36_dc867")
 title = "Envelope gordo de Townshend"
 description = "A mesma letra apertada. Dois selos — a carta pesa. Carimbo de Townshend, 22 de maio."
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar o envelope"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia2/Envelope/Examinar" unique_id=1598028783]
-shape = SubResource("BoxShape3D_wyl48")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia2/Envelope/Examinar" unique_id=68762717]
+shape = SubResource("BoxShape3D_c1avs")
 
-[node name="Escrever" type="Area3D" parent="Miskatonic/Dia2" unique_id=487093232]
+[node name="Escrever" type="Area3D" parent="Miskatonic/Dia2" unique_id=168344573]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, 0.85, -2.22)
-script = ExtResource("66_dhgyq")
-reply = ExtResource("70_xt4y3")
+script = ExtResource("68_diu4e")
+reply = ExtResource("72_25lu3")
 prompt = "Escrever a Akeley"
-condition = SubResource("Resource_l5tpe")
+condition = SubResource("Resource_tu07q")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia2/Escrever" unique_id=466057899]
-shape = SubResource("BoxShape3D_4syca")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia2/Escrever" unique_id=1719229436]
+shape = SubResource("BoxShape3D_v1njp")
 
-[node name="Dia3" type="Node3D" parent="Miskatonic" unique_id=1598069490]
+[node name="Dia3" type="Node3D" parent="Miskatonic" unique_id=229155924]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3" unique_id=76101410]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_1advv")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3" unique_id=971751300]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_kvexj")
 
-[node name="Vista" type="MeshInstance3D" parent="Miskatonic/Dia3" unique_id=905028062]
+[node name="Vista" type="MeshInstance3D" parent="Miskatonic/Dia3" unique_id=1312193689]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -4.2)
-material_override = ExtResource("31_qhsms")
-mesh = SubResource("QuadMesh_j7f4g")
+material_override = ExtResource("33_3pkmm")
+mesh = SubResource("QuadMesh_oeok0")
 
-[node name="Lua" type="OmniLight3D" parent="Miskatonic/Dia3" unique_id=1011471584]
+[node name="Lua" type="OmniLight3D" parent="Miskatonic/Dia3" unique_id=791854975]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -2.6)
 light_color = Color(0.5, 0.6, 0.9, 1)
 light_energy = 0.4
 
-[node name="Abajur" type="Node3D" parent="Miskatonic/Dia3" unique_id=1333019098]
+[node name="Abajur" type="Node3D" parent="Miskatonic/Dia3" unique_id=97333675]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.62, 0.78, -2.45)
 
-[node name="Base" type="MeshInstance3D" parent="Miskatonic/Dia3/Abajur" unique_id=75127001]
+[node name="Base" type="MeshInstance3D" parent="Miskatonic/Dia3/Abajur" unique_id=2113627639]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_tkkmq")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_wrwcd")
 
-[node name="Haste" type="MeshInstance3D" parent="Miskatonic/Dia3/Abajur" unique_id=1719470973]
+[node name="Haste" type="MeshInstance3D" parent="Miskatonic/Dia3/Abajur" unique_id=1961924109]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_g1yr6")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_nsbot")
 
-[node name="Cupula" type="MeshInstance3D" parent="Miskatonic/Dia3/Abajur" unique_id=2103030988]
+[node name="Cupula" type="MeshInstance3D" parent="Miskatonic/Dia3/Abajur" unique_id=1064976066]
 transform = Transform3D(1, 0, 0, 0, 0.9848077, -0.17364818, 0, 0.17364818, 0.9848077, 0, 0.36, 0)
-material_override = ExtResource("29_ij0fk")
-mesh = SubResource("CylinderMesh_hdxvp")
+material_override = ExtResource("31_xn04v")
+mesh = SubResource("CylinderMesh_xpn1v")
 
-[node name="Luz" type="OmniLight3D" parent="Miskatonic/Dia3/Abajur" unique_id=1099572508]
+[node name="Luz" type="OmniLight3D" parent="Miskatonic/Dia3/Abajur" unique_id=498520971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0.12)
 light_color = Color(1, 0.8, 0.55, 1)
 light_energy = 2.2
 omni_range = 6.0
 
-[node name="Bilhete" type="MeshInstance3D" parent="Miskatonic/Dia3" unique_id=780325812]
+[node name="Bilhete" type="MeshInstance3D" parent="Miskatonic/Dia3" unique_id=1018683336]
 transform = Transform3D(0.99026805, 0, 0.1391731, 0, 1, 0, -0.1391731, 0, 0.99026805, -0.05, 0.786, -2.16)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("BoxMesh_ir3qp")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_clcxi")
 metadata/treme = true
 
-[node name="Ler" type="Area3D" parent="Miskatonic/Dia3/Bilhete" unique_id=887607564]
-script = ExtResource("36_8kdnc")
-document = ExtResource("71_p8tpq")
+[node name="Ler" type="Area3D" parent="Miskatonic/Dia3/Bilhete" unique_id=873691902]
+script = ExtResource("38_sla21")
+document = ExtResource("73_gvc0l")
 remove_visual = false
 prompt = "Ler o bilhete"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Bilhete/Ler" unique_id=1666900984]
-shape = SubResource("BoxShape3D_rpvfo")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Bilhete/Ler" unique_id=1966967848]
+shape = SubResource("BoxShape3D_g5ckq")
 
-[node name="Transcricao" type="MeshInstance3D" parent="Miskatonic/Dia3" unique_id=427306088]
+[node name="Transcricao" type="MeshInstance3D" parent="Miskatonic/Dia3" unique_id=1093727770]
 transform = Transform3D(0.9781476, 0, -0.2079117, 0, 1, 0, 0.2079117, 0, 0.9781476, 0.25, 0.786, -2.05)
-material_override = ExtResource("35_g0xy8")
-mesh = SubResource("BoxMesh_1k73y")
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_q7fmg")
 metadata/treme = true
 
-[node name="Ler" type="Area3D" parent="Miskatonic/Dia3/Transcricao" unique_id=2054079417]
-script = ExtResource("36_8kdnc")
-document = ExtResource("72_pudrh")
+[node name="Ler" type="Area3D" parent="Miskatonic/Dia3/Transcricao" unique_id=890958893]
+script = ExtResource("38_sla21")
+document = ExtResource("74_b2f5e")
 remove_visual = false
 prompt = "Ler a transcrição"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Transcricao/Ler" unique_id=1665114710]
-shape = SubResource("BoxShape3D_vm0le")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Transcricao/Ler" unique_id=1423599537]
+shape = SubResource("BoxShape3D_og5g8")
 
-[node name="Pacote" type="Node3D" parent="Miskatonic/Dia3" unique_id=1372246445]
+[node name="Pacote" type="Node3D" parent="Miskatonic/Dia3" unique_id=172701579]
 transform = Transform3D(0.9702957, 0, 0.2419219, 0, 1, 0, -0.2419219, 0, 0.9702957, -0.42, 0.78, -2.38)
 
-[node name="Caixa" type="MeshInstance3D" parent="Miskatonic/Dia3/Pacote" unique_id=1990777751]
+[node name="Caixa" type="MeshInstance3D" parent="Miskatonic/Dia3/Pacote" unique_id=1688938895]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-material_override = ExtResource("33_7f5fr")
-mesh = SubResource("BoxMesh_d3fhx")
+material_override = ExtResource("35_gkd3n")
+mesh = SubResource("BoxMesh_svs2y")
 
-[node name="Etiqueta" type="Label3D" parent="Miskatonic/Dia3/Pacote" unique_id=2054370312]
+[node name="Etiqueta" type="Label3D" parent="Miskatonic/Dia3/Pacote" unique_id=1790588922]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0.081)
 pixel_size = 0.00012
 alpha_cut = 1
@@ -2240,57 +2331,57 @@ to A. N. WILMARTH — ARKHAM, MASS."
 font_size = 40
 outline_size = 0
 
-[node name="Estojo" type="Node3D" parent="Miskatonic/Dia3" unique_id=594921791]
+[node name="Estojo" type="Node3D" parent="Miskatonic/Dia3" unique_id=903558425]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.81, -2.34)
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Estojo" unique_id=798522925]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_gdkvx")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Estojo" unique_id=1000495837]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_87r48")
 
-[node name="Tubo" type="MeshInstance3D" parent="Miskatonic/Dia3/Estojo" unique_id=1439837163]
+[node name="Tubo" type="MeshInstance3D" parent="Miskatonic/Dia3/Estojo" unique_id=1750850423]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
-material_override = ExtResource("73_xtatu")
-mesh = SubResource("CylinderMesh_nvvhq")
+material_override = ExtResource("75_ip1yw")
+mesh = SubResource("CylinderMesh_55m3t")
 
-[node name="Examinar" type="Area3D" parent="Miskatonic/Dia3/Estojo/Tubo" unique_id=122808881]
-script = ExtResource("34_3x7uq")
+[node name="Examinar" type="Area3D" parent="Miskatonic/Dia3/Estojo/Tubo" unique_id=553806685]
+script = ExtResource("36_dc867")
 title = "O cilindro de cera"
 description = "Um cilindro de cera escura, gravado com ditafone, no estojo de papelão. Na tampa, a letra apertada de Akeley: “1º de maio de 1915.”"
 initial_rotation = Vector3(90, 0, 0)
 prompt = "Examinar o estojo"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Estojo/Tubo/Examinar" unique_id=745121290]
-shape = SubResource("BoxShape3D_kdtr7")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Estojo/Tubo/Examinar" unique_id=1454181795]
+shape = SubResource("BoxShape3D_7cw7m")
 
-[node name="Caixote" type="Node3D" parent="Miskatonic/Dia3" unique_id=477028976]
+[node name="Caixote" type="Node3D" parent="Miskatonic/Dia3" unique_id=1279149267]
 transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, -1.5, 0, 2.05)
 
-[node name="Fundo" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=1514992494]
+[node name="Fundo" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=1264957015]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_e20wy")
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_rp3r7")
 
-[node name="Lado-1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=780219691]
+[node name="Lado-1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=2121915294]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 0.15, 0)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_axe0r")
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_ni1p8")
 
-[node name="Frente-1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=742877350]
+[node name="Frente-1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=436869044]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, -0.18)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_mmd0p")
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_1o8cm")
 
-[node name="Lado1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=1653144955]
+[node name="Lado1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=1162217847]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.15, 0)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_dyx7d")
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_4cuce")
 
-[node name="Frente1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=1490113074]
+[node name="Frente1" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote" unique_id=1307749902]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0.18)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_rd8o8")
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_3jm4y")
 
-[node name="Rotulo" type="Label3D" parent="Miskatonic/Dia3/Caixote" unique_id=146248316]
+[node name="Rotulo" type="Label3D" parent="Miskatonic/Dia3/Caixote" unique_id=63481661]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0.192)
 pixel_size = 0.0004
 alpha_cut = 1
@@ -2299,204 +2390,350 @@ text = "MISKATONIC UNIVERSITY
 ADMINISTRATION BLDG."
 font_size = 48
 
-[node name="Colisao" type="StaticBody3D" parent="Miskatonic/Dia3/Caixote" unique_id=1754008201]
+[node name="Colisao" type="StaticBody3D" parent="Miskatonic/Dia3/Caixote" unique_id=827925562]
 
-[node name="Forma0" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Colisao" unique_id=422714217]
+[node name="Forma0" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Colisao" unique_id=590613117]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
-shape = SubResource("BoxShape3D_e6yjn")
+shape = SubResource("BoxShape3D_3yimc")
 
-[node name="Peca_corneta" type="Node3D" parent="Miskatonic/Dia3/Caixote" unique_id=44763570]
+[node name="Peca_corneta" type="Node3D" parent="Miskatonic/Dia3/Caixote" unique_id=323849325]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0.12, 0)
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Caixote/Peca_corneta" unique_id=231964579]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_qdk26")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Caixote/Peca_corneta" unique_id=416038246]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_2lvok")
 
-[node name="Corneta" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_corneta" unique_id=659698903]
+[node name="Corneta" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_corneta" unique_id=1096686772]
 transform = Transform3D(0.17364822, -0.9848077, 0, 0.9848077, 0.17364822, 0, 0, 0, 1, 0, 0, 0)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_3ne7b")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_swftu")
 
-[node name="Montar" type="Area3D" parent="Miskatonic/Dia3/Caixote/Peca_corneta" unique_id=266894857]
-script = ExtResource("40_aqt7o")
+[node name="Montar" type="Area3D" parent="Miskatonic/Dia3/Caixote/Peca_corneta" unique_id=825978509]
+script = ExtResource("42_8tob6")
 changes = Dictionary[StringName, float]({
 &"fono_corneta": 1.0
 })
 additive = false
 prompt = "Montar a corneta"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Peca_corneta/Montar" unique_id=337455539]
-shape = SubResource("BoxShape3D_c67ct")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Peca_corneta/Montar" unique_id=1269970739]
+shape = SubResource("BoxShape3D_itxmb")
 
-[node name="Peca_manivela" type="Node3D" parent="Miskatonic/Dia3/Caixote" unique_id=2041932464]
+[node name="Peca_manivela" type="Node3D" parent="Miskatonic/Dia3/Caixote" unique_id=214567963]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.08, 0.06)
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=1891471249]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_ido38")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=729468013]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_b0t78")
 
-[node name="Braco" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=184151303]
-material_override = ExtResource("24_cai74")
-mesh = SubResource("BoxMesh_c1avs")
+[node name="Braco" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=1301400264]
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("BoxMesh_rywxl")
 
-[node name="Punho" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=1101075311]
+[node name="Punho" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=1830939511]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07, 0.025, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("CylinderMesh_tu07q")
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("CylinderMesh_v1wb8")
 
-[node name="Montar" type="Area3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=667349305]
-script = ExtResource("40_aqt7o")
+[node name="Montar" type="Area3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela" unique_id=882035318]
+script = ExtResource("42_8tob6")
 changes = Dictionary[StringName, float]({
 &"fono_manivela": 1.0
 })
 additive = false
 prompt = "Montar a manivela"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela/Montar" unique_id=68239738]
-shape = SubResource("BoxShape3D_v1njp")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Peca_manivela/Montar" unique_id=1317632344]
+shape = SubResource("BoxShape3D_cuf86")
 
-[node name="Peca_agulha" type="Node3D" parent="Miskatonic/Dia3/Caixote" unique_id=231846225]
+[node name="Peca_agulha" type="Node3D" parent="Miskatonic/Dia3/Caixote" unique_id=186810134]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14, 0.06, -0.08)
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Caixote/Peca_agulha" unique_id=1623135042]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_kvexj")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia3/Caixote/Peca_agulha" unique_id=2117130808]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_a742c")
 
-[node name="Lata" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_agulha" unique_id=449380782]
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_oeok0")
+[node name="Lata" type="MeshInstance3D" parent="Miskatonic/Dia3/Caixote/Peca_agulha" unique_id=1565646675]
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_dee1b")
 
-[node name="Montar" type="Area3D" parent="Miskatonic/Dia3/Caixote/Peca_agulha" unique_id=297782329]
-script = ExtResource("40_aqt7o")
+[node name="Montar" type="Area3D" parent="Miskatonic/Dia3/Caixote/Peca_agulha" unique_id=284977651]
+script = ExtResource("42_8tob6")
 changes = Dictionary[StringName, float]({
 &"fono_agulha": 1.0
 })
 additive = false
 prompt = "Pôr uma agulha"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Peca_agulha/Montar" unique_id=882762888]
-shape = SubResource("BoxShape3D_wrwcd")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Caixote/Peca_agulha/Montar" unique_id=1690373773]
+shape = SubResource("BoxShape3D_lbjrt")
 
-[node name="Escrever" type="Area3D" parent="Miskatonic/Dia3" unique_id=1421611528]
+[node name="Escrever" type="Area3D" parent="Miskatonic/Dia3" unique_id=1039941397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, 0.85, -2.22)
-script = ExtResource("66_dhgyq")
-reply = ExtResource("74_8xwfm")
+script = ExtResource("68_diu4e")
+reply = ExtResource("76_i37l6")
 prompt = "Escrever a Akeley"
-condition = SubResource("Resource_nsbot")
+condition = SubResource("Resource_s7uxd")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Escrever" unique_id=50552735]
-shape = SubResource("BoxShape3D_xpn1v")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia3/Escrever" unique_id=1856957985]
+shape = SubResource("BoxShape3D_ou03d")
 
-[node name="MaquinaFonografo" type="Node3D" parent="Miskatonic" unique_id=1563695432]
+[node name="MaquinaFonografo" type="Node3D" parent="Miskatonic" unique_id=1665458184]
 transform = Transform3D(0.49999997, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.49999997, -2.15, 0.9, 2.35)
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo" unique_id=1506796109]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_clcxi")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo" unique_id=1450093874]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_0ypf1")
 
-[node name="Caixa" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo" unique_id=1792684445]
+[node name="Caixa" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo" unique_id=2069387023]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.07, 0)
-material_override = ExtResource("20_mfkew")
-mesh = SubResource("BoxMesh_g5ckq")
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_dggvn")
 
-[node name="Mandril" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo" unique_id=1318653427]
+[node name="Mandril" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo" unique_id=1036218836]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0.19, 0.02)
-material_override = ExtResource("24_cai74")
-mesh = SubResource("CylinderMesh_q7fmg")
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("CylinderMesh_epca1")
 
-[node name="Cilindro" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=1550661488]
+[node name="Cilindro" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=1296312658]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Cilindro" unique_id=1927687746]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_og5g8")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Cilindro" unique_id=288811423]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_jgm02")
 
-[node name="Cera" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Cilindro" unique_id=1561543569]
+[node name="Cera" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Cilindro" unique_id=902970722]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0.19, 0.02)
-material_override = ExtResource("28_mer0s")
-mesh = SubResource("CylinderMesh_svs2y")
+material_override = ExtResource("30_2q1j2")
+mesh = SubResource("CylinderMesh_0sw0x")
 
-[node name="Corneta" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=7793523]
+[node name="Corneta" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=778505391]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Corneta" unique_id=2022740694]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_87r48")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Corneta" unique_id=1795556364]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_mg7yy")
 
-[node name="Cone" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Corneta" unique_id=1848854431]
+[node name="Cone" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Corneta" unique_id=792724176]
 transform = Transform3D(1, 0, 0, 0, 0.57357645, 0.81915206, 0, -0.81915206, 0.57357645, 0.05, 0.38, -0.12)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("CylinderMesh_55m3t")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_er0ef")
 
-[node name="Manivela" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=550249822]
+[node name="Manivela" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=1586153079]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Manivela" unique_id=488837057]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_7cw7m")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Manivela" unique_id=1465002909]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_57tj7")
 
-[node name="Braco" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Manivela" unique_id=724620871]
+[node name="Braco" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Manivela" unique_id=140071483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.08, 0)
-material_override = ExtResource("24_cai74")
-mesh = SubResource("BoxMesh_rp3r7")
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("BoxMesh_d7uny")
 
-[node name="Agulha" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=1489478977]
+[node name="Agulha" type="Node3D" parent="Miskatonic/MaquinaFonografo" unique_id=1285140977]
 
-[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Agulha" unique_id=500632511]
-script = ExtResource("45_2aytg")
-condition = SubResource("Resource_ni1p8")
+[node name="ConditionalNode" type="Node" parent="Miskatonic/MaquinaFonografo/Agulha" unique_id=1049076877]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_87w8c")
 
-[node name="Diafragma" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Agulha" unique_id=1929167759]
+[node name="Diafragma" type="MeshInstance3D" parent="Miskatonic/MaquinaFonografo/Agulha" unique_id=445410389]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.24, 0)
-material_override = ExtResource("22_mx1ja")
-mesh = SubResource("BoxMesh_1o8cm")
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("BoxMesh_i3iur")
 
-[node name="Fonografo" type="Area3D" parent="Miskatonic/MaquinaFonografo" unique_id=1689271738 node_paths=PackedStringArray("luz", "tremer")]
+[node name="Fonografo" type="Area3D" parent="Miskatonic/MaquinaFonografo" unique_id=22944495 node_paths=PackedStringArray("luz", "tremer")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
-script = ExtResource("75_efmkv")
-gravacao = ExtResource("76_g5d0x")
-gravacao_longa = ExtResource("77_dbm0j")
-zumbido = ExtResource("78_lij66")
-narracao_depois = ExtResource("79_hodvx")
+script = ExtResource("77_di310")
+gravacao = ExtResource("78_rkvtt")
+gravacao_longa = ExtResource("79_jhtsh")
+zumbido = ExtResource("80_b056n")
+narracao_depois = ExtResource("81_plv2r")
 luz = NodePath("../../Dia3/Abajur/Luz")
 tremer = [NodePath("../../Dia3/Bilhete"), NodePath("../../Dia3/Transcricao")]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/MaquinaFonografo/Fonografo" unique_id=1272751479]
-shape = SubResource("BoxShape3D_4cuce")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/MaquinaFonografo/Fonografo" unique_id=1445714961]
+shape = SubResource("BoxShape3D_atri0")
 
-[node name="SairPorta" type="Area3D" parent="Miskatonic" unique_id=1587844774]
+[node name="Dia4" type="Node3D" parent="Miskatonic" unique_id=1644735219]
+
+[node name="ConditionalNode" type="Node" parent="Miskatonic/Dia4" unique_id=603055253]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_cgedl")
+
+[node name="Vista" type="MeshInstance3D" parent="Miskatonic/Dia4" unique_id=1041374687]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -4.2)
+material_override = ExtResource("66_hodvx")
+mesh = SubResource("QuadMesh_n4fq7")
+
+[node name="Sol" type="SpotLight3D" parent="Miskatonic/Dia4" unique_id=259274651]
+transform = Transform3D(-0.9835472, -0.10580669, 0.14642376, 0, 0.81053156, 0.585695, -0.18065152, 0.5760587, -0.79719603, 0.6, 3.6, -4.5)
+light_color = Color(1, 0.9, 0.7, 1)
+light_energy = 7.5
+spot_range = 11.0
+spot_angle = 30.0
+
+[node name="Preenchimento" type="OmniLight3D" parent="Miskatonic/Dia4" unique_id=534641630]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0.6)
+light_color = Color(1, 0.912, 0.76, 1)
+light_energy = 1.1
+omni_range = 7.0
+
+[node name="Telegrama" type="MeshInstance3D" parent="Miskatonic/Dia4" unique_id=1256598891]
+transform = Transform3D(0.9975641, 0, -0.06975647, 0, 1, 0, 0.06975647, 0, 0.9975641, 0.02, 0.7815, -2.12)
+material_override = ExtResource("75_ip1yw")
+mesh = SubResource("BoxMesh_cxxq7")
+
+[node name="Ler" type="Area3D" parent="Miskatonic/Dia4/Telegrama" unique_id=493108438]
+script = ExtResource("38_sla21")
+document = ExtResource("82_r2ix2")
+remove_visual = false
+prompt = "Ler o telegrama"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia4/Telegrama/Ler" unique_id=1696679555]
+shape = SubResource("BoxShape3D_r4dy5")
+
+[node name="CartaJulho" type="MeshInstance3D" parent="Miskatonic/Dia4" unique_id=1524984021]
+transform = Transform3D(0.9848077, 0, 0.17364818, 0, 1, 0, -0.17364818, 0, 0.9848077, 0.36, 0.786, -2.02)
+material_override = ExtResource("37_5jj00")
+mesh = SubResource("BoxMesh_mfgu8")
+
+[node name="Ler" type="Area3D" parent="Miskatonic/Dia4/CartaJulho" unique_id=611233361]
+script = ExtResource("38_sla21")
+document = ExtResource("83_0vsgr")
+remove_visual = false
+prompt = "Ler a carta"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia4/CartaJulho/Ler" unique_id=1461958994]
+shape = SubResource("BoxShape3D_tiwti")
+
+[node name="Envelope" type="Node3D" parent="Miskatonic/Dia4" unique_id=702037218]
+transform = Transform3D(0.99254614, 0, 0.12186935, 0, 1, 0, -0.12186935, 0, 0.99254614, -0.2, 0.78199995, -2.47)
+script = ExtResource("53_dhgyq")
+remetente = "H. W. Akeley
+General Delivery, Brattleboro, Vt."
+carimbo_cidade = "BRATTLEBORO"
+carimbo_data = "JUL 12
+1928"
+
+[node name="Examinar" type="Area3D" parent="Miskatonic/Dia4/Envelope" unique_id=439500697]
+script = ExtResource("36_dc867")
+title = "Envelope de Brattleboro"
+description = "A letra de Akeley, mais trêmula. Carimbo de Brattleboro, 12 de julho — ele já não confia no correio de Townshend."
+initial_rotation = Vector3(90, 0, 0)
+prompt = "Examinar o envelope"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia4/Envelope/Examinar" unique_id=1731239503]
+shape = SubResource("BoxShape3D_ykxw0")
+
+[node name="Escrever" type="Area3D" parent="Miskatonic/Dia4" unique_id=1886169218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, 0.85, -2.22)
+script = ExtResource("68_diu4e")
+reply = ExtResource("84_m8u08")
+prompt = "Escrever a Akeley"
+condition = SubResource("Resource_8nenu")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/Dia4/Escrever" unique_id=268459838]
+shape = SubResource("BoxShape3D_mkynx")
+
+[node name="FotografiaJulho" type="Node3D" parent="Miskatonic" unique_id=1046713199]
+
+[node name="ConditionalNode" type="Node" parent="Miskatonic/FotografiaJulho" unique_id=1798777173]
+script = ExtResource("47_kjjxk")
+condition = SubResource("Resource_kvxd6")
+
+[node name="Foto10" type="Node3D" parent="Miskatonic/FotografiaJulho" unique_id=342848605]
+transform = Transform3D(0.9945219, 0, 0.104528464, 0, 1, 0, -0.104528464, 0, 0.9945219, -0.25, 0.78125, -2.33)
+script = ExtResource("55_sfqqn")
+imagem = ExtResource("85_wnghe")
+
+[node name="Examinar" type="Area3D" parent="Miskatonic/FotografiaJulho/Foto10" unique_id=714237601]
+script = ExtResource("36_dc867")
+title = "Fotografia — o exército de pegadas"
+description = "Repulsivamente perturbadora: um verdadeiro exército de pegadas em fila, de frente para uma linha igualmente cerrada e resoluta de pegadas de cães. Tirada depois de uma noite em que os cães se superaram em latidos e uivos."
+initial_rotation = Vector3(90, 0, 0)
+flag = &"viu_foto_exercito"
+exposure = 0.04
+prompt = "Examinar a fotografia"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/FotografiaJulho/Foto10/Examinar" unique_id=1803149400]
+shape = SubResource("BoxShape3D_sbhjr")
+
+[node name="TelefoneParede" type="Node3D" parent="Miskatonic" unique_id=1503926856]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.43, 1.45, -2.25)
+
+[node name="Caixa" type="MeshInstance3D" parent="Miskatonic/TelefoneParede" unique_id=1926192498]
+material_override = ExtResource("22_g0xy8")
+mesh = SubResource("BoxMesh_cuqml")
+
+[node name="Sineta-1" type="MeshInstance3D" parent="Miskatonic/TelefoneParede" unique_id=314265897]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, -0.05, 0.14, -0.075)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_7ofwg")
+
+[node name="Sineta1" type="MeshInstance3D" parent="Miskatonic/TelefoneParede" unique_id=2046947731]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.05, 0.14, -0.075)
+material_override = ExtResource("24_dvck4")
+mesh = SubResource("CylinderMesh_17fyp")
+
+[node name="Bocal" type="MeshInstance3D" parent="Miskatonic/TelefoneParede" unique_id=18656064]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.1)
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("CylinderMesh_6bfku")
+
+[node name="Fone" type="MeshInstance3D" parent="Miskatonic/TelefoneParede" unique_id=201264554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, -0.02, -0.02)
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("CylinderMesh_llccv")
+
+[node name="Manivela" type="MeshInstance3D" parent="Miskatonic/TelefoneParede" unique_id=881910240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14, 0.02, -0.03)
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("BoxMesh_dx03x")
+
+[node name="Telefone" type="Area3D" parent="Miskatonic/TelefoneParede" unique_id=111333473]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.08)
+script = ExtResource("86_5b0bg")
+ligacoes = Array[ExtResource("87_3koal")]([ExtResource("88_0ehhf"), ExtResource("89_mdxk4"), ExtResource("90_fmekf"), ExtResource("91_g6bsg")])
+campainha = ExtResource("92_mfx7i")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/TelefoneParede/Telefone" unique_id=665233112]
+shape = SubResource("BoxShape3D_5ury0")
+
+[node name="SairPorta" type="Area3D" parent="Miskatonic" unique_id=1302566040]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.05, 2.88)
-script = ExtResource("80_decim")
+script = ExtResource("93_d7k2f")
 prompt = "Ir para casa"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/SairPorta" unique_id=1608854367]
-shape = SubResource("BoxShape3D_3jm4y")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Miskatonic/SairPorta" unique_id=780552655]
+shape = SubResource("BoxShape3D_hins6")
 
-[node name="Armario" type="Node3D" parent="Miskatonic" unique_id=3599659]
+[node name="Armario" type="Node3D" parent="Miskatonic" unique_id=2081346280]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2.15, 0, 2.35)
 
-[node name="Movel" type="MeshInstance3D" parent="Miskatonic/Armario" unique_id=1187354140]
+[node name="Movel" type="MeshInstance3D" parent="Miskatonic/Armario" unique_id=494994810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-material_override = ExtResource("19_8s7on")
-mesh = SubResource("BoxMesh_3yimc")
+material_override = ExtResource("21_3x7uq")
+mesh = SubResource("BoxMesh_b23sm")
 
-[node name="Juncao" type="MeshInstance3D" parent="Miskatonic/Armario" unique_id=735204175]
+[node name="Juncao" type="MeshInstance3D" parent="Miskatonic/Armario" unique_id=2021320015]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -0.255)
-material_override = ExtResource("24_cai74")
-mesh = SubResource("BoxMesh_2lvok")
+material_override = ExtResource("26_ej1ob")
+mesh = SubResource("BoxMesh_k7pvx")
 
-[node name="Colisao" type="StaticBody3D" parent="Miskatonic/Armario" unique_id=458061552]
+[node name="Colisao" type="StaticBody3D" parent="Miskatonic/Armario" unique_id=1185211223]
 
-[node name="Forma0" type="CollisionShape3D" parent="Miskatonic/Armario/Colisao" unique_id=355958165]
+[node name="Forma0" type="CollisionShape3D" parent="Miskatonic/Armario/Colisao" unique_id=90804291]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-shape = SubResource("BoxShape3D_swftu")
+shape = SubResource("BoxShape3D_svl82")
 
-[node name="Player" type="CharacterBody3D" parent="." unique_id=934642438 instance=ExtResource("81_diu4e")]
+[node name="Player" type="CharacterBody3D" parent="." unique_id=581368002 instance=ExtResource("94_autmv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.3)
-script = ExtResource("82_v4vjt")
-footstep_sounds = Array[AudioStream]([ExtResource("83_3q0q2"), ExtResource("84_fdkl7"), ExtResource("85_25lu3")])
+script = ExtResource("95_olup4")
+footstep_sounds = Array[AudioStream]([ExtResource("96_4ueoc"), ExtResource("97_virye"), ExtResource("98_72j8q")])
 
-[node name="Cadeira" type="Marker3D" parent="." unique_id=1274612461 groups=["spawn"]]
+[node name="Cadeira" type="Marker3D" parent="." unique_id=933321227 groups=["spawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.3)
 
-[node name="Porta" type="Marker3D" parent="." unique_id=1944708069 groups=["spawn"]]
+[node name="Porta" type="Marker3D" parent="." unique_id=481171154 groups=["spawn"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2.3)

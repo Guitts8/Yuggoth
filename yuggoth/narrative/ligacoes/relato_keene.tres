@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Ligacao" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://narrative/ligacao.gd" id="1_lig"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="2_cond"]
+[ext_resource type="Resource" path="res://narrative/narration/depois_relato.tres" id="3_narr"]
+[ext_resource type="Resource" path="res://narrative/narration/cartao_boston.tres" id="4_cart"]
+
+[sub_resource type="Resource" id="Resource_cond"]
+script = ExtResource("2_cond")
+key = &"ligou_telegrama_noturno"
+op = 3
+value = 1.0
+
+[resource]
+script = ExtResource("1_lig")
+id = &"relato_keene"
+prompt = "Atender o telefone"
+condition = SubResource("Resource_cond")
+recebida = true
+falas = PackedStringArray("Boston: Professor Wilmarth? Aqui é a North Station. Temos uma notícia — talvez tenha muito a ver com o seu caso.", "Boston: O funcionário do expresso do 5508 se lembrou de um incidente. Uma discussão em Keene, New Hampshire, pouco depois da uma hora, enquanto o trem esperava.", "Boston: Um homem de voz muito curiosa — magro, ruivo, com jeito de roceiro — muito agitado por causa de uma caixa pesada que dizia esperar.", "Boston: A caixa não estava no trem, nem nos livros da companhia. Ele deu o nome de Stanley Adams.", "Boston: E tinha uma voz tão estranhamente grossa e zumbida que deixava o funcionário tonto e sonolento só de ouvi-la.", "Boston: O rapaz não se lembra bem de como a conversa terminou. Só de despertar de vez quando o trem começou a andar.", "Boston: É um moço de veracidade inquestionável, professor. De antecedentes conhecidos, e há muitos anos na companhia.")
+narracao_depois = ExtResource("3_narr")
+cartao_depois = ExtResource("4_cart")
