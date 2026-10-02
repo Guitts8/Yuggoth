@@ -7,6 +7,8 @@ mecânicas) continua valendo onde **não contradiz** o livro; onde contradiz, o 
 Fonte: `docs/fonte/the_whisperer_in_darkness_1931.txt` (original inglês, domínio
 público). Textos do jogo são tradução nossa e fiel desse texto.
 
+O jogo na ordem, com o que já está jogável: `docs/SEQUENCIA.md`.
+
 Legenda: ✅ já no GDD/jogo · ➕ falta, entra · ⚠️ GDD diverge do livro · 💭 invenção do GDD, mantida (não contradiz)
 
 ---

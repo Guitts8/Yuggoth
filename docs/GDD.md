@@ -570,6 +570,8 @@ func resolve_pages() -> Array[String]:
 
 **Risco aceito:** o Ato III, maior risco de design, é validado por último. Como nada da demo depende da fazenda, mudanças nele não afetam o que já foi lançado.
 
+**Estado (2026-10-02):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–4 jogáveis com arte e som provisórios (gerados por script); faltam os Dias 5 e 6, a arte e o som finais do escritório e a voz do disco. O que cada parte já tem: `docs/SEQUENCIA.md`.
+
 ### 12.1 Riscos
 | Risco | Mitigação |
 |---|---|
