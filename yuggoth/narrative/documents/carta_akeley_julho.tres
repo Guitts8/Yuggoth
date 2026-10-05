@@ -1,6 +1,30 @@
-[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="DocumentData" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+[ext_resource type="Script" path="res://narrative/document_variant.gd" id="2_var"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="3_cond"]
+
+[sub_resource type="Resource" id="Resource_comparou"]
+script = ExtResource("3_cond")
+key = &"comparou_assinatura"
+op = 3
+value = 1.0
+
+[sub_resource type="Resource" id="Resource_ruivo"]
+script = ExtResource("2_var")
+condition = SubResource("Resource_comparou")
+pages = PackedStringArray("[right]Brattleboro, Vt.
+12 de julho de 1928[/right]
+
+Wilmarth —
+
+Mais uma carta sua se extraviou. Não me escreva mais para Townshend: mande tudo aos meus cuidados na Posta-Restante de Brattleboro, aonde irei com frequência, de carro ou pela linha de ônibus que substituiu o trem de passageiros no ramal.", "Os cães latem cada vez mais nas noites sem lua, e de manhã encontro marcas de garra frescas na estrada e na lama dos fundos do quintal. Mando-lhe uma fotografia: um verdadeiro exército de pegadas em fila, de frente para uma linha igualmente cerrada e resoluta de pegadas de cães. Foi depois de uma noite em que os cães se superaram em latidos e uivos.", "Quanto à pedra: não confio em nenhuma rota de transporte comum ou esperada. Vou levá-la de carro, atravessando o condado, até Bellows Falls, e despachá-la pelo Boston & Maine, passando por Keene, Winchendon e Fitchburg — ainda que isso me obrigue a estradas mais solitárias e mais cercadas de mata do que a estrada principal para Brattleboro.
+
+Quando despachei o disco, notei um homem na agência do expresso de Brattleboro — magro, ruivo, com jeito de roceiro — cujos modos e expressão estavam longe de me tranquilizar. Parecia ansioso demais por conversar com os funcionários — e tomou o mesmo trem em que o disco seguiu. Confesso que só fiquei em paz quando o senhor me escreveu dizendo que o recebera.
+
+[right]H. W. A.[/right]")
+id = &"carta_akeley_julho_ruivo"
+exposure_on_read = 0.05
 
 [resource]
 script = ExtResource("1_doc")
@@ -17,4 +41,5 @@ Mais uma carta sua se extraviou. Não me escreva mais para Townshend: mande tudo
 Quando despachei o disco, notei um homem na agência do expresso de Brattleboro cujos modos e expressão estavam longe de me tranquilizar. Parecia ansioso demais por conversar com os funcionários — e tomou o mesmo trem em que o disco seguiu. Confesso que só fiquei em paz quando o senhor me escreveu dizendo que o recebera.
 
 [right]H. W. A.[/right]")
+variants = Array[ExtResource("2_var")]([SubResource("Resource_ruivo")])
 exposure_on_read = 0.04

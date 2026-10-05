@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_5_oferta"
+title = "Minha carta a Akeley — 15 de agosto"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+15 de agosto de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Procure ajuda, e chame a lei em seu socorro. Sua carta me perturbou muito, e peço-lhe com toda a insistência que deixe de lado essa reserva solitária. Se o senhor não o fizer, talvez eu mesmo tome alguma providência.
+
+Sei que não o deseja; mas penso em ir a Vermont em pessoa, e em ajudá-lo a expor a situação às autoridades competentes. O senhor não pode continuar sozinho nessa fazenda remota.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

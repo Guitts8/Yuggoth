@@ -68,10 +68,7 @@ func _falar(l: Ligacao) -> void:
 			return
 	GameState.set_flag(l.get_done_flag())
 	if l.cartao_depois:
-		await SceneDirector.fade_out(1.0)
-		SceneDirector.hold_black = true
-		await Narrator.say(l.cartao_depois, Narrator.Style.CARTAO)
-		await SceneDirector.release_black(1.2)
+		await SceneDirector.time_skip(l.cartao_depois)
 		if not is_inside_tree():
 			return
 	if l.narracao_depois:

@@ -45,12 +45,15 @@ Legenda: ✅ já no GDD/jogo · ➕ falta, entra · ⚠️ GDD diverge do livro 
 ## Cap. IV — O cerco (em cartas)
 | Situação no livro | No jogo |
 |---|---|
-| Agosto: tronco atravessado na estrada (2/8), tiro de raspão no carro (5–6/8) | ➕ carta |
-| 15/8: carta frenética — tiros na noite de 12–13, **3 dos 12 cães** mortos, pegadas de Brown entre as garras, cabo telefônico cortado | ✅ Dia 4 do GDD ("cartas desesperadas, cães mortos") — ⚠️ GDD diz 4 cães; livro: 12 |
-| Wilmarth responde oferecendo ir a Vermont e chamar as autoridades | ➕ resposta desse dia |
-| **Telegrama de Bellows Falls**: "COMPREENDO SUA POSIÇÃO MAS NADA POSSO FAZER…" assinado **AKELY** (sem o segundo E) | ✅ "telegrama estranho" (GDD) — ➕ a assinatura errada é o detalhe a comparar |
-| Bilhete de Akeley: ele **nunca mandou** o telegrama; quem mandou foi um homem ruivo de voz zumbida | ➕ |
-| 28/8: quer "uma saída digna"; lua cheia segura as criaturas | ➕ carta |
+| A pedra "não está mais nesta terra"; letra "lamentavelmente trêmula"; tronco atravessado na estrada (2/8), tiro de raspão no carro (5–6/8) | ✅ Dia 5: carta do começo de agosto (o texto treme no leitor) |
+| 15/8: carta frenética, escrita no correio de Brattleboro — tiros na noite de 12–13, **3 dos 12 cães** mortos, pegadas de Brown entre as garras, cabo telefônico cortado ao norte de Newfane, quatro cães novos | ✅ Dia 5 |
+| Wilmarth responde oferecendo ir a Vermont e chamar as autoridades; "Iria me sugar e me engolir?" | ✅ Dia 5: a carta da oferta (sem tom) |
+| **Telegrama de Bellows Falls**: "COMPREENDO SUA POSIÇÃO MAS NADA POSSO FAZER…" assinado **AKELY** (sem o segundo E) | ✅ Dia 5: o telegrama; "Comparar a assinatura com as cartas" depois do bilhete |
+| Wilmarth responde ao telegrama | ✅ Dia 5: telegrafa pelo telefone |
+| Bilhete trêmulo: ele **nunca mandou** o telegrama nem recebeu a carta; homem ruivo de voz zumbida; original a lápis, letra desconhecida; mais cães mortos, tiros toda noite sem lua, pegadas de Brown e de mais homens calçados; Califórnia | ✅ Dia 5 |
+| Wilmarth renova as ofertas de ajuda | ✅ Dia 5: segunda carta (sem tom) |
+| 28/8: quer "uma saída digna"; Wilmarth manda "a resposta mais animadora que pude" | ✅ Dia 5: a carta e a resposta do dia (tom cauteloso = o do livro) |
+| Akeley responde com menos terrores: a lua cheia segura as criaturas; fala em se hospedar em Brattleboro; Wilmarth anima de novo | ➕ abertura do Dia 6 |
 | **5/9 (segunda)**: algo pousa no telhado, briga dos cães, zumbido, cheiro, tiros pela janela, poças de sangue e **gosma verde**, 5 cães mortos (um por ele mesmo) | ➕ carta — e é a noite do Interlúdio (abaixo) |
 | **6/9 (terça)**: "Falaram comigo"; "Fique fora disso, Wilmarth"; Yuggoth e além; quebre o disco | ➕ carta |
 | **7/9 (quarta)**: carta datilografada *deles*; tocou numa das coisas mortas — **evaporou no galpão de lenha**; fotografou e **o filme não mostra nada**; Walter Brown sumiu; o filho George (176 Pleasant St., San Diego); gás venenoso e máscaras; o xerife | ➕ carta — a última manuscrita (entrada do Interlúdio) |

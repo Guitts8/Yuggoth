@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+[ext_resource type="Script" path="res://narrative/narration_variant.gd" id="2_var"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="3_cond"]
+
+[sub_resource type="Resource" id="Resource_cetica"]
+script = ExtResource("3_cond")
+key = &"resposta_dia_5"
+op = 0
+value = -1.0
+
+[sub_resource type="Resource" id="Resource_credula"]
+script = ExtResource("3_cond")
+key = &"resposta_dia_5"
+op = 0
+value = 1.0
+
+[sub_resource type="Resource" id="Resource_var_cetica"]
+script = ExtResource("2_var")
+condition = SubResource("Resource_cetica")
+text = "Pus a carta no correio. Era o conselho de um homem sensato. Eu já não tinha certeza de ser esse homem."
+
+[sub_resource type="Resource" id="Resource_var_credula"]
+script = ExtResource("2_var")
+condition = SubResource("Resource_credula")
+text = "Pus a carta no correio, e torci para que fosse ele, e não outro, a abri-la."
+
+[resource]
+script = ExtResource("1_line")
+id = &"resposta_animadora"
+text = "Preparei e pus no correio a resposta mais animadora que pude."
+variants = Array[ExtResource("2_var")]([SubResource("Resource_var_cetica"), SubResource("Resource_var_credula")])

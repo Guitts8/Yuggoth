@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"bilhete_akeley_agosto"
+title = "Bilhete de H. W. Akeley — o telegrama"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.7]Brattleboro, Vt.
+22 de agosto de 1928[/tremulo][/right]
+
+[tremulo forca=0.7]Wilmarth —[/tremulo]
+
+[tremulo forca=0.7]Eu nunca lhe mandei telegrama nenhum. E a sua carta, a que ele tão claramente responde, nunca chegou às minhas mãos.[/tremulo]
+
+[tremulo forca=0.7]Fui às pressas a Bellows Falls perguntar. Quem deixou a mensagem no telégrafo foi um estranho ruivo, de voz curiosamente grossa e zumbida; mais do que isso não consegui saber. O funcionário me mostrou o original, rabiscado a lápis pelo remetente. A letra me é inteiramente desconhecida. E a assinatura estava errada: A-K-E-L-Y, sem o segundo E.[/tremulo]", "[tremulo forca=0.65]Morreram mais cães; comprei outros. A troca de tiros virou coisa certa em toda noite sem lua. As pegadas de Brown, e as de pelo menos mais um ou dois vultos humanos calçados, aparecem agora com regularidade entre as marcas de garra, na estrada e nos fundos do terreiro.[/tremulo]
+
+[tremulo forca=0.65]É um negócio bem feio, admito; e logo, provavelmente, terei de ir morar com meu filho na Califórnia, consiga ou não vender a casa velha. Mas não é fácil deixar o único lugar que se pode de fato chamar de lar. Tenho de aguentar mais um pouco. Talvez consiga espantar os intrusos — sobretudo se desistir, abertamente, de toda tentativa de penetrar os segredos deles.[/tremulo]
+
+[right][tremulo forca=0.7]H. W. A.[/tremulo][/right]")
+exposure_on_read = 0.05

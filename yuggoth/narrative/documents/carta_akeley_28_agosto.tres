@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_28_agosto"
+title = "Carta de H. W. Akeley — 28 de agosto"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.4]Brattleboro, Vt.
+27 de agosto de 1928[/tremulo][/right]
+
+[tremulo forca=0.4]Wilmarth —[/tremulo]
+
+[tremulo forca=0.4]Já não sou tão contrário ao seu plano quanto fui. Mas gostaria de esperar mais um pouco — o bastante para pôr as minhas coisas em ordem e me conformar com a ideia de deixar a terra onde nasci, a que tenho um apego quase mórbido.[/tremulo]
+
+[tremulo forca=0.4]As pessoas olham de esguelha para os meus estudos e as minhas especulações. Será melhor sair em silêncio, sem pôr a região em polvorosa e sem espalhar dúvidas sobre o meu juízo.[/tremulo]
+
+[tremulo forca=0.4]Tive o bastante, admito. Mas quero uma saída digna, se puder.[/tremulo]
+
+[right][tremulo forca=0.4]H. W. A.[/tremulo][/right]")
+exposure_on_read = 0.0

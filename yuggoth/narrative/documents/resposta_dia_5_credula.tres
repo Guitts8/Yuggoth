@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_5_credula"
+title = "Minha carta a Akeley — 29 de agosto"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+29 de agosto de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Não espere pôr as coisas em ordem. Quem mandou aquele telegrama já assina com o seu nome, e lê o que eu lhe escrevo. A coisa está se estendendo, e eu temo pelo senhor.
+
+A casa não vale a sua vida. Vá para junto do seu filho, na Califórnia, enquanto ainda pode — e deixe que digam o que quiserem.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

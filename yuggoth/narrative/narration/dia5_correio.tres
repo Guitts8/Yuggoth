@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"dia5_correio"
+text = "As cartas de Akeley vinham agora numa letra que se tornara lamentavelmente trêmula. No dia 15 de agosto recebi uma carta frenética, que me perturbou muito."

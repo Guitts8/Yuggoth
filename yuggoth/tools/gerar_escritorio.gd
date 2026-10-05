@@ -37,10 +37,12 @@ func _ready() -> void:
 	cena.set_script(load("res://levels/escritorio/escritorio.gd"))
 	cena.set("env_1930", _env_1930())
 	cena.set("env_dia", _env_dia())
-	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite(), cena.get("env_dia")]
+	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite(), cena.get("env_dia"), _env_chuva()]
 	cena.set("ambientes_dia", ambientes)
 	cena.set("som_chuva", load(SFX_DIR + "chuva.wav"))
 	cena.set("som_tarde", load(SFX_DIR + "tarde.wav"))
+	var sons: Array[AudioStream] = [null, null, null, null, null, load(SFX_DIR + "chuva.wav")]
+	cena.set("sons_dia", sons)
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))
 	cena.set("linha_cartas", load("res://narrative/narration/prologo_cartas.tres"))
@@ -49,13 +51,15 @@ func _ready() -> void:
 		load("res://narrative/narration/cartao_dia_2.tres"),
 		load("res://narrative/narration/cartao_dia_3.tres"),
 		load("res://narrative/narration/cartao_dia_4.tres"),
-		load("res://narrative/narration/cartao_dia_5.tres")]
+		load("res://narrative/narration/cartao_dia_5.tres"),
+		load("res://narrative/narration/cartao_dia_6.tres")]
 	cena.set("cartoes_dia", cartoes)
 	var correio: Array[NarrationLine] = [null,
 		load("res://narrative/narration/dia1_correio.tres"),
 		load("res://narrative/narration/dia2_correio.tres"),
 		load("res://narrative/narration/dia3_correio.tres"),
-		load("res://narrative/narration/dia4_correio.tres")]
+		load("res://narrative/narration/dia4_correio.tres"),
+		load("res://narrative/narration/dia5_correio.tres")]
 	cena.set("linhas_correio", correio)
 	cena.set("linha_resposta_selada", load("res://narrative/narration/resposta_selada.tres"))
 
@@ -116,6 +120,8 @@ func _materiais() -> void:
 	_mat("foto", "foto_pegada", {})
 	_mat("cartao_foto", "papel_envelope", {world = 12.0, cor = Color(1.16, 1.14, 1.1)})
 	_mat("vidro_aceso", "papel", {unlit = true, cor = Color(1.1, 0.85, 0.5)})
+	# O vulto que passa pela janela no Dia 5 (iluminado só pelo abajur).
+	_mat("sombra", "sombra", {})
 
 
 func _mat(name: String, tex: String, o: Dictionary) -> void:
@@ -153,6 +159,13 @@ func _env_1930() -> Environment:
 func _env_noite() -> Environment:
 	var e := _env_1930()
 	e.ambient_light_color = Color(0.15, 0.14, 0.17)
+	return e
+
+
+## Dia 5: noite de chuva, mais fria que a do Dia 3.
+func _env_chuva() -> Environment:
+	var e := _env_1930()
+	e.ambient_light_color = Color(0.12, 0.13, 0.17)
 	return e
 
 
@@ -405,7 +418,7 @@ func _cadeira(parent: Node) -> void:
 
 
 func _estante(parent: Node) -> void:
-	# Parede oeste, metade norte. Uma prateleira tem um vão (esconderijo do Dia 5).
+	# Parede oeste, metade norte. Uma prateleira tem um vão (sobra do antigo esconderijo, GDD §6.4).
 	var g := _group(parent, "Estante", Vector3(-W + 0.18, 0, -2.0))
 	var alt := 2.3
 	_box(g, "LadoN", Vector3(0.36, alt, 0.04), Vector3(0, alt / 2, -0.78), "madeira_escura")
@@ -659,6 +672,83 @@ func _dias(parent: Node) -> void:
 	_fonografo(parent, dia3)
 	_dia_4(parent)
 	_telefone(parent)
+	_dia_5(parent)
+
+
+func _composta(modo: CompositeCondition.Mode, conds: Array) -> CompositeCondition:
+	var c := CompositeCondition.new()
+	c.mode = modo
+	c.conditions.assign(conds)
+	return c
+
+
+## Dia 5 (cap. IV): agosto. A carta frenética, a oferta de ajuda, o telegrama
+## "AKELY", o bilhete que o desmente e a carta da "saída digna". As cartas
+## cruzam o correio: cada carta selada salta no tempo (ReplyData.cartao_depois,
+## Ligacao.cartao_depois), e o que chega depois aparece no escuro, pela flag
+## `narrou_<cartão>`. Noite de chuva; um vulto passa pela janela (não confirmado).
+func _dia_5(parent: Node) -> void:
+	var g := _grupo_do_dia(parent, 5)
+	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_chuva(g)
+	_abajur(g)
+	var janela := _area(g, StateInteractable.new(), "OlharJanela", Vector3(1.6, 1.5, 0.2), Vector3(0, 1.65, -D)) as StateInteractable
+	janela.prompt = "Olhar"
+	janela.notice = "Só a chuva, escorrendo no vidro."
+
+	# 15 de agosto: as cartas trêmulas e a oferta de ir a Vermont.
+	_folha(g, "CartaAgosto", Vector3(-0.26, MESA + 0.003, -2.08), 9, "carta_akeley_agosto", "Ler a carta", false)
+	_folha(g, "Carta15", Vector3(0.0, MESA + 0.005, -2.12), -5, "carta_akeley_15_agosto", "Ler a carta de 15 de agosto", false)
+	var env := _envelope(g, "Envelope", Vector3(-0.12, MESA, -2.47), 5, {
+		remetente = "H. W. Akeley\nGeneral Delivery, Brattleboro, Vt.",
+		carimbo_cidade = "BRATTLEBORO",
+		carimbo_data = "AUG 14\n1928",
+	})
+	_examinavel(env, Vector3(0.2, 0.04, 0.12), "Examinar o envelope", "Envelope de Brattleboro",
+		"Escrita no próprio correio de Brattleboro e posta ali mesmo: chegou sem demora. A letra mal se sustenta na linha.")
+	var oferta := _grupo_se(g, "Oferta", _flag(&"narrou_cartao_telegrama_akely", true))
+	_escrever(oferta, "oferta_dia_5", &"leu_carta_akeley_15_agosto")
+
+	# A resposta: um telegrama de Bellows Falls, assinado AKELY.
+	var tel := _grupo_se(g, "TelegramaAkely", _flag(&"narrou_cartao_telegrama_akely"))
+	var papel := _box(tel, "Papel", Vector3(0.2, 0.003, 0.14), Vector3(0.45, MESA + 0.0015, -1.94), "envelope")
+	papel.rotation_degrees.y = -10
+	# Depois do bilhete, o mesmo papel serve para comparar (uma área por vez).
+	var comparando := _composta(CompositeCondition.Mode.TODAS, [_flag(&"leu_bilhete_akeley_agosto"), _flag(&"comparou_assinatura", true)])
+	var lendo := comparando.duplicate() as CompositeCondition
+	lendo.negate = true
+	var ler := _area(_grupo_se(papel, "Leitura", lendo), DocumentPickup.new(), "Ler", Vector3(0.24, 0.06, 0.18)) as DocumentPickup
+	ler.prompt = "Ler o telegrama"
+	ler.remove_visual = false
+	ler.document = load("res://narrative/documents/telegrama_akely.tres")
+	var comparar := _area(_grupo_se(papel, "Comparacao", comparando), StateInteractable.new(), "Comparar", Vector3(0.24, 0.06, 0.18)) as StateInteractable
+	comparar.prompt = "Comparar a assinatura com as cartas"
+	comparar.changes = {&"comparou_assinatura": 1.0, &"exposicao": 0.03}
+	comparar.narration = load("res://narrative/narration/comparar_assinatura.tres")
+
+	# O bilhete: ele nunca mandou o telegrama. Depois, a carta que renova a oferta.
+	var bilhete := _grupo_se(g, "Bilhete", _flag(&"narrou_cartao_aprofundava"))
+	_folha(bilhete, "Folha", Vector3(-0.26, MESA + 0.009, -2.1), -7, "bilhete_akeley_agosto", "Ler o bilhete", false)
+	var renovacao := _grupo_se(g, "Renovacao", _composta(CompositeCondition.Mode.TODAS,
+		[_flag(&"narrou_cartao_aprofundava"), _flag(&"narrou_cartao_28_agosto", true)]))
+	_escrever(renovacao, "renovacao_dia_5", &"comparou_assinatura")
+
+	# 28 de agosto: "uma saída digna". A resposta do dia (a que leva para casa).
+	var c28 := _grupo_se(g, "Carta28", _flag(&"narrou_cartao_28_agosto"))
+	_folha(c28, "Folha", Vector3(0.0, MESA + 0.011, -2.1), 6, "carta_akeley_28_agosto", "Ler a carta de 28 de agosto", false)
+	_escrever(c28, "resposta_dia_5", &"leu_carta_akeley_28_agosto")
+
+	# Depois do bilhete, quem olhar para a janela vê algo passar lá fora. Uma vez.
+	var sombra := Aparicao.new()
+	sombra.name = "Sombra"
+	sombra.position = Vector3(-1.7, 1.6, -D - 0.35)
+	sombra.deslocamento = Vector3(3.4, 0.15, 0)
+	sombra.duracao = 1.6
+	sombra.condition = _flag(&"leu_bilhete_akeley_agosto")
+	sombra.flag = &"viu_sombra_janela"
+	sombra.exposure = 0.03
+	_add(g, sombra)
+	_quad(sombra, "Vulto", Vector2(0.9, 1.3), Vector3.ZERO, Vector3.ZERO, "sombra")
 
 
 ## Dia 4 (cap. III): a pedra que não chega. O telegrama de quarta-feira, a carta
@@ -712,7 +802,7 @@ func _telefone(parent: Node) -> void:
 	tel.unique_name_in_owner = true
 	tel.campainha = load(SFX_DIR + "campainha.wav")
 	var ligs: Array[Ligacao] = []
-	for id in ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene"]:
+	for id in ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene", "resposta_telegrama"]:
 		ligs.append(load("res://narrative/ligacoes/%s.tres" % id))
 	tel.ligacoes = ligs
 
@@ -726,12 +816,7 @@ func _dia_3(parent: Node) -> Node3D:
 	var g := _grupo_do_dia(parent, 3)
 	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
 	_omni(g, "Lua", Vector3(0, 2.2, -2.6), Color(0.5, 0.6, 0.9), 0.4, 5.0)
-	var abajur := _group(g, "Abajur", Vector3(0.62, MESA, -2.45))
-	_cyl(abajur, "Base", 0.07, 0.08, 0.03, Vector3(0, 0.015, 0), "latao")
-	_cyl(abajur, "Haste", 0.012, 0.012, 0.3, Vector3(0, 0.18, 0), "latao", 6)
-	var cupula := _cyl(abajur, "Cupula", 0.06, 0.14, 0.12, Vector3(0, 0.36, 0), "estofado", 10)
-	cupula.rotation_degrees.x = 10
-	_omni(abajur, "Luz", Vector3(0, 0.3, 0.12), Color(1.0, 0.8, 0.55), 2.2, 6.0)
+	_abajur(g)
 
 	var bilhete := _folha(g, "Bilhete", Vector3(-0.05, MESA + 0.003, -2.16), 8, "bilhete_disco", "Ler o bilhete", false)
 	var transcricao := _folha(g, "Transcricao", Vector3(0.25, MESA + 0.003, -2.05), -12, "transcricao_disco", "Ler a transcrição", false)
@@ -798,6 +883,17 @@ func _dia_3(parent: Node) -> Node3D:
 
 	_escrever(g, "resposta_dia_3", &"tocou_disco")
 	return g
+
+
+## Abajur elétrico na mesa, para as noites. A luz fica em "Abajur/Luz" (o
+## fonógrafo pulsa a do Dia 3).
+func _abajur(parent: Node) -> OmniLight3D:
+	var abajur := _group(parent, "Abajur", Vector3(0.62, MESA, -2.45))
+	_cyl(abajur, "Base", 0.07, 0.08, 0.03, Vector3(0, 0.015, 0), "latao")
+	_cyl(abajur, "Haste", 0.012, 0.012, 0.3, Vector3(0, 0.18, 0), "latao", 6)
+	var cupula := _cyl(abajur, "Cupula", 0.06, 0.14, 0.12, Vector3(0, 0.36, 0), "estofado", 10)
+	cupula.rotation_degrees.x = 10
+	return _omni(abajur, "Luz", Vector3(0, 0.3, 0.12), Color(1.0, 0.8, 0.55), 2.2, 6.0)
 
 
 ## A máquina comercial emprestada da administração (cap. III), sobre o armário.

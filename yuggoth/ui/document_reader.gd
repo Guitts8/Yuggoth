@@ -16,6 +16,7 @@ func _ready() -> void:
 	hide()
 	body.install_effect(WhisperTextEffect.new())
 	body.install_effect(IllegibleTextEffect.new())
+	body.install_effect(TremorTextEffect.new())
 	Events.document_requested.connect(open)
 
 
@@ -39,6 +40,10 @@ func open(doc: DocumentData) -> void:
 	if not GameState.has_flag(read_flag):
 		GameState.set_flag(read_flag)
 		GameState.add(&"exposicao", doc.exposure_on_read)
+	var variant := doc.resolve_variant()
+	if variant and variant.id and not GameState.has_flag(variant.get_read_flag()):
+		GameState.set_flag(variant.get_read_flag())
+		GameState.add(&"exposicao", variant.exposure_on_read)
 
 
 func _repaginate(doc: DocumentData) -> void:

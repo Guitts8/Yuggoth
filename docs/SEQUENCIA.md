@@ -18,7 +18,7 @@ Legenda: ✅ jogável (arte e som provisórios) · ⏳ planejado
 | 2 | Dia 2 — As fotografias | 22–28 de maio | ✅ | cap. II |
 | 3 | Dia 3 — O disco | fim de junho – 3 de julho | ✅ | cap. III |
 | 4 | Dia 4 — A pedra que não chega | 18–21 de julho | ✅ | cap. III |
-| 5 | Dia 5 — O telegrama "AKELY" | agosto | ⏳ | cap. IV |
+| 5 | Dia 5 — O telegrama "AKELY" | 15–29 de agosto | ✅ | cap. IV |
 | 6 | Dia 6 — As três últimas cartas | 5–7 de setembro | ⏳ | cap. IV |
 | — | Interlúdio — "O Cerco" (como Akeley) | 4–7 de setembro | ⏳ | cap. IV (as cartas, vividas) |
 | 7 | Dia 7 — A carta datilografada | 8–10 de setembro | ⏳ | cap. V |
@@ -216,15 +216,63 @@ cilindro, nos dias seguintes.
 
 ---
 
-## 5. Dia 5 — O telegrama "AKELY" ⏳ (agosto)
-Do cap. IV. A carta frenética de 15 de agosto (tronco na estrada, tiro de raspão,
-tiros na noite de 12–13, **3 dos 12 cães** mortos, pegadas de **Brown** entre as
-garras, cabo telefônico cortado). Wilmarth responde oferecendo ir a Vermont e
-chamar as autoridades. Chega o **telegrama de Bellows Falls**: *"COMPREENDO SUA
-POSIÇÃO MAS NADA POSSO FAZER..."*, assinado **AKELY** (sem o segundo E) — comparar
-com as cartas. Depois, o bilhete de Akeley: **ele nunca o mandou**; quem mandou
-foi um homem ruivo de voz zumbida. Carta de 28 de agosto (a "saída digna").
-Primeira **alteração de texto** ao reler cartas antigas. Noite de chuva; sombra na janela.
+## 5. Dia 5 — O telegrama "AKELY" ✅ (15–29 de agosto)
+**Clima:** noite de chuva. Abajur na mesa, chuva na janela (som de chuva no lugar
+da tarde). As cartas de Akeley agora vêm em **letra trêmula** (o texto treme no
+leitor, mais a cada carta).
+**Ao começar:** *"As cartas de Akeley vinham agora numa letra que se tornara
+lamentavelmente trêmula. No dia 15 de agosto recebi uma carta frenética, que me
+perturbou muito."*
+
+As cartas cruzam o correio: cada carta selada **salta no tempo** (tela preta e
+cartão), e o que chega depois já está na mesa quando a luz volta.
+
+**Na sala (15 de agosto):**
+- **Carta do começo de agosto**: a pedra "não está mais nesta terra"; o tronco
+  atravessado na estrada (dia 2), o tiro de raspão e as presenças na mata (5 e 6);
+  nunca sai sem dois cães.
+- **Carta de 15 de agosto**, escrita no correio de Brattleboro, e o **envelope**
+  (carimbo *AUG 14*): a noite de 12 para 13, **3 dos 12 cães** mortos a tiro, as
+  pegadas de **Brown** entre as garras, o cabo telefônico cortado ao norte de
+  Newfane, quatro cães novos e munição. Ao fechá-la: *"Minha atitude diante do caso
+  passava depressa do científico para um alarme pessoal..."*
+
+**O que fazer:**
+1. **"Escrever a Akeley"** — a oferta (sem tom a escolher): *"Procure ajuda, e
+   chame a lei em seu socorro."*; ir a Vermont, falar com as autoridades. Narrador:
+   *"A coisa se estendia assim. Haveria de me sugar para dentro dela, e me engolir?"*
+   Cartão: *"Em resposta, porém, recebi apenas um telegrama de Bellows Falls."*
+2. **O telegrama** (Western Union, 17 de agosto): *"COMPREENDO SUA POSIÇÃO MAS NADA
+   POSSO FAZER. NÃO TOME NENHUMA PROVIDÊNCIA PORQUE ISSO SÓ PODERIA PREJUDICAR A
+   AMBOS. AGUARDE EXPLICAÇÃO."* — assinado **HENRY AKELY** (o de julho dizia AKELEY).
+3. **"Telegrafar a resposta a Akeley"** pelo telefone de parede → cartão: *"Mas o
+   caso se aprofundava sem parar."*
+4. **O bilhete de Akeley** (22 de agosto, a letra mais trêmula de todas): ele
+   **nunca mandou** o telegrama nem recebeu a carta; em Bellows Falls, quem o deixou
+   foi um **estranho ruivo de voz grossa e zumbida**; o original a lápis, letra
+   desconhecida, **A-K-E-L-Y**; mais cães mortos, tiros toda noite sem lua, as
+   pegadas de Brown e de mais um ou dois homens calçados; talvez a Califórnia.
+   Narrador: *"Certas conjecturas eram inevitáveis. O telegrama ainda estava sobre a mesa."*
+5. **"Comparar a assinatura com as cartas"** (no telegrama): *"HENRY AKELY. Sem o
+   segundo E..."* → **primeira alteração de texto**: relida a partir daí, a **carta
+   de julho** descreve o homem da agência do expresso como *"magro, ruivo, com jeito
+   de roceiro"* — o que antes não dizia. Nenhum aviso.
+6. Depois do bilhete, quem olhar para a **janela** vê **um vulto passar** lá fora,
+   uma vez, sem som. "Olhar" a janela: *"Só a chuva, escorrendo no vidro."*
+7. **"Escrever a Akeley"** de novo — renovar a oferta (sem tom) → cartão: *"A
+   resposta dele chegou a 28 de agosto."*
+8. **Carta de 28 de agosto**: já não é tão contra o plano; quer pôr as coisas em
+   ordem; *"quero uma saída digna, se puder."*
+9. **A resposta do dia** (29 de agosto):
+   | Tom | Abertura |
+   |---|---|
+   | cético | "Vá à polícia. Homens de carne e osso cortam fios e mandam telegramas." |
+   | cauteloso — o do livro | "Uma saída digna é perfeitamente possível, e conte comigo para ela." |
+   | crédulo | "Não espere pôr as coisas em ordem." |
+
+   Depois: *"Preparei e pus no correio a resposta mais animadora que pude."* (varia com o tom)
+
+**Fim do dia:** porta → *"Setembro de 1928."*
 
 ## 6. Dia 6 — As três últimas cartas ⏳ (5–7 de setembro)
 As cartas de **segunda** (algo pousa no telhado, briga dos cães, gosma verde, 5
@@ -285,12 +333,19 @@ Yuggoth — O Despertar, Yuggoth — O Estudioso, Testemunha, Cinzas (GDD §7).
 | `viu_*` | detalhes vistos nas fotos (`viu_garra_foto`, `viu_rastros_caverna`, `viu_circulo`, `viu_hieroglifos`, `viu_marca_casa`, `viu_akeley_foto`, `viu_foto_pegada`, `viu_foto_exercito`) |
 | `fono_corneta`, `fono_manivela`, `fono_agulha`, `fono_cilindro` | montagem do fonógrafo |
 | `tocou_disco`, `vezes_disco`, `ouviu_wilmarth_no_disco` | o disco |
-| `ligou_<id>` | telefonemas do Dia 4 (`agencia_arkham`, `boston`, `telegrama_noturno`, `relato_keene`) |
+| `ligou_<id>` | telefonemas (Dia 4: `agencia_arkham`, `boston`, `telegrama_noturno`, `relato_keene`; Dia 5: `resposta_telegrama`) |
+| `escreveu_oferta_dia_5`, `escreveu_renovacao_dia_5` | Dia 5: as cartas sem tom (a oferta; a renovação) |
+| `narrou_<cartão>` | cartão de salto no tempo já mostrado; no Dia 5 decide o que está na mesa (`cartao_telegrama_akely`, `cartao_aprofundava`, `cartao_28_agosto`) |
+| `comparou_assinatura` | Dia 5: comparou o telegrama com as cartas (liga a 1ª alteração de texto) |
+| `leu_carta_akeley_julho_ruivo` | releu a carta de julho alterada |
+| `viu_sombra_janela` | Dia 5: o vulto passou pela janela |
 | `exposicao` | 0–1; nunca aparece na tela |
 | `sonho` | 0–1; visual onírico em sequências (Prólogo) |
 
-**De onde vem a exposição até o Dia 4:** carta 1 (+0,05), carta 2 (+0,20),
+**De onde vem a exposição até o Dia 5:** carta 1 (+0,05), carta 2 (+0,20),
 foto da pegada (+0,05, e +0,05 nas pinças), rastros da caverna (+0,03),
 hieróglifos (+0,05), marca perto da casa (+0,02), transcrição (+0,05), o disco
 (+0,15 na primeira vez, +0,03 nas outras), carta de julho (+0,04), foto do
-exército (+0,04).
+exército (+0,04); carta do começo de agosto (+0,02), carta de 15 de agosto
+(+0,04), bilhete (+0,05), comparar a assinatura (+0,03), reler a carta de julho
+alterada (+0,05), o vulto na janela (+0,03).

@@ -28,10 +28,16 @@ static var _font_cache: Dictionary[String, SystemFont] = {}
 
 
 func resolve_pages() -> PackedStringArray:
+	var variant := resolve_variant()
+	return variant.pages if variant else pages
+
+
+## A variante em vigor, ou null para o texto original.
+func resolve_variant() -> DocumentVariant:
 	for variant in variants:
 		if variant and (variant.condition == null or variant.condition.is_met()):
-			return variant.pages
-	return pages
+			return variant
+	return null
 
 
 ## Fonte do estilo em todas as variantes ([i], [b]) de um RichTextLabel.

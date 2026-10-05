@@ -22,6 +22,8 @@ const SONHO_DESCIDA := 4.0
 @export var ambientes_dia: Array[Environment] = []
 @export var som_chuva: AudioStream
 @export var som_tarde: AudioStream
+## Ambiente sonoro de cada dia (índice = dia); faltando, vale `som_tarde`.
+@export var sons_dia: Array[AudioStream] = []
 @export var som_pena: AudioStream
 @export var linha_abertura: NarrationLine
 @export var linha_cartas: NarrationLine
@@ -78,7 +80,7 @@ func _vestir(em_1930: bool) -> void:
 		relogio.stop()
 	for light in _energias:
 		light.light_energy = _energias[light]
-	AudioDirector.play_ambience(som_chuva if em_1930 else som_tarde)
+	AudioDirector.play_ambience(som_chuva if em_1930 else _som_do_dia())
 
 
 ## Escondido também sai da física e para de processar (interações somem junto).
@@ -188,7 +190,15 @@ func _entrar_pela_porta() -> void:
 
 
 func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
-	Narrator.say(reply.narracao_depois if reply.narracao_depois else linha_resposta_selada)
+	var fala := reply.narracao_depois if reply.narracao_depois else linha_resposta_selada
+	if reply.cartao_depois == null:
+		Narrator.say(fala)
+		return
+	# A carta vai e o tempo passa até a volta do correio (Dia 5).
+	await Narrator.say(fala)
+	if not is_inside_tree():
+		return
+	await SceneDirector.time_skip(reply.cartao_depois)
 
 
 func _on_porta(_by: Node) -> void:
@@ -223,6 +233,13 @@ func _ambiente_do_dia() -> Environment:
 	if n < ambientes_dia.size() and ambientes_dia[n]:
 		return ambientes_dia[n]
 	return env_dia
+
+
+func _som_do_dia() -> AudioStream:
+	var n := dia()
+	if n < sons_dia.size() and sons_dia[n]:
+		return sons_dia[n]
+	return som_tarde
 
 
 ## Fala do narrador ao fechar um documento pela primeira vez, se existir

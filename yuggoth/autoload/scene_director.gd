@@ -105,6 +105,17 @@ func release_black(time := FADE_TIME) -> void:
 	await fade_in(time)
 
 
+## Salto no tempo dentro da mesma fase: escurece, mostra o cartão e volta (ex.:
+## depois de um telefonema ou de uma carta). O cartão é dito já no escuro, então
+## a fase pode trocar o cenário pela flag `narrou_<id>` dele sem o jogador ver.
+## Quem chama checa is_inside_tree() depois.
+func time_skip(cartao: NarrationLine, saida := 1.0, volta := 1.2) -> void:
+	await fade_out(saida)
+	hold_black = true
+	await Narrator.say(cartao, Narrator.Style.CARTAO)
+	await release_black(volta)
+
+
 func _tween_fade(alpha: float, time: float) -> void:
 	var tween := create_tween()
 	tween.tween_property(_fade, "modulate:a", alpha, time)

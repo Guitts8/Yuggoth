@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_5_cetica"
+title = "Minha carta a Akeley — 29 de agosto"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+29 de agosto de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Vá à polícia. Homens de carne e osso cortam fios e mandam telegramas. Tiros, cães mortos, um cabo telefônico cortado, um telegrama assinado com o seu nome por outra mão: nada disso precisa de seres das colinas para ser explicado, e tudo isso é caso para o xerife.
+
+O senhor tem as pegadas de Brown; leve-as a quem de direito. Compreendo que queira sair sem alarde — mas não há saída mais digna do que a de quem não tem nada a esconder.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_5_renovacao"
+title = "Minha carta a Akeley — o telegrama"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+23 de agosto de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Renovo as minhas ofertas de ajuda. Escrevo-lhe assim que recebo o seu bilhete, e falo outra vez em visitá-lo, e em ajudá-lo a convencer as autoridades do perigo terrível em que o senhor se encontra.
+
+Quem mandou aquele telegrama em seu nome tinha lido a carta que eu lhe escrevi. Isso já não é coisa que um homem resolva sozinho.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

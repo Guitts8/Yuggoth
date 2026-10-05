@@ -60,9 +60,9 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 
 | Objeto | Notas |
 |---|---|
-| **Escrivaninha** | Com gavetas que **abrem** (o Dia 5 usa uma gaveta com chave). Gavetas como peças separadas. |
+| **Escrivaninha** | Com gavetas (peças separadas). Nenhum dia precisa abri-las: esconder itens saiu do GDD (§6.4). |
 | **Cadeira da escrivaninha** | Madeira, encosto de ripas. O jogador começa sentado nela. |
-| **Estante de livros** | Prateleiras com lombadas; um vão numa prateleira (esconderijo do Dia 5, "atrás dos livros"). |
+| **Estante de livros** | Prateleiras com lombadas (o vão numa prateleira era o esconderijo de uma versão antiga do GDD; pode sair). |
 | **Lareira** | Tijolo, consolo de madeira, grelha de ferro. Funciona acesa e apagada. |
 | **Poltrona** | Estofada, de leitura. Aparece também coberta por lençol (versão "drapeada" ajuda). |
 | **Janela de guilhotina** | Caixilho de madeira com vidraças; a vista é um plano atrás. |
@@ -73,7 +73,8 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 ### C — a caixa provisória aguenta
 
 Quadro de cortiça, armário do fonógrafo, cabideiro, tapete, tinteiro e pena,
-castiçais do consolo.
+castiçais do consolo. O **vulto da janela** (Dia 5) é um plano com textura
+recortada e deve continuar vago: só melhorar a silhueta, nunca mostrá-lo nítido.
 
 ### Texturas que melhorariam muito
 - **Papel de parede** (o atual é um padrão simples de listras e losangos).

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_5_cautelosa"
+title = "Minha carta a Akeley — 29 de agosto"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+29 de agosto de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Uma saída digna é perfeitamente possível, e conte comigo para ela. Alegra-me saber que o senhor já não é tão contrário ao meu plano. Ponha as suas coisas em ordem, sem pressa e sem alarde; ninguém precisa saber dos seus estudos para entender que um homem só, numa fazenda isolada, prefira a companhia do filho.
+
+Escreva-me sempre. E, se precisar, eu vou.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_agosto"
+title = "Carta de H. W. Akeley — começo de agosto"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.3]Brattleboro, Vt.
+7 de agosto de 1928[/tremulo][/right]
+
+[tremulo forca=0.3]Wilmarth —[/tremulo]
+
+[tremulo forca=0.3]Da pedra, não espero mais nada. A perda da caixa é o cumprimento, portentoso e ameaçador, do que tinha de acontecer. Não se esqueça dos poderes telepáticos e hipnóticos dos seres das colinas e dos seus agentes. Para ser franco, não creio que a pedra ainda esteja nesta terra.[/tremulo]
+
+[tremulo forca=0.3]Mas agora há coisa pior. Eles começaram a se fechar em volta de mim com uma determinação inteiramente nova. Os latidos dos cães à noite, sempre que a lua está fraca ou ausente, são hediondos; e houve tentativas de me molestar nas estradas solitárias por onde tenho de passar de dia.[/tremulo]", "[tremulo forca=0.35]No dia 2, a caminho da vila no meu carro, encontrei um tronco de árvore atravessado no caminho, num ponto em que a estrada corta um trecho fundo de mata. Os latidos selvagens dos dois cães grandes que eu levava diziam bem demais das coisas que deviam estar à espreita ali perto. O que teria acontecido se os cães não estivessem comigo, não ouso imaginar. Agora não saio sem pelo menos dois da minha matilha fiel e forte.[/tremulo]
+
+[tremulo forca=0.35]Nos dias 5 e 6 houve outras coisas na estrada: numa vez, uma bala raspou o meu carro; na outra, os latidos dos cães falavam de presenças ímpias na mata.[/tremulo]
+
+[right][tremulo forca=0.35]H. W. A.[/tremulo][/right]")
+exposure_on_read = 0.02

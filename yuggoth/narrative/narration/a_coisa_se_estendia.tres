@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"a_coisa_se_estendia"
+text = "A coisa se estendia assim. Haveria de me sugar para dentro dela, e me engolir?"

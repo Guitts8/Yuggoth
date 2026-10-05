@@ -43,6 +43,7 @@ func _texturas() -> void:
 	_save(_vista(true), "vista_dia")
 	_save(_vista_entardecer(), "vista_entardecer")
 	_save(_gota(), "gota")
+	_save(_sombra(), "sombra")
 	# Correspondência.
 	_save(_papel_envelope(), "papel_envelope")
 	_save(_selo(), "selo_2c")
@@ -709,6 +710,33 @@ func _foto_exercito() -> Image:
 				var a := -PI * 0.5 + (d - 1.5) * 0.5
 				_elipse(img, c + Vector2(cos(a) * 4.0 - 3.0, sin(a) * 4.0), Vector2(1.1, 1.1), 0.22)
 	return _revelar(img, 56)
+
+
+## O vulto que passa pela janela no Dia 5: corpo curvado, membros finos e uma
+## asa de morcego meio aberta, borrados pela chuva. Fora do contorno, alfa 0
+## (o shader descarta); a forma nunca é nítida o bastante para se confirmar.
+func _sombra() -> Image:
+	var img := _img(32, 48)
+	var n := _noise(61, 0.18)
+	var corpo := func(x: float, y: float) -> float:
+		var d := Vector2((x - 15.0) / 7.5, (y - 28.0) / 13.0).length()
+		# Asa: um leque saindo do alto das costas, para a esquerda.
+		var a := Vector2(x - 13.0, y - 20.0)
+		var asa := 1.0 if a.x < 0 and a.length() < 15.0 and absf(a.angle() + PI * 0.75) < 0.45 else 0.0
+		# Membros: riscos finos para baixo e para a frente.
+		var membro := 0.0
+		for k in 3:
+			var x0 := 12.0 + k * 4.0
+			if y > 36 and absf(x - (x0 + (y - 36) * (0.35 * (k - 1)))) < 0.9:
+				membro = 1.0
+		return maxf(maxf(1.0 - d, 0.0) * 3.0, maxf(asa, membro))
+	for y in 48:
+		for x in 32:
+			var v: float = corpo.call(float(x), float(y)) + n.get_noise_2d(x, y) * 0.45
+			var c := Color(0.32, 0.25, 0.26).lerp(Color(0.42, 0.3, 0.3), n.get_noise_2d(x * 3.0, y * 3.0) * 0.5 + 0.5)
+			c.a = 1.0 if v > 0.55 else 0.0
+			img.set_pixel(x, y, c)
+	return img
 
 
 ## Risco de chuva (para partículas): branco translúcido vertical.

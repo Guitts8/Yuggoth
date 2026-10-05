@@ -10,6 +10,9 @@ extends Resource
 @export var options: Array[ReplyOption] = []
 ## Dita depois de selar, no lugar da fala padrão do escritório.
 @export var narracao_depois: NarrationLine
+## Salto no tempo depois da fala (ex.: Dia 5, "Em resposta, recebi apenas um
+## telegrama..."). Ver SceneDirector.time_skip().
+@export var cartao_depois: NarrationLine
 
 
 func get_done_flag() -> StringName:

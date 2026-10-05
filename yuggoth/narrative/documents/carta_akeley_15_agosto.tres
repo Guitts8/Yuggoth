@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_15_agosto"
+title = "Carta de H. W. Akeley — 15 de agosto"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.5]Agência do correio, Brattleboro
+14 de agosto de 1928[/tremulo][/right]
+
+[tremulo forca=0.5]Wilmarth —[/tremulo]
+
+[tremulo forca=0.5]Escrevo-lhe daqui mesmo, do correio de Brattleboro, para que esta siga sem demora.[/tremulo]
+
+[tremulo forca=0.55]Na noite de 12 para 13 houve coisas pavorosas. Balas voando do lado de fora da casa — e de manhã encontrei três dos meus doze cães grandes mortos a tiro. Na estrada, uma miríade de marcas de garra; e entre elas, as pegadas humanas de Walter Brown.[/tremulo]", "[tremulo forca=0.55]Comecei a telefonar para Brattleboro, pedindo mais cães, mas a linha morreu antes que eu tivesse dito grande coisa. Vim de carro até aqui e soube que os homens da companhia telefônica acharam o cabo principal cortado, num corte limpo, num ponto em que ele passa pelas colinas desertas ao norte de Newfane.[/tremulo]
+
+[tremulo forca=0.5]Estou para voltar para casa com quatro cães novos, de boa raça, e várias caixas de munição para o meu rifle de repetição de caça grossa.[/tremulo]
+
+[right][tremulo forca=0.5]H. W. A.[/tremulo][/right]")
+exposure_on_read = 0.04
