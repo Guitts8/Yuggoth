@@ -728,14 +728,14 @@ func _dia_5(parent: Node) -> void:
 
 	# O bilhete: ele nunca mandou o telegrama. Depois, a carta que renova a oferta.
 	var bilhete := _grupo_se(g, "Bilhete", _flag(&"narrou_cartao_aprofundava"))
-	_folha(bilhete, "Folha", Vector3(-0.26, MESA + 0.009, -2.1), -7, "bilhete_akeley_agosto", "Ler o bilhete", false)
+	_folha(bilhete, "Folha", Vector3(-0.52, MESA + 0.005, -1.98), -7, "bilhete_akeley_agosto", "Ler o bilhete", false)
 	var renovacao := _grupo_se(g, "Renovacao", _composta(CompositeCondition.Mode.TODAS,
 		[_flag(&"narrou_cartao_aprofundava"), _flag(&"narrou_cartao_28_agosto", true)]))
 	_escrever(renovacao, "renovacao_dia_5", &"comparou_assinatura")
 
 	# 28 de agosto: "uma saída digna". A resposta do dia (a que leva para casa).
 	var c28 := _grupo_se(g, "Carta28", _flag(&"narrou_cartao_28_agosto"))
-	_folha(c28, "Folha", Vector3(0.0, MESA + 0.011, -2.1), 6, "carta_akeley_28_agosto", "Ler a carta de 28 de agosto", false)
+	_folha(c28, "Folha", Vector3(0.22, MESA + 0.007, -1.96), 6, "carta_akeley_28_agosto", "Ler a carta de 28 de agosto", false)
 	_escrever(c28, "resposta_dia_5", &"leu_carta_akeley_28_agosto")
 
 	# Depois do bilhete, quem olhar para a janela vê algo passar lá fora. Uma vez.
@@ -858,11 +858,20 @@ func _dia_3(parent: Node) -> Node3D:
 	rotulo.position = Vector3(0, 0.17, 0.192)
 	rotulo.alpha_cut = Label3D.ALPHA_CUT_DISCARD
 	_add(caixote, rotulo)
-	_colisao(caixote, "Colisao", [[Vector3(0.5, 0.3, 0.38), Vector3(0, 0.15, 0)]])
+	# Aberto em cima: só paredes e fundo colidem. Uma caixa maciça bloqueava o
+	# raio de interação e as peças lá dentro nunca podiam ser miradas.
+	_colisao(caixote, "Colisao", [
+		[Vector3(0.5, 0.02, 0.38), Vector3(0, 0.01, 0)],
+		[Vector3(0.02, 0.3, 0.38), Vector3(-0.24, 0.15, 0)],
+		[Vector3(0.02, 0.3, 0.38), Vector3(0.24, 0.15, 0)],
+		[Vector3(0.5, 0.3, 0.02), Vector3(0, 0.15, -0.18)],
+		[Vector3(0.5, 0.3, 0.02), Vector3(0, 0.15, 0.18)],
+	])
+	# [flag, ação, posição, tamanho da área]
 	var pecas := [
-		[&"fono_corneta", "Montar a corneta", Vector3(-0.08, 0.12, 0)],
-		[&"fono_manivela", "Montar a manivela", Vector3(0.12, 0.08, 0.06)],
-		[&"fono_agulha", "Pôr uma agulha", Vector3(0.14, 0.06, -0.08)],
+		[&"fono_corneta", "Montar a corneta", Vector3(-0.08, 0.12, 0), Vector3(0.3, 0.16, 0.2)],
+		[&"fono_manivela", "Montar a manivela", Vector3(0.12, 0.08, 0.06), Vector3(0.16, 0.1, 0.1)],
+		[&"fono_agulha", "Pôr uma agulha", Vector3(0.14, 0.06, -0.08), Vector3(0.12, 0.1, 0.1)],
 	]
 	for p: Array in pecas:
 		var peca := _grupo_se(caixote, "Peca_%s" % String(p[0]).trim_prefix("fono_"), _flag(p[0], true))
@@ -876,7 +885,7 @@ func _dia_3(parent: Node) -> Node3D:
 				_cyl(peca, "Punho", 0.01, 0.01, 0.05, Vector3(0.07, 0.025, 0), "madeira_escura", 6)
 			&"fono_agulha":
 				_cyl(peca, "Lata", 0.025, 0.025, 0.012, Vector3.ZERO, "latao", 8)
-		var montar := _area(peca, StateInteractable.new(), "Montar", Vector3(0.22, 0.15, 0.22)) as StateInteractable
+		var montar := _area(peca, StateInteractable.new(), "Montar", p[3]) as StateInteractable
 		montar.prompt = p[1]
 		montar.changes = {p[0]: 1.0}
 		montar.additive = false

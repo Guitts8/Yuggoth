@@ -229,6 +229,7 @@ func _ready() -> void:
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
 	esc = root.find_child("Escritorio", true, false)
 	_check(esc.miskatonic.visible and not esc.player.seated, "recarregar depois do Prólogo vai direto ao escritório")
+	await _check_alcance(esc, "Dia 1")
 
 	# --- Escritório: Dia 1 (GDD §5.1) ---
 	player = esc.player
@@ -277,6 +278,7 @@ func _ready() -> void:
 	var dia2: Node3D = esc.find_child("Dia2", true, false)
 	var fotos: Node3D = esc.find_child("Fotografias", true, false)
 	_check(dia2.visible and fotos.visible, "Dia 2: a carta e as fotografias na mesa")
+	await _check_alcance(esc, "Dia 2")
 	_check(fotos.find_children("*", "Fotografia", false, false).size() == 9, "as nove fotografias do livro")
 	_check(not esc.relogio.playing, "o relógio da parede parou")
 	_check(esc.world_env.environment == esc.ambientes_dia[2], "entardecer no Dia 2")
@@ -319,12 +321,19 @@ func _ready() -> void:
 	var fono: Fonografo = esc.fonografo
 	var escrever3: WriteReply = esc.find_child("Dia3", true, false).get_node("Escrever")
 	_check(fono.is_visible_in_tree() and fono.faltando().size() == 3, "a máquina emprestada chega desmontada")
+	await _check_alcance(esc, "Dia 3")
 	_check(not escrever3.can_interact(player), "responder só depois de ouvir o disco")
 	fono.interact(player)
 	_check(not GameState.has_flag(&"tocou_disco"), "sem corneta, manivela e agulha não toca")
+	# Como o jogador: de pé ao lado do caixote, mirar cada peça e apertar E.
+	var mirou := true
 	for montar: StateInteractable in esc.find_child("Caixote", true, false).find_children("Montar", "StateInteractable", true, false):
-		montar.interact(player)
+		player.global_position = Vector3(-0.95, 0.0, 1.55)
+		await _mirar(player, (montar.get_child(0) as Node3D).global_position)
+		mirou = mirou and player._target == montar
+		await _press(&"interagir")
 	await _frames(2)
+	_check(mirou, "a mira alcança as peças dentro do caixote")
 	_check(fono.faltando().is_empty() and fono.prompt == "Pôr o cilindro de cera", "peças montadas; falta o cilindro")
 	fono.interact(player)
 	await _frames(2)
@@ -355,6 +364,7 @@ func _ready() -> void:
 	var dia4: Node3D = esc.find_child("Dia4", true, false)
 	var tel: Telefone = esc.find_child("Telefone", true, false)
 	_check(dia4.visible and esc.find_child("Foto10", true, false).is_visible_in_tree(), "Dia 4: telegrama, carta de julho e a foto do exército")
+	await _check_alcance(esc, "Dia 4")
 	_check(not tel.can_interact(player), "telefone sem ligação antes do telegrama")
 	dia4.get_node("Telegrama/Ler").interact(player)
 	await _frames(2)
@@ -388,6 +398,7 @@ func _ready() -> void:
 	var dia5: Node3D = esc.find_child("Dia5", true, false)
 	_check(dia5.visible and esc.world_env.environment == esc.ambientes_dia[5], "Dia 5: noite no escritório")
 	_check(AudioDirector.get_ambience() == esc.sons_dia[5], "Dia 5: chuva")
+	await _check_alcance(esc, "Dia 5")
 	var oferta: WriteReply = dia5.get_node("Oferta/Escrever")
 	var telegrama5: Node3D = dia5.get_node("TelegramaAkely")
 	_check(not oferta.can_interact(player) and not telegrama5.visible, "antes da carta de 15 de agosto, nada a responder")
@@ -402,6 +413,7 @@ func _ready() -> void:
 	writer._seal()
 	await _until(func() -> bool: return GameState.has_flag(&"narrou_cartao_telegrama_akely") and not SceneDirector.hold_black, 60.0)
 	_check(telegrama5.visible and not oferta.is_visible_in_tree(), "em resposta, só um telegrama de Bellows Falls")
+	await _check_alcance(esc, "Dia 5, o telegrama")
 	var papel: Node3D = telegrama5.get_node("Papel")
 	papel.get_node("Leitura/Ler").interact(player)
 	await _frames(2)
@@ -418,6 +430,7 @@ func _ready() -> void:
 	reader.close()
 	await _frames(2)
 	_check(comparar.is_visible_in_tree() and not papel.get_node("Leitura").visible, "depois do bilhete, o telegrama é para comparar")
+	await _check_alcance(esc, "Dia 5, o bilhete")
 	var julho: DocumentData = load("res://narrative/documents/carta_akeley_julho.tres")
 	var renovar: WriteReply = dia5.get_node("Renovacao/Escrever")
 	_check(not julho.resolve_pages()[2].contains("ruivo") and not renovar.can_interact(player), "antes de comparar: a carta de julho intacta, nada a escrever")
@@ -445,6 +458,7 @@ func _ready() -> void:
 	await _until(func() -> bool: return GameState.has_flag(&"narrou_cartao_28_agosto") and not SceneDirector.hold_black, 60.0)
 	var c28: Node3D = dia5.get_node("Carta28")
 	_check(c28.visible and not dia5.get_node("Sombra").visible, "28 de agosto: a carta da saída digna")
+	await _check_alcance(esc, "Dia 5, 28 de agosto")
 	esc.porta.interact(player)
 	await _frames(2)
 	_check(GameState.get_value(&"dia") == 5, "a porta espera a resposta de 28 de agosto")
@@ -474,6 +488,53 @@ func _ready() -> void:
 
 	print("SMOKE: %s (%d falha(s))" % ["OK" if _failures == 0 else "FALHOU", _failures])
 	get_tree().quit(_failures)
+
+
+## Interações visíveis que a mira do jogador (raio de 2 m, camadas mundo e
+## interação) não alcança de nenhum ponto da sala, em pé ou sentado — ex.: uma
+## colisão tampando as peças dentro do caixote do Dia 3.
+func _inalcancaveis(esc: Escritorio) -> PackedStringArray:
+	var space := esc.get_world_3d().direct_space_state
+	var fora := PackedStringArray()
+	for alvo: Interactable in esc.find_children("*", "Interactable", true, false):
+		if not alvo.is_visible_in_tree():
+			continue
+		var centro := (alvo.get_child(0) as Node3D).global_position
+		var achou := false
+		for h in [1.15, 1.6]:
+			for r in [0.4, 0.8, 1.2]:
+				for i in 16:
+					var a := TAU * i / 16.0
+					var origem := Vector3(centro.x + cos(a) * r, h, centro.z + sin(a) * r)
+					if absf(origem.x) > 2.3 or absf(origem.z) > 2.8 or origem.distance_to(centro) > 1.9:
+						continue
+					var q := PhysicsRayQueryParameters3D.create(origem, centro, 3, [esc.player.get_rid()])
+					q.collide_with_areas = true
+					if space.intersect_ray(q).get("collider") == alvo:
+						achou = true
+						break
+				if achou:
+					break
+			if achou:
+				break
+		if not achou:
+			fora.append(String(esc.get_path_to(alvo)))
+	return fora
+
+
+## Vira o corpo e a cabeça do player para o ponto e espera a mira atualizar.
+func _mirar(player: Player, ponto: Vector3) -> void:
+	player.look_at(Vector3(ponto.x, player.global_position.y, ponto.z))
+	await _frames(1)
+	var olho := player.camera.global_position
+	player.head.rotation.x = atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
+	await _frames(3)
+
+
+func _check_alcance(esc: Escritorio, quando: String) -> void:
+	await _frames(2)
+	var fora := _inalcancaveis(esc)
+	_check(fora.is_empty(), "%s: toda interação visível ao alcance da mira %s" % [quando, fora if fora else ""])
 
 
 func _check(ok: bool, label: String) -> void:
