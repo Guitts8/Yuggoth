@@ -275,7 +275,9 @@ cartão), e o que chega depois já está na mesa quando a luz volta.
 **Fim do dia:** porta → *"Setembro de 1928."*
 
 ## 6. Dia 6 — As três últimas cartas ⏳ (5–7 de setembro)
-As cartas de **segunda** (algo pousa no telhado, briga dos cães, gosma verde, 5
+Abre com o que faltou de agosto: Akeley responde com menos terrores (só a lua
+cheia, acha ele, segura as criaturas; fala em se hospedar em Brattleboro quando a
+lua minguar) e Wilmarth o anima de novo. Depois, as cartas de **segunda** (algo pousa no telhado, briga dos cães, gosma verde, 5
 cães mortos, um por ele mesmo), **terça** ("falaram comigo"; "fique fora disso,
 Wilmarth"; quebre o disco) e **quarta** (a coisa morta que evapora no galpão; o
 filme que sai vazio; Brown sumiu; o filho George; gás e máscaras; o xerife).

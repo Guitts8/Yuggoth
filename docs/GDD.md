@@ -137,9 +137,9 @@ Beats:
 | 1 | 5 de maio | A 1ª carta de Akeley, na íntegra | Ler; recortes no quadro (enchentes, o debate, o Pendrifter); rascunho ao *Arkham Advertiser*; **resposta** | Tarde ensolarada, pássaros |
 | 2 | fim de maio | A 2ª carta, "quase por volta do correio": **as fotografias** e a carta "enciclopédica" (três horas de leitura) | Examinar as fotos com **lupa** (a caverna revela os rastros; no círculo de pedras não há nada; a pedra negra ao lado do busto de Milton; a casa e os cães); ler a carta — Wilmarth **se recusa** a transcrever certos trechos; **abandonar o rascunho do Advertiser** ("meu debate público acabou para sempre"); **resposta** | Anoitecer. O relógio da parede para de tocar 💭 |
 | 3 | fim de junho | **O disco** chega, despachado de Brattleboro, com bilhete (medo das estradas, Walter Brown) | Montar a máquina **emprestada da administração** (puzzle leve: corneta, manivela, agulha no caixote); ler a **transcrição**; **tocar o disco** — quantas vezes quiser; **resposta** | Depois do disco: zumbido baixo permanente |
-| 4 | 18–19 de julho | **A pedra não chega.** Telegrama de Bellows Falls: trem 5508. Wilmarth espera; telefona; interurbano para Boston; o relato do funcionário de Keene sobre **"Stanley Adams"** | **Telefone** na mesa: ligar para a agência de expresso, depois para a North Station; ditar o telegrama noturno a Akeley; ouvir o relato (voz que "dava tontura e sono"); cartão: a ida a Boston e a noite escrevendo cartas | Calor de julho; tarde passando no relógio parado |
-| 5 | agosto | A carta frenética de 15/8 (3 dos 12 cães mortos, pegadas de Brown, cabo cortado); Wilmarth oferece ir a Vermont; o **telegrama "AKELY"**; o bilhete de Akeley: **ele nunca o mandou** | **Resposta** (oferecer ajuda); **comparar a assinatura** do telegrama com as cartas; reler cartas antigas (**primeira alteração de texto**) | Noite, chuva. Sombra na janela (não confirmada) |
-| 6 | 5–7 de setembro | As **três últimas cartas manuscritas**: o telhado (segunda), "falaram comigo" (terça), a coisa morta que evapora e o filme vazio (quarta) | Ler as três; **resposta** (a carta registrada: "mude-se para Brattleboro"); ao terminar a última → **Interlúdio** (§5.1a) | Noite sem lua |
+| 4 | 18–21 de julho | **A pedra não chega.** Telegrama de Bellows Falls: trem 5508. Wilmarth espera; telefona; interurbano para Boston; o relato do funcionário de Keene sobre **"Stanley Adams"** | **Telefone** de parede, ao lado da mesa: ligar para a agência de expresso, depois para a North Station; ditar o telegrama noturno a Akeley; ouvir o relato (voz que "dava tontura e sono"); cartão: a ida a Boston e a noite escrevendo cartas | Calor de julho; tarde passando no relógio parado |
+| 5 | 15–29 de agosto | A carta do começo de agosto (tronco na estrada, tiro de raspão) e a frenética de 15/8 (3 dos 12 cães mortos, pegadas de Brown, cabo cortado), em letra trêmula; Wilmarth oferece ir a Vermont; o **telegrama "AKELY"**; o bilhete de Akeley: **ele nunca o mandou**; Wilmarth renova a oferta; a carta de 28/8 ("uma saída digna") | As cartas cruzam o correio: cada carta selada salta no tempo. A **oferta** e a **renovação** são cartas sem tom; telegrafar a resposta pelo telefone; **comparar a assinatura** do telegrama com as cartas → **primeira alteração de texto** (a carta de julho, relida); **resposta** do dia à carta de 28/8 ("a mais animadora que pude") | Noite, chuva. Um vulto passa pela janela (não confirmado) |
+| 6 | 5–7 de setembro | Abre com a resposta mais calma de Akeley (só a lua cheia segura as criaturas; hospedar-se em Brattleboro). As **três últimas cartas manuscritas**: o telhado (segunda), "falaram comigo" (terça), a coisa morta que evapora e o filme vazio (quarta) | Ler as três; **resposta** (a carta registrada: "mude-se para Brattleboro"); ao terminar a última → **Interlúdio** (§5.1a) | Noite sem lua |
 | 7 | 8–10 de setembro | A **carta datilografada**, serena, convidando; a noite em claro; os telegramas ("COMBINAÇÃO SATISFATÓRIA... NÃO ESQUEÇA DISCO CARTAS FOTOS") | Comparar com as cartas antigas (estilo, vocabulário, grafia); telegrafar a resposta; **arrumar a valise: leva tudo**, como no livro (§6.4) | Escritório "arrumado" sozinho 💭 |
 
 > **Nota de ritmo:** os Dias 4 e 7 são curtos. O 7 vem logo depois do Interlúdio: o escritório calmo e a carta serena contra o que o jogador acabou de viver. Não alongar.
@@ -152,7 +152,7 @@ Beats:
 - 💭 Se o jogador parar e tocar de novo, a gravação **dura mais** — um trecho novo no fim: a voz zumbida diz "Wilmarth". (O livro: ele tocou "muitas outras vezes".)
 - A voz humana do disco é a **mesma voz de Noyes** — no livro, quem revela isso é a voz do cilindro, no Ato III.
 
-**Escolha de resposta (Dias 1 a 6):** (no Dia 4, as cartas da noite em claro, depois do relato de Keene) Wilmarth escreve a Akeley escolhendo o tom. O tom do livro é sempre uma das opções.
+**Escolha de resposta (Dias 1 a 6):** (no Dia 4, as cartas da noite em claro, depois do relato de Keene) Wilmarth escreve a Akeley escolhendo o tom. O tom do livro é sempre uma das opções. Uma escolha de tom por dia: quando o livro tem várias cartas no mesmo dia (Dia 5), as outras são escritas sem escolha (não mexem em `crenca`).
 - *Cético* → `crenca -1` · *Cauteloso* → `crenca 0` · *Crédulo* → `crenca +1`
 
 Isso altera o conteúdo das cartas seguintes (Akeley responde ao que foi dito — sem contradizer os fatos do livro) e, principalmente, **como "Akeley" trata o jogador no Ato III**.
@@ -420,7 +420,7 @@ O som carrega metade do terror. Prioridade de produção igual à do visual.
 | **O disco de fonógrafo** | Gravação cerimonial com chiado de 78 rpm, banda estreita (300 Hz–3 kHz), voz humana + voz zumbida. Peça de áudio mais importante do jogo. |
 | **O sussurro de "Akeley"** | Voz sussurrada sem sonoridade vocal, com uma camada subsônica de zumbido quase inaudível. |
 | **Voz mecânica dos cilindros** | Plana, monotônica, com artefatos de vocoder e ritmo levemente errado. |
-| **Ambiente** | Arkham: chuva, relógio, cidade distante. Vermont: rios, vento em pinheiros, **ausência de pássaros** (notar o silêncio). |
+| **Ambiente** | Arkham: chuva, relógio, cidade distante. Vermont: rios, vento em pinheiros, **ausência de pássaros** (notar o silêncio). **Pássaros só nas poucas cenas de dia que transmitem tranquilidade** (no escritório, só o Dia 1); à noite e nos dias tensos eles cessam. |
 | **Música** | Mínima. Drones e cordas preparadas só em transições e no clímax. Silêncio é o padrão. |
 
 Buses no Godot: `Master → Music, Ambience, SFX, Voice, Whisper` — `Whisper` com cadeia de efeitos própria (filtro, distorção, pitch) animada por código.
@@ -570,7 +570,7 @@ func resolve_pages() -> Array[String]:
 
 **Risco aceito:** o Ato III, maior risco de design, é validado por último. Como nada da demo depende da fazenda, mudanças nele não afetam o que já foi lançado.
 
-**Estado (2026-10-02):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–5 jogáveis com arte e som provisórios (gerados por script); falta o Dia 6, a arte e o som finais do escritório e a voz do disco. O que cada parte já tem: `docs/SEQUENCIA.md`.
+**Estado (2026-10-05):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–5 jogáveis com arte e som provisórios (gerados por script); falta o Dia 6 (com o fim da demo), a arte e o som finais do escritório, a voz do disco e o visual de sonho (pendente: definir o que falta além da intensidade). O que cada parte já tem: `docs/SEQUENCIA.md`.
 
 ### 12.1 Riscos
 | Risco | Mitigação |
