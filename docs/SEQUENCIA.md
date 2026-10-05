@@ -137,7 +137,7 @@ debate público sobre o horror de Vermont terminou para sempre."*; responder (28
 ---
 
 ## 3. Dia 3 — O disco ✅ (fim de junho – 3 de julho)
-**Clima:** noite. Abajur elétrico na mesa, lua na janela.
+**Clima:** noite. Abajur elétrico na mesa, lua na janela. Quase silêncio, vento fraco lá fora (nenhum pássaro — eles só cantam na tarde do Dia 1).
 **Ao começar:** *"No fim de junho chegou o disco — despachado de Brattleboro, porque Akeley não confiava no ramal ao norte de lá."*
 
 **Na sala:**

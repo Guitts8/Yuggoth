@@ -758,6 +758,8 @@ func _sons() -> void:
 	_wav(_relogio(), "relogio", true)
 	_wav(_pena(), "pena", false)
 	_wav(_tarde(), "tarde", true)
+	_wav(_tarde(false), "dia_quieto", true)
+	_wav(_noite(), "noite", true)
 	for i in 3:
 		_wav(_passo(40 + i), "passo_madeira_%d" % (i + 1), false)
 	# O disco de 1915 (cap. III): os tempos vêm das gravações em narrative/gravacoes.
@@ -866,14 +868,16 @@ func _pena() -> PackedFloat32Array:
 	return b
 
 
-func _tarde() -> PackedFloat32Array:
+## Cidade distante; com `passaros`, o canto da tarde tranquila (só o Dia 1).
+## Pássaros nunca à noite nem em dia tenso: o padrão do escritório é sem eles.
+func _tarde(passaros := true) -> PackedFloat32Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 33
 	var b := _buf(8.5)
 	for i in b.size():
 		b[i] = rng.randf_range(-1, 1) * 0.12
 	_lowpass(b, 400.0)  # cidade distante
-	for k in 9:  # pássaros: varreduras curtas de seno
+	for k in (9 if passaros else 0):  # pássaros: varreduras curtas de seno
 		var at := rng.randi_range(0, b.size() - RATE)
 		var f0 := rng.randf_range(2600, 3600)
 		var notas := rng.randi_range(2, 4)
@@ -885,6 +889,26 @@ func _tarde() -> PackedFloat32Array:
 				var f := f0 + sin(t * PI) * 900.0
 				b[start + j] += sin(TAU * f * j / RATE) * sin(t * PI) * 0.08
 	return _seamless(b, 0.5)
+
+
+## Noite no escritório: quase silêncio, o prédio assentando e um vento fraco
+## que sobe e desce lá fora. Nenhum bicho.
+func _noite() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 34
+	var b := _buf(12.0)
+	for i in b.size():
+		b[i] = rng.randf_range(-1, 1) * 0.05
+	_lowpass(b, 180.0)
+	var vento := _buf(12.0)
+	for i in vento.size():
+		vento[i] = rng.randf_range(-1, 1)
+	_lowpass(vento, 500.0)
+	for i in b.size():
+		var t := float(i) / RATE
+		var rajada := maxf(0.0, sin(t * TAU / 12.0 * 2.0 + 0.6) * 0.6 + sin(t * TAU / 12.0 * 3.0) * 0.4)
+		b[i] += vento[i] * rajada * 0.07
+	return _seamless(b, 1.0)
 
 
 ## Lê inícios, tipos e duração de um .tres de Gravacao sem carregá-lo (o .tres

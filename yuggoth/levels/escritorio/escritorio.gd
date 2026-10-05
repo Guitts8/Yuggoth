@@ -21,8 +21,10 @@ const SONHO_DESCIDA := 4.0
 ## vista da janela de cada dia ficam dentro de `Miskatonic/DiaN`.
 @export var ambientes_dia: Array[Environment] = []
 @export var som_chuva: AudioStream
-@export var som_tarde: AudioStream
-## Ambiente sonoro de cada dia (índice = dia); faltando, vale `som_tarde`.
+## Ambiente do escritório quando o dia não pede outro: cidade distante, sem
+## pássaros. Pássaros só onde `sons_dia` pede (dia claro e tranquilo, o Dia 1).
+@export var som_padrao: AudioStream
+## Ambiente sonoro de cada dia (índice = dia); faltando, vale `som_padrao`.
 @export var sons_dia: Array[AudioStream] = []
 @export var som_pena: AudioStream
 @export var linha_abertura: NarrationLine
@@ -239,7 +241,7 @@ func _som_do_dia() -> AudioStream:
 	var n := dia()
 	if n < sons_dia.size() and sons_dia[n]:
 		return sons_dia[n]
-	return som_tarde
+	return som_padrao
 
 
 ## Fala do narrador ao fechar um documento pela primeira vez, se existir

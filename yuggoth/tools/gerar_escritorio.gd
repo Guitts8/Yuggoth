@@ -40,8 +40,10 @@ func _ready() -> void:
 	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite(), cena.get("env_dia"), _env_chuva()]
 	cena.set("ambientes_dia", ambientes)
 	cena.set("som_chuva", load(SFX_DIR + "chuva.wav"))
-	cena.set("som_tarde", load(SFX_DIR + "tarde.wav"))
-	var sons: Array[AudioStream] = [null, null, null, null, null, load(SFX_DIR + "chuva.wav")]
+	# Pássaros só no Dia 1 (tarde tranquila); à noite e nos dias tensos, não.
+	cena.set("som_padrao", load(SFX_DIR + "dia_quieto.wav"))
+	var sons: Array[AudioStream] = [null, load(SFX_DIR + "tarde.wav"), null,
+		load(SFX_DIR + "noite.wav"), null, load(SFX_DIR + "chuva.wav")]
 	cena.set("sons_dia", sons)
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))

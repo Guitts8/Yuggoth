@@ -229,7 +229,7 @@ func _ready() -> void:
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
 	esc = root.find_child("Escritorio", true, false)
 	_check(esc.miskatonic.visible and not esc.player.seated, "recarregar depois do Prólogo vai direto ao escritório")
-	await _check_alcance(esc, "Dia 1")
+	await _check_dia(esc, 1)
 
 	# --- Escritório: Dia 1 (GDD §5.1) ---
 	player = esc.player
@@ -278,7 +278,7 @@ func _ready() -> void:
 	var dia2: Node3D = esc.find_child("Dia2", true, false)
 	var fotos: Node3D = esc.find_child("Fotografias", true, false)
 	_check(dia2.visible and fotos.visible, "Dia 2: a carta e as fotografias na mesa")
-	await _check_alcance(esc, "Dia 2")
+	await _check_dia(esc, 2)
 	_check(fotos.find_children("*", "Fotografia", false, false).size() == 9, "as nove fotografias do livro")
 	_check(not esc.relogio.playing, "o relógio da parede parou")
 	_check(esc.world_env.environment == esc.ambientes_dia[2], "entardecer no Dia 2")
@@ -321,7 +321,7 @@ func _ready() -> void:
 	var fono: Fonografo = esc.fonografo
 	var escrever3: WriteReply = esc.find_child("Dia3", true, false).get_node("Escrever")
 	_check(fono.is_visible_in_tree() and fono.faltando().size() == 3, "a máquina emprestada chega desmontada")
-	await _check_alcance(esc, "Dia 3")
+	await _check_dia(esc, 3)
 	_check(not escrever3.can_interact(player), "responder só depois de ouvir o disco")
 	fono.interact(player)
 	_check(not GameState.has_flag(&"tocou_disco"), "sem corneta, manivela e agulha não toca")
@@ -364,7 +364,7 @@ func _ready() -> void:
 	var dia4: Node3D = esc.find_child("Dia4", true, false)
 	var tel: Telefone = esc.find_child("Telefone", true, false)
 	_check(dia4.visible and esc.find_child("Foto10", true, false).is_visible_in_tree(), "Dia 4: telegrama, carta de julho e a foto do exército")
-	await _check_alcance(esc, "Dia 4")
+	await _check_dia(esc, 4)
 	_check(not tel.can_interact(player), "telefone sem ligação antes do telegrama")
 	dia4.get_node("Telegrama/Ler").interact(player)
 	await _frames(2)
@@ -398,7 +398,7 @@ func _ready() -> void:
 	var dia5: Node3D = esc.find_child("Dia5", true, false)
 	_check(dia5.visible and esc.world_env.environment == esc.ambientes_dia[5], "Dia 5: noite no escritório")
 	_check(AudioDirector.get_ambience() == esc.sons_dia[5], "Dia 5: chuva")
-	await _check_alcance(esc, "Dia 5")
+	await _check_dia(esc, 5)
 	var oferta: WriteReply = dia5.get_node("Oferta/Escrever")
 	var telegrama5: Node3D = dia5.get_node("TelegramaAkely")
 	_check(not oferta.can_interact(player) and not telegrama5.visible, "antes da carta de 15 de agosto, nada a responder")
@@ -529,6 +529,15 @@ func _mirar(player: Player, ponto: Vector3) -> void:
 	var olho := player.camera.global_position
 	player.head.rotation.x = atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 	await _frames(3)
+
+
+## Começo de um dia no escritório: tudo ao alcance da mira, e pássaros só no
+## Dia 1 (a única tarde tranquila; à noite e nos dias tensos eles calam).
+func _check_dia(esc: Escritorio, n: int) -> void:
+	await _check_alcance(esc, "Dia %d" % n)
+	var amb := AudioDirector.get_ambience()
+	var passaros := amb == esc.sons_dia[1]
+	_check(passaros == (n == 1) and amb != null, "Dia %d: %s" % [n, "pássaros na tarde" if n == 1 else "sem pássaros"])
 
 
 func _check_alcance(esc: Escritorio, quando: String) -> void:
