@@ -6,8 +6,9 @@ extends Node
 @export var start_level: PackedScene
 ## Desligado (testes, ou para testar uma fase direto): pula o menu e começa um jogo novo.
 @export var boot_to_menu := true
-## Altura alvo do mundo em pixels. Com base 1080p, shrink 4 = 480x270.
-@export var target_height := 270
+## Altura alvo do mundo em pixels; o shrink é inteiro e arredondado, então com
+## base 1080p dá shrink 2 = 960x540.
+@export var target_height := 480
 ## Velocidade com que a distorção de tela persegue `exposicao`.
 @export var exposure_follow := 1.5
 

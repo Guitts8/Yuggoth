@@ -26,7 +26,7 @@ do Dia 1 e da noite do Dia 6, para o usuário aprovar antes da Fase 2.
 - `psx_lit`: luz **por pixel** (sai `vertex_lighting`), mantendo tremor de vértice e
   afim; **facetas** com normal por face (derivadas) — o low-poly aparece na luz.
 - **Sombras**: a lâmpada da mesa e o sol da janela projetam sombra.
-- Resolução interna: testar **360** e **480** linhas (hoje 270). A UI continua nativa.
+- Resolução interna: **480** (shrink inteiro: 540 linhas em 1080p; era 270). A UI continua nativa. ✅
 - Ambiente: tonemap filmico, contraste e cor quentes, um pouco de brilho na lâmpada;
   escuro de verdade fora do círculo da luz.
 - **Lâmpada de banqueiro** (cúpula de vidro verde) como luz-chave nas noites.

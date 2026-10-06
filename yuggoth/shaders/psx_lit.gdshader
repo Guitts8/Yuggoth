@@ -1,8 +1,13 @@
-// Material PSX iluminado por vértice (Gouraud). Ver psx_common.gdshaderinc.
+// Material PSX iluminado por pixel, com facetas: cada polígono recebe a normal
+// da própria face, então o low-poly aparece na luz (e as sombras funcionam).
+// Ver psx_common.gdshaderinc.
 shader_type spatial;
-render_mode vertex_lighting, specular_disabled, cull_back;
+render_mode specular_disabled, cull_back;
 
 #include "res://shaders/psx_common.gdshaderinc"
+
+// Normal da face (derivadas da posição) em vez da normal suavizada do modelo.
+uniform bool facetado = true;
 
 varying vec2 affine_uv;
 varying float affine_w;
@@ -23,4 +28,7 @@ void fragment() {
 		discard;
 	}
 	ALBEDO = tex.rgb;
+	if (facetado) {
+		NORMAL = normalize(cross(dFdy(VERTEX), dFdx(VERTEX)));
+	}
 }

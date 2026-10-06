@@ -1,16 +1,16 @@
 [gd_resource type="ShaderMaterial" format=3]
 
-[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_iei7l"]
-[ext_resource type="Texture2D" path="res://art/textures/tijolo.png" id="2_whbhv"]
+[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_pbsp1"]
+[ext_resource type="Texture2D" path="res://art/textures/papel.png" id="2_dqsuq"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_iei7l")
-shader_parameter/albedo_tex = ExtResource("2_whbhv")
-shader_parameter/albedo_color = null
+shader = ExtResource("1_pbsp1")
+shader_parameter/albedo_tex = ExtResource("2_dqsuq")
+shader_parameter/albedo_color = Color(0.22, 0.6, 0.3, 1)
 shader_parameter/uv_scale = null
 shader_parameter/world_uv = true
-shader_parameter/tiles_per_meter = 2.5
+shader_parameter/tiles_per_meter = 6.0
 shader_parameter/snap_scale = null
 shader_parameter/affine_near = null
 shader_parameter/affine_far = null

@@ -125,6 +125,7 @@ func _materiais() -> void:
 	_mat("foto", "foto_pegada", {})
 	_mat("cartao_foto", "papel_envelope", {world = 12.0, cor = Color(1.16, 1.14, 1.1)})
 	_mat("vidro_aceso", "papel", {unlit = true, cor = Color(1.1, 0.85, 0.5)})
+	_mat("vidro_verde", "papel", {world = 6.0, cor = Color(0.22, 0.6, 0.3)})
 	# O vulto que passa pela janela no Dia 5 (iluminado só pelo abajur).
 	_mat("sombra", "sombra", {})
 
@@ -145,12 +146,25 @@ func _mat(name: String, tex: String, o: Dictionary) -> void:
 	m[name] = load(path)
 
 
+## Comum a todos: tonemap fílmico, oclusão de ambiente e um brilho leve nas luzes.
+func _pos(e: Environment) -> Environment:
+	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	e.tonemap_exposure = 1.15
+	e.ssao_enabled = true
+	e.ssao_radius = 0.6
+	e.ssao_intensity = 1.6
+	e.glow_enabled = true
+	e.glow_intensity = 0.5
+	e.glow_hdr_threshold = 0.9
+	return e
+
+
 func _env_1930() -> Environment:
-	var e := Environment.new()
+	var e := _pos(Environment.new())
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = Color.BLACK
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color(0.11, 0.115, 0.16)
+	e.ambient_light_color = Color(0.035, 0.037, 0.05)
 	e.fog_enabled = true
 	e.fog_mode = Environment.FOG_MODE_DEPTH
 	e.fog_light_color = Color(0.02, 0.022, 0.03)
@@ -163,14 +177,14 @@ func _env_1930() -> Environment:
 ## Dia 3: noite no escritório (só o abajur e a lua).
 func _env_noite() -> Environment:
 	var e := _env_1930()
-	e.ambient_light_color = Color(0.15, 0.14, 0.17)
+	e.ambient_light_color = Color(0.045, 0.042, 0.05)
 	return e
 
 
 ## Dia 5: noite de chuva, mais fria que a do Dia 3.
 func _env_chuva() -> Environment:
 	var e := _env_1930()
-	e.ambient_light_color = Color(0.12, 0.13, 0.17)
+	e.ambient_light_color = Color(0.035, 0.04, 0.055)
 	return e
 
 
@@ -178,17 +192,17 @@ func _env_chuva() -> Environment:
 func _env_entardecer() -> Environment:
 	var e := _env_dia()
 	e.background_color = Color(0.5, 0.35, 0.3)
-	e.ambient_light_color = Color(0.32, 0.25, 0.22)
+	e.ambient_light_color = Color(0.2, 0.15, 0.13)
 	e.fog_light_color = Color(0.3, 0.2, 0.16)
 	return e
 
 
 func _env_dia() -> Environment:
-	var e := Environment.new()
+	var e := _pos(Environment.new())
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = Color(0.6, 0.66, 0.72)
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color(0.55, 0.5, 0.42)
+	e.ambient_light_color = Color(0.36, 0.32, 0.27)
 	e.fog_enabled = true
 	e.fog_mode = Environment.FOG_MODE_DEPTH
 	e.fog_light_color = Color(0.5, 0.46, 0.4)
@@ -500,7 +514,9 @@ func _gabinete_1930() -> void:
 	_cyl(lamp, "Base", 0.07, 0.08, 0.03, Vector3(0, 0.015, 0), "latao")
 	_cyl(lamp, "Tanque", 0.06, 0.06, 0.08, Vector3(0, 0.07, 0), "latao")
 	_cyl(lamp, "Chamine", 0.03, 0.04, 0.16, Vector3(0, 0.19, 0), "vidro_aceso", 6)
-	_omni(lamp, "Luz", Vector3(0, 0.28, 0.1), Color(1.0, 0.72, 0.45), 1.8, 5.5)
+	var chama := _omni(lamp, "Luz", Vector3(0, 0.28, 0.1), Color(1.0, 0.72, 0.45), 2.6, 5.0)
+	chama.shadow_enabled = true
+	chama.omni_attenuation = 1.4
 	_omni(g, "LuzLua", Vector3(0, 2.0, -2.5), Color(0.5, 0.6, 0.9), 0.7, 6.0)
 
 	# Canto sudoeste: poltrona coberta por lençol.
@@ -666,6 +682,7 @@ func _luz(parent: Node, vista: String, sol_cor: Color, sol_energia: float, sol_a
 	sol.light_energy = sol_energia
 	sol.spot_range = 11.0
 	sol.spot_angle = 30.0
+	sol.shadow_enabled = true
 	_add(parent, sol)
 	_omni(parent, "Preenchimento", Vector3(0, 2.6, 0.6), Color(1.0, 0.92, 0.8).lerp(sol_cor, 0.4), preench, 7.0)
 
@@ -938,15 +955,31 @@ func _dia_3(parent: Node) -> Node3D:
 	return g
 
 
-## Abajur elétrico na mesa, para as noites. A luz fica em "Abajur/Luz" (o
-## fonógrafo pulsa a do Dia 3).
-func _abajur(parent: Node) -> OmniLight3D:
-	var abajur := _group(parent, "Abajur", Vector3(0.62, MESA, -2.45))
-	_cyl(abajur, "Base", 0.07, 0.08, 0.03, Vector3(0, 0.015, 0), "latao")
-	_cyl(abajur, "Haste", 0.012, 0.012, 0.3, Vector3(0, 0.18, 0), "latao", 6)
-	var cupula := _cyl(abajur, "Cupula", 0.06, 0.14, 0.12, Vector3(0, 0.36, 0), "estofado", 10)
-	cupula.rotation_degrees.x = 10
-	return _omni(abajur, "Luz", Vector3(0, 0.3, 0.12), Color(1.0, 0.8, 0.55), 2.2, 6.0)
+## Lâmpada de banqueiro na mesa (cúpula de vidro verde), a luz-chave das noites.
+## A cúpula joga a luz para baixo: um spot com sombra faz o círculo na mesa, e um
+## omni fraco sem sombra é o que a mesa rebate na sala. A luz-chave fica em
+## "Abajur/Luz" (o fonógrafo pulsa a do Dia 3).
+func _abajur(parent: Node) -> SpotLight3D:
+	var abajur := _group(parent, "Abajur", Vector3(0.62, MESA, -2.45), -20)
+	_box(abajur, "Base", Vector3(0.16, 0.025, 0.1), Vector3(0, 0.0125, 0), "latao")
+	_cyl(abajur, "Haste", 0.01, 0.01, 0.3, Vector3(0, 0.17, 0), "latao", 6)
+	# Meio cilindro deitado, aberto para baixo: a cúpula verde.
+	var cupula := _cyl(abajur, "Cupula", 0.055, 0.055, 0.3, Vector3(0, 0.33, 0.04), "vidro_verde", 7)
+	cupula.rotation_degrees.z = 90
+	cupula.scale = Vector3(1, 1, 0.75)
+	_box(abajur, "Lampada", Vector3(0.22, 0.012, 0.04), Vector3(0, 0.29, 0.04), "vidro_aceso")
+	var luz := SpotLight3D.new()
+	luz.name = "Luz"
+	luz.transform = Transform3D(Basis.looking_at(Vector3(0, -1, 0.45)), Vector3(0, 0.27, 0.06))
+	luz.light_color = Color(1.0, 0.78, 0.5)
+	luz.light_energy = 4.0
+	luz.spot_range = 3.0
+	luz.spot_angle = 62.0
+	luz.spot_angle_attenuation = 0.6
+	luz.shadow_enabled = true
+	_add(abajur, luz)
+	_omni(abajur, "Rebatida", Vector3(0, 0.45, 0.35), Color(1.0, 0.8, 0.6), 0.35, 4.5)
+	return luz
 
 
 ## A máquina comercial emprestada da administração (cap. III), sobre o armário.

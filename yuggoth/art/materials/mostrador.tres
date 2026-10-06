@@ -16,3 +16,4 @@ shader_parameter/affine_near = null
 shader_parameter/affine_far = null
 shader_parameter/affine_max_error = null
 shader_parameter/alpha_cut = null
+shader_parameter/facetado = null

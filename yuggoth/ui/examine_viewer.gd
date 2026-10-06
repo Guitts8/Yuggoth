@@ -17,7 +17,7 @@ const CLOSEST := 0.3
 ## Raio da zona central onde um detalhe conta como "olhado", em fração da altura.
 const FOCUS_RADIUS := 0.18
 
-@export var target_height := 270
+@export var target_height := 480
 
 var _target: Examinable
 var _model: Node3D

@@ -5,8 +5,9 @@ shader_type canvas_item;
 uniform float progresso : hint_range(0.0, 1.0) = 0.0;
 uniform float ceu : hint_range(0.0, 1.0) = 0.0;
 uniform float aspecto = 1.7778;
-// O céu é desenhado na grade do mundo (~270 linhas), para emendar com o PS1.
-uniform float linhas = 270.0;
+// O céu é desenhado na grade do mundo (TintaTransicao passa a altura do
+// SubViewport), para emendar com o PS1.
+uniform float linhas = 540.0;
 uniform vec4 cor_tinta : source_color = vec4(0.07, 0.06, 0.08, 1.0);
 uniform vec4 ceu_alto : source_color = vec4(0.1, 0.11, 0.22, 1.0);
 uniform vec4 ceu_horizonte : source_color = vec4(0.78, 0.45, 0.3, 1.0);

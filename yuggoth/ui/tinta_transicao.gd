@@ -92,6 +92,10 @@ func _montar(doc: DocumentData) -> void:
 	mat.shader = SHADER
 	var tela := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(16, 9)
 	mat.set_shader_parameter(&"aspecto", tela.x / tela.y)
+	# O céu na mesma grade do mundo, para emendar com o que estava na tela.
+	var mundo := get_tree().root.find_child("World", true, false) as SubViewport if is_inside_tree() else null
+	if mundo:
+		mat.set_shader_parameter(&"linhas", float(mundo.size.y))
 	_tinta.material = mat
 	add_child(_tinta)
 
