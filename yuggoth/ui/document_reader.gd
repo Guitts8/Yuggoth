@@ -6,6 +6,7 @@ var _doc: DocumentData
 var _pages: PackedStringArray = []
 var _page := 0
 var _opened_frame := -1
+var _tamanho_base := 0
 
 @onready var title_label: Label = %Title
 @onready var body: RichTextLabel = %Body
@@ -14,6 +15,7 @@ var _opened_frame := -1
 
 func _ready() -> void:
 	hide()
+	_tamanho_base = body.get_theme_font_size(&"normal_font_size")
 	body.install_effect(WhisperTextEffect.new())
 	body.install_effect(IllegibleTextEffect.new())
 	body.install_effect(TremorTextEffect.new())
@@ -27,7 +29,7 @@ func open(doc: DocumentData) -> void:
 	_opened_frame = Engine.get_process_frames()
 
 	title_label.text = doc.title
-	DocumentData.apply_fonts(body, doc.style)
+	DocumentData.apply_fonts(body, doc.style, _tamanho_base)
 	WhisperTextEffect.intensity = GameState.get_number(&"exposicao")
 	show()
 	_pages = doc.resolve_pages()
@@ -50,9 +52,32 @@ func _repaginate(doc: DocumentData) -> void:
 	await get_tree().process_frame
 	if _doc != doc or not visible:
 		return
-	_pages = _paginate(doc.resolve_pages())
+	_pages = _paginar_apertando(doc)
 	_page = mini(_page, _pages.size() - 1)
 	_show_page()
+
+
+## Como quem escreve à mão aperta a letra no fim da folha: se cada página do
+## documento quase cabe no papel (sobraria uma folha), a letra diminui (até APERTO_MAX) para caber
+## inteira. Página que transborda de verdade continua indo para a folha seguinte.
+const APERTO_MAX := 0.8
+
+
+func _paginar_apertando(doc: DocumentData) -> PackedStringArray:
+	var fonte := doc.resolve_pages()
+	var base := _tamanho_base
+	DocumentData.apply_fonts(body, doc.style, base)
+	var paginas := _paginate(fonte)
+	var tamanho := base
+	# Só quando sobra uma folha: um texto longo não vira letra miúda.
+	while paginas.size() == fonte.size() + 1 and tamanho > int(base * APERTO_MAX):
+		tamanho -= 1
+		DocumentData.apply_fonts(body, doc.style, tamanho)
+		var apertadas := _paginate(fonte)
+		if apertadas.size() == fonte.size():
+			return apertadas
+	DocumentData.apply_fonts(body, doc.style, base)
+	return paginas
 
 
 ## Página que não cabe no papel é dividida por parágrafo (linha em branco) nas

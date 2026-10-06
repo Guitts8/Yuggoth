@@ -737,6 +737,18 @@ func _ready() -> void:
 			if reader._curto(pagina):
 				sozinhas.append(doc.id)
 	_check(sozinhas.is_empty(), "nenhuma folha só com a assinatura %s" % [sozinhas if sozinhas else ""])
+	# As cartas de Wilmarth (as respostas) cabem numa folha do dossiê, como no papel em que foram escritas.
+	var partidas := PackedStringArray()
+	reader.show()
+	for arquivo in DirAccess.get_files_at("res://narrative/documents"):
+		if arquivo.begins_with("resposta_"):
+			var doc := load("res://narrative/documents/" + arquivo.trim_suffix(".remap")) as DocumentData
+			if reader._paginar_apertando(doc).size() > 1:
+				partidas.append(doc.id)
+	reader.hide()
+	_check(partidas.is_empty(), "as cartas de Wilmarth cabem numa folha do dossiê %s" % [partidas if partidas else ""])
+	DocumentData.apply_fonts(reader.body, DocumentData.Style.MANUSCRITO)
+	_check(reader.body.get_theme_font(&"italics_font") is FontVariation, "[i] na letra de mão: a fonte inclinada")
 
 	var file := FileAccess.open(TEST_SAVE, FileAccess.WRITE)
 	file.store_string('{"type":"Dictionary","args":["s:version","i:0"]}')

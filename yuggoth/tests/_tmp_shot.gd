@@ -1,5 +1,6 @@
 extends Node
-## Descartável: os quatro sonhos entre os dias, em SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável: cada resposta a Akeley no leitor (como no dossiê), página por
+## página, em SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -11,35 +12,27 @@ func _ready() -> void:
 	root.boot_to_menu = false
 	add_child(root)
 	await _s(0.5)
-	# [noite, de onde, para onde olhar]
-	var vistas := [[2, Vector3(-1.0, 0, 2.2), Vector3(-0.2, 0.2, -1.4)],
-		[3, Vector3(0.0, 0, -1.0), Vector3(0.0, 0.95, -2.2)],
-		[4, Vector3(0.0, 0, -1.3), Vector3(0.2, 1.1, -3.0)],
-		[5, Vector3(-0.8, 0, 0.2), Vector3(2.4, 1.3, -2.2)]]
-	for v: Array in vistas:
-		GameState.reset()
-		GameState.set_flag(&"prologo_concluido")
-		GameState.set_value(&"dia", v[0])
-		GameState.set_flag(&"tocou_disco")
-		await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-		await _s(0.5)
-		var esc: Escritorio = root.find_child("Escritorio", true, false)
-		Narrator.cancel()
-		await SceneDirector.fade_out(0.1)
-		esc._sonhar(v[0])
-		await _s(1.0)
-		_mirar(esc.player, v[1], v[2])
-		await _s(3.5)
-		_shot("%s_noite%d" % [tag, v[0]])
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+	await _s(1.0)
+	Narrator.cancel()
+	var reader = root.get_node("UI/DocumentReader")
+	for arquivo in DirAccess.get_files_at("res://narrative/documents"):
+		if not arquivo.begins_with("resposta_"):
+			continue
+		var doc := load("res://narrative/documents/" + arquivo.trim_suffix(".remap")) as DocumentData
+		reader.open(doc)
+		await _s(0.3)
+		for p in reader._pages.size():
+			reader._page = p
+			reader._show_page()
+			await _s(0.1)
+			_shot("%s_%s_p%d" % [tag, doc.id, p + 1])
+		reader.close()
+		await _s(0.1)
 	SaveSystem.delete_save()
 	get_tree().quit()
-
-
-func _mirar(player: Player, de: Vector3, ponto: Vector3) -> void:
-	player.global_position = de
-	player.look_at(Vector3(ponto.x, de.y, ponto.z))
-	var olho := de + Vector3(0, player.eye_height, 0)
-	player.head.rotation.x = atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 
 
 func _shot(name: String) -> void:

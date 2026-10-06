@@ -14,7 +14,7 @@ const STYLE_FONTS := {
 }
 const FONT_SLOTS: Array[StringName] = [&"normal_font", &"italics_font", &"bold_font", &"bold_italics_font"]
 
-static var _font_cache: Dictionary[String, SystemFont] = {}
+static var _font_cache: Dictionary[String, Font] = {}
 
 @export var id: StringName
 @export var title := ""
@@ -43,21 +43,35 @@ func resolve_variant() -> DocumentVariant:
 	return null
 
 
-## Fonte do estilo em todas as variantes ([i], [b]) de um RichTextLabel.
-static func apply_fonts(label: RichTextLabel, doc_style: Style) -> void:
+## Fonte do estilo em todas as variantes ([i], [b]) de um RichTextLabel. O
+## itálico e o negrito são a mesma fonte inclinada e engrossada: a letra de mão
+## (Segoe Script) não tem itálico, e [i] sumia. Com `size` > 0, fixa o tamanho.
+static func apply_fonts(label: RichTextLabel, doc_style: Style, size := 0) -> void:
+	if size > 0:
+		label.add_theme_font_size_override(&"normal_font_size", size)
 	# [i] e [b] usam o mesmo tamanho do texto normal (o tema só define o normal).
-	var size := label.get_theme_font_size(&"normal_font_size")
+	size = label.get_theme_font_size(&"normal_font_size")
 	for slot in [&"italics_font_size", &"bold_font_size", &"bold_italics_font_size"]:
 		label.add_theme_font_size_override(slot, size)
 	for slot in FONT_SLOTS:
 		var key := "%d:%s" % [doc_style, slot]
 		if not _font_cache.has(key):
-			var font := SystemFont.new()
-			font.font_names = PackedStringArray(STYLE_FONTS[doc_style])
-			font.font_italic = String(slot).contains("italics")
-			font.font_weight = 700 if String(slot).begins_with("bold") else 400
-			_font_cache[key] = font
+			_font_cache[key] = _fonte(doc_style, slot)
 		label.add_theme_font_override(slot, _font_cache[key])
+
+
+static func _fonte(doc_style: Style, slot: StringName) -> Font:
+	var base := SystemFont.new()
+	base.font_names = PackedStringArray(STYLE_FONTS[doc_style])
+	if slot == &"normal_font":
+		return base
+	var v := FontVariation.new()
+	v.base_font = base
+	if String(slot).contains("italics"):
+		v.variation_transform = Transform2D(Vector2(1, 0), Vector2(0.38 if doc_style == Style.MANUSCRITO else 0.22, 1), Vector2.ZERO)
+	if String(slot).begins_with("bold"):
+		v.variation_embolden = 0.7
+	return v
 
 
 ## Flag marcada na primeira leitura, ex.: leu_carta_akeley_1.
