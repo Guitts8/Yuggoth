@@ -26,6 +26,12 @@ escrivaninha, **"Pôr na mesa"** → **"Abrir com a espátula"** (som de papel r
 → o conteúdo sai para a mesa; depois o envelope é examinável (carimbo, selos,
 letra). Pacotes que não passam na fresta ficam no chão junto à porta.
 
+**O tempo passa na própria sala:** nos saltos dentro de um dia (Dias 4 a 6), não há
+tela preta. O jogador fica parado; a sala escurece, a **folhinha** no peitoril da
+janela perde uma folha por dia (com som), a luz fria da manhã entra e vai embora, e
+o cartão aparece sobre a cena — o que chega cai pela fresta no primeiro escuro. A
+folhinha mostra a data o tempo todo (em inglês, como tudo o que é impresso na sala).
+
 | # | Parte | Data na história | Estado | Livro |
 |---|---|---|---|---|
 | — | Menu principal | — | ✅ | — |
@@ -250,8 +256,8 @@ leitor, mais a cada carta).
 lamentavelmente trêmula. No dia 15 de agosto recebi uma carta frenética, que me
 perturbou muito."*
 
-As cartas cruzam o correio: cada carta posta na porta **salta no tempo** (tela preta e
-cartão); o que chega depois cai pela fresta no escuro (ouve-se) e está no chão
+As cartas cruzam o correio: cada carta posta na porta **salta no tempo** (o lapso na
+sala); o que chega depois cai pela fresta no escuro (ouve-se) e está no chão
 junto à porta quando a luz volta.
 
 **Na sala (15 de agosto)** — dois envelopes de Brattleboro (*AUG 7* e *AUG 14*) chegam **amarrados num maço**; na mesa, "Desamarrar o maço", e as duas cartas ficam soltas para abrir:
@@ -308,8 +314,8 @@ mais a cada carta.
 terrores a relatar quando acusou o recebimento da minha carta."*
 
 As cartas cruzam o correio, como no Dia 5, mas agora **cada carta lida traz a
-seguinte**: ao fechá-la pela primeira vez, tela preta, cartão, e a próxima cai pela
-fresta no escuro (`DocumentData.cartao_depois`). Uma carta chega por dia: 5, 6 e 7
+seguinte**: ao fechá-la pela primeira vez, o lapso na sala, e a próxima cai
+pela fresta no escuro (`DocumentData.cartao_depois`). Uma carta chega por dia: 5, 6 e 7
 de setembro (envelopes de Brattleboro, *SEP 3*, *4* e *5*). Reler pelo dossiê não
 salta de novo.
 

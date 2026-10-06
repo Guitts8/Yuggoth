@@ -47,10 +47,19 @@ const SONHO_DESCIDA := 4.0
 @export var linha_fim_demo: NarrationLine
 ## Segundos depois de ler a folha do relato até o narrador lembrar das cartas.
 @export var dica_cartas_apos := 8.0
+## Os saltos no tempo dentro do dia passam na própria sala (passar_tempo).
+@export var lapso: Lapso
+## Data na folhinha ao começar cada dia (dia do ano de 1928); índice = dia.
+@export var datas_dia: Array[int] = []
+## Data depois de cada salto no tempo, pelo id do cartão. Faltando, um dia depois.
+@export var datas_cartao: Dictionary[StringName, int] = {}
 
 var _lembrando := false
 var _saindo := false
 var _saltando := false
+var _cartao_no_lapso := false
+## Durante um salto no tempo dentro do dia (o lapso e o cartão dele).
+var em_lapso := false
 var _energias: Dictionary[Light3D, float] = {}
 
 @onready var gabinete: Node3D = $Gabinete1930
@@ -67,6 +76,7 @@ func _ready() -> void:
 	for light: Light3D in gabinete.find_children("*", "Light3D", true, false):
 		_energias[light] = light.light_energy
 	player.lamp.available = false
+	SceneDirector.tempo = self
 	porta.interacted.connect(_on_porta)
 	Events.reply_written.connect(_on_reply_written)
 	Events.document_closed.connect(_on_document_closed)
@@ -82,7 +92,14 @@ func _ready() -> void:
 		_prologo()
 
 
+func _exit_tree() -> void:
+	if SceneDirector.tempo == self:
+		SceneDirector.tempo = null
+
+
 func _vestir(em_1930: bool) -> void:
+	if lapso and not em_1930:
+		lapso.mostrar(_data())
 	_ativar(gabinete, em_1930)
 	_ativar(miskatonic, not em_1930)
 	world_env.environment = env_1930 if em_1930 else _ambiente_do_dia()
@@ -161,6 +178,7 @@ func _lembrar() -> void:
 
 	GameState.set_flag(&"prologo_concluido")
 	GameState.set_value(&"dia", 1)
+	GameState.set_value(&"data", _data_inicio())
 	_vestir(false)
 	await Narrator.say(_cartao(1), Narrator.Style.CARTAO)
 	if not is_inside_tree():
@@ -222,7 +240,7 @@ func _process(_delta: float) -> void:
 ## dia (a do Dia 6, a demo); as outras (Dias 5 e 6) saltam no tempo até a volta
 ## do correio. Sem carta, só sai depois de responder.
 func _on_porta(_by: Node) -> void:
-	if _saindo or _saltando:
+	if _saindo or _saltando or em_lapso:
 		return
 	var carta := CartaSaida.atual
 	if carta == null:
@@ -275,6 +293,7 @@ func _fim_do_dia() -> void:
 	# Falas que sobraram do dia que acabou não atravessam para o seguinte.
 	Narrator.cancel()
 	GameState.add(&"dia", 1)
+	GameState.set_value(&"data", _data_inicio())
 	_vestir(false)
 	_entrar_pela_porta()
 	await Narrator.say(_cartao(dia()), Narrator.Style.CARTAO)
@@ -286,6 +305,45 @@ func _fim_do_dia() -> void:
 	SaveSystem.checkpoint()
 	_saindo = false
 	_inicio_do_dia()
+
+
+## Data de hoje na folhinha (dia do ano de 1928).
+func _data() -> int:
+	return int(GameState.get_value(&"data", _data_inicio()))
+
+
+func _data_inicio() -> int:
+	var n := dia()
+	return datas_dia[n] if n < datas_dia.size() else 1
+
+
+## SceneDirector.time_skip, no escritório: o lapso na própria sala, sem tela
+## preta. O jogador fica parado; o cartão aparece no primeiro escuro (é aí que
+## o que chega aparece, pela flag `narrou_<cartão>`).
+func passar_tempo(cartao: NarrationLine) -> void:
+	var de := _data()
+	var ate: int = datas_cartao.get(cartao.id, de + 1)
+	em_lapso = true
+	player.input_enabled = false
+	# A fala que veio antes (ex.: a de depois de selar) termina primeiro: o cartão
+	# precisa entrar no escuro do lapso, não depois dele.
+	while Narrator.is_speaking():
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
+	_cartao_no_lapso = true
+	await lapso.passar(de, ate, func() -> void:
+		await Narrator.say(cartao, Narrator.Style.CARTAO)
+		_cartao_no_lapso = false)
+	if not is_inside_tree():
+		return
+	GameState.set_value(&"data", ate)
+	while _cartao_no_lapso:
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
+	player.input_enabled = not Events.is_modal_open
+	em_lapso = false
 
 
 func _ambiente_do_dia() -> Environment:

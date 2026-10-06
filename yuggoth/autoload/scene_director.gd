@@ -14,6 +14,9 @@ var is_busy := false
 ## Uma fase pode segurar a tela preta ao abrir (ex.: cartão do Prólogo):
 ## enquanto true, fade_in() não faz nada. Solte com release_black().
 var hold_black := false
+## A fase pode passar o tempo do seu jeito, sem tela preta (o escritório: o
+## lapso na própria sala). Precisa de `passar_tempo(cartao)`; ver time_skip().
+var tempo: Node
 
 var _root: Node
 var _fade: ColorRect
@@ -108,8 +111,12 @@ func release_black(time := FADE_TIME) -> void:
 ## Salto no tempo dentro da mesma fase: escurece, mostra o cartão e volta (ex.:
 ## depois de um telefonema ou de uma carta). O cartão é dito já no escuro, então
 ## a fase pode trocar o cenário pela flag `narrou_<id>` dele sem o jogador ver.
-## Quem chama checa is_inside_tree() depois.
+## Com `tempo` registrado (o escritório), quem passa o tempo é a fase, sem tela
+## preta. Quem chama checa is_inside_tree() depois.
 func time_skip(cartao: NarrationLine, saida := 1.0, volta := 1.2) -> void:
+	if is_instance_valid(tempo) and tempo.is_inside_tree():
+		await tempo.passar_tempo(cartao)
+		return
 	await fade_out(saida)
 	hold_black = true
 	await Narrator.say(cartao, Narrator.Style.CARTAO)

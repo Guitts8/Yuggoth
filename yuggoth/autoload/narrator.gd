@@ -40,6 +40,11 @@ func say(line: NarrationLine, style := Style.LEGENDA) -> void:
 	_speaking = false
 
 
+## Há uma linha na tela (as da fila esperam por ela).
+func is_speaking() -> bool:
+	return _speaking
+
+
 ## Decide variante e discrepância no momento em que a linha é mostrada.
 func resolve(line: NarrationLine) -> String:
 	GameState.set_flag(line.get_said_flag())

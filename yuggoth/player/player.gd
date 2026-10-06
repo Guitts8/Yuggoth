@@ -153,7 +153,8 @@ func _update_head(delta: float, crouching: bool) -> void:
 
 func _update_target() -> void:
 	var hit: Interactable = null
-	if ray.is_colliding():
+	# Parado (um lapso no tempo, uma tela aberta), nada na mira.
+	if input_enabled and ray.is_colliding():
 		hit = ray.get_collider() as Interactable
 	if hit and not hit.can_interact(self):
 		hit = null

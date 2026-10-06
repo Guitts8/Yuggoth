@@ -790,6 +790,8 @@ func _miskatonic() -> void:
 	var corredor := _omni(g, "LuzCorredor", Vector3(-0.95, 0.12, D - 0.3), Color(1.0, 0.8, 0.55), 0.5, 2.2)
 	corredor.omni_attenuation = 1.6
 
+	_lapso(g)
+
 	# Com correspondência na mão, mirar o tampo a põe na mesa (some sem nada na mão).
 	var por := _area(g, MesaCorreio.new(), "PorNaMesa", Vector3(1.6, 0.1, 0.8), Vector3(0, MESA + 0.05, -2.2)) as MesaCorreio
 	por.unique_name_in_owner = true
@@ -805,6 +807,74 @@ func _miskatonic() -> void:
 	_box(a, "Movel", Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0), "madeira_escura")
 	_box(a, "Juncao", Vector3(0.01, 0.8, 0.01), Vector3(0, 0.45, -0.255), "ferro")
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
+
+
+## O tempo passando na sala (Lapso): a folhinha no peitoril da janela, de frente
+## para a escrivaninha, o sol frio da manhã e a vista de dia que entram nos saltos.
+func _lapso(g: Node3D) -> void:
+	var lapso := Lapso.new()
+	lapso.name = "Lapso"
+	_add(g, lapso)
+	lapso.sala = g
+	lapso.ambiente = cena.get_node("WorldEnvironment")
+	lapso.som_folha = load(SFX_DIR + "papel_pegar.wav")
+
+	var sol := SpotLight3D.new()
+	sol.name = "Sol"
+	var sol_pos := Vector3(0.6, 3.4, -D - 1.5)
+	sol.transform = Transform3D(Basis.looking_at(Vector3(-0.3, 0, 0.4) - sol_pos), sol_pos)
+	sol.light_color = Color(0.85, 0.92, 1.0)
+	sol.light_energy = 0.0
+	sol.spot_range = 11.0
+	sol.spot_angle = 30.0
+	sol.shadow_enabled = true
+	_add(lapso, sol)
+	lapso.sol = sol
+	var vista := _quad(lapso, "VistaDia", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.18), Vector3.ZERO, "vista_dia")
+	vista.visible = false
+	lapso.vista_dia = vista
+
+	# A folhinha: base de madeira, o bloco inclinado para trás, a folha do dia.
+	var f := _group(lapso, "Folhinha", Vector3(0.5, JANELA_Y.x + 0.03, -D + 0.1), -12)
+	# Grande o bastante para a data se ler da cadeira, a 1,6 m.
+	f.scale = Vector3.ONE * 1.6
+	_box(f, "Base", Vector3(0.12, 0.025, 0.07), Vector3(0, 0.0125, 0), "madeira_escura")
+	var bloco := _group(f, "Bloco", Vector3(0, 0.025, 0))
+	bloco.rotation_degrees.x = -15
+	_box(bloco, "Papel", Vector3(0.11, 0.14, 0.015), Vector3(0, 0.07, 0), "envelope")
+	var folha := _quad(bloco, "Folha", Vector2(0.105, 0.135), Vector3(0, 0.07, 0.0081), Vector3.ZERO, "envelope")
+	lapso.folha = folha
+	var textos := []
+	for t: Array in [["Mes", 0.046, 40, Color(0.6, 0.1, 0.08)], ["Dia", 0.002, 130, Color(0.1, 0.08, 0.08)], ["Semana", -0.048, 30, Color(0.1, 0.08, 0.08)]]:
+		var label := Label3D.new()
+		label.name = t[0]
+		label.position = Vector3(0, t[1], 0.0006)
+		label.font_size = t[2]
+		label.pixel_size = 0.0004
+		label.modulate = t[3]
+		label.outline_size = 0
+		label.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+		label.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		var fonte := SystemFont.new()
+		fonte.font_names = PackedStringArray(["Georgia", "Times New Roman", "serif"])
+		label.font = fonte
+		_add(folha, label)
+		textos.append(label)
+	lapso.texto_mes = textos[0]
+	lapso.texto_dia = textos[1]
+	lapso.texto_semana = textos[2]
+
+	cena.set("lapso", lapso)
+	# Datas (1928): a chegada do correio de cada dia; o dia depois de cada salto.
+	var datas: Array[int] = [0, Lapso.dia_do_ano(5, 8), Lapso.dia_do_ano(5, 24), Lapso.dia_do_ano(7, 2), Lapso.dia_do_ano(7, 18), Lapso.dia_do_ano(8, 15), Lapso.dia_do_ano(8, 31)]
+	cena.set("datas_dia", datas)
+	var depois: Dictionary[StringName, int] = {
+		&"cartao_sexta": Lapso.dia_do_ano(7, 20), &"cartao_boston": Lapso.dia_do_ano(7, 21),
+		&"cartao_telegrama_akely": Lapso.dia_do_ano(8, 17), &"cartao_aprofundava": Lapso.dia_do_ano(8, 23),
+		&"cartao_28_agosto": Lapso.dia_do_ano(8, 28), &"cartao_5_setembro": Lapso.dia_do_ano(9, 5),
+		&"cartao_6_setembro": Lapso.dia_do_ano(9, 6), &"cartao_7_setembro": Lapso.dia_do_ano(9, 7),
+	}
+	cena.set("datas_cartao", depois)
 
 
 ## Canto nordeste, abaixo do telefone: arquivo de aço de quatro gavetas, com a

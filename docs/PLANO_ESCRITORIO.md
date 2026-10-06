@@ -109,7 +109,8 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
 5. **Lapso na própria sala** no lugar do corte seco dos saltos no tempo: sem tela
    preta, a luz da janela passa de noite a manhã a noite, uma **folhinha** de
    calendário na mesa perde as folhas (com som), e o texto do cartão aparece como
-   legenda sobre a cena.
+   legenda sobre a cena. ✅ `Lapso` (SceneDirector.tempo → `Escritorio.passar_tempo`);
+   a folhinha fica no peitoril, as datas em `datas_dia`/`datas_cartao` (1928).
 6. **Vinheta jogável de Boston** (Dia 4, livro cap. III): uma cena curta e fechada
    fora do escritório — a conversa em pessoa com o funcionário do expresso — e de
    volta à sala. Serve de molde para outras saídas do livro.
