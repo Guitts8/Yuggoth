@@ -105,6 +105,7 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    sob cada legenda, o clique do gancho. ✅ (sons sintetizados provisórios)
 4. **Lareira acesa pelo jogador** nas noites frias (Dias 5 e 6): "Acender a
    lareira" — luz quente e trêmula, estalos. As noites deixam de ser difíceis de ver.
+   ✅ `Fogo` (luz que pisca, chamas em billboard, crepitar); `lareira_dia_<N>`.
 5. **Lapso na própria sala** no lugar do corte seco dos saltos no tempo: sem tela
    preta, a luz da janela passa de noite a manhã a noite, uma **folhinha** de
    calendário na mesa perde as folhas (com som), e o texto do cartão aparece como

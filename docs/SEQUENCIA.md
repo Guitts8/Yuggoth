@@ -243,7 +243,8 @@ cilindro, nos dias seguintes.
 
 ## 5. Dia 5 — O telegrama "AKELY" ✅ (15–29 de agosto)
 **Clima:** noite de chuva. Abajur na mesa, chuva na janela (som de chuva no lugar
-da tarde). As cartas de Akeley agora vêm em **letra trêmula** (o texto treme no
+da tarde). Há lenha na lareira: **"Acender a lareira"** (fósforo, crepitar) aquece e
+clareia a metade leste da sala — vale para o Dia 6 também. As cartas de Akeley agora vêm em **letra trêmula** (o texto treme no
 leitor, mais a cada carta).
 **Ao começar:** *"As cartas de Akeley vinham agora numa letra que se tornara
 lamentavelmente trêmula. No dia 15 de agosto recebi uma carta frenética, que me

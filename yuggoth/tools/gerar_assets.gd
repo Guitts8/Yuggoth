@@ -50,6 +50,7 @@ func _texturas() -> void:
 	_save(_tecido(Color(0.24, 0.2, 0.16), 32), "feltro")
 	_save(_cortina(), "cortina")
 	_save(_gota(), "gota")
+	_save(_chama(), "chama")
 	_save(_sombra(), "sombra")
 	# Correspondência.
 	_save(_papel_envelope(), "papel_envelope")
@@ -923,6 +924,9 @@ func _sons() -> void:
 	_wav(_manivela(), "telefone_manivela", false)
 	_wav(_linha_telefone(), "telefone_linha", true)
 	_wav(_voz_telefone(), "telefone_voz", true)
+	# A lareira (noites dos Dias 5 e 6).
+	_wav(_fosforo(), "fosforo", false)
+	_wav(_lareira(), "lareira", true)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1368,6 +1372,60 @@ func _voz_telefone() -> PackedFloat32Array:
 	for k in b.size():
 		b[k] = clampf(b[k] / maxf(pico, 0.001) * 1.6, -1.0, 1.0) * 0.5
 	return _seamless(b, 0.2)
+
+
+## O fósforo riscado e a lenha pegando: atrito curto, depois o sopro do fogo.
+func _fosforo() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 55
+	var b := _buf(1.6)
+	_atrito(b, 0, int(0.14 * RATE), func(t: float) -> float: return 0.5 * sin(PI * t), rng)
+	var sopro := _buf(1.6)
+	for i in range(int(0.12 * RATE), sopro.size()):
+		var t := float(i) / RATE - 0.12
+		sopro[i] = rng.randf_range(-1, 1) * minf(1.0, t * 3.0) * exp(-maxf(0.0, t - 0.5) * 2.0) * 0.5
+	_lowpass(sopro, 500.0)
+	for i in b.size():
+		b[i] += sopro[i]
+	return b
+
+
+## Lenha queimando: o ronco grave das chamas e estalos soltos.
+func _lareira() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 56
+	var b := _buf(8.0)
+	for i in b.size():
+		b[i] = rng.randf_range(-1, 1)
+	_lowpass(b, 160.0)
+	for i in b.size():
+		b[i] *= 2.2
+	var estalos := _buf(8.0)
+	for k in 70:
+		var at := rng.randi_range(0, estalos.size() - 900)
+		var amp := rng.randf_range(0.08, 0.5) if rng.randf() < 0.85 else rng.randf_range(0.6, 0.9)
+		var dec := rng.randf_range(15.0, 60.0)
+		for j in 800:
+			estalos[at + j] += rng.randf_range(-1, 1) * amp * exp(-j / dec)
+	_lowpass(estalos, 5000.0)
+	for i in b.size():
+		b[i] = b[i] * 0.5 + estalos[i]
+	return _seamless(b, 0.4)
+
+
+## Chama (para billboards): gota com borda irregular, amarela embaixo, vermelha na ponta.
+func _chama() -> Image:
+	var img := _img(16, 32)
+	var n := _noise(57, 0.25)
+	for y in 32:
+		for x in 16:
+			var alto := 1.0 - y / 31.0  # 0 embaixo, 1 em cima
+			var largura := 7.0 * sqrt(maxf(0.0, 1.0 - alto)) * (0.6 + 0.4 * sin(alto * PI * 0.9 + 0.5))
+			var d := absf(x - 7.5) + n.get_noise_2d(x * 2.0, y) * 2.0
+			var c := Color(1.0, 0.85, 0.35).lerp(Color(0.95, 0.35, 0.08), alto)
+			c.a = 1.0 if d < largura else 0.0
+			img.set_pixel(x, y, c)
+	return img
 
 
 func _passo(seed: int) -> PackedFloat32Array:

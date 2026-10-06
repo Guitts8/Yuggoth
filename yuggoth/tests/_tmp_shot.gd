@@ -1,6 +1,6 @@
 extends Node
-## Descartável: o maço de cartas do Prólogo, o pacote do expresso (Dia 3) e o
-## maço do Dia 5, em SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável: a noite do Dia 6 com a lareira apagada e acesa, em SHOT_DIR,
+## com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -12,37 +12,24 @@ func _ready() -> void:
 	root.boot_to_menu = false
 	add_child(root)
 	await _s(0.5)
-	# Prólogo: o maço na mesa de 1930.
 	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 6)
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(6.0)
+	await _s(1.0)
 	var esc: Escritorio = root.find_child("Escritorio", true, false)
 	Narrator.cancel()
-	_mirar(esc.player, Vector3(0.0, 0, -1.55), esc.caixa.global_position)
-	await _s(1.0)
-	_shot("%s_prologo" % tag)
-	for dia in [3, 5]:
-		GameState.reset()
-		GameState.set_flag(&"prologo_concluido")
-		GameState.set_value(&"dia", dia)
-		await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-		await _s(1.0)
-		esc = root.find_child("Escritorio", true, false)
-		Narrator.cancel()
-		var no_chao: Correspondencia = esc.find_child("Dia%d" % dia, true, false).get_node("%s/Correio" % ("Pacote" if dia == 3 else "Maco"))
-		var alvo := no_chao.get_visual().global_position
-		_mirar(esc.player, alvo + Vector3(0.0, 0, -0.9), alvo)
-		await _s(1.0)
-		Narrator.cancel()
-		_shot("%s_d%d_chao" % [tag, dia])
-		no_chao.interact(esc.player)
-		(esc.get_node(^"%PorNaMesa") as MesaCorreio).interact(esc.player)
-		_mirar(esc.player, Vector3(0.1, 0, -1.4), Vector3(0.1, 0.78, -2.15))
-		await _s(1.0)
-		_shot("%s_d%d_mesa" % [tag, dia])
-		no_chao.interact(esc.player)
-		await _s(1.0)
-		_shot("%s_d%d_aberto" % [tag, dia])
+	var vistas := [["porta", Vector3(-0.9, 0, 2.2), Vector3(0.6, 0.9, -1.5)],
+		["mesa", Vector3(-0.2, 0, -1.2), Vector3(1.5, 0.8, -1.4)],
+		["lareira", Vector3(0.6, 0, 0.6), Vector3(2.4, 0.4, -0.6)]]
+	for aceso in [false, true]:
+		if aceso:
+			esc.find_child("Dia6", true, false).get_node("AcenderLareira").interact(esc.player)
+		for v: Array in vistas:
+			_mirar(esc.player, v[1], v[2])
+			await _s(1.2)
+			Narrator.cancel()
+			_shot("%s_%s_%s" % [tag, "acesa" if aceso else "apagada", v[0]])
 	SaveSystem.delete_save()
 	get_tree().quit()
 

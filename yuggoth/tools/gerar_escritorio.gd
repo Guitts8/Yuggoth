@@ -1052,6 +1052,7 @@ func _dia_6(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 6)
 	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
 	_abajur(g)
+	_lareira_noite(g, 6)
 	var janela := _area(g, StateInteractable.new(), "OlharJanela", Vector3(1.6, 1.5, 0.2), Vector3(0, 1.65, -D)) as StateInteractable
 	janela.prompt = "Olhar"
 	janela.notice = "Nenhuma lua. Só as nuvens, baixas e espessas."
@@ -1105,6 +1106,7 @@ func _dia_5(parent: Node) -> void:
 	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
 	_chuva(g)
 	_abajur(g)
+	_lareira_noite(g, 5)
 	var janela := _area(g, StateInteractable.new(), "OlharJanela", Vector3(1.6, 1.5, 0.2), Vector3(0, 1.65, -D)) as StateInteractable
 	janela.prompt = "Olhar"
 	janela.notice = "Só a chuva, escorrendo no vidro."
@@ -1366,6 +1368,68 @@ func _dia_3(parent: Node) -> Node3D:
 
 	_escrever(g, "resposta_dia_3", &"tocou_disco")
 	return g
+
+
+## Noite fria do dia `n` (Dias 5 e 6): a lenha na grelha e "Acender a lareira".
+## Acesa (`lareira_dia_<n>`), uma luz quente e trêmula clareia a metade leste da
+## sala, com o crepitar — é o que deixa as últimas noites legíveis sem acender a sala.
+func _lareira_noite(parent: Node, n: int) -> void:
+	var fogo_pos := Vector3(W - 0.22, 0.19, -0.6)
+	var lenha := _group(parent, "Lenha", fogo_pos)
+	# Duas toras lado a lado ao longo da grelha e uma atravessada por cima.
+	for k in 3:
+		var tora := _cyl(lenha, "Tora%d" % k, 0.035, 0.04, 0.42, Vector3([-0.05, 0.05, 0.0][k], [0.035, 0.035, 0.09][k], 0), "madeira_escura", 7)
+		tora.rotation_degrees = Vector3(90, [4.0, -6.0, 25.0][k], 0)
+	var chave := StringName("lareira_dia_%d" % n)
+	var acender := _area(parent, StateInteractable.new(), "AcenderLareira", Vector3(0.5, 0.8, 0.9), Vector3(W - 0.3, 0.45, -0.6)) as StateInteractable
+	acender.prompt = "Acender a lareira"
+	acender.changes = {chave: 1.0}
+	acender.additive = false
+	acender.condition = _flag(chave, true)
+
+	var aceso := _grupo_se(parent, "Fogo", _flag(chave))
+	var fogo := Fogo.new()
+	fogo.name = "Chamas"
+	fogo.position = fogo_pos
+	_add(aceso, fogo)
+	# Brasas embaixo da lenha.
+	_box(fogo, "Brasas", Vector3(0.24, 0.02, 0.4), Vector3(0, -0.005, 0), "vidro_aceso")
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+	mat.billboard_keep_scale = true
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	mat.albedo_texture = load(TEX_DIR + "chama.png")
+	var chamas: Array[Node3D] = []
+	for k in 5:
+		var q := QuadMesh.new()
+		q.size = Vector2(0.14, 0.28)
+		q.center_offset = Vector3(0, 0.14, 0)
+		q.material = mat
+		var mi := MeshInstance3D.new()
+		mi.name = "Chama%d" % k
+		mi.mesh = q
+		mi.position = Vector3(0, 0.02, -0.16 + k * 0.08)
+		mi.scale = Vector3.ONE * (0.75 + 0.4 * sin(k * 1.9 + 0.4) ** 2)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_add(fogo, mi)
+		chamas.append(mi)
+	fogo.chamas = chamas
+	var luz := _omni(fogo, "Luz", Vector3(-0.3, 0.3, 0), Color(1.0, 0.58, 0.28), 2.0, 5.5)
+	luz.shadow_enabled = true
+	luz.omni_attenuation = 1.2
+	fogo.luz = luz
+	fogo.energia = 2.0
+	var crepitar := AudioStreamPlayer3D.new()
+	crepitar.name = "Crepitar"
+	crepitar.stream = load(SFX_DIR + "lareira.wav")
+	crepitar.autoplay = true
+	crepitar.bus = &"Ambience"
+	crepitar.volume_db = -6.0
+	crepitar.unit_size = 2.5
+	_add(fogo, crepitar)
+	acender.som = load(SFX_DIR + "fosforo.wav")
 
 
 ## Lugar da lâmpada de banqueiro na mesa.
