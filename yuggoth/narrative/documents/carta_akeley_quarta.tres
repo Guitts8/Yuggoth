@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_quarta"
+title = "Carta de H. W. Akeley — quarta-feira"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.85]Quarta-feira.[/tremulo][/right]
+
+[tremulo forca=0.85]W —[/tremulo]
+
+[tremulo forca=0.85]Sua carta chegou, mas não adianta mais discutir nada. Estou inteiramente resignado. Admira-me ainda ter força de vontade bastante para combatê-los. Não posso escapar, mesmo que estivesse disposto a largar tudo e fugir. Eles vão me pegar.[/tremulo]
+
+[tremulo forca=0.85]Recebi uma carta deles ontem — o carteiro rural a trouxe enquanto eu estava em Brattleboro. Datilografada e com carimbo de Bellows Falls. Diz o que eles querem fazer comigo — não posso repetir. Cuide-se você também! Quebre aquele disco. As noites nubladas continuam, e a lua minguando o tempo todo.[/tremulo]
+
+[tremulo forca=0.85]Quem me dera ousar pedir ajuda — isso talvez me firmasse a vontade —, mas qualquer um que se atrevesse a vir me chamaria de louco, a menos que por acaso houvesse alguma prova. Não poderia pedir que viessem sem motivo nenhum — perdi o contato com todo mundo, e já faz anos.[/tremulo]
+
+[tremulo forca=0.85]Mas ainda não lhe contei o pior, Wilmarth. Prepare-se para ler isto, pois vai lhe dar um choque. Mas é a verdade. É isto — eu vi e toquei uma das coisas, ou parte de uma das coisas. Deus, homem, é horrível! Estava morta, é claro. Um dos cães a pegou, e eu a encontrei perto do canil esta manhã.[/tremulo]
+
+[tremulo forca=0.85]Tentei guardá-la no galpão de lenha para convencer as pessoas de tudo, mas evaporou inteira em poucas horas. Não sobrou nada. Você sabe, todas aquelas coisas nos rios só foram vistas na primeira manhã depois da enchente. E aqui vai o pior. Tentei fotografá-la para você, mas quando revelei o filme não havia nada visível além do galpão.[/tremulo]
+
+[tremulo forca=0.85]De que pode ter sido feita aquela coisa? Eu a vi e a senti, e todos eles deixam pegadas. Era com certeza feita de matéria — mas que tipo de matéria? A forma não se pode descrever. Era um grande caranguejo com uma porção de anéis carnudos em pirâmide, ou nós de uma substância grossa e fibrosa coberta de antenas, onde um homem teria a cabeça. Aquela coisa verde e pegajosa é o sangue ou o suco dela. E há mais delas para chegar à terra a qualquer momento.[/tremulo]
+
+[tremulo forca=0.85]Walter Brown sumiu — não tem sido visto à toa em nenhuma das suas esquinas de costume nas vilas daqui. Devo tê-lo acertado com um dos meus tiros, embora as criaturas pareçam sempre tentar levar os seus mortos e feridos.[/tremulo]
+
+[tremulo forca=0.85]Cheguei à cidade esta tarde sem problema nenhum, mas receio que estejam começando a se conter porque têm certeza de mim. Escrevo isto no correio de Brattleboro. Isto pode ser um adeus — se for, escreva ao meu filho George Goodenough Akeley, 176 Pleasant St., San Diego, Cal., mas não venha até aqui. Escreva ao rapaz se não tiver notícias minhas em uma semana, e fique de olho nos jornais.[/tremulo]
+
+[tremulo forca=0.85]Vou jogar as minhas duas últimas cartas agora — se me restar força de vontade. Primeiro, tentar gás venenoso nas coisas (tenho os produtos químicos certos e preparei máscaras para mim e para os cães) e depois, se não der certo, contar ao xerife. Podem me trancar num hospício se quiserem — será melhor do que o que as outras criaturas fariam.[/tremulo]
+
+[tremulo forca=0.85]Talvez eu consiga que prestem atenção às pegadas em volta da casa — são fracas, mas eu as encontro toda manhã. Imagino, porém, que a polícia diria que eu as forjei de algum jeito; pois todos me acham um sujeito esquisito.[/tremulo]
+
+[tremulo forca=0.85]Preciso tentar que um policial estadual passe uma noite aqui e veja com os próprios olhos — embora fosse bem próprio das criaturas saber disso e se conter justo naquela noite. Eles cortam os meus fios sempre que tento telefonar de noite — os homens da linha acham muito estranho, e talvez testemunhem a meu favor, se não lhes der na cabeça que fui eu mesmo que os cortei. Faz mais de uma semana que nem tento mandar consertá-los.[/tremulo]
+
+[tremulo forca=0.85]Eu poderia conseguir que alguns dos ignorantes testemunhassem por mim sobre a realidade dos horrores, mas todo mundo ri do que eles dizem, e de todo modo evitam a minha casa há tanto tempo que não sabem de nenhum dos acontecimentos novos. Você não conseguiria trazer um daqueles lavradores decadentes a menos de uma milha da minha casa nem por amor nem por dinheiro.[/tremulo]
+
+[tremulo forca=0.85]O carteiro ouve o que eles dizem e caçoa de mim por isso — Deus! Se eu ao menos ousasse lhe contar como é real! Acho que vou tentar fazê-lo reparar nas pegadas, mas ele vem à tarde e a essa hora elas quase sempre já sumiram. Se eu guardasse uma pondo uma caixa ou uma panela por cima, ele acharia com certeza que era fraude ou brincadeira.[/tremulo]
+
+[tremulo forca=0.85]Quem me dera não ter virado tamanho ermitão; as pessoas já não aparecem como antigamente. Nunca ousei mostrar a pedra negra nem os retratos da Kodak, nem tocar aquele disco, a ninguém senão aos ignorantes. Os outros diriam que forjei a coisa toda e não fariam nada além de rir. Mas talvez eu ainda tente mostrar os retratos. Eles mostram nitidamente as marcas de garra, mesmo que as coisas que as fizeram não possam ser fotografadas. Que pena ninguém mais ter visto aquela coisa esta manhã, antes de ela virar nada![/tremulo]
+
+[tremulo forca=0.85]Mas não sei se me importo. Depois do que passei, um hospício é um lugar tão bom quanto qualquer outro. Os médicos podem me ajudar a tomar a decisão de sair desta casa, e é só isso que vai me salvar.[/tremulo]
+
+[tremulo forca=0.85]Escreva ao meu filho George se não tiver notícias logo. Adeus, quebre aquele disco, e não se meta nisso.[/tremulo]
+
+[right][tremulo forca=0.85]Seu — AKELEY[/tremulo][/right]")
+exposure_on_read = 0.06

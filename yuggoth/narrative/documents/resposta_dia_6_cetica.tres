@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_6_cetica"
+title = "Minha carta a Akeley — 7 de setembro (registrada)"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+7 de setembro de 1928[/right]
+
+Prezado Akeley,
+
+Vá para Brattleboro hoje mesmo, e fique lá. Procure um médico — o senhor mesmo diz que os médicos podem ajudá-lo a decidir, e eu digo o mesmo. Não o julgo louco; julgo-o exausto, e sozinho há tempo demais.
+
+O filme não mostrou nada porque um homem nessa agitação erra a exposição, como qualquer um erraria. Não tire disso mais do que isso.
+
+Ponha-se sob a proteção das autoridades. Escreverei ao seu filho, se for preciso. Responda-me, peço-lhe.
+
+[right]A. N. W.[/right]")
+exposure_on_read = 0.0

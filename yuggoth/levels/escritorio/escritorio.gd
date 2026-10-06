@@ -34,11 +34,20 @@ const SONHO_DESCIDA := 4.0
 ## Dita ao começar cada dia, enquanto a resposta do dia não foi escrita; índice = dia.
 @export var linhas_correio: Array[NarrationLine] = []
 @export var linha_resposta_selada: NarrationLine
+## Dia em que, selada a resposta, a última carta manuscrita leva ao Interlúdio
+## (GDD §5.1a): a letra enche a tela e a tinta vira o céu de Vermont.
+@export var dia_do_interludio := 6
+## A carta que enche a tela nessa transição.
+@export var ultima_carta: DocumentData
+## Cartão depois da tinta. Na demo o jogo acaba aí e volta ao menu; no jogo
+## completo, aqui entra a troca para a fazenda.
+@export var linha_fim_demo: NarrationLine
 ## Segundos depois da abertura até o narrador lembrar das cartas.
 @export var dica_cartas_apos := 8.0
 
 var _lembrando := false
 var _saindo := false
+var _saltando := false
 var _energias: Dictionary[Light3D, float] = {}
 
 @onready var gabinete: Node3D = $Gabinete1930
@@ -193,14 +202,39 @@ func _entrar_pela_porta() -> void:
 
 func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
 	var fala := reply.narracao_depois if reply.narracao_depois else linha_resposta_selada
-	if reply.cartao_depois == null:
+	var interludio := reply.id == StringName("resposta_dia_%d" % dia_do_interludio)
+	if reply.cartao_depois == null and not interludio:
 		Narrator.say(fala)
 		return
-	# A carta vai e o tempo passa até a volta do correio (Dia 5).
 	await Narrator.say(fala)
 	if not is_inside_tree():
 		return
-	await SceneDirector.time_skip(reply.cartao_depois)
+	if interludio:
+		_para_o_interludio()
+	else:
+		# A carta vai e o tempo passa até a volta do correio (Dia 5).
+		await SceneDirector.time_skip(reply.cartao_depois)
+
+
+## Fim do Dia 6 e da demo: a tinta da última carta, o cartão e o menu.
+func _para_o_interludio() -> void:
+	_saindo = true
+	var tinta := TintaTransicao.new()
+	get_tree().root.add_child(tinta)
+	# Se a fase sair no meio (menu de pausa), a tinta vai junto.
+	tree_exiting.connect(tinta.queue_free)
+	await tinta.tocar(ultima_carta)
+	if not is_inside_tree():
+		return
+	await SceneDirector.fade_out(1.5)
+	if not is_inside_tree():
+		return
+	SceneDirector.hold_black = true
+	tinta.queue_free()
+	await Narrator.say(linha_fim_demo, Narrator.Style.CARTAO)
+	if not is_inside_tree():
+		return
+	Events.quit_to_menu_requested.emit()
 
 
 func _on_porta(_by: Node) -> void:
@@ -246,12 +280,34 @@ func _som_do_dia() -> AudioStream:
 
 ## Fala do narrador ao fechar um documento pela primeira vez, se existir
 ## `narrative/narration/ao_ler_<id>.tres` (ex.: a reação à 2ª carta de Akeley).
+## Depois dela, o salto no tempo do documento (`cartao_depois`), se houver.
 func _on_document_closed(doc: DocumentData) -> void:
 	if doc == null:
 		return
+	var line: NarrationLine = null
 	var path := "res://narrative/narration/ao_ler_%s.tres" % doc.id
-	if not ResourceLoader.exists(path):
+	if ResourceLoader.exists(path):
+		line = load(path) as NarrationLine
+		if line and GameState.has_flag(line.get_said_flag()):
+			line = null
+	var salto := doc.cartao_depois
+	if salto and GameState.has_flag(salto.get_said_flag()):
+		salto = null
+	if salto == null:
+		if line:
+			Narrator.say(line)
 		return
-	var line := load(path) as NarrationLine
-	if line and not GameState.has_flag(line.get_said_flag()):
-		Narrator.say(line)
+	# Fechada enquanto o salto anterior ainda clareia: espera a vez.
+	while _saltando:
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
+	if GameState.has_flag(salto.get_said_flag()):
+		return
+	_saltando = true
+	if line:
+		await Narrator.say(line)
+		if not is_inside_tree():
+			return
+	await SceneDirector.time_skip(salto)
+	_saltando = false

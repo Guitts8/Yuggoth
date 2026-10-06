@@ -37,13 +37,13 @@ func _ready() -> void:
 	cena.set_script(load("res://levels/escritorio/escritorio.gd"))
 	cena.set("env_1930", _env_1930())
 	cena.set("env_dia", _env_dia())
-	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite(), cena.get("env_dia"), _env_chuva()]
+	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite(), cena.get("env_dia"), _env_chuva(), _env_noite()]
 	cena.set("ambientes_dia", ambientes)
 	cena.set("som_chuva", load(SFX_DIR + "chuva.wav"))
 	# Pássaros só no Dia 1 (tarde tranquila); à noite e nos dias tensos, não.
 	cena.set("som_padrao", load(SFX_DIR + "dia_quieto.wav"))
 	var sons: Array[AudioStream] = [null, load(SFX_DIR + "tarde.wav"), null,
-		load(SFX_DIR + "noite.wav"), null, load(SFX_DIR + "chuva.wav")]
+		load(SFX_DIR + "noite.wav"), null, load(SFX_DIR + "chuva.wav"), load(SFX_DIR + "noite.wav")]
 	cena.set("sons_dia", sons)
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))
@@ -61,9 +61,12 @@ func _ready() -> void:
 		load("res://narrative/narration/dia2_correio.tres"),
 		load("res://narrative/narration/dia3_correio.tres"),
 		load("res://narrative/narration/dia4_correio.tres"),
-		load("res://narrative/narration/dia5_correio.tres")]
+		load("res://narrative/narration/dia5_correio.tres"),
+		load("res://narrative/narration/dia6_correio.tres")]
 	cena.set("linhas_correio", correio)
 	cena.set("linha_resposta_selada", load("res://narrative/narration/resposta_selada.tres"))
+	cena.set("ultima_carta", load("res://narrative/documents/carta_akeley_quarta.tres"))
+	cena.set("linha_fim_demo", load("res://narrative/narration/fim_da_demo.tres"))
 
 	var env := WorldEnvironment.new()
 	env.name = "WorldEnvironment"
@@ -675,6 +678,7 @@ func _dias(parent: Node) -> void:
 	_dia_4(parent)
 	_telefone(parent)
 	_dia_5(parent)
+	_dia_6(parent)
 
 
 func _composta(modo: CompositeCondition.Mode, conds: Array) -> CompositeCondition:
@@ -682,6 +686,42 @@ func _composta(modo: CompositeCondition.Mode, conds: Array) -> CompositeConditio
 	c.mode = modo
 	c.conditions.assign(conds)
 	return c
+
+
+## Dia 6 (cap. IV): as três últimas cartas manuscritas. Abre com a resposta
+## mais calma de Akeley; o ânimo de Wilmarth cruza no correio com a carta de
+## segunda, e cada carta lida traz a seguinte no dia seguinte
+## (DocumentData.cartao_depois). Selada a carta registrada, a letra da última
+## enche a tela e a tinta vira o céu de Vermont (Escritorio._para_o_interludio).
+## Noite sem lua.
+func _dia_6(parent: Node) -> void:
+	var g := _grupo_do_dia(parent, 6)
+	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_abajur(g)
+	var janela := _area(g, StateInteractable.new(), "OlharJanela", Vector3(1.6, 1.5, 0.2), Vector3(0, 1.65, -D)) as StateInteractable
+	janela.prompt = "Olhar"
+	janela.notice = "Nenhuma lua. Só as nuvens, baixas e espessas."
+
+	# Fim de agosto: menos terrores. Wilmarth o anima de novo.
+	_folha(g, "CartaSetembro", Vector3(-0.1, MESA + 0.003, -2.1), -6, "carta_akeley_setembro", "Ler a carta", false)
+	var env := _envelope(g, "Envelope", Vector3(-0.15, MESA, -2.47), -4, {
+		remetente = "H. W. Akeley\nGeneral Delivery, Brattleboro, Vt.",
+		carimbo_cidade = "BRATTLEBORO",
+		carimbo_data = "AUG 31\n1928",
+	})
+	_examinavel(env, Vector3(0.2, 0.04, 0.12), "Examinar o envelope", "Envelope de Brattleboro",
+		"A letra ainda treme, mas está mais firme do que em agosto. Carimbo de Brattleboro, 31 de agosto.")
+	var animo := _grupo_se(g, "Animo", _flag(&"narrou_cartao_5_setembro", true))
+	_escrever(animo, "animo_dia_6", &"leu_carta_akeley_setembro")
+
+	# Segunda, terça e quarta: uma por dia, cada uma chegando no escuro do salto.
+	var segunda := _grupo_se(g, "Segunda", _flag(&"narrou_cartao_5_setembro"))
+	_folha(segunda, "Folha", Vector3(0.2, MESA + 0.005, -2.0), 7, "carta_akeley_segunda", "Ler a carta de segunda-feira", false)
+	var terca := _grupo_se(g, "Terca", _flag(&"narrou_cartao_6_setembro"))
+	_folha(terca, "Folha", Vector3(-0.42, MESA + 0.007, -1.98), -9, "carta_akeley_terca", "Ler a carta de terça-feira", false)
+	var quarta := _grupo_se(g, "Quarta", _flag(&"narrou_cartao_7_setembro"))
+	_folha(quarta, "Folha", Vector3(0.02, MESA + 0.009, -1.9), 3, "carta_akeley_quarta", "Ler a carta de quarta-feira", false)
+	_escrever(quarta, "resposta_dia_6", &"leu_carta_akeley_quarta")
 
 
 ## Dia 5 (cap. IV): agosto. A carta frenética, a oferta de ajuda, o telegrama

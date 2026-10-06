@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+[ext_resource type="Resource" path="res://narrative/narration/cartao_6_setembro.tres" id="2_cartao"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_segunda"
+title = "Carta de H. W. Akeley — segunda-feira"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.5]Segunda-feira.[/tremulo][/right]
+
+[tremulo forca=0.5]Caro Wilmarth —[/tremulo]
+
+[tremulo forca=0.5]Um P.S. um tanto desanimador à minha última. A noite passada foi de nuvens espessas — embora sem chuva — e nem um pouco de luar passou. As coisas ficaram bem feias, e acho que o fim está chegando, apesar de tudo o que esperamos.[/tremulo]
+
+[tremulo forca=0.5]Depois da meia-noite algo pousou no telhado da casa, e os cães todos correram para ver o que era. Eu os ouvia abocanhando e se debatendo por ali, e então um conseguiu subir ao telhado saltando do puxado baixo. Houve uma luta terrível lá em cima, e ouvi um zumbido medonho que nunca vou esquecer. E então veio um cheiro chocante.[/tremulo]
+
+[tremulo forca=0.5]Mais ou menos ao mesmo tempo, balas entraram pela janela e quase me pegaram de raspão. Acho que a linha principal das criaturas da colina tinha chegado perto da casa quando os cães se dividiram por causa do telhado. O que havia lá em cima ainda não sei, mas temo que as criaturas estejam aprendendo a se guiar melhor com as suas asas espaciais.[/tremulo]
+
+[tremulo forca=0.5]Apaguei a luz, usei as janelas como seteiras e varri toda a volta da casa com fogo de rifle, apontado alto o bastante para não acertar os cães. Isso pareceu encerrar a coisa, mas de manhã encontrei grandes poças de sangue no quintal, ao lado de poças de uma substância verde e pegajosa que tinha o pior cheiro que já senti na vida. Subi no telhado e encontrei mais da substância pegajosa lá.[/tremulo]
+
+[tremulo forca=0.5]Cinco dos cães foram mortos — receio ter acertado um por mirar baixo demais, pois foi atingido nas costas. Agora estou repondo as vidraças que os tiros quebraram, e vou a Brattleboro buscar mais cães. Acho que os homens do canil me julgam louco. Mando outro bilhete mais tarde. Suponho que estarei pronto para a mudança em uma ou duas semanas, embora quase me mate pensar nisso.[/tremulo]
+
+[tremulo forca=0.5]Às pressas —[/tremulo]
+
+[right][tremulo forca=0.5]AKELEY[/tremulo][/right]")
+exposure_on_read = 0.04
+cartao_depois = ExtResource("2_cartao")

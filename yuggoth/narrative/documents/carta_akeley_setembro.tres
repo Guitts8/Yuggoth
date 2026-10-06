@@ -1,0 +1,69 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+[ext_resource type="Script" path="res://narrative/document_variant.gd" id="2_var"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="3_cond"]
+
+[sub_resource type="Resource" id="Resource_cetica"]
+script = ExtResource("3_cond")
+key = &"resposta_dia_5"
+op = 0
+value = -1.0
+
+[sub_resource type="Resource" id="Resource_credula"]
+script = ExtResource("3_cond")
+key = &"resposta_dia_5"
+op = 0
+value = 1.0
+
+[sub_resource type="Resource" id="Resource_var_cetica"]
+script = ExtResource("2_var")
+condition = SubResource("Resource_cetica")
+pages = PackedStringArray("[right][tremulo forca=0.3]Brattleboro, Vt.
+31 de agosto de 1928[/tremulo][/right]
+
+[tremulo forca=0.3]Wilmarth —[/tremulo]
+
+[tremulo forca=0.3]Recebi a sua. Quanto à polícia, já lhe disse: qualquer um me chamaria de louco, a menos que houvesse alguma prova. Mas as coisas andaram mais quietas estes dias, e tenho menos a contar.[/tremulo]
+
+[tremulo forca=0.3]Não estou muito otimista, porém. Creio que é só a época da lua cheia que os está segurando. Espero que não venham muitas noites de nuvens fechadas.[/tremulo]
+
+[tremulo forca=0.3]Quando a lua minguar, talvez eu me hospede em Brattleboro por uns tempos. Ainda não decidi nada.[/tremulo]
+
+[right][tremulo forca=0.3]H. W. A.[/tremulo][/right]")
+
+[sub_resource type="Resource" id="Resource_var_credula"]
+script = ExtResource("2_var")
+condition = SubResource("Resource_credula")
+pages = PackedStringArray("[right][tremulo forca=0.3]Brattleboro, Vt.
+31 de agosto de 1928[/tremulo][/right]
+
+[tremulo forca=0.3]Wilmarth —[/tremulo]
+
+[tremulo forca=0.3]Recebi a sua. Diz-me para não esperar, e talvez tenha razão. As coisas andaram mais quietas estes dias, e tenho menos a contar.[/tremulo]
+
+[tremulo forca=0.3]Não estou muito otimista, porém. Creio que é só a época da lua cheia que os está segurando. Espero que não venham muitas noites de nuvens fechadas.[/tremulo]
+
+[tremulo forca=0.3]Quando a lua minguar, talvez eu me hospede em Brattleboro por uns tempos. Ainda não decidi nada.[/tremulo]
+
+[right][tremulo forca=0.3]H. W. A.[/tremulo][/right]")
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_setembro"
+title = "Carta de H. W. Akeley — 31 de agosto"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.3]Brattleboro, Vt.
+31 de agosto de 1928[/tremulo][/right]
+
+[tremulo forca=0.3]Wilmarth —[/tremulo]
+
+[tremulo forca=0.3]Recebi a sua, e fez-me bem. As coisas andaram mais quietas estes dias, e tenho menos a contar.[/tremulo]
+
+[tremulo forca=0.3]Não estou muito otimista, porém. Creio que é só a época da lua cheia que os está segurando. Espero que não venham muitas noites de nuvens fechadas.[/tremulo]
+
+[tremulo forca=0.3]Quando a lua minguar, talvez eu me hospede em Brattleboro por uns tempos. Ainda não decidi nada.[/tremulo]
+
+[right][tremulo forca=0.3]H. W. A.[/tremulo][/right]")
+variants = Array[ExtResource("2_var")]([SubResource("Resource_var_cetica"), SubResource("Resource_var_credula")])
+exposure_on_read = 0.0

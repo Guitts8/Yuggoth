@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+[ext_resource type="Script" path="res://narrative/narration_variant.gd" id="2_var"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="3_cond"]
+
+[sub_resource type="Resource" id="Resource_cetico"]
+script = ExtResource("3_cond")
+key = &"crenca"
+op = 5
+value = -1.0
+
+[sub_resource type="Resource" id="Resource_var_cetico"]
+script = ExtResource("2_var")
+condition = SubResource("Resource_cetico")
+text = "Rabisquei umas palavras incoerentes de conselho e ânimo e as mandei por carta registrada. A fotografia vazia, eu a atribuía a algum descuido dele, na agitação. Do resto, já não sabia o que pensar."
+
+[resource]
+script = ExtResource("1_line")
+id = &"resposta_registrada"
+text = "Rabisquei umas palavras incoerentes de conselho e ânimo e as mandei por carta registrada. Naquele momento, a minha crença em tudo o que Akeley contara era praticamente completa — embora eu achasse que a fotografia falhara por algum descuido dele, na agitação."
+variants = Array[ExtResource("2_var")]([SubResource("Resource_var_cetico")])

@@ -45,6 +45,7 @@ func _ready() -> void:
 	main_menu.new_game_requested.connect(new_game)
 	main_menu.continue_requested.connect(continue_game)
 	pause_menu.quit_to_menu_requested.connect(quit_to_menu)
+	Events.quit_to_menu_requested.connect(quit_to_menu)
 	if boot_to_menu:
 		main_menu.open()
 	else:

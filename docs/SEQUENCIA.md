@@ -19,8 +19,8 @@ Legenda: ✅ jogável (arte e som provisórios) · ⏳ planejado
 | 3 | Dia 3 — O disco | fim de junho – 3 de julho | ✅ | cap. III |
 | 4 | Dia 4 — A pedra que não chega | 18–21 de julho | ✅ | cap. III |
 | 5 | Dia 5 — O telegrama "AKELY" | 15–29 de agosto | ✅ | cap. IV |
-| 6 | Dia 6 — As três últimas cartas | 5–7 de setembro | ⏳ | cap. IV |
-| — | Interlúdio — "O Cerco" (como Akeley) | 4–7 de setembro | ⏳ | cap. IV (as cartas, vividas) |
+| 6 | Dia 6 — As três últimas cartas | 31 de agosto – 7 de setembro | ✅ | cap. IV |
+| — | Interlúdio — "O Cerco" (como Akeley) | 2–6 de setembro | ⏳ | cap. IV (as cartas, vividas) |
 | 7 | Dia 7 — A carta datilografada | 8–10 de setembro | ⏳ | cap. V |
 | — | Moldura I | 1930 | ⏳ | — |
 | — | Ato II — A Viagem | 12 de setembro | ⏳ | cap. VI |
@@ -28,8 +28,8 @@ Legenda: ✅ jogável (arte e som provisórios) · ⏳ planejado
 | — | Ato III — A Casa | 12–13 de setembro | ⏳ | cap. VII–VIII |
 | — | Epílogo e finais | 1930 | ⏳ | cap. VIII (desfecho) |
 
-A **demo** vai do Prólogo ao Dia 6 e termina ao ler a última carta manuscrita
-(a entrada do Interlúdio).
+A **demo** vai do Prólogo ao Dia 6 e termina na entrada do Interlúdio: a letra
+da última carta manuscrita enche a tela e a tinta vira o céu de Vermont.
 
 ---
 
@@ -274,17 +274,72 @@ cartão), e o que chega depois já está na mesa quando a luz volta.
 
 **Fim do dia:** porta → *"Setembro de 1928."*
 
-## 6. Dia 6 — As três últimas cartas ⏳ (5–7 de setembro)
-Abre com o que faltou de agosto: Akeley responde com menos terrores (só a lua
-cheia, acha ele, segura as criaturas; fala em se hospedar em Brattleboro quando a
-lua minguar) e Wilmarth o anima de novo. Depois, as cartas de **segunda** (algo pousa no telhado, briga dos cães, gosma verde, 5
-cães mortos, um por ele mesmo), **terça** ("falaram comigo"; "fique fora disso,
-Wilmarth"; quebre o disco) e **quarta** (a coisa morta que evapora no galpão; o
-filme que sai vazio; Brown sumiu; o filho George; gás e máscaras; o xerife).
-Resposta: a carta registrada ("mude-se para Brattleboro"). Ao terminar a última
-carta, a tinta se espalha e vira o céu de Vermont → **Interlúdio**. *(Fim da demo.)*
+## 6. Dia 6 — As três últimas cartas ✅ (31 de agosto – 7 de setembro)
+**Clima:** noite sem lua (abajur na mesa, sem chuva, sem pássaros). "Olhar" a
+janela: *"Nenhuma lua. Só as nuvens, baixas e espessas."* A letra de Akeley treme
+mais a cada carta.
+**Ao começar:** *"Aparentemente o ânimo fez efeito, pois Akeley tinha menos
+terrores a relatar quando acusou o recebimento da minha carta."*
 
-## Interlúdio — "O Cerco" ⏳ (como Akeley, 4–7 de setembro)
+As cartas cruzam o correio, como no Dia 5, mas agora **cada carta lida traz a
+seguinte**: ao fechá-la pela primeira vez, tela preta, cartão, e a próxima já está
+na mesa (`DocumentData.cartao_depois`). Uma carta chega por dia: 5, 6 e 7 de
+setembro. Reler pelo dossiê não salta de novo.
+
+**Na sala (31 de agosto):**
+- **Carta calma** (31 de agosto, composta das frases do livro) e o **envelope**
+  (carimbo *AUG 31*): menos terrores; não está muito otimista — *"é só a época da
+  lua cheia que os está segurando"*; espera que não venham muitas noites de nuvens
+  fechadas; talvez se hospede em Brattleboro quando a lua minguar. Responde ao tom
+  do Dia 5 (cético: a polícia o chamaria de louco; crédulo: "diz-me para não esperar").
+
+**O que fazer:**
+1. **"Escrever a Akeley"** — ânimo de novo (sem tom): *"Não se fie só na lua: vá
+   para Brattleboro agora."* Narrador: *"Escrevi-lhe de novo, animando-o."* Cartão:
+   *"Mas a 5 de setembro chegou uma nova carta, que evidentemente cruzara com a minha
+   no correio; e a esta eu não pude dar uma resposta tão esperançosa."*
+2. **Carta de segunda-feira** (na íntegra): a noite de nuvens espessas; algo pousa
+   no telhado; um cão sobe pelo puxado baixo; a luta, o **zumbido**, o cheiro; balas
+   pela janela; ele apaga a luz e atira das janelas, alto para não acertar os cães;
+   de manhã, poças de sangue e de uma **substância verde e pegajosa**, mais no
+   telhado; **cinco cães mortos — um com um tiro nas costas**. Ao fechar, cartão:
+   *"Essa não foi a única carta de Akeley a cruzar com a minha. Na manhã seguinte —
+   6 de setembro — chegou mais uma; desta vez, um rabisco frenético."*
+3. **Carta de terça-feira** (na íntegra): *"Acho que estou enlouquecendo"*;
+   **"falaram comigo"** na voz zumbida, e uma voz humana os ajudou; *"Fique fora
+   disso, Wilmarth"*; levá-lo vivo para Yuggoth e além da última borda curva do
+   espaço; mais seis cães mortos; **"melhor quebrar o disco"**. Ao fechar, cartão:
+   *"Não dormi nada naquela noite. Não tentei responder [...] A resposta veio, de
+   fato, no dia seguinte."*
+4. **Carta de quarta-feira** (na íntegra, a letra quase ilegível de tão trêmula):
+   a carta datilografada *deles*, de Bellows Falls; **tocou numa das coisas mortas**
+   — evaporou no galpão de lenha; **o filme não mostra nada além do galpão**; *"um
+   grande caranguejo com uma porção de anéis carnudos em pirâmide"*; Walter Brown
+   sumiu; o filho **George Goodenough Akeley, 176 Pleasant St., San Diego**; gás
+   venenoso e máscaras para ele e os cães; o xerife; os fios cortados; *"quebre
+   aquele disco, e não se meta nisso."* Ao fechar: *"A carta me lançou, francamente,
+   no mais negro terror."* A porta, até aqui, só diz *"Ainda devo uma resposta ao
+   Sr. Akeley."*
+5. **A carta registrada** (7 de setembro):
+   | Tom | Abertura |
+   |---|---|
+   | cético | "Vá para Brattleboro e procure um médico. O senhor está exausto." |
+   | cauteloso | "Mude-se para Brattleboro hoje, e deixe tudo para trás." |
+   | crédulo — o do livro | "Mude-se para Brattleboro. Eu levo o disco e convenço os tribunais." |
+
+   Depois: *"Rabisquei umas palavras incoerentes de conselho e ânimo e as mandei por
+   carta registrada. Naquele momento, a minha crença em tudo o que Akeley contara era
+   praticamente completa — embora eu achasse que a fotografia falhara por algum
+   descuido dele, na agitação."* (com `crenca` ≤ −1, a crença não está completa)
+
+**Fim do dia (e da demo):** sem porta. O fim da carta de quarta aparece no papel,
+a câmera se aproxima até a **letra trêmula encher a tela**, a **tinta se espalha**
+em manchas até cobrir tudo e **seca num céu de fim de tarde** sobre os morros do
+vale (pixelado na grade do mundo) → tela preta, *"Fim da demonstração. A história
+continua."* → menu principal. (`TintaTransicao`; no jogo completo, aqui entra a
+fazenda.) O save continua no começo do Dia 6.
+
+## Interlúdio — "O Cerco" ⏳ (como Akeley, 2–6 de setembro)
 As noites das três cartas, vividas na fazenda (mesmo mapa do Ato III, habitado):
 a rotina com os **doze cães** (quatro com nome), a noite do telhado (atirar das
 janelas no escuro), a manhã do sangue e da gosma verde, "falaram comigo", a coisa

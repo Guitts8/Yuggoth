@@ -25,6 +25,9 @@ static var _font_cache: Dictionary[String, SystemFont] = {}
 @export var variants: Array[DocumentVariant] = []
 ## Somado a `exposicao` na primeira leitura.
 @export_range(0.0, 1.0, 0.01) var exposure_on_read := 0.0
+## Salto no tempo ao fechar pela primeira vez (Dia 6: uma carta chega por dia,
+## e lida uma, o correio traz a seguinte). Quem honra é a fase (o escritório).
+@export var cartao_depois: NarrationLine
 
 
 func resolve_pages() -> PackedStringArray:

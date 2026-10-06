@@ -13,6 +13,8 @@ signal reply_requested(reply: ReplyData)
 signal reply_written(reply: ReplyData, option: ReplyOption)
 ## Legenda de um som (voz no disco, ruídos); some depois de `seconds`.
 signal subtitle_requested(text: String, seconds: float)
+## Uma fase encerrou o jogo (fim da demo): o GameRoot volta ao menu principal.
+signal quit_to_menu_requested
 
 ## Espelho do último modal_changed, para quem precisa consultar em vez de escutar.
 var is_modal_open := false

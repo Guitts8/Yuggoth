@@ -139,7 +139,7 @@ Beats:
 | 3 | fim de junho | **O disco** chega, despachado de Brattleboro, com bilhete (medo das estradas, Walter Brown) | Montar a máquina **emprestada da administração** (puzzle leve: corneta, manivela, agulha no caixote); ler a **transcrição**; **tocar o disco** — quantas vezes quiser; **resposta** | Depois do disco: zumbido baixo permanente |
 | 4 | 18–21 de julho | **A pedra não chega.** Telegrama de Bellows Falls: trem 5508. Wilmarth espera; telefona; interurbano para Boston; o relato do funcionário de Keene sobre **"Stanley Adams"** | **Telefone** de parede, ao lado da mesa: ligar para a agência de expresso, depois para a North Station; ditar o telegrama noturno a Akeley; ouvir o relato (voz que "dava tontura e sono"); cartão: a ida a Boston e a noite escrevendo cartas | Calor de julho; tarde passando no relógio parado |
 | 5 | 15–29 de agosto | A carta do começo de agosto (tronco na estrada, tiro de raspão) e a frenética de 15/8 (3 dos 12 cães mortos, pegadas de Brown, cabo cortado), em letra trêmula; Wilmarth oferece ir a Vermont; o **telegrama "AKELY"**; o bilhete de Akeley: **ele nunca o mandou**; Wilmarth renova a oferta; a carta de 28/8 ("uma saída digna") | As cartas cruzam o correio: cada carta selada salta no tempo. A **oferta** e a **renovação** são cartas sem tom; telegrafar a resposta pelo telefone; **comparar a assinatura** do telegrama com as cartas → **primeira alteração de texto** (a carta de julho, relida); **resposta** do dia à carta de 28/8 ("a mais animadora que pude") | Noite, chuva. Um vulto passa pela janela (não confirmado) |
-| 6 | 5–7 de setembro | Abre com a resposta mais calma de Akeley (só a lua cheia segura as criaturas; hospedar-se em Brattleboro). As **três últimas cartas manuscritas**: o telhado (segunda), "falaram comigo" (terça), a coisa morta que evapora e o filme vazio (quarta) | Ler as três; **resposta** (a carta registrada: "mude-se para Brattleboro"); ao terminar a última → **Interlúdio** (§5.1a) | Noite sem lua |
+| 6 | 31 de agosto – 7 de setembro | Abre com a resposta mais calma de Akeley (só a lua cheia segura as criaturas; hospedar-se em Brattleboro). As **três últimas cartas manuscritas**: o telhado (segunda), "falaram comigo" (terça), a coisa morta que evapora e o filme vazio (quarta) | O ânimo (sem tom); cada carta lida traz a seguinte no dia seguinte (salto no tempo ao fechá-la); **resposta** (a carta registrada: "mude-se para Brattleboro"); selada, a letra da última carta enche a tela → **Interlúdio** (§5.1a) | Noite sem lua |
 | 7 | 8–10 de setembro | A **carta datilografada**, serena, convidando; a noite em claro; os telegramas ("COMBINAÇÃO SATISFATÓRIA... NÃO ESQUEÇA DISCO CARTAS FOTOS") | Comparar com as cartas antigas (estilo, vocabulário, grafia); telegrafar a resposta; **arrumar a valise: leva tudo**, como no livro (§6.4) | Escritório "arrumado" sozinho 💭 |
 
 > **Nota de ritmo:** os Dias 4 e 7 são curtos. O 7 vem logo depois do Interlúdio: o escritório calmo e a carta serena contra o que o jogador acabou de viver. Não alongar.
@@ -158,9 +158,9 @@ Beats:
 Isso altera o conteúdo das cartas seguintes (Akeley responde ao que foi dito — sem contradizer os fatos do livro) e, principalmente, **como "Akeley" trata o jogador no Ato III**.
 
 ### 5.1a Interlúdio — "O Cerco" (13–15 min)
-**Personagem:** Henry Wentworth Akeley. **Local:** a fazenda de Akeley — o **mesmo mapa do Ato III**, habitado e iluminado. **Datas:** as noites de 4 a 7 de setembro de 1928 — **o que as três últimas cartas contam**, agora jogado.
+**Personagem:** Henry Wentworth Akeley. **Local:** a fazenda de Akeley — o **mesmo mapa do Ato III**, habitado e iluminado. **Datas:** as noites de 2 a 6 de setembro de 1928 (as cartas são de segunda 3, terça 4 e quarta 5; chegam a Arkham dois dias depois) — **o que as três últimas cartas contam**, agora jogado.
 
-**Transição de entrada:** no Dia 6, Wilmarth lê a última carta manuscrita. A câmera aproxima do papel; a caligrafia nervosa preenche a tela; a tinta se espalha e vira o céu de fim de tarde sobre o vale. O jogador está parado no quintal, segurando um balde de ração. As mãos são outras: mais velhas, sujas de terra.
+**Transição de entrada:** no Dia 6, selada a carta registrada, o fim da última carta manuscrita volta à tela. A câmera aproxima do papel; a caligrafia nervosa preenche a tela; a tinta se espalha e vira o céu de fim de tarde sobre o vale. O jogador está parado no quintal, segurando um balde de ração. As mãos são outras: mais velhas, sujas de terra.
 
 **Os cães:** **doze cães policiais** no começo (como no livro), já menos a cada noite. Quatro têm nome e comportamento próprio (nomes provisórios **Brutus, Nell, Sargento, Rolo**): seguir o jogador, deitar perto da lareira, latir para a mata, rosnar para a janela. Os outros são presença no canil e no quintal.
 
@@ -570,7 +570,7 @@ func resolve_pages() -> Array[String]:
 
 **Risco aceito:** o Ato III, maior risco de design, é validado por último. Como nada da demo depende da fazenda, mudanças nele não afetam o que já foi lançado.
 
-**Estado (2026-10-05):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–5 jogáveis com arte e som provisórios (gerados por script); falta o Dia 6 (com o fim da demo), a arte e o som finais do escritório, a voz do disco e o visual de sonho (pendente: definir o que falta além da intensidade). O que cada parte já tem: `docs/SEQUENCIA.md`.
+**Estado (2026-10-05):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–6 jogáveis com arte e som provisórios (gerados por script), com o fim da demo (a tinta → o céu de Vermont → menu); falta a arte e o som finais do escritório (revisão visual planejada: low-poly facetado, luz da lâmpada por pixel), a voz do disco e o visual de sonho (pendente: definir o que falta além da intensidade). O que cada parte já tem: `docs/SEQUENCIA.md`.
 
 ### 12.1 Riscos
 | Risco | Mitigação |

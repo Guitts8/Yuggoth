@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_6_credula"
+title = "Minha carta a Akeley — 7 de setembro (registrada)"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+7 de setembro de 1928[/right]
+
+Prezado Akeley,
+
+Mude-se para Brattleboro imediatamente, e ponha-se sob a proteção das autoridades. Eu irei a Brattleboro com o disco e o ajudarei a convencer os tribunais do seu juízo. Não é loucura; eu ouvi a voz.
+
+Já é tempo, também, de alertar a gente da região contra essa coisa que está no meio dela. Não pode ficar só entre nós dois.
+
+Não espere mais uma noite. Vá.
+
+[right]A. N. W.[/right]")
+exposure_on_read = 0.0

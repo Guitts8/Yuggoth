@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"resposta_dia_6_animo"
+title = "Minha carta a Akeley — 3 de setembro"
+style = 0
+pages = PackedStringArray("[right]Rua Saltonstall, 118
+Arkham, Massachusetts
+3 de setembro de 1928[/right]
+
+Prezado Sr. Akeley,
+
+Alegra-me muito que tenha menos terrores a relatar. Mas não se fie só na lua. Não espere que ela mingue: vá para Brattleboro agora, enquanto as noites estão quietas, e hospede-se lá. Estará entre gente, perto do correio e do telégrafo, e eu poderei alcançá-lo.
+
+Os seus livros e as suas coisas podem ir depois. Coragem.
+
+Atenciosamente,
+[right]Albert N. Wilmarth[/right]")
+exposure_on_read = 0.0

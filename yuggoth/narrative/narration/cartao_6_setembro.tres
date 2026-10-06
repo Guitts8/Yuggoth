@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NarrationLine" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/narration_line.gd" id="1_line"]
+
+[resource]
+script = ExtResource("1_line")
+id = &"cartao_6_setembro"
+text = "Essa não foi a única carta de Akeley a cruzar com a minha. Na manhã seguinte — 6 de setembro — chegou mais uma; desta vez, um rabisco frenético."

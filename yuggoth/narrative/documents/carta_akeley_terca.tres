@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+[ext_resource type="Resource" path="res://narrative/narration/cartao_7_setembro.tres" id="2_cartao"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"carta_akeley_terca"
+title = "Carta de H. W. Akeley — terça-feira"
+style = 0
+pages = PackedStringArray("[right][tremulo forca=0.7]Terça-feira.[/tremulo][/right]
+
+[tremulo forca=0.7]As nuvens não se abriram, então nada de lua outra vez — e ela já está minguando, de todo modo. Eu mandaria pôr eletricidade na casa e instalaria um holofote, se não soubesse que eles cortariam os cabos tão depressa quanto fossem consertados.[/tremulo]
+
+[tremulo forca=0.7]Acho que estou enlouquecendo. Pode ser que tudo o que já lhe escrevi seja um sonho ou loucura. Já era ruim antes, mas desta vez é demais. Falaram comigo a noite passada — falaram naquela maldita voz zumbida e me disseram coisas que não ouso repetir para você. Eu os ouvi claramente por cima dos latidos dos cães, e uma vez, quando foram abafados, uma voz humana os ajudou.[/tremulo]
+
+[tremulo forca=0.7]Fique fora disso, Wilmarth — é pior do que você ou eu jamais suspeitamos. Eles não pretendem me deixar ir para a Califórnia agora — querem me levar vivo, ou o que teórica e mentalmente equivale a vivo — não só para Yuggoth, mas para além — para fora da galáxia e talvez além da última borda curva do espaço.[/tremulo]
+
+[tremulo forca=0.7]Eu lhes disse que não iria aonde eles querem, nem do modo terrível como propõem me levar, mas receio que não adiante nada. Minha casa fica tão afastada que logo eles podem vir tanto de dia quanto de noite. Mais seis cães mortos, e senti presenças ao longo de todos os trechos de mata da estrada quando fui a Brattleboro hoje.[/tremulo]
+
+[tremulo forca=0.7]Foi um erro tentar lhe mandar aquele disco de fonógrafo e a pedra negra. Melhor quebrar o disco antes que seja tarde demais. Mando outra linha amanhã, se eu ainda estiver aqui.[/tremulo]
+
+[tremulo forca=0.7]Quem me dera conseguir levar meus livros e minhas coisas para Brattleboro e me hospedar lá. Eu fugiria sem nada, se pudesse, mas algo dentro da minha mente me prende. Posso escapulir até Brattleboro, onde eu deveria estar seguro, mas me sinto tão prisioneiro lá quanto em casa. E parece que sei que não conseguiria ir muito mais longe, mesmo que largasse tudo e tentasse. É horrível — não se meta nisso.[/tremulo]
+
+[right][tremulo forca=0.7]Seu — AKELEY[/tremulo][/right]")
+exposure_on_read = 0.05
+cartao_depois = ExtResource("2_cartao")
