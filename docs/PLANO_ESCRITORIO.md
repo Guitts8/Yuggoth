@@ -41,6 +41,15 @@ com chapéu e sobretudo, cesto de papéis, xícaras, pilhas de livros, a torre d
 Miskatonic na vista da janela, lâmpada de banqueiro, mata-borrão, espátula de
 cartas. Atualizar `docs/ARTE.md` (o que vale modelar à mão muda).
 
+✅ Feito: lambri com moldura (nos dois vestidos), estante cheia (livros soltos numa
+malha só, `_lote` + cor de vértice), arquivo de aço com a máquina de escrever em
+cima (canto nordeste), cabideiro com chapéu e sobretudo (canto sudeste — saiu de
+dentro do armário), cesto de papéis, espátula, mata-borrão com cantoneiras,
+cortinas de veludo abertas, lâmpada de banqueiro na mesa todos os dias (acesa só
+nas noites) e a torre gótica da Miskatonic nas três vistas (mostrador aceso à
+noite). Xícaras, pilhas de livros e planta ficaram para a Fase 5, que as faz
+acumular por dia.
+
 ## Fase 3 — Correio pela fresta
 Componente novo **`Correspondencia`** (estado em `GameState`, `correio_<id>`):
 

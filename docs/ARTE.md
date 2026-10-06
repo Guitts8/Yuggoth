@@ -18,7 +18,10 @@ constante na sala; **C** = melhora, mas a caixa provisória aguenta.
   para móveis, na base para objetos de mesa). Frente do objeto virada para **-Z**.
 - **Polígonos:** objetos de mão 100–400 tris; móveis 200–800; nada acima de
   ~1.500. Faces grandes **subdivididas a cada ~0,5 m**: o shader afim torce
-  polígonos grandes e a luz é calculada só nos vértices.
+  polígonos grandes.
+- **Facetado:** a luz é por pixel e cada polígono usa a normal da própria face
+  (`psx_lit`, `facetado`) — o low-poly aparece na luz, como na referência. Não
+  adianta suavizar normais; a silhueta e as facetas são o desenho.
 - **Texturas:** 64×64 ou 128×128 px, PNG, sem filtro (nearest), paleta
   dessaturada (ocre, verde-musgo, marrom de madeira, azul de noite). Atlas por
   objeto é bem-vindo. Sem normal map, sem PBR: o material é o `psx_lit`.
@@ -62,7 +65,10 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 |---|---|
 | **Escrivaninha** | Com gavetas (peças separadas). Nenhum dia precisa abri-las: esconder itens saiu do GDD (§6.4). |
 | **Cadeira da escrivaninha** | Madeira, encosto de ripas. O jogador começa sentado nela. |
-| **Estante de livros** | Prateleiras com lombadas (o vão numa prateleira era o esconderijo de uma versão antiga do GDD; pode sair). |
+| **Estante de livros** | Cheia: hoje cada livro é uma caixa (cor de vértice + `capa_livro.png`), numa malha só. Um modelo à mão pode manter isso ou trazer os livros como peças. |
+| **Lâmpada de banqueiro** | Na mesa todos os dias; cúpula de vidro verde, base de latão, correntinha. É a luz-chave das noites: a cúpula precisa ser fechada em cima (a luz só desce). |
+| **Arquivo de aço** | Quatro gavetas, verde-oliva, canto nordeste. A máquina de escrever fica guardada em cima (só decoração). |
+| **Cabideiro** | Canto sudeste, com chapéu de feltro e sobretudo. O sobretudo provisório é um cilindro achatado: o que mais ganha com modelo. |
 | **Lareira** | Tijolo, consolo de madeira, grelha de ferro. Funciona acesa e apagada. |
 | **Poltrona** | Estofada, de leitura. Aparece também coberta por lençol (versão "drapeada" ajuda). |
 | **Janela de guilhotina** | Caixilho de madeira com vidraças; a vista é um plano atrás. |
@@ -72,14 +78,16 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 
 ### C — a caixa provisória aguenta
 
-Quadro de cortiça, armário do fonógrafo, cabideiro, tapete, tinteiro e pena,
-castiçais do consolo. O **vulto da janela** (Dia 5) é um plano com textura
+Quadro de cortiça, armário do fonógrafo, tapete, tinteiro e pena, castiçais do
+consolo, lambri (textura `lambri.png`), cortinas (faixas em zigue-zague), cesto de
+papéis, espátula de cartas, mata-borrão, máquina de escrever. O **vulto da janela** (Dia 5) é um plano com textura
 recortada e deve continuar vago: só melhorar a silhueta, nunca mostrá-lo nítido.
 
 ### Texturas que melhorariam muito
 - **Papel de parede** (o atual é um padrão simples de listras e losangos).
-- **Vista de Arkham** pela janela, de dia e de noite (telhados de 1928, torre da
-  universidade ao longe). Hoje são silhuetas geradas.
+- **Vista de Arkham** pela janela, de dia, ao entardecer e de noite (telhados de
+  1928 e a torre gótica da Miskatonic, com o mostrador aceso à noite). Hoje são
+  silhuetas geradas em 256×128; a torre fica um pouco à direita do centro.
 - **Recortes de jornal** no quadro, legíveis de longe só como manchas de texto.
 
 ---

@@ -27,7 +27,9 @@ void fragment() {
 	if (tex.a < alpha_cut) {
 		discard;
 	}
-	ALBEDO = tex.rgb;
+	// Cor de vértice (branca quando a malha não tem): várias peças de cores
+	// diferentes numa malha só, como os livros da estante.
+	ALBEDO = tex.rgb * COLOR.rgb;
 	if (facetado) {
 		NORMAL = normalize(cross(dFdy(VERTEX), dFdx(VERTEX)));
 	}

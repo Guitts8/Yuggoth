@@ -1,14 +1,14 @@
 [gd_resource type="ShaderMaterial" format=3]
 
-[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_jtmxp"]
-[ext_resource type="Texture2D" path="res://art/textures/lombadas.png" id="2_3u7xw"]
+[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_c154t"]
+[ext_resource type="Texture2D" path="res://art/textures/capa_livro.png" id="2_mun87"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_jtmxp")
-shader_parameter/albedo_tex = ExtResource("2_3u7xw")
+shader = ExtResource("1_c154t")
+shader_parameter/albedo_tex = ExtResource("2_mun87")
 shader_parameter/albedo_color = null
-shader_parameter/uv_scale = Vector2(5, 1)
+shader_parameter/uv_scale = null
 shader_parameter/world_uv = null
 shader_parameter/tiles_per_meter = null
 shader_parameter/snap_scale = null

@@ -22,6 +22,8 @@ const H := 3.0  # pé-direito
 ## Janela norte (abertura na parede).
 const JANELA_X := 0.8
 const JANELA_Y := Vector2(0.9, 2.4)
+## Altura do lambri (até o peitoril da janela).
+const LAMBRI := 0.9
 
 var cena: Node3D
 var m: Dictionary[String, Material] = {}
@@ -104,7 +106,14 @@ func _materiais() -> void:
 	_mat("madeira_clara", "madeira_clara", {world = 2.0})
 	_mat("porta", "porta", {})
 	_mat("tijolo", "tijolo", {world = 2.5})
-	_mat("lombadas", "lombadas", {scale = Vector2(5, 1)})
+	_mat("lambri", "lambri", {world = 1.0 / LAMBRI})
+	_mat("aco", "aco", {world = 2.0})
+	_mat("gaveta_arquivo", "gaveta_arquivo", {})
+	_mat("esmalte_preto", "aco", {world = 6.0, cor = Color(0.2, 0.2, 0.2)})
+	_mat("capa_livro", "capa_livro", {})
+	_mat("la_escura", "la_escura", {world = 3.0})
+	_mat("feltro", "feltro", {world = 4.0})
+	_mat("cortina", "cortina", {world = 1.2})
 	_mat("cortica", "cortica", {world = 2.0})
 	_mat("tapete", "tapete", {})
 	_mat("estofado", "estofado", {world = 3.0})
@@ -277,6 +286,54 @@ func _cyl(parent: Node, name: String, top: float, bottom: float, height: float, 
 	return mi
 
 
+## Várias caixas numa malha só, cada uma com a sua cor de vértice (o psx_lit
+## multiplica a textura por ela) e UV 0..1 por face, "para baixo" = -Y (nas
+## faces de cima/baixo, +Z). Peça: [tamanho, posição, rotação em graus, cor].
+func _lote(parent: Node, name: String, pecas: Array, mat: String) -> MeshInstance3D:
+	# [normal, eixo u, eixo v]; u × v = -normal, para a ordem dos vértices sair
+	# horária vista de fora (a frente, no Godot).
+	const FACES := [
+		[Vector3.RIGHT, Vector3.FORWARD, Vector3.DOWN], [Vector3.LEFT, Vector3.BACK, Vector3.DOWN],
+		[Vector3.BACK, Vector3.RIGHT, Vector3.DOWN], [Vector3.FORWARD, Vector3.LEFT, Vector3.DOWN],
+		[Vector3.UP, Vector3.RIGHT, Vector3.BACK], [Vector3.DOWN, Vector3.RIGHT, Vector3.FORWARD],
+	]
+	var verts := PackedVector3Array()
+	var normais := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	var cores := PackedColorArray()
+	var indices := PackedInt32Array()
+	for p: Array in pecas:
+		var meio: Vector3 = p[0] * 0.5
+		var base := Basis.from_euler((p[2] as Vector3) * PI / 180.0)
+		for f: Array in FACES:
+			var n: Vector3 = f[0]
+			var u: Vector3 = f[1]
+			var v: Vector3 = f[2]
+			var i0 := verts.size()
+			for c: Vector2 in [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]:
+				var local := n * meio + u * (c.x * 2.0 - 1.0) * meio + v * (c.y * 2.0 - 1.0) * meio
+				verts.append(base * local + p[1])
+				normais.append(base * n)
+				uvs.append(c)
+				cores.append(p[3])
+			indices.append_array([i0, i0 + 1, i0 + 2, i0, i0 + 2, i0 + 3])
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	arrays[Mesh.ARRAY_NORMAL] = normais
+	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	arrays[Mesh.ARRAY_COLOR] = cores
+	arrays[Mesh.ARRAY_INDEX] = indices
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	var mi := MeshInstance3D.new()
+	mi.name = name
+	mi.mesh = mesh
+	mi.material_override = m[mat]
+	_add(parent, mi)
+	return mi
+
+
 ## Corpo estático com uma caixa de colisão por item: [tamanho, posição].
 func _colisao(parent: Node, name: String, boxes: Array) -> StaticBody3D:
 	var body := StaticBody3D.new()
@@ -330,25 +387,45 @@ func _omni(parent: Node, name: String, pos: Vector3, cor: Color, energy: float, 
 
 func _estrutura() -> void:
 	var e := _group(cena, "Estrutura")
-	_quad(e, "Piso", Vector2(2 * W, 2 * D), Vector3(0, 0, 0), Vector3(-90, 0, 0), "piso")
-	_quad(e, "Teto", Vector2(2 * W, 2 * D), Vector3(0, H, 0), Vector3(90, 0, 0), "teto")
-	_quad(e, "ParedeOeste", Vector2(2 * D, H), Vector3(-W, H / 2, 0), Vector3(0, 90, 0), "parede")
-	_quad(e, "ParedeLeste", Vector2(2 * D, H), Vector3(W, H / 2, 0), Vector3(0, -90, 0), "parede")
-	_quad(e, "ParedeSul", Vector2(2 * W, H), Vector3(0, H / 2, D), Vector3(0, 180, 0), "parede")
+	# Cada plano passa um pouco (`sobra`) dos vizinhos, por fora da sala: o tremor de
+	# vértice abria frestas nas quinas, e o fundo aparecia em pontinhos.
+	var sobra := 0.2
+	_quad(e, "Piso", Vector2(2 * W + sobra, 2 * D + sobra), Vector3(0, 0, 0), Vector3(-90, 0, 0), "piso")
+	_quad(e, "Teto", Vector2(2 * W + sobra, 2 * D + sobra), Vector3(0, H, 0), Vector3(90, 0, 0), "teto")
+	_quad(e, "ParedeOeste", Vector2(2 * D + sobra, H + sobra), Vector3(-W, H / 2, 0), Vector3(0, 90, 0), "parede")
+	_quad(e, "ParedeLeste", Vector2(2 * D + sobra, H + sobra), Vector3(W, H / 2, 0), Vector3(0, -90, 0), "parede")
+	_quad(e, "ParedeSul", Vector2(2 * W + sobra, H + sobra), Vector3(0, H / 2, D), Vector3(0, 180, 0), "parede")
 	# Norte em pedaços, com espessura, em volta da janela.
 	var t := 0.2
 	var lado := W - JANELA_X
-	_box(e, "ParedeNorteO", Vector3(lado, H, t), Vector3(-JANELA_X - lado / 2, H / 2, -D - t / 2), "parede")
-	_box(e, "ParedeNorteL", Vector3(lado, H, t), Vector3(JANELA_X + lado / 2, H / 2, -D - t / 2), "parede")
+	_box(e, "ParedeNorteO", Vector3(lado + sobra / 2, H + sobra, t), Vector3(-JANELA_X - (lado + sobra / 2) / 2, H / 2, -D - t / 2), "parede")
+	_box(e, "ParedeNorteL", Vector3(lado + sobra / 2, H + sobra, t), Vector3(JANELA_X + (lado + sobra / 2) / 2, H / 2, -D - t / 2), "parede")
 	_box(e, "ParedeNorteBaixo", Vector3(2 * JANELA_X, JANELA_Y.x, t), Vector3(0, JANELA_Y.x / 2, -D - t / 2), "parede")
-	_box(e, "ParedeNorteAlto", Vector3(2 * JANELA_X, H - JANELA_Y.y, t), Vector3(0, (H + JANELA_Y.y) / 2, -D - t / 2), "parede")
+	_box(e, "ParedeNorteAlto", Vector3(2 * JANELA_X, H + sobra / 2 - JANELA_Y.y, t), Vector3(0, (H + sobra / 2 + JANELA_Y.y) / 2, -D - t / 2), "parede")
 
-	# Rodapé.
+	# Lambri até o peitoril, com moldura em cima; no sul, interrompido pela porta.
+	var l := 0.025
+	var lambri := _group(e, "Lambri")
+	var trechos := [
+		["Oeste", Vector3(l, LAMBRI, 2 * D), Vector3(-W + l / 2, LAMBRI / 2, 0)],
+		["Leste", Vector3(l, LAMBRI, 2 * D), Vector3(W - l / 2, LAMBRI / 2, 0)],
+		["Norte", Vector3(2 * W, LAMBRI, l), Vector3(0, LAMBRI / 2, -D + l / 2)],
+		["SulO", Vector3(0.95, LAMBRI, l), Vector3(-W + 0.475, LAMBRI / 2, D - l / 2)],
+		["SulL", Vector3(2.95, LAMBRI, l), Vector3(W - 1.475, LAMBRI / 2, D - l / 2)],
+	]
+	for t2: Array in trechos:
+		_box(lambri, t2[0], t2[1], t2[2], "lambri")
+		var tam: Vector3 = t2[1]
+		var moldura := Vector3(maxf(tam.x, 0.05), 0.04, maxf(tam.z, 0.05))
+		_box(lambri, "Moldura" + t2[0], moldura, Vector3(t2[2].x, LAMBRI + 0.02, t2[2].z), "madeira_escura")
+
+	# Rodapé, à frente do lambri.
 	var r := 0.12
-	_box(e, "RodapeOeste", Vector3(0.03, r, 2 * D), Vector3(-W + 0.015, r / 2, 0), "madeira_escura")
-	_box(e, "RodapeLeste", Vector3(0.03, r, 2 * D), Vector3(W - 0.015, r / 2, 0), "madeira_escura")
-	_box(e, "RodapeSul", Vector3(2 * W, r, 0.03), Vector3(0, r / 2, D - 0.015), "madeira_escura")
-	_box(e, "RodapeNorte", Vector3(2 * W, r, 0.03), Vector3(0, r / 2, -D + 0.015), "madeira_escura")
+	var rp := 0.045
+	_box(e, "RodapeOeste", Vector3(rp, r, 2 * D), Vector3(-W + rp / 2, r / 2, 0), "madeira_escura")
+	_box(e, "RodapeLeste", Vector3(rp, r, 2 * D), Vector3(W - rp / 2, r / 2, 0), "madeira_escura")
+	_box(e, "RodapeSul", Vector3(2 * W, r, rp), Vector3(0, r / 2, D - rp / 2), "madeira_escura")
+	_box(e, "RodapeNorte", Vector3(2 * W, r, rp), Vector3(0, r / 2, -D + rp / 2), "madeira_escura")
 
 	# Janela: caixilho e travessas em cruz.
 	var j := _group(e, "Janela", Vector3(0, 0, -D))
@@ -406,12 +483,31 @@ func _mobilia() -> void:
 	_lareira(mob)
 	_poltrona(_group(mob, "Poltrona", Vector3(1.6, 0, 0.9), 90), "estofado")
 	_quad(mob, "Tapete", Vector2(2.4, 1.8), Vector3(0, 0.006, 0.3), Vector3(-90, 0, 0), "tapete")
-	var cab := _group(mob, "Cabideiro", Vector3(-2.1, 0, 2.6))
-	_cyl(cab, "Haste", 0.02, 0.02, 1.8, Vector3(0, 0.9, 0), "madeira_escura", 6)
-	_cyl(cab, "Pe", 0.02, 0.22, 0.08, Vector3(0, 0.04, 0), "madeira_escura", 6)
+	_cabideiro(mob)
+
+
+## Canto sudeste: cabideiro com o chapéu no alto e o sobretudo virado para a sala.
+func _cabideiro(parent: Node) -> void:
+	var cab := _group(parent, "Cabideiro", Vector3(2.15, 0, 2.62), 45)
+	_cyl(cab, "Haste", 0.02, 0.025, 1.8, Vector3(0, 0.9, 0), "madeira_escura", 6)
+	_cyl(cab, "Pe", 0.03, 0.22, 0.08, Vector3(0, 0.04, 0), "madeira_escura", 6)
 	for i in 3:
-		var gancho := _box(cab, "Gancho%d" % i, Vector3(0.18, 0.02, 0.02), Vector3(0, 1.72, 0), "latao")
+		var gancho := _box(cab, "Gancho%d" % i, Vector3(0.2, 0.02, 0.02), Vector3(0, 1.66, 0), "latao")
 		gancho.rotation_degrees.y = i * 60
+	# Chapéu de feltro coroando a haste.
+	_cyl(cab, "Aba", 0.15, 0.16, 0.014, Vector3(0, 1.8, 0), "feltro", 10)
+	_cyl(cab, "Copa", 0.085, 0.095, 0.1, Vector3(0, 1.86, 0), "feltro", 8)
+	_cyl(cab, "Fita", 0.097, 0.097, 0.022, Vector3(0, 1.82, 0), "la_escura", 8)
+	# Sobretudo pendurado num gancho, de frente para a sala (-Z).
+	var casaco := _group(cab, "Sobretudo", Vector3(0, 0, -0.14))
+	_box(casaco, "Ombros", Vector3(0.44, 0.07, 0.16), Vector3(0, 1.58, 0), "la_escura").rotation_degrees.x = 4
+	var corpo := _cyl(casaco, "Corpo", 0.19, 0.25, 1.0, Vector3(0, 1.06, 0.01), "la_escura", 7)
+	corpo.scale = Vector3(1, 1, 0.5)
+	_box(casaco, "Gola", Vector3(0.16, 0.12, 0.05), Vector3(0, 1.52, -0.07), "la_escura").rotation_degrees.x = -20
+	for s in [-1, 1]:
+		var manga := _box(casaco, "Manga%d" % s, Vector3(0.09, 0.6, 0.1), Vector3(s * 0.21, 1.24, 0.0), "la_escura")
+		manga.rotation_degrees.z = s * 4
+	_colisao(cab, "Colisao", [[Vector3(0.45, 1.8, 0.45), Vector3(0, 0.9, -0.05)]])
 
 
 func _escrivaninha(parent: Node) -> void:
@@ -436,8 +532,53 @@ func _cadeira(parent: Node) -> void:
 	_box(g, "Encosto", Vector3(0.46, 0.42, 0.04), Vector3(0, 0.74, 0.2), "madeira_clara")
 
 
+const CORES_LIVRO := [Color(0.5, 0.13, 0.1), Color(0.16, 0.3, 0.18), Color(0.14, 0.17, 0.36),
+	Color(0.55, 0.4, 0.2), Color(0.32, 0.2, 0.12), Color(0.2, 0.18, 0.16), Color(0.4, 0.1, 0.16),
+	Color(0.6, 0.55, 0.42)]
+
+
+## Livros de uma fileira, de pé, encostados ao fundo (x = `fundo`, lombada para
+## +X), de z0 a z1, sobre `y`. Às vezes uma pilha deitada; no fim, um inclinado.
+func _fileira(pecas: Array, rng: RandomNumberGenerator, y: float, fundo: float, z0: float, z1: float, alt_max: float) -> void:
+	var z := z0
+	while z < z1 - 0.03:
+		var cor: Color = CORES_LIVRO[rng.randi_range(0, CORES_LIVRO.size() - 1)] * rng.randf_range(0.8, 1.15)
+		cor.a = 1.0
+		var prof := rng.randf_range(0.15, 0.23)
+		if rng.randf() < 0.07 and z1 - z > 0.3:
+			# Pilha deitada.
+			var larg := rng.randf_range(0.18, 0.26)
+			var topo := y
+			for k in rng.randi_range(2, 5):
+				var esp := rng.randf_range(0.025, 0.05)
+				var c: Color = CORES_LIVRO[rng.randi_range(0, CORES_LIVRO.size() - 1)]
+				pecas.append([Vector3(prof, esp, larg - k * 0.01), Vector3(fundo + prof / 2, topo + esp / 2, z + larg / 2),
+					Vector3(0, rng.randf_range(-6, 6), 0), c])
+				topo += esp
+			z += larg + 0.01
+			continue
+		if rng.randf() < 0.05:
+			z += rng.randf_range(0.03, 0.08)  # um vão
+			continue
+		var esp := rng.randf_range(0.022, 0.06)
+		var alt := minf(rng.randf_range(0.19, 0.33), alt_max)
+		if z + esp > z1:
+			break
+		pecas.append([Vector3(prof, alt, esp), Vector3(fundo + prof / 2, y + alt / 2, z + esp / 2), Vector3.ZERO, cor])
+		z += esp
+	# O último, inclinado sobre os outros, se sobrou espaço.
+	var resto := z1 - z
+	if resto > 0.06:
+		var alt := minf(0.26, alt_max)
+		var ang := rad_to_deg(asin(clampf((resto - 0.035) / alt, 0.0, 0.6)))
+		var cor: Color = CORES_LIVRO[rng.randi_range(0, CORES_LIVRO.size() - 1)]
+		var a := deg_to_rad(ang)
+		pecas.append([Vector3(0.2, alt, 0.035), Vector3(fundo + 0.1, y + (alt * cos(a) + 0.035 * sin(a)) / 2,
+			z + (alt * sin(a) + 0.035 * cos(a)) / 2), Vector3(-ang, 0, 0), cor])
+
+
 func _estante(parent: Node) -> void:
-	# Parede oeste, metade norte. Uma prateleira tem um vão (sobra do antigo esconderijo, GDD §6.4).
+	# Parede oeste, metade norte, cheia.
 	var g := _group(parent, "Estante", Vector3(-W + 0.18, 0, -2.0))
 	var alt := 2.3
 	_box(g, "LadoN", Vector3(0.36, alt, 0.04), Vector3(0, alt / 2, -0.78), "madeira_escura")
@@ -446,12 +587,12 @@ func _estante(parent: Node) -> void:
 	var prateleiras := [0.06, 0.5, 0.94, 1.38, 1.82, alt - 0.02]
 	for i in prateleiras.size():
 		_box(g, "Prateleira%d" % i, Vector3(0.36, 0.04, 1.52), Vector3(0, prateleiras[i], 0), "madeira_escura")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 41
+	var livros := []
 	for i in 5:
-		var y: float = prateleiras[i] + 0.02 + 0.17
-		var largura := 1.5 if i != 2 else 1.05
-		var z := 0.0 if i != 2 else -0.22
-		_box(g, "Livros%d" % i, Vector3(0.24, 0.34, largura), Vector3(-0.04, y, z), "madeira_escura")
-		_quad(g, "Lombadas%d" % i, Vector2(largura, 0.34), Vector3(0.081, y, z), Vector3(0, 90, 0), "lombadas")
+		_fileira(livros, rng, prateleiras[i] + 0.02, -0.16, -0.76, 0.76, prateleiras[i + 1] - prateleiras[i] - 0.06)
+	_lote(g, "Livros", livros, "capa_livro")
 	_colisao(g, "Colisao", [[Vector3(0.36, alt, 1.6), Vector3(0, alt / 2, 0)]])
 
 
@@ -586,11 +727,22 @@ func _miskatonic() -> void:
 			leitura.remove_visual = false
 			leitura.document = load("res://narrative/documents/%s.tres" % docs_recortes[i])
 
-	# Escrivaninha (todos os dias): tinteiro, pena, mata-borrão.
+	# Escrivaninha (todos os dias): tinteiro, pena, mata-borrão com cantoneiras,
+	# espátula de cartas e a lâmpada de banqueiro (acesa só nas noites, _abajur).
 	_cyl(g, "Tinteiro", 0.03, 0.035, 0.05, Vector3(0.36, 0.805, -2.32), "ferro", 6)
 	var pena := _box(g, "Pena", Vector3(0.01, 0.01, 0.2), Vector3(0.3, 0.79, -2.12), "lencol")
 	pena.rotation_degrees.y = 25
 	_box(g, "MataBorrao", Vector3(0.5, 0.008, 0.36), Vector3(0.05, 0.784, -2.12), "estofado")
+	for s in [-1, 1]:
+		_box(g, "Cantoneira%d" % s, Vector3(0.05, 0.012, 0.37), Vector3(0.05 + s * 0.24, 0.786, -2.12), "feltro")
+	var espatula := _group(g, "Espatula", Vector3(-0.68, MESA, -1.9), 80)
+	_box(espatula, "Lamina", Vector3(0.15, 0.003, 0.016), Vector3(-0.04, 0.0015, 0), "ferro")
+	_box(espatula, "Cabo", Vector3(0.07, 0.01, 0.018), Vector3(0.07, 0.005, 0), "latao")
+	_abajur_peca(g)
+
+	_arquivo(g)
+	_cesto(g)
+	_cortinas(g)
 
 	_dias(g)
 
@@ -604,6 +756,59 @@ func _miskatonic() -> void:
 	_box(a, "Movel", Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0), "madeira_escura")
 	_box(a, "Juncao", Vector3(0.01, 0.8, 0.01), Vector3(0, 0.45, -0.255), "ferro")
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
+
+
+## Canto nordeste, abaixo do telefone: arquivo de aço de quatro gavetas, com a
+## máquina de escrever guardada em cima (só decoração).
+func _arquivo(parent: Node) -> void:
+	var a := _group(parent, "Arquivo", Vector3(W - 0.31, 0, -D + 0.26), 90)
+	var alt := 1.32
+	_box(a, "Corpo", Vector3(0.45, alt, 0.6), Vector3(0, alt / 2, 0), "aco")
+	for i in 4:
+		_quad(a, "Gaveta%d" % i, Vector2(0.41, 0.29), Vector3(0, 0.2 + i * 0.31, -0.302), Vector3(0, 180, 0), "gaveta_arquivo")
+	_colisao(a, "Colisao", [[Vector3(0.45, alt, 0.6), Vector3(0, alt / 2, 0)]])
+
+	# Máquina de escrever: base, corpo inclinado com as fileiras de teclas, rolo.
+	var maquina := _group(a, "MaquinaEscrever", Vector3(0, alt, 0.02))
+	_lote(maquina, "Corpo", [
+		[Vector3(0.3, 0.05, 0.26), Vector3(0, 0.025, 0), Vector3.ZERO, Color.WHITE],
+		[Vector3(0.28, 0.08, 0.14), Vector3(0, 0.09, 0.04), Vector3(-12, 0, 0), Color.WHITE],
+		[Vector3(0.34, 0.035, 0.035), Vector3(0, 0.15, 0.1), Vector3.ZERO, Color.WHITE],
+		[Vector3(0.04, 0.02, 0.02), Vector3(-0.19, 0.16, 0.1), Vector3(0, 0, 20), Color.WHITE],
+	], "esmalte_preto")
+	var teclas := []
+	for fila in 4:
+		for k in 10 - fila:
+			teclas.append([Vector3(0.016, 0.01, 0.016), Vector3(-0.1 + k * 0.022 + fila * 0.011, 0.065 + fila * 0.012, -0.09 + fila * 0.028),
+				Vector3(-12, 0, 0), Color.WHITE])
+	_lote(maquina, "Teclas", teclas, "lencol")
+
+
+## Cesto de papéis de vime, aberto, à direita da escrivaninha.
+func _cesto(parent: Node) -> void:
+	var c := _group(parent, "Cesto", Vector3(1.0, 0, -1.95))
+	var fora := _cyl(c, "Fora", 0.15, 0.11, 0.34, Vector3(0, 0.17, 0), "madeira_clara", 9)
+	(fora.mesh as CylinderMesh).cap_top = false
+	var dentro := _cyl(c, "Dentro", 0.14, 0.1, 0.33, Vector3(0, 0.175, 0), "madeira_clara", 9)
+	(dentro.mesh as CylinderMesh).cap_top = false
+	(dentro.mesh as CylinderMesh).flip_faces = true
+	_cyl(c, "Aro", 0.155, 0.155, 0.02, Vector3(0, 0.335, 0), "madeira_escura", 9)
+	_colisao(c, "Colisao", [[Vector3(0.3, 0.34, 0.3), Vector3(0, 0.17, 0)]])
+
+
+## Cortinas de veludo, abertas, uma de cada lado da janela; pregas de verdade
+## (faixas em zigue-zague), para a luz facetada mostrar o caimento.
+func _cortinas(parent: Node) -> void:
+	var g := _group(parent, "Cortinas", Vector3(0, 0, -D + 0.1))
+	var varao := _cyl(g, "Varao", 0.012, 0.012, 2.8, Vector3(0, 2.58, -0.02), "latao", 6)
+	varao.rotation_degrees.z = 90
+	for s in [-1, 1]:
+		var pecas := []
+		var alt := 2.52
+		for k in 6:
+			var ang := 28.0 if k % 2 else -28.0
+			pecas.append([Vector3(0.085, alt, 0.012), Vector3(s * (1.06 + k * 0.075), 0.04 + alt / 2, 0), Vector3(0, ang, 0), Color.WHITE])
+		_lote(g, "Cortina%s" % ("O" if s < 0 else "L"), pecas, "cortina")
 
 
 # --- Os dias --------------------------------------------------------------------
@@ -955,18 +1160,28 @@ func _dia_3(parent: Node) -> Node3D:
 	return g
 
 
-## Lâmpada de banqueiro na mesa (cúpula de vidro verde), a luz-chave das noites.
-## A cúpula joga a luz para baixo: um spot com sombra faz o círculo na mesa, e um
-## omni fraco sem sombra é o que a mesa rebate na sala. A luz-chave fica em
-## "Abajur/Luz" (o fonógrafo pulsa a do Dia 3).
-func _abajur(parent: Node) -> SpotLight3D:
-	var abajur := _group(parent, "Abajur", Vector3(0.62, MESA, -2.45), -20)
+## Lugar da lâmpada de banqueiro na mesa.
+const ABAJUR_POS := Vector3(0.62, MESA, -2.45)
+const ABAJUR_ROT := -20.0
+
+
+## A lâmpada de banqueiro (cúpula de vidro verde), na mesa todos os dias.
+func _abajur_peca(parent: Node) -> void:
+	var abajur := _group(parent, "LampadaBanqueiro", ABAJUR_POS, ABAJUR_ROT)
 	_box(abajur, "Base", Vector3(0.16, 0.025, 0.1), Vector3(0, 0.0125, 0), "latao")
 	_cyl(abajur, "Haste", 0.01, 0.01, 0.3, Vector3(0, 0.17, 0), "latao", 6)
-	# Meio cilindro deitado, aberto para baixo: a cúpula verde.
+	# Cilindro deitado e achatado: a cúpula verde.
 	var cupula := _cyl(abajur, "Cupula", 0.055, 0.055, 0.3, Vector3(0, 0.33, 0.04), "vidro_verde", 7)
 	cupula.rotation_degrees.z = 90
 	cupula.scale = Vector3(1, 1, 0.75)
+	_cyl(abajur, "Corrente", 0.003, 0.003, 0.08, Vector3(0.1, 0.25, 0.09), "latao", 4)
+
+
+## A lâmpada acesa, a luz-chave das noites: o tubo aceso sob a cúpula, um spot
+## com sombra que faz o círculo na mesa e um omni fraco sem sombra (o que a mesa
+## rebate na sala). A luz-chave fica em "Abajur/Luz" (o fonógrafo pulsa a do Dia 3).
+func _abajur(parent: Node) -> SpotLight3D:
+	var abajur := _group(parent, "Abajur", ABAJUR_POS, ABAJUR_ROT)
 	_box(abajur, "Lampada", Vector3(0.22, 0.012, 0.04), Vector3(0, 0.29, 0.04), "vidro_aceso")
 	var luz := SpotLight3D.new()
 	luz.name = "Luz"

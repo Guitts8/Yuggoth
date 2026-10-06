@@ -40,6 +40,19 @@ func _ready() -> void:
 		player.head.rotation.x = deg_to_rad(-38)
 		await _s(1.0)
 		_shot("%s_d%d_mesa" % [tag, dia])
+		# Em pé, para a estante (oeste), para o arquivo (nordeste) e para o
+		# cabideiro (sudeste).
+		for vista: Array in [["estante", Vector3(0.5, 0, -0.6), Vector3(-2.3, 1.1, -2.0)],
+				["arquivo", Vector3(-0.6, 0, -0.4), Vector3(2.2, 1.0, -2.6)],
+				["cabideiro", Vector3(-0.4, 0, -0.2), Vector3(2.1, 1.1, 2.6)]]:
+			player.global_position = vista[1]
+			var alvo: Vector3 = vista[2]
+			player.look_at(Vector3(alvo.x, 0, alvo.z))
+			await _s(0.2)
+			var olho := player.camera.global_position
+			player.head.rotation.x = atan2(alvo.y - olho.y, Vector2(alvo.x - olho.x, alvo.z - olho.z).length())
+			await _s(0.8)
+			_shot("%s_d%d_%s" % [tag, dia, vista[0]])
 	SaveSystem.delete_save()
 	get_tree().quit()
 

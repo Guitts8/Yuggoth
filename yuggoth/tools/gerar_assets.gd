@@ -29,7 +29,6 @@ func _texturas() -> void:
 	_save(_papel_parede(), "papel_parede")
 	_save(_reboco(), "reboco")
 	_save(_tijolo(), "tijolo")
-	_save(_lombadas(), "lombadas")
 	_save(_cortica(), "cortica")
 	_save(_tapete(), "tapete")
 	_save(_tecido(Color(0.24, 0.31, 0.21), 21), "estofado")
@@ -42,6 +41,13 @@ func _texturas() -> void:
 	_save(_vista(false), "vista_noite")
 	_save(_vista(true), "vista_dia")
 	_save(_vista_entardecer(), "vista_entardecer")
+	_save(_lambri(), "lambri")
+	_save(_aco(), "aco")
+	_save(_gaveta_arquivo(), "gaveta_arquivo")
+	_save(_capa_livro(), "capa_livro")
+	_save(_tecido(Color(0.17, 0.16, 0.15), 31), "la_escura")
+	_save(_tecido(Color(0.24, 0.2, 0.16), 32), "feltro")
+	_save(_cortina(), "cortina")
 	_save(_gota(), "gota")
 	_save(_sombra(), "sombra")
 	# Correspondência.
@@ -176,26 +182,87 @@ func _tijolo() -> Image:
 	return img
 
 
-func _lombadas() -> Image:
+## Lambri de madeira escura: duas almofadas lado a lado, com travessas em cima e
+## embaixo. Uma repetição = 0,9 m (a altura do lambri, com world_uv).
+func _lambri() -> Image:
+	var img := _madeira(Color(0.3, 0.18, 0.1), 33, 0)
+	for y in 64:
+		for x in 64:
+			var px := x % 32
+			var dentro := px >= 4 and px <= 27 and y >= 12 and y <= 55
+			if not dentro:
+				_mul(img, x, y, 0.82)  # travessas e montantes
+			elif px == 4 or y == 12:
+				_mul(img, x, y, 0.55)  # sombra da moldura
+			elif px == 27 or y == 55:
+				_mul(img, x, y, 1.3)  # luz na borda
+	return img
+
+
+## Aço pintado de verde-oliva, gasto nas quinas (arquivo).
+func _aco() -> Image:
 	var img := _img()
+	var n := _noise(34, 0.12)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 18
-	var cores := [Color(0.42, 0.12, 0.1), Color(0.14, 0.25, 0.16), Color(0.12, 0.15, 0.3),
-		Color(0.5, 0.38, 0.18), Color(0.3, 0.2, 0.12), Color(0.22, 0.2, 0.18)]
-	var x := 0
-	while x < 64:
-		var w := rng.randi_range(3, 6)
-		var c: Color = cores[rng.randi_range(0, cores.size() - 1)]
-		var topo := rng.randi_range(0, 8)  # livros de alturas diferentes
-		for xx in range(x, mini(x + w, 64)):
-			for y in 64:
-				var col := Color(0.06, 0.05, 0.04) if y < topo else c
-				if y >= topo and (y == topo + 6 or y == 56):
-					col = Color(0.62, 0.5, 0.25)  # faixa dourada
-				if xx == x:
-					col = _shade(col, 0.6)
-				img.set_pixel(xx, y, col)
-		x += w
+	rng.seed = 34
+	for y in 64:
+		for x in 64:
+			img.set_pixel(x, y, _shade(Color(0.27, 0.3, 0.24), 0.93 + n.get_noise_2d(x, y) * 0.07))
+	for i in 12:  # riscos
+		var p := Vector2i(rng.randi_range(0, 63), rng.randi_range(0, 63))
+		for k in rng.randi_range(2, 6):
+			img.set_pixel((p.x + k) % 64, p.y, Color(0.42, 0.42, 0.38))
+	return img
+
+
+## Frente de uma gaveta de arquivo: friso, porta-etiqueta de latão com o cartão
+## e o puxador. UV 0..1 numa face.
+func _gaveta_arquivo() -> Image:
+	var img := _aco()
+	for x in 64:
+		for y in [0, 1, 62, 63]:
+			_mul(img, x, y, 0.45)
+	for y in 64:
+		for x in [0, 1, 62, 63]:
+			_mul(img, x, y, 0.45)
+	for y in range(14, 24):
+		for x in range(20, 44):
+			var borda := y == 14 or y == 23 or x == 20 or x == 43
+			img.set_pixel(x, y, Color(0.6, 0.46, 0.22) if borda else Color(0.84, 0.8, 0.68))
+	for x in range(24, 40):
+		img.set_pixel(x, 19, Color(0.3, 0.28, 0.3))  # a etiqueta escrita
+	for y in range(32, 40):
+		for x in range(22, 42):
+			var c := Color(0.62, 0.5, 0.26) if y < 36 else Color(0.3, 0.24, 0.12)
+			img.set_pixel(x, y, c)
+	return img
+
+
+## Couro/pano claro de uma lombada, com duas faixas douradas; a cor de vértice
+## tinge cada livro. UV 0..1 por face.
+func _capa_livro() -> Image:
+	var img := _img(16, 64)
+	var n := _noise(35, 0.2)
+	for y in 64:
+		for x in 16:
+			var f := 0.9 + n.get_noise_2d(x * 2.0, y) * 0.1
+			var c := Color(0.8, 0.8, 0.78)
+			if y in [6, 7, 9, 54, 56, 57]:
+				c = Color(1.0, 0.86, 0.5)
+			elif y >= 20 and y <= 30 and x >= 4 and x <= 11 and (x + y) % 3 != 0:
+				c = Color(0.95, 0.84, 0.55)  # título
+			img.set_pixel(x, y, _shade(c, f))
+	return img
+
+
+## Veludo vinho, com pregas verticais.
+func _cortina() -> Image:
+	var img := _img()
+	var n := _noise(36, 0.05)
+	for y in 64:
+		for x in 64:
+			var prega := sin(x * TAU / 16.0 + n.get_noise_2d(x, y) * 1.5) * 0.18
+			img.set_pixel(x, y, _shade(Color(0.36, 0.11, 0.1), 0.86 + prega))
 	return img
 
 
@@ -312,40 +379,100 @@ func _vista(dia: bool) -> Image:
 	return _vista_cores(Color(0.03, 0.04, 0.08), Color(0.08, 0.09, 0.14), Color(0.02, 0.02, 0.035), Color(0.015, 0.02, 0.025), false, 0.004)
 
 
-## Telhados de Arkham com a paleta dada. `faces` = fachadas com luz e sombra;
-## `janelas` = chance de cada pixel de prédio ser uma janela acesa.
+const VW := 256
+const VH := 128
+## A torre da Miskatonic na vista: centro e largura do fuste, em pixels. A janela,
+## vista da cadeira, mostra mais ou menos as colunas 58..198 e as linhas 0..100.
+const TORRE_X := 152
+const TORRE_L := 14
+
+
+## Telhados de Arkham com a paleta dada, e a torre gótica da universidade.
+## `faces` = fachadas com luz e sombra; `janelas` = chance de cada pixel de
+## prédio ser uma janela acesa (e o mostrador da torre aceso).
 func _vista_cores(ceu_alto: Color, ceu_baixo: Color, predio: Color, arvore: Color, faces: bool, janelas: float) -> Image:
-	var img := _img(128, 64)
-	var n := _noise(27, 0.03)
+	var img := _img(VW, VH)
+	var n := _noise(27, 0.015)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 27
-	# Perfil de telhados em degraus, com empenas.
+	# Perfil de telhados: casas de duas águas e de mansarda, com chaminés.
 	var alturas := PackedInt32Array()
-	alturas.resize(128)
+	alturas.resize(VW)
 	var x := 0
-	while x < 128:
-		var w := rng.randi_range(10, 22)
-		var h := rng.randi_range(20, 38)
+	while x < VW:
+		var w := rng.randi_range(18, 40)
+		var h := rng.randi_range(36, 68)
+		var mansarda := rng.randf() < 0.35
+		var chamine := rng.randi_range(3, w - 6)
 		for i in w:
-			if x + i < 128:
-				var empena := mini(i, w - 1 - i) / 2
-				alturas[x + i] = h + empena
+			if x + i < VW:
+				var meio := mini(i, w - 1 - i)
+				var telhado := mini(meio, 6) * 2 if mansarda else meio * 2 / 3
+				alturas[x + i] = h + telhado
+				if i >= chamine and i < chamine + 3:
+					alturas[x + i] += 7
 		x += w
-	for yy in 64:
-		for xx in 128:
-			var t := yy / 63.0
-			var c := ceu_alto.lerp(ceu_baixo, t)
-			var copa := 14 + int(n.get_noise_1d(xx * 3.0) * 8.0)
-			if yy > 64 - copa:
+	for yy in VH:
+		for xx in VW:
+			var c := ceu_alto.lerp(ceu_baixo, yy / float(VH - 1))
+			var copa := 28 + int(n.get_noise_1d(xx * 3.0) * 16.0)
+			if yy > VH - copa:
 				c = _shade(arvore, 0.9 + n.get_noise_2d(xx * 4.0, yy * 4.0) * 0.2)
-			if yy > 64 - alturas[xx]:
+			if yy > VH - alturas[xx]:
 				c = predio
 				if faces:
-					c = _shade(predio, 1.1 if xx % 7 < 4 else 0.9)
+					c = _shade(predio, 1.1 if xx % 14 < 8 else 0.9)
 				if rng.randf() < janelas:
 					c = Color(0.55, 0.42, 0.18)  # janela acesa
 			img.set_pixel(xx, yy, c)
+	_torre(img, predio, faces, janelas > 0.0)
 	return img
+
+
+## A torre gótica da Miskatonic: fuste com contrafortes, campanário com mostrador
+## e janela ogival, pináculos nos cantos e a agulha.
+func _torre(img: Image, cor: Color, faces: bool, acesa: bool) -> void:
+	var meia := TORRE_L / 2
+	var topo_fuste := 44
+	var luz := func(px: int) -> Color:
+		if not faces:
+			return cor
+		return _shade(cor, 1.12 if px < TORRE_X else 0.86)
+	# Fuste, alargando para os contrafortes embaixo.
+	for yy in range(topo_fuste, VH):
+		var larg := meia + (2 if yy > 80 else 0)
+		for xx in range(TORRE_X - larg, TORRE_X + larg):
+			img.set_pixel(xx, yy, luz.call(xx))
+	# Cornija do campanário.
+	for xx in range(TORRE_X - meia - 1, TORRE_X + meia + 1):
+		img.set_pixel(xx, topo_fuste, _shade(cor, 0.7))
+	# Mostrador (aceso à noite) e janela ogival embaixo dele.
+	var centro := Vector2(TORRE_X - 0.5, 52.5)
+	for yy in range(48, 58):
+		for xx in range(TORRE_X - 5, TORRE_X + 5):
+			var d := Vector2(xx, yy).distance_to(centro)
+			if d < 4.2:
+				img.set_pixel(xx, yy, Color(0.85, 0.72, 0.4) if acesa else _shade(cor, 1.35 if faces else 1.2))
+			elif d < 5.0:
+				img.set_pixel(xx, yy, _shade(cor, 0.6))
+	for yy in range(62, 76):
+		var meia_janela := 2 if yy > 64 else (1 if yy > 62 else 0)
+		for xx in range(TORRE_X - meia_janela, TORRE_X + meia_janela):
+			img.set_pixel(xx, yy, Color(0.4, 0.3, 0.14) if acesa else _shade(cor, 0.55))
+	# Pináculos nos cantos.
+	for s in [-1, 1]:
+		var px: int = TORRE_X + s * meia - (1 if s > 0 else 0)
+		for yy in range(30, topo_fuste):
+			var w := 1 if yy < 36 else 2
+			for k in w:
+				img.set_pixel(px - s * k, yy, luz.call(px))
+	# Agulha, afinando até o remate.
+	for yy in range(8, topo_fuste):
+		var meia_agulha := int(round((yy - 8) / float(topo_fuste - 8) * (meia - 2)))
+		for xx in range(TORRE_X - meia_agulha - 1, TORRE_X + meia_agulha + 1):
+			img.set_pixel(xx, yy, luz.call(xx))
+	for yy in range(3, 8):
+		img.set_pixel(TORRE_X - 1, yy, cor)
 
 
 ## Fim de tarde (Dia 2): céu alaranjado, telhados em contraluz, janelas acendendo.
