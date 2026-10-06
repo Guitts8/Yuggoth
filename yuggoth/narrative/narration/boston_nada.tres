@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("1_line")
-id = &"cartao_boston"
-text = "Naquela noite fui a Boston falar com o funcionário: um rapaz franco e simpático, que nada pôde acrescentar. Mal tinha certeza de que reconheceria o estranho de novo."
+id = &"boston_nada"
+text = "Era um rapaz franco e simpático, mas vi que não podia acrescentar nada ao que já contara. Percebendo que não tinha mais o que dizer, voltei a Arkham."

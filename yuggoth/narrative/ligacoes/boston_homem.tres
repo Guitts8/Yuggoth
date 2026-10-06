@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Ligacao" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/ligacao.gd" id="1_lig"]
+
+[resource]
+script = ExtResource("1_lig")
+id = &"boston_homem"
+prompt = "Perguntar pelo homem de Keene"
+falas = PackedStringArray("Wilmarth: O senhor se lembra do homem de Keene?", "Funcionário: Lembro, professor. Foi em Keene, com o trem parado, pouco depois da uma hora.", "Funcionário: Magro, ruivo, com jeito de roceiro. Muito agitado por causa de uma caixa pesada que dizia esperar.", "Funcionário: Mas a caixa não estava no trem, nem nos livros da companhia. Ele deu o nome de Stanley Adams.")

@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_3r0rq"]
+[ext_resource type="Texture2D" path="res://art/textures/la_escura.png" id="2_2fwk3"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_3r0rq")
+shader_parameter/albedo_tex = ExtResource("2_2fwk3")
+shader_parameter/albedo_color = Color(1.3, 1.25, 1.5, 1)
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = true
+shader_parameter/tiles_per_meter = 3.0
+shader_parameter/snap_scale = null
+shader_parameter/affine_near = null
+shader_parameter/affine_far = null
+shader_parameter/affine_max_error = null
+shader_parameter/alpha_cut = null
+shader_parameter/facetado = null

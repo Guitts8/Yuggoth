@@ -42,6 +42,8 @@ func _texturas() -> void:
 	_save(_vista(false), "vista_noite")
 	_save(_vista(true), "vista_dia")
 	_save(_vista_entardecer(), "vista_entardecer")
+	# Boston de noite, da janela da pensão: mais janelas acesas, sem a torre de Arkham.
+	_save(_vista_cores(Color(0.03, 0.04, 0.08), Color(0.1, 0.09, 0.12), Color(0.02, 0.02, 0.035), Color(0.015, 0.02, 0.025), false, 0.012, false, 41), "vista_boston")
 	_save(_lambri(), "lambri")
 	_save(_aco(), "aco")
 	_save(_gaveta_arquivo(), "gaveta_arquivo")
@@ -410,11 +412,11 @@ const TORRE_L := 14
 ## Telhados de Arkham com a paleta dada, e a torre gótica da universidade.
 ## `faces` = fachadas com luz e sombra; `janelas` = chance de cada pixel de
 ## prédio ser uma janela acesa (e o mostrador da torre aceso).
-func _vista_cores(ceu_alto: Color, ceu_baixo: Color, predio: Color, arvore: Color, faces: bool, janelas: float) -> Image:
+func _vista_cores(ceu_alto: Color, ceu_baixo: Color, predio: Color, arvore: Color, faces: bool, janelas: float, torre := true, semente := 27) -> Image:
 	var img := _img(VW, VH)
-	var n := _noise(27, 0.015)
+	var n := _noise(semente, 0.015)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 27
+	rng.seed = semente
 	# Perfil de telhados: casas de duas águas e de mansarda, com chaminés.
 	var alturas := PackedInt32Array()
 	alturas.resize(VW)
@@ -445,7 +447,8 @@ func _vista_cores(ceu_alto: Color, ceu_baixo: Color, predio: Color, arvore: Colo
 				if rng.randf() < janelas:
 					c = Color(0.55, 0.42, 0.18)  # janela acesa
 			img.set_pixel(xx, yy, c)
-	_torre(img, predio, faces, janelas > 0.0)
+	if torre:
+		_torre(img, predio, faces, janelas > 0.0)
 	return img
 
 
@@ -925,6 +928,8 @@ func _sons() -> void:
 	_wav(_manivela(), "telefone_manivela", false)
 	_wav(_linha_telefone(), "telefone_linha", true)
 	_wav(_voz_telefone(), "telefone_voz", true)
+	# A mesma voz sem palavras, em pessoa (sem a banda do telefone).
+	_wav(_voz_telefone(false), "voz_sala", true)
 	# A lareira (noites dos Dias 5 e 6).
 	_wav(_fosforo(), "fosforo", false)
 	_wav(_lareira(), "lareira", true)
@@ -1339,7 +1344,7 @@ func _linha_telefone() -> PackedFloat32Array:
 
 ## Uma voz ao longe, na banda do telefone: sílabas de vogais sintéticas, sem
 ## palavra nenhuma (a legenda diz o que é dito). Toca com pitch por interlocutor.
-func _voz_telefone() -> PackedFloat32Array:
+func _voz_telefone(na_linha := true) -> PackedFloat32Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 54
 	var b := _buf(6.0)
@@ -1365,8 +1370,8 @@ func _voz_telefone() -> PackedFloat32Array:
 		# Às vezes uma pausa entre palavras.
 		if rng.randf() < 0.25:
 			i += int(rng.randf_range(0.08, 0.3) * RATE)
-	_highpass(b, 300.0)
-	_lowpass(b, 2800.0)
+	_highpass(b, 300.0 if na_linha else 90.0)
+	_lowpass(b, 2800.0 if na_linha else 4500.0)
 	var pico := 0.0
 	for s in b:
 		pico = maxf(pico, absf(s))

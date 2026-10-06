@@ -113,7 +113,10 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    a folhinha fica no peitoril, as datas em `datas_dia`/`datas_cartao` (1928).
 6. **Vinheta jogável de Boston** (Dia 4, livro cap. III): uma cena curta e fechada
    fora do escritório — a conversa em pessoa com o funcionário do expresso — e de
-   volta à sala. Serve de molde para outras saídas do livro.
+   volta à sala. Serve de molde para outras saídas do livro. ✅ `levels/boston/`
+   (gerar_boston): o quarto de pensão, o rapaz (Interlocutor, 3 perguntas; a da voz
+   amolece a sala), a volta ao escritório já de noite. Os geradores dividem
+   `tools/gerador_base.gd`.
 7. **Sonho ou aparição em todos os dias** (2 a 6), para nenhum dia ficar morno;
    sem susto (o limite de 2 jumpscares continua). Já certo: o **Mi-Go cruzando o
    painel da cidade** à noite (silhueta 2D, uma vez, sem som). Os sonhos usam a

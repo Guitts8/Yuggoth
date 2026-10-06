@@ -40,7 +40,7 @@ Legenda: ✅ jogável · 📄 no GDD, ainda não construído · ➕ falta, entra
 | Negociação para mandar a pedra; homem suspeito na agência de expresso de Brattleboro; cartas de Wilmarth extraviadas; correio passa a ser posta-restante em Brattleboro; foto do "exército" de pegadas diante das pegadas dos cães | ✅ Dia 4: carta de julho + a foto (fica nos dias seguintes) |
 | **18 de julho: telegrama** — a pedra vai no trem 5508. Wilmarth **espera a manhã inteira**; **telefona** à agência de expresso; **interurbano** para a North Station, em Boston; manda telegrama noturno a Akeley | ✅ Dia 4: telegrama; telefone de parede — agência, interurbano, telegrama noturno |
 | O relato de Boston: o funcionário de Keene, o homem magro e ruivo "**Stanley Adams**", de voz grossa e zumbida que dava tontura e sono | ✅ Dia 4: o telefone toca na sexta-feira |
-| Wilmarth vai a Boston interrogar o funcionário; passa a noite escrevendo cartas (Akeley, expresso, polícia de Keene); nada se descobre | ✅ Dia 4: cartão + as cartas da noite em claro (resposta) + "minhas investigações não deram em nada" |
+| Wilmarth vai a Boston interrogar o funcionário; passa a noite escrevendo cartas (Akeley, expresso, polícia de Keene); nada se descobre | ✅ Dia 4: vinheta jogável no quarto do funcionário (💭 o lugar e as perguntas; o que ele diz é do livro) + a volta ao escritório de noite, as cartas da noite em claro (resposta) + "minhas investigações não deram em nada" |
 
 ## Cap. IV — O cerco (em cartas)
 | Situação no livro | No jogo |

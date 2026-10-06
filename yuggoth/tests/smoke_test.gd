@@ -482,9 +482,51 @@ func _ready() -> void:
 	_check(GameState.has_flag(&"ligou_telegrama_noturno") and not SceneDirector.hold_black, "agência, Boston e o telegrama noturno; salto para sexta")
 	_check(tel.atual() != null and tel.atual().recebida and tel.prompt == "Atender o telefone", "sexta-feira: o telefone toca")
 	tel.interact(player)
-	await _until(func() -> bool: return GameState.has_flag(&"ligou_relato_keene") and not tel.em_ligacao(), 60.0)
+	await _until(func() -> bool: return GameState.has_flag(&"ligou_relato_keene"), 60.0)
 	Events.subtitle_requested.disconnect(ouvir_tel)
 	_check(falas_tel.any(func(f: String) -> bool: return f.contains("Stanley Adams")), "o relato de Keene: Stanley Adams")
+
+	# --- Boston: a vinheta (livro cap. III) ---
+	const BOSTON := "res://levels/boston/boston.tscn"
+	await _until(func() -> bool: return SceneDirector.current_level == BOSTON and not SceneDirector.is_busy, 30.0)
+	var boston: Boston = root.find_child("Boston", true, false)
+	_check(boston != null, "naquela noite, a Boston: o quarto do funcionário")
+	player = boston.player
+	var rapaz: Interlocutor = boston.get_node("%Conversa")
+	var saida: Interactable = boston.get_node("%Saida")
+	_check(rapaz.can_interact(player) and rapaz.prompt == "Perguntar pelo homem de Keene" and not saida.can_interact(player),
+		"o rapaz espera as perguntas; ainda não se volta")
+	await _check_alcance(boston, "Boston", Vector2(1.8, 2.1))
+	var sonho_max := 0.0
+	var falas_boston: Array[String] = []
+	var ouvir_boston := func(texto: String, _s: float) -> void: falas_boston.append(texto)
+	Events.subtitle_requested.connect(ouvir_boston)
+	for i in 3:
+		rapaz.interact(player)
+		await _frames(1)
+		while rapaz.em_conversa():
+			sonho_max = maxf(sonho_max, GameState.get_number(&"sonho"))
+			await get_tree().process_frame
+	Events.subtitle_requested.disconnect(ouvir_boston)
+	_check(falas_boston.any(func(f: String) -> bool: return f.contains("não tenho certeza nem disso")), "nem tem certeza de que o reconheceria")
+	_check(sonho_max > 0.3, "falando da voz de Keene, a sala amolece")
+	await _until(func() -> bool: return is_zero_approx(GameState.get_number(&"sonho")), 10.0)
+	_check(is_zero_approx(GameState.get_number(&"sonho")) and saida.can_interact(player), "nada de novo: a porta leva de volta a Arkham")
+	var ditas: Array[String] = []
+	var ouvir_narrador := func(texto: String, _estilo: Narrator.Style) -> void: ditas.append(texto)
+	Narrator.line_started.connect(ouvir_narrador)
+	saida.interact(player)
+	await _until(func() -> bool: return SceneDirector.current_level == "res://levels/escritorio/escritorio.tscn" and not SceneDirector.is_busy, 30.0)
+	esc = root.find_child("Escritorio", true, false)
+	player = esc.player
+	dia4 = esc.find_child("Dia4", true, false)
+	tel = esc.find_child("Telefone", true, false)
+	_check(esc.world_env.environment == esc.env_noite and dia4.get_node("Noite").visible and not dia4.get_node("Tarde").visible,
+		"de volta a Arkham, já de noite")
+	await _until(func() -> bool: return GameState.has_flag(&"narrou_depois_relato"), 30.0)
+	Narrator.line_started.disconnect(ouvir_narrador)
+	_check(GameState.has_flag(&"narrou_depois_relato") and not ditas.any(func(d: String) -> bool: return d.contains("Na manhã de quarta-feira")),
+		"a noite em claro escrevendo cartas (sem repetir o correio da manhã)")
 	var escrever4: WriteReply = dia4.get_node("Escrever")
 	_check(escrever4.can_interact(player), "depois do relato, as cartas da noite")
 	escrever4.interact(player)
@@ -706,7 +748,7 @@ func _ready() -> void:
 ## Interações visíveis que a mira do jogador (raio de 2 m, camadas mundo e
 ## interação) não alcança de nenhum ponto da sala, em pé ou sentado — ex.: uma
 ## colisão tampando as peças dentro do caixote do Dia 3.
-func _inalcancaveis(esc: Escritorio) -> PackedStringArray:
+func _inalcancaveis(esc: Node3D, limites := Vector2(2.3, 2.8)) -> PackedStringArray:
 	var space := esc.get_world_3d().direct_space_state
 	var fora := PackedStringArray()
 	for alvo: Interactable in esc.find_children("*", "Interactable", true, false):
@@ -719,9 +761,9 @@ func _inalcancaveis(esc: Escritorio) -> PackedStringArray:
 				for i in 16:
 					var a := TAU * i / 16.0
 					var origem := Vector3(centro.x + cos(a) * r, h, centro.z + sin(a) * r)
-					if absf(origem.x) > 2.3 or absf(origem.z) > 2.8 or origem.distance_to(centro) > 1.9:
+					if absf(origem.x) > limites.x or absf(origem.z) > limites.y or origem.distance_to(centro) > 1.9:
 						continue
-					var q := PhysicsRayQueryParameters3D.create(origem, centro, 3, [esc.player.get_rid()])
+					var q := PhysicsRayQueryParameters3D.create(origem, centro, 3, [(esc.get_node(^"Player") as Player).get_rid()])
 					q.collide_with_areas = true
 					if space.intersect_ray(q).get("collider") == alvo:
 						achou = true
@@ -763,9 +805,9 @@ func _check_dia(esc: Escritorio, n: int) -> void:
 	_check(passaros == (n == 1) and amb != null, "Dia %d: %s" % [n, "pássaros na tarde" if n == 1 else "sem pássaros"])
 
 
-func _check_alcance(esc: Escritorio, quando: String) -> void:
+func _check_alcance(esc: Node3D, quando: String, limites := Vector2(2.3, 2.8)) -> void:
 	await _frames(2)
-	var fora := _inalcancaveis(esc)
+	var fora := _inalcancaveis(esc, limites)
 	_check(fora.is_empty(), "%s: toda interação visível ao alcance da mira %s" % [quando, fora if fora else ""])
 
 

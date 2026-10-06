@@ -27,6 +27,12 @@ const SONHO_DESCIDA := 4.0
 @export var som_padrao: AudioStream
 ## Ambiente sonoro de cada dia (índice = dia); faltando, vale `som_padrao`.
 @export var sons_dia: Array[AudioStream] = []
+## Quando o dia vira noite sem acabar (`anoiteceu_dia_<N>`: a volta de Boston).
+@export var env_noite: Environment
+@export var som_noite: AudioStream
+## Ditas uma vez ao entrar no escritório com a flag marcada (voltando de outra
+## fase): flag → linha. Ex.: `voltou_de_boston` → a noite em claro escrevendo cartas.
+@export var linhas_volta: Dictionary[StringName, NarrationLine] = {}
 @export var som_pena: AudioStream
 ## A carta saindo pela porta, para o correio.
 @export var som_postar: AudioStream
@@ -210,10 +216,18 @@ func _cartao(n: int) -> NarrationLine:
 	return cartoes_dia[n] if n < cartoes_dia.size() else null
 
 
+## Uma vez por dia (voltar de outra fase no mesmo dia não repete o correio).
 func _inicio_do_dia() -> void:
 	var n := dia()
-	if n < linhas_correio.size() and not _respondeu(n):
-		Narrator.say(linhas_correio[n])
+	var comecou := StringName("comecou_dia_%d" % n)
+	if not GameState.has_flag(comecou):
+		GameState.set_flag(comecou)
+		if n < linhas_correio.size() and not _respondeu(n):
+			Narrator.say(linhas_correio[n])
+	for flag in linhas_volta:
+		var linha := linhas_volta[flag]
+		if GameState.has_flag(flag) and not GameState.has_flag(linha.get_said_flag()):
+			Narrator.say(linha)
 
 
 func _respondeu(n: int) -> bool:
@@ -307,6 +321,11 @@ func _fim_do_dia() -> void:
 	_inicio_do_dia()
 
 
+## O dia virou noite sem acabar (Dia 4: a volta de Boston): noiteceu_dia_<N>.
+func _anoiteceu() -> bool:
+	return GameState.has_flag(StringName("anoiteceu_dia_%d" % dia()))
+
+
 ## Data de hoje na folhinha (dia do ano de 1928).
 func _data() -> int:
 	return int(GameState.get_value(&"data", _data_inicio()))
@@ -348,6 +367,8 @@ func passar_tempo(cartao: NarrationLine) -> void:
 
 func _ambiente_do_dia() -> Environment:
 	var n := dia()
+	if _anoiteceu() and env_noite:
+		return env_noite
 	if n < ambientes_dia.size() and ambientes_dia[n]:
 		return ambientes_dia[n]
 	return env_dia
@@ -355,6 +376,8 @@ func _ambiente_do_dia() -> Environment:
 
 func _som_do_dia() -> AudioStream:
 	var n := dia()
+	if _anoiteceu() and som_noite:
+		return som_noite
 	if n < sons_dia.size() and sons_dia[n]:
 		return sons_dia[n]
 	return som_padrao

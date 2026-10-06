@@ -1,4 +1,4 @@
-extends Node
+extends "res://tools/gerador_base.gd"
 ## Monta levels/escritorio/escritorio.tscn (planta aprovada em 2026-10-02) e os
 ## materiais em art/materials/. Rodar da pasta yuggoth/, depois de gerar_assets:
 ##   godot --headless --import
@@ -12,9 +12,6 @@ extends Node
 ## piso em y 0, teto em y 3. Norte = -Z, para onde o jogador olha sentado.
 
 const OUT := "res://levels/escritorio/escritorio.tscn"
-const MAT_DIR := "res://art/materials/"
-const TEX_DIR := "res://art/textures/"
-const SFX_DIR := "res://audio/placeholder/"
 
 const W := 2.5  # meia largura
 const D := 3.0  # meia profundidade
@@ -24,9 +21,6 @@ const JANELA_X := 0.8
 const JANELA_Y := Vector2(0.9, 2.4)
 ## Altura do lambri (até o peitoril da janela).
 const LAMBRI := 0.9
-
-var cena: Node3D
-var m: Dictionary[String, Material] = {}
 
 
 func _ready() -> void:
@@ -47,6 +41,11 @@ func _ready() -> void:
 	var sons: Array[AudioStream] = [null, load(SFX_DIR + "tarde.wav"), null,
 		load(SFX_DIR + "noite.wav"), null, load(SFX_DIR + "chuva.wav"), load(SFX_DIR + "noite.wav")]
 	cena.set("sons_dia", sons)
+	# O Dia 4 vira noite sem acabar: a volta de Boston, para as cartas da madrugada.
+	cena.set("env_noite", _env_noite())
+	cena.set("som_noite", load(SFX_DIR + "noite.wav"))
+	var volta: Dictionary[StringName, NarrationLine] = {&"voltou_de_boston": load("res://narrative/narration/depois_relato.tres")}
+	cena.set("linhas_volta", volta)
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
 	cena.set("som_postar", load(SFX_DIR + "papel_pegar.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))
@@ -88,13 +87,7 @@ func _ready() -> void:
 	_spawn("Cadeira", Vector3(0, 0, -1.3))
 	_spawn("Porta", Vector3(-1.0, 0, 2.3))
 
-	var packed := PackedScene.new()
-	var err := packed.pack(cena)
-	if err == OK:
-		err = ResourceSaver.save(packed, OUT)
-	print("gerar_escritorio: ", error_string(err))
-	cena.free()
-	get_tree().quit(0 if err == OK else 1)
+	_salvar(OUT)
 
 
 # --- Materiais -----------------------------------------------------------------
@@ -141,35 +134,6 @@ func _materiais() -> void:
 	_mat("sombra", "sombra", {})
 	# A criatura cruzando o céu da cidade (Dias 3 e 6): silhueta sem luz.
 	_mat("migo", "migo", {unlit = true})
-
-
-func _mat(name: String, tex: String, o: Dictionary) -> void:
-	var mat := ShaderMaterial.new()
-	mat.shader = load("res://shaders/psx_unlit.gdshader" if o.get("unlit", false) else "res://shaders/psx_lit.gdshader")
-	mat.set_shader_parameter(&"albedo_tex", load(TEX_DIR + tex + ".png"))
-	if o.has("world"):
-		mat.set_shader_parameter(&"world_uv", true)
-		mat.set_shader_parameter(&"tiles_per_meter", o.world)
-	if o.has("scale"):
-		mat.set_shader_parameter(&"uv_scale", o.scale)
-	if o.has("cor"):
-		mat.set_shader_parameter(&"albedo_color", o.cor)
-	var path := MAT_DIR + name + ".tres"
-	ResourceSaver.save(mat, path, ResourceSaver.FLAG_CHANGE_PATH)
-	m[name] = load(path)
-
-
-## Comum a todos: tonemap fílmico, oclusão de ambiente e um brilho leve nas luzes.
-func _pos(e: Environment) -> Environment:
-	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	e.tonemap_exposure = 1.15
-	e.ssao_enabled = true
-	e.ssao_radius = 0.6
-	e.ssao_intensity = 1.6
-	e.glow_enabled = true
-	e.glow_intensity = 0.5
-	e.glow_hdr_threshold = 0.9
-	return e
 
 
 func _env_1930() -> Environment:
@@ -225,119 +189,6 @@ func _env_dia() -> Environment:
 	return e
 
 
-# --- Ajudantes -----------------------------------------------------------------
-
-func _add(parent: Node, node: Node) -> Node:
-	parent.add_child(node)
-	node.owner = cena
-	return node
-
-
-func _group(parent: Node, name: String, pos := Vector3.ZERO, rot_y := 0.0) -> Node3D:
-	var g := Node3D.new()
-	g.name = name
-	g.position = pos
-	g.rotation_degrees.y = rot_y
-	_add(parent, g)
-	return g
-
-
-## Caixa subdividida a cada ~0,5 m (afim e luz por vértice dependem disso).
-func _box(parent: Node, name: String, size: Vector3, pos: Vector3, mat: String) -> MeshInstance3D:
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	mesh.subdivide_width = int(size.x / 0.5)
-	mesh.subdivide_height = int(size.y / 0.5)
-	mesh.subdivide_depth = int(size.z / 0.5)
-	var mi := MeshInstance3D.new()
-	mi.name = name
-	mi.mesh = mesh
-	mi.material_override = m[mat]
-	mi.position = pos
-	_add(parent, mi)
-	return mi
-
-
-## Quad virado para +Z antes de `rot` (graus).
-func _quad(parent: Node, name: String, size: Vector2, pos: Vector3, rot: Vector3, mat: String) -> MeshInstance3D:
-	var mesh := QuadMesh.new()
-	mesh.size = size
-	mesh.subdivide_width = int(size.x / 0.5)
-	mesh.subdivide_depth = int(size.y / 0.5)
-	var mi := MeshInstance3D.new()
-	mi.name = name
-	mi.mesh = mesh
-	mi.material_override = m[mat]
-	mi.position = pos
-	mi.rotation_degrees = rot
-	_add(parent, mi)
-	return mi
-
-
-func _cyl(parent: Node, name: String, top: float, bottom: float, height: float, pos: Vector3, mat: String, sides := 8) -> MeshInstance3D:
-	var mesh := CylinderMesh.new()
-	mesh.top_radius = top
-	mesh.bottom_radius = bottom
-	mesh.height = height
-	mesh.radial_segments = sides
-	mesh.rings = 1
-	var mi := MeshInstance3D.new()
-	mi.name = name
-	mi.mesh = mesh
-	mi.material_override = m[mat]
-	mi.position = pos
-	_add(parent, mi)
-	return mi
-
-
-## Várias caixas numa malha só, cada uma com a sua cor de vértice (o psx_lit
-## multiplica a textura por ela) e UV 0..1 por face, "para baixo" = -Y (nas
-## faces de cima/baixo, +Z). Peça: [tamanho, posição, rotação em graus, cor].
-func _lote(parent: Node, name: String, pecas: Array, mat: String) -> MeshInstance3D:
-	# [normal, eixo u, eixo v]; u × v = -normal, para a ordem dos vértices sair
-	# horária vista de fora (a frente, no Godot).
-	const FACES := [
-		[Vector3.RIGHT, Vector3.FORWARD, Vector3.DOWN], [Vector3.LEFT, Vector3.BACK, Vector3.DOWN],
-		[Vector3.BACK, Vector3.RIGHT, Vector3.DOWN], [Vector3.FORWARD, Vector3.LEFT, Vector3.DOWN],
-		[Vector3.UP, Vector3.RIGHT, Vector3.BACK], [Vector3.DOWN, Vector3.RIGHT, Vector3.FORWARD],
-	]
-	var verts := PackedVector3Array()
-	var normais := PackedVector3Array()
-	var uvs := PackedVector2Array()
-	var cores := PackedColorArray()
-	var indices := PackedInt32Array()
-	for p: Array in pecas:
-		var meio: Vector3 = p[0] * 0.5
-		var base := Basis.from_euler((p[2] as Vector3) * PI / 180.0)
-		for f: Array in FACES:
-			var n: Vector3 = f[0]
-			var u: Vector3 = f[1]
-			var v: Vector3 = f[2]
-			var i0 := verts.size()
-			for c: Vector2 in [Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1)]:
-				var local := n * meio + u * (c.x * 2.0 - 1.0) * meio + v * (c.y * 2.0 - 1.0) * meio
-				verts.append(base * local + p[1])
-				normais.append(base * n)
-				uvs.append(c)
-				cores.append(p[3])
-			indices.append_array([i0, i0 + 1, i0 + 2, i0, i0 + 2, i0 + 3])
-	var arrays := []
-	arrays.resize(Mesh.ARRAY_MAX)
-	arrays[Mesh.ARRAY_VERTEX] = verts
-	arrays[Mesh.ARRAY_NORMAL] = normais
-	arrays[Mesh.ARRAY_TEX_UV] = uvs
-	arrays[Mesh.ARRAY_COLOR] = cores
-	arrays[Mesh.ARRAY_INDEX] = indices
-	var mesh := ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	var mi := MeshInstance3D.new()
-	mi.name = name
-	mi.mesh = mesh
-	mi.material_override = m[mat]
-	_add(parent, mi)
-	return mi
-
-
 ## Barbante em cruz em volta de uma caixa de tamanho `tam` (base em y 0, centrada
 ## em x/z), com o nó e um laço em cima. Devolve o grupo (para sumir ao desamarrar).
 func _barbante(parent: Node, tam: Vector3, rot_laco := 0.0) -> Node3D:
@@ -370,55 +221,6 @@ func _maco(parent: Node, nome: String, n: int, seed: int) -> Node3D:
 	_lote(g, "Envelopes", pecas, "envelope")
 	_barbante(g, Vector3(Envelope.LARGURA, esp * n, Envelope.ALTURA), 15)
 	return g
-
-
-## Corpo estático com uma caixa de colisão por item: [tamanho, posição].
-func _colisao(parent: Node, name: String, boxes: Array) -> StaticBody3D:
-	var body := StaticBody3D.new()
-	body.name = name
-	_add(parent, body)
-	for i in boxes.size():
-		var shape := CollisionShape3D.new()
-		shape.name = "Forma%d" % i
-		var box := BoxShape3D.new()
-		box.size = boxes[i][0]
-		shape.shape = box
-		shape.position = boxes[i][1]
-		_add(body, shape)
-	return body
-
-
-## Área de interação com forma de caixa.
-func _area(parent: Node, area: Area3D, name: String, size: Vector3, pos := Vector3.ZERO) -> Area3D:
-	area.name = name
-	area.position = pos
-	_add(parent, area)
-	var shape := CollisionShape3D.new()
-	shape.name = "CollisionShape3D"
-	var box := BoxShape3D.new()
-	box.size = size
-	shape.shape = box
-	_add(area, shape)
-	return area
-
-
-func _spawn(name: String, pos: Vector3) -> void:
-	var marker := Marker3D.new()
-	marker.name = name
-	marker.position = pos
-	_add(cena, marker)
-	marker.add_to_group(&"spawn", true)
-
-
-func _omni(parent: Node, name: String, pos: Vector3, cor: Color, energy: float, alcance: float) -> OmniLight3D:
-	var l := OmniLight3D.new()
-	l.name = name
-	l.position = pos
-	l.light_color = cor
-	l.light_energy = energy
-	l.omni_range = alcance
-	_add(parent, l)
-	return l
 
 
 # --- Estrutura (comum aos dois vestidos) ----------------------------------------
@@ -871,7 +673,7 @@ func _lapso(g: Node3D) -> void:
 	var datas: Array[int] = [0, Lapso.dia_do_ano(5, 8), Lapso.dia_do_ano(5, 24), Lapso.dia_do_ano(7, 2), Lapso.dia_do_ano(7, 18), Lapso.dia_do_ano(8, 15), Lapso.dia_do_ano(8, 31)]
 	cena.set("datas_dia", datas)
 	var depois: Dictionary[StringName, int] = {
-		&"cartao_sexta": Lapso.dia_do_ano(7, 20), &"cartao_boston": Lapso.dia_do_ano(7, 21),
+		&"cartao_sexta": Lapso.dia_do_ano(7, 20),
 		&"cartao_telegrama_akely": Lapso.dia_do_ano(8, 17), &"cartao_aprofundava": Lapso.dia_do_ano(8, 23),
 		&"cartao_28_agosto": Lapso.dia_do_ano(8, 28), &"cartao_5_setembro": Lapso.dia_do_ano(9, 5),
 		&"cartao_6_setembro": Lapso.dia_do_ano(9, 6), &"cartao_7_setembro": Lapso.dia_do_ano(9, 7),
@@ -935,25 +737,6 @@ func _cortinas(parent: Node) -> void:
 # --- Os dias --------------------------------------------------------------------
 
 const MESA := 0.78  # altura do tampo da escrivaninha
-
-
-func _cond_valor(chave: StringName, op: ValueCondition.Op, valor: float, negar := false) -> ValueCondition:
-	var c := ValueCondition.new()
-	c.key = chave
-	c.op = op
-	c.value = valor
-	c.negate = negar
-	return c
-
-
-## Grupo que só existe enquanto `cond` vale (ConditionalNode dentro).
-func _grupo_se(parent: Node, nome: String, cond: Condition) -> Node3D:
-	var g := _group(parent, nome)
-	var cn := ConditionalNode.new()
-	cn.name = "ConditionalNode"
-	cn.condition = cond
-	_add(g, cn)
-	return g
 
 
 ## Conteúdo que só existe num dia: um grupo com ConditionalNode (`dia == n`).
@@ -1105,13 +888,6 @@ func _dias(parent: Node) -> void:
 	_telefone(parent)
 	_dia_5(parent)
 	_dia_6(parent)
-
-
-func _composta(modo: CompositeCondition.Mode, conds: Array) -> CompositeCondition:
-	var c := CompositeCondition.new()
-	c.mode = modo
-	c.conditions.assign(conds)
-	return c
 
 
 ## Dia 6 (cap. IV): as três últimas cartas manuscritas. Abre com a resposta
@@ -1270,7 +1046,13 @@ func _dia_5(parent: Node) -> void:
 ## ansiosa de julho com a foto do "exército" de pegadas, e o telefone.
 func _dia_4(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 4)
-	_luz(g, "vista_dia", Color(1.0, 0.9, 0.7), 7.5, Vector3(-0.3, 0, 0.4), Vector3(0.6, 3.6, -D - 1.5), 1.1)
+	# A tarde de julho; de volta de Boston (`anoiteceu_dia_4`), a noite e o abajur.
+	var tarde := _grupo_se(g, "Tarde", _flag(&"anoiteceu_dia_4", true))
+	_luz(tarde, "vista_dia", Color(1.0, 0.9, 0.7), 7.5, Vector3(-0.3, 0, 0.4), Vector3(0.6, 3.6, -D - 1.5), 1.1)
+	var noite := _grupo_se(g, "Noite", _flag(&"anoiteceu_dia_4"))
+	_quad(noite, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_omni(noite, "Lua", Vector3(0, 2.2, -2.6), Color(0.5, 0.6, 0.9), 0.4, 5.0)
+	_abajur(noite)
 	var telegrama := _box(g, "Telegrama", Vector3(0.2, 0.003, 0.14), Vector3(0.02, MESA + 0.0015, -2.12), "envelope")
 	telegrama.rotation_degrees.y = -4
 	var ler := _area(telegrama, DocumentPickup.new(), "Ler", Vector3(0.24, 0.06, 0.18)) as DocumentPickup
@@ -1328,11 +1110,7 @@ func _telefone(parent: Node) -> void:
 	var ligs: Array[Ligacao] = []
 	for id in ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene", "resposta_telegrama"]:
 		ligs.append(load("res://narrative/ligacoes/%s.tres" % id))
-	tel.ligacoes = ligs
-
-
-func _flag(chave: StringName, negar := false) -> ValueCondition:
-	return _cond_valor(chave, ValueCondition.Op.MAIOR_OU_IGUAL, 1, negar)
+	tel.conversas = ligs
 
 
 ## Dia 3 (cap. III): o disco chega de Brattleboro. Noite; abajur na mesa.

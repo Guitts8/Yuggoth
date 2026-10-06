@@ -235,8 +235,14 @@ cilindro, nos dias seguintes.
    uma discussão em **Keene** com um homem magro, ruivo, de jeito de roceiro, que
    deu o nome de **Stanley Adams** e tinha uma voz tão grossa e zumbida que o
    deixava tonto e sonolento.
-6. Cartão: a ida a Boston para falar com o funcionário. Narrador: a noite em claro
-   escrevendo cartas.
+6. **Boston** (vinheta jogável): *"Naquela noite fui a Boston falar com o
+   funcionário, tendo obtido no escritório o nome e o endereço dele."* O quarto de
+   pensão do rapaz, à noite (o boné e o paletó do expresso no gancho). Três
+   perguntas — o homem de Keene, a voz (a sala amolece enquanto ele fala dela: *"Me
+   deixava tonto e com sono, só de ouvir"*), se o reconheceria (*"não tenho certeza
+   nem disso"*). *"Era um rapaz franco e simpático, mas vi que não podia acrescentar
+   nada..."* → **"Voltar a Arkham"**: o escritório já de noite, o abajur aceso, e o
+   narrador: a noite em claro escrevendo cartas.
 7. **As cartas da noite** (resposta, 21 de julho):
    | Tom | Abertura |
    |---|---|

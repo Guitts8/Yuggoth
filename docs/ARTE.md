@@ -61,6 +61,11 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 | **Fotografia** (`Fotografia`) | Cartão 13 × 10 cm com borda branca; imagem 11,6 × 8,7 cm | O cartão pode ganhar cantos arredondados e um leve empenamento. As **imagens** (9, descritas no cap. II) são texturas — trocar `art/textures/foto_*.png` por versões melhores (128×96 ou 256×192, sépia) mantém tudo funcionando. |
 | **Folha de carta** | 22 × 30 cm | Hoje é uma caixa com textura de papel pautado; a 2ª carta é um maço grosso. |
 
+### Personagens
+| Objeto | Notas |
+|---|---|
+| **O funcionário do expresso** (Boston, Dia 4) | Rapaz "franco e simpático", sentado à mesa do quarto de pensão, de camisa e colete, mangas arregaçadas, cabelo curto. Hoje é um boneco de caixas (`gerar_boston._funcionario`). Precisa de rosto legível de perto e de um rig simples (cabeça e mãos), sentado. |
+
 ### B — presença constante
 
 | Objeto | Notas |

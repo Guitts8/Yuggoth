@@ -1,5 +1,5 @@
 extends Node
-## Descartável: a criatura cruzando o céu da cidade (Dia 3, depois do disco), em
+## Descartável: a vinheta de Boston e a volta ao escritório de noite, em
 ## SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
@@ -14,21 +14,32 @@ func _ready() -> void:
 	await _s(0.5)
 	GameState.reset()
 	GameState.set_flag(&"prologo_concluido")
-	GameState.set_value(&"dia", 3)
-	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(1.0)
-	var esc: Escritorio = root.find_child("Escritorio", true, false)
-	Narrator.cancel()
-	esc.player.global_position = Vector3(0, 0, -1.4)
-	esc.player.rotation = Vector3.ZERO
-	esc.player.head.rotation.x = deg_to_rad(8)
-	await _s(0.5)
+	GameState.set_value(&"dia", 4)
 	GameState.set_flag(&"tocou_disco")
-	var t := 0.0
-	for marca in [0.9, 1.5, 2.1, 2.7]:
-		await _s(marca - t)
-		t = marca
-		_shot("%s_%.2f" % [tag, marca])
+	await SceneDirector.change_level("res://levels/boston/boston.tscn", &"Entrada")
+	await _s(2.5)
+	var boston: Boston = root.find_child("Boston", true, false)
+	_shot("%s_entrada" % tag)
+	var player := boston.player
+	player.global_position = Vector3(-0.2, 0, 0.2)
+	player.look_at(Vector3(1.05, 0, -1.15))
+	player.head.rotation.x = deg_to_rad(-12)
+	await _s(0.8)
+	_shot("%s_rapaz" % tag)
+	var rapaz: Interlocutor = boston.get_node("%Conversa")
+	rapaz.interact(player)
+	while rapaz.em_conversa():
+		await _s(0.2)
+	rapaz.interact(player)
+	await _s(5.5)
+	_shot("%s_voz" % tag)
+	while rapaz.em_conversa():
+		await _s(0.2)
+	GameState.set_flag(&"voltou_de_boston")
+	GameState.set_flag(&"anoiteceu_dia_4")
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta")
+	await _s(2.0)
+	_shot("%s_volta" % tag)
 	SaveSystem.delete_save()
 	get_tree().quit()
 
