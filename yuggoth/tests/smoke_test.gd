@@ -639,6 +639,16 @@ func _ready() -> void:
 	_check(not SceneDirector.hold_black, "depois da demo, a tela preta não fica presa")
 	Engine.time_scale = 1.0
 
+	# Paginar sem abrir (abrir marcaria `leu_<id>`); no fim, porque é um quadro longo.
+	var sozinhas := PackedStringArray()
+	for arquivo in DirAccess.get_files_at("res://narrative/documents"):
+		var doc := load("res://narrative/documents/" + arquivo.trim_suffix(".remap")) as DocumentData
+		DocumentData.apply_fonts(reader.body, doc.style)
+		for pagina in reader._paginate(doc.resolve_pages()).slice(1):
+			if reader._curto(pagina):
+				sozinhas.append(doc.id)
+	_check(sozinhas.is_empty(), "nenhuma folha só com a assinatura %s" % [sozinhas if sozinhas else ""])
+
 	var file := FileAccess.open(TEST_SAVE, FileAccess.WRITE)
 	file.store_string('{"type":"Dictionary","args":["s:version","i:0"]}')
 	file.close()

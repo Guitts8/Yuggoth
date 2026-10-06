@@ -57,24 +57,39 @@ func _repaginate(doc: DocumentData) -> void:
 
 ## Página que não cabe no papel é dividida por parágrafo (linha em branco) nas
 ## folhas seguintes: textos longos do livro entram sem quebra manual. Por isso
-## uma tag BBCode não pode atravessar parágrafos.
+## uma tag BBCode não pode atravessar parágrafos. Uma assinatura (último
+## parágrafo, curto) nunca fica sozinha numa folha: leva o parágrafo anterior junto.
 func _paginate(source: PackedStringArray) -> PackedStringArray:
 	var limit := body.size.y
 	if limit <= 0.0:
 		return source
 	var out := PackedStringArray()
 	for page in source:
-		var current := ""
-		for para in page.split("\n\n"):
-			var candidate := para if current.is_empty() else current + "\n\n" + para
-			body.text = candidate
-			if not current.is_empty() and body.get_content_height() > limit:
-				out.append(current)
-				current = para
-			else:
-				current = candidate
-		out.append(current)
+		var paras := page.split("\n\n")
+		var current := PackedStringArray()
+		for i in paras.size():
+			var para := paras[i]
+			body.text = "\n\n".join(current + PackedStringArray([para]))
+			if current.is_empty() or body.get_content_height() <= limit:
+				current.append(para)
+				continue
+			var carry := PackedStringArray()
+			if i == paras.size() - 1 and _curto(para) and current.size() > 1:
+				carry.append(current[current.size() - 1])
+				current.resize(current.size() - 1)
+			out.append("\n\n".join(current))
+			current = carry
+			current.append(para)
+		out.append("\n\n".join(current))
 	return out
+
+
+static var _tags := RegEx.create_from_string("\\[[^\\]]*\\]")
+
+
+## Assinatura, P.S. de uma linha: menos de 40 letras fora das tags.
+static func _curto(para: String) -> bool:
+	return _tags.sub(para, "", true).strip_edges().length() < 40
 
 
 func close() -> void:
