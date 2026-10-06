@@ -383,6 +383,18 @@ func _data_inicio() -> int:
 	return datas_dia[n] if n < datas_dia.size() else 1
 
 
+## Vira Wilmarth, devagar, para a janela, de onde o tempo se vê passar.
+func _olhar_a_janela() -> void:
+	var janela := Vector3(0.0, 1.55, -3.0)
+	var de := player.global_position
+	var yaw := atan2(-(janela.x - de.x), -(janela.z - de.z))
+	var olho := player.camera.global_position
+	var pitch := atan2(janela.y - olho.y, Vector2(janela.x - olho.x, janela.z - olho.z).length())
+	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(player, ^"rotation:y", player.rotation.y + angle_difference(player.rotation.y, yaw), 1.6)
+	t.tween_property(player.head, ^"rotation:x", pitch, 1.6)
+
+
 ## SceneDirector.time_skip, no escritório: o lapso na própria sala, sem tela
 ## preta. O jogador fica parado; o cartão aparece no primeiro escuro (é aí que
 ## o que chega aparece, pela flag `narrou_<cartão>`).
@@ -391,6 +403,7 @@ func passar_tempo(cartao: NarrationLine) -> void:
 	var ate: int = datas_cartao.get(cartao.id, de + 1)
 	em_lapso = true
 	player.input_enabled = false
+	_olhar_a_janela()
 	# A fala que veio antes (ex.: a de depois de selar) termina primeiro: o cartão
 	# precisa entrar no escuro do lapso, não depois dele.
 	while Narrator.is_speaking():

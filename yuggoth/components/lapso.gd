@@ -2,8 +2,8 @@ class_name Lapso
 extends Node3D
 ## O tempo passando na própria sala (docs/PLANO_ESCRITORIO.md, Fase 3b), no
 ## lugar do corte em tela preta: para cada dia que passa, a sala escurece (a
-## noite), uma folha da folhinha cai, e a luz fria da manhã entra pela janela e
-## vai embora. O cartão aparece sobre a cena, no primeiro escuro — é ali que o
+## noite), uma folha da folhinha cai, e o dia nasce, entardece e anoitece pela
+## janela. O cartão aparece sobre a cena, no primeiro escuro — é ali que o
 ## que chega (a carta nova, pela fresta) aparece. A fase o chama de
 ## SceneDirector.time_skip (ver Escritorio.passar_tempo).
 ##
@@ -17,11 +17,19 @@ const SEMANA := ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY
 ## 1928 é bissexto.
 const DIAS_NO_MES := [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
+const DURACAO_TOTAL := 15.0
+const CICLO_MIN := 3.5
+const COR_AURORA := Color(1.0, 0.62, 0.55)
+const COR_DIA := Color(0.95, 0.95, 1.0)
+const COR_TARDE := Color(1.0, 0.55, 0.25)
+
 ## O sol da manhã que entra pela janela durante o lapso (apagado no resto do tempo).
 @export var sol: Light3D
 @export var sol_energia := 6.0
-## A paisagem de dia, posta na frente da do dia corrente enquanto o sol está alto.
+## As paisagens postas na frente da do dia corrente: o dia claro, e a aurora e o
+## fim de tarde (o céu alaranjado).
 @export var vista_dia: Node3D
+@export var vista_tarde: Node3D
 @export var ambiente: WorldEnvironment
 ## As luzes que escurecem à noite: todas as Light3D visíveis sob este nó.
 @export var sala: Node3D
@@ -33,8 +41,9 @@ const DIAS_NO_MES := [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 @export var texto_semana: Label3D
 @export var som_folha: AudioStream
 @export_group("")
-## Segundos por dia que passa.
-@export var ciclo := 1.4
+## Segundos de um dia que passa sozinho; vários dias dividem DURACAO_TOTAL, sem
+## ficar mais curtos que CICLO_MIN cada.
+@export var ciclo := 7.0
 
 var passando := false
 var _ambiente_base := -1.0
@@ -67,6 +76,9 @@ func mostrar(data: int) -> void:
 
 
 ## Passa de `de` a `ate` (dias do ano). `no_escuro` é chamado no primeiro escuro.
+## Cada dia que passa: a noite (a sala apaga, cai uma folha), a aurora rosada, o
+## dia claro, a tarde alaranjada e o anoitecer — o sol entrando pela janela com
+## a cor da hora. Vários dias de uma vez passam mais depressa, cada um inteiro.
 func passar(de: int, ate: int, no_escuro: Callable) -> void:
 	passando = true
 	var luzes: Dictionary[Light3D, float] = {}
@@ -76,40 +88,50 @@ func passar(de: int, ate: int, no_escuro: Callable) -> void:
 	var env := ambiente.environment
 	var ambiente_base := env.ambient_light_energy
 	_ambiente_base = ambiente_base
-	for k in maxi(1, ate - de):
-		# A noite: a sala quase apaga.
-		var t := create_tween().set_parallel()
-		for l in luzes:
-			t.tween_property(l, ^"light_energy", luzes[l] * 0.08, ciclo * 0.3)
-		t.tween_property(env, ^"ambient_light_energy", ambiente_base * 0.3, ciclo * 0.3)
-		await t.finished
-		if not is_inside_tree():
-			return
-		if k == 0:
-			no_escuro.call()
-		_arrancar_folha(de + k + 1)
-		# A manhã: o sol frio entra pela janela e vai embora.
-		vista_dia.visible = true
-		t = create_tween().set_parallel()
-		t.tween_property(sol, ^"light_energy", sol_energia, ciclo * 0.35).set_trans(Tween.TRANS_SINE)
-		for l in luzes:
-			t.tween_property(l, ^"light_energy", luzes[l], ciclo * 0.35)
-		t.tween_property(env, ^"ambient_light_energy", ambiente_base * 1.5, ciclo * 0.35)
-		await t.finished
-		if not is_inside_tree():
-			return
-		t = create_tween().set_parallel()
-		t.tween_property(sol, ^"light_energy", 0.0, ciclo * 0.35).set_trans(Tween.TRANS_SINE)
-		t.tween_property(env, ^"ambient_light_energy", ambiente_base, ciclo * 0.35)
-		await t.finished
-		if not is_inside_tree():
-			return
-		vista_dia.visible = false
+	var dias := maxi(1, ate - de)
+	var dur := clampf(DURACAO_TOTAL / dias, CICLO_MIN, ciclo)
+	# [fração do dia, energia do sol, cor do sol, vista, luz da sala, ambiente]
+	var horas := [
+		[0.16, 0.0, COR_AURORA, null, 0.06, 0.25],
+		[0.2, sol_energia * 0.45, COR_AURORA, vista_tarde, 0.1, 0.8],
+		[0.24, sol_energia, COR_DIA, vista_dia, 0.08, 1.6],
+		[0.24, sol_energia * 0.6, COR_TARDE, vista_tarde, 0.1, 1.0],
+		[0.16, 0.0, COR_TARDE, null, 1.0, 1.0],
+	]
+	for k in dias:
+		for h in horas.size():
+			var hora: Array = horas[h]
+			var segundos: float = dur * hora[0]
+			if h == 1 or h == 3:
+				_vista(hora[3])
+			elif h == 2:
+				_vista(vista_dia)
+			var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
+			t.tween_property(sol, ^"light_energy", hora[1], segundos)
+			t.tween_property(sol, ^"light_color", hora[2], segundos)
+			for l in luzes:
+				t.tween_property(l, ^"light_energy", luzes[l] * hora[4], segundos)
+			t.tween_property(env, ^"ambient_light_energy", ambiente_base * hora[5], segundos)
+			await t.finished
+			if not is_inside_tree():
+				return
+			if h == 0:
+				if k == 0:
+					no_escuro.call()
+				_arrancar_folha(de + k + 1)
+			elif h == 4:
+				_vista(null)
 	for l in luzes:
 		l.light_energy = luzes[l]
 	env.ambient_light_energy = ambiente_base
 	passando = false
 
+
+## Uma das paisagens do lapso na frente da do dia corrente (null: nenhuma).
+func _vista(qual: Node3D) -> void:
+	vista_dia.visible = qual == vista_dia
+	if vista_tarde:
+		vista_tarde.visible = qual == vista_tarde
 
 ## A folha de cima se solta e cai para a frente; a de baixo já mostra `data`.
 func _arrancar_folha(data: int) -> void:

@@ -660,6 +660,9 @@ func _lapso(g: Node3D) -> void:
 	var vista := _quad(lapso, "VistaDia", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.18), Vector3.ZERO, "vista_dia")
 	vista.visible = false
 	lapso.vista_dia = vista
+	var tarde := _quad(lapso, "VistaTarde", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.17), Vector3.ZERO, "vista_entardecer")
+	tarde.visible = false
+	lapso.vista_tarde = tarde
 
 	# A folhinha: base de madeira, o bloco inclinado para trás, a folha do dia.
 	var f := _group(lapso, "Folhinha", Vector3(0.5, JANELA_Y.x + 0.03, -D + 0.1), -12)

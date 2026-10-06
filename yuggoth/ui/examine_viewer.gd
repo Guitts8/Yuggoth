@@ -180,10 +180,11 @@ func _frame_model() -> void:
 	var box := AABB()
 	var first := true
 	var to_pivot := pivot.global_transform.affine_inverse()
-	var visuals: Array[Node] = _model.find_children("*", "VisualInstance3D", true, false)
+	# Só geometria: uma luz junto do objeto (a da pedra do sonho) inflava o raio.
+	var visuals: Array[Node] = _model.find_children("*", "GeometryInstance3D", true, false)
 	visuals.append(_model)
 	for node in visuals:
-		var vi := node as VisualInstance3D
+		var vi := node as GeometryInstance3D
 		if vi == null:
 			continue
 		var b: AABB = (to_pivot * vi.global_transform) * vi.get_aabb()
@@ -195,9 +196,13 @@ func _frame_model() -> void:
 	camera.near = _base_distance * CLOSEST * 0.1
 
 
-## Tira da cópia tudo que não é visual: áreas de interação, corpos, scripts de lógica.
+## Tira da cópia tudo que não é visual: áreas de interação, corpos, luzes e sons
+## (o visualizador tem a sua luz; um som tocaria de novo).
 func _strip(root: Node) -> void:
-	for node in root.find_children("*", "CollisionObject3D", true, false):
+	var fora: Array[Node] = root.find_children("*", "CollisionObject3D", true, false)
+	fora.append_array(root.find_children("*", "Light3D", true, false))
+	fora.append_array(root.find_children("*", "AudioStreamPlayer3D", true, false))
+	for node in fora:
 		if is_instance_valid(node):
 			node.get_parent().remove_child(node)
 			node.free()

@@ -1,6 +1,6 @@
 extends Node
-## Descartável: cada resposta a Akeley no leitor (como no dossiê), página por
-## página, em SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável: o lapso (um dia), a pedra do sonho no exame e a criatura no céu,
+## em SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -12,25 +12,50 @@ func _ready() -> void:
 	root.boot_to_menu = false
 	add_child(root)
 	await _s(0.5)
+	# O lapso: de pé no meio da sala, olhando para a lareira; ele vira para a janela.
 	GameState.reset()
 	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 6)
+	GameState.set_flag(&"tocou_disco")
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
 	await _s(1.0)
+	var esc: Escritorio = root.find_child("Escritorio", true, false)
 	Narrator.cancel()
-	var reader = root.get_node("UI/DocumentReader")
-	for arquivo in DirAccess.get_files_at("res://narrative/documents"):
-		if not arquivo.begins_with("resposta_"):
-			continue
-		var doc := load("res://narrative/documents/" + arquivo.trim_suffix(".remap")) as DocumentData
-		reader.open(doc)
-		await _s(0.3)
-		for p in reader._pages.size():
-			reader._page = p
-			reader._show_page()
-			await _s(0.1)
-			_shot("%s_%s_p%d" % [tag, doc.id, p + 1])
-		reader.close()
-		await _s(0.1)
+	esc.player.global_position = Vector3(0.2, 0, -0.8)
+	esc.player.rotation.y = -PI / 2
+	esc.player.head.rotation.x = 0.0
+	await _s(0.5)
+	esc.passar_tempo(load("res://narrative/narration/cartao_6_setembro.tres"))
+	var t := 0.0
+	for marca in [1.8, 2.6, 3.6, 5.3, 6.5, 7.6]:
+		await _s(marca - t)
+		t = marca
+		_shot("%s_lapso_%.1f" % [tag, marca])
+	while esc.em_lapso:
+		await _s(0.2)
+	# A criatura (Dia 3, depois do disco).
+	GameState.set_value(&"dia", 3)
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+	await _s(1.0)
+	esc = root.find_child("Escritorio", true, false)
+	Narrator.cancel()
+	esc.player.global_position = Vector3(0, 0, -1.4)
+	esc.player.rotation = Vector3.ZERO
+	esc.player.head.rotation.x = deg_to_rad(8)
+	await _s(2.1)
+	_shot("%s_migo" % tag)
+	# A pedra do sonho, no exame.
+	GameState.set_value(&"dia", 4)
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+	await _s(0.5)
+	esc = root.find_child("Escritorio", true, false)
+	Narrator.cancel()
+	await SceneDirector.fade_out(0.1)
+	esc._sonhar(4)
+	await _s(3.0)
+	esc.find_child("Noite4", true, false).get_node("Pedra/Examinar").interact(esc.player)
+	await _s(1.0)
+	_shot("%s_pedra" % tag)
 	SaveSystem.delete_save()
 	get_tree().quit()
 

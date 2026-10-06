@@ -1349,43 +1349,50 @@ func _linha_telefone() -> PackedFloat32Array:
 	return _seamless(b, 0.3)
 
 
-## Uma voz ao longe, na banda do telefone: sílabas de vogais sintéticas, sem
-## palavra nenhuma (a legenda diz o que é dito). Toca com pitch por interlocutor.
+## Uma voz ao longe, sem palavra nenhuma (a legenda diz o que é dito), tocada com
+## o tom de quem fala. De propósito diferente das vozes do disco (que precisam
+## impactar): soprada e abafada — quase só ar nos formantes, um fio de tom acima
+## do da voz do disco, sílabas curtas e apressadas; na linha, o chiado e a
+## saturação do microfone de carvão.
 func _voz_telefone(na_linha := true) -> PackedFloat32Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 54
 	var b := _buf(6.0)
-	var pulso := PackedFloat32Array()
-	pulso.resize(b.size())
+	var excita := PackedFloat32Array()
+	excita.resize(b.size())
 	var fase := 0.0
+	var tom := 0.18 if na_linha else 0.3
 	for i in b.size():
 		var t := float(i) / RATE
-		var f0 := 125.0 + sin(t * 1.7) * 14.0 + sin(t * 5.3) * 5.0
+		var f0 := 165.0 + sin(t * 2.3) * 18.0
 		fase += f0 / RATE
-		pulso[i] = (fmod(fase, 1.0) * 2.0 - 1.0) + rng.randf_range(-0.1, 0.1)
-	const VOGAIS := [Vector2(730, 1090), Vector2(530, 1840), Vector2(390, 1990), Vector2(570, 840), Vector2(440, 1020), Vector2(300, 870)]
+		excita[i] = rng.randf_range(-1, 1) * (1.0 - tom) + sin(TAU * fase) * tom
+	const VOGAIS := [Vector2(800, 1250), Vector2(500, 1700), Vector2(380, 2100), Vector2(620, 1000)]
 	var i := 0
 	while i < b.size():
-		var dur := int(rng.randf_range(0.12, 0.26) * RATE)
+		var dur := int(rng.randf_range(0.07, 0.15) * RATE)
 		var fim := mini(i + dur, b.size())
 		var v: Vector2 = VOGAIS[rng.randi_range(0, VOGAIS.size() - 1)]
-		_ressoar(pulso, b, i, fim, v.x, 90.0, 1.0)
-		_ressoar(pulso, b, i, fim, v.y, 120.0, 0.6)
+		_ressoar(excita, b, i, fim, v.x, 260.0, 1.0)
+		_ressoar(excita, b, i, fim, v.y, 320.0, 0.8)
 		for j in range(i, fim):
-			b[j] *= sin(PI * float(j - i) / (fim - i))
+			b[j] *= pow(sin(PI * float(j - i) / (fim - i)), 0.6)
 		i = fim
-		# Às vezes uma pausa entre palavras.
-		if rng.randf() < 0.25:
-			i += int(rng.randf_range(0.08, 0.3) * RATE)
-	_highpass(b, 300.0 if na_linha else 90.0)
-	_lowpass(b, 2800.0 if na_linha else 4500.0)
+		# Pausas mais longas entre os grupos de sílabas.
+		if rng.randf() < 0.35:
+			i += int(rng.randf_range(0.12, 0.4) * RATE)
+	_highpass(b, 450.0 if na_linha else 140.0)
+	_lowpass(b, 2400.0 if na_linha else 3800.0)
 	var pico := 0.0
 	for s in b:
 		pico = maxf(pico, absf(s))
 	for k in b.size():
-		b[k] = clampf(b[k] / maxf(pico, 0.001) * 1.6, -1.0, 1.0) * 0.5
+		var s := b[k] / maxf(pico, 0.001)
+		if na_linha:
+			# Carvão: satura e chia.
+			s = tanh(s * 2.5) * 0.8 + rng.randf_range(-1, 1) * 0.05
+		b[k] = clampf(s, -1.0, 1.0) * 0.45
 	return _seamless(b, 0.2)
-
 
 ## O fósforo riscado e a lenha pegando: atrito curto, depois o sopro do fogo.
 func _fosforo() -> PackedFloat32Array:
@@ -1445,10 +1452,10 @@ func _lareira() -> PackedFloat32Array:
 
 ## Silhueta de longe de uma das criaturas voando (livro: corpo de crustáceo,
 ## asas membranosas, a cabeça um elipsoide de anéis em vez de rosto). Contra o
-## céu da janela, só a forma: um rosado apagado, que o azul da noite não engole.
+## céu da janela, só a forma: um cinza-violáceo escuro, um pouco acima do céu.
 func _migo() -> Image:
 	var img := _img(48, 32)
-	var cor := Color(0.26, 0.18, 0.2)
+	var cor := Color(0.14, 0.125, 0.15)
 	var pinta := func(x: float, y: float) -> void:
 		if x >= 0 and y >= 0 and x < 48 and y < 32:
 			img.set_pixel(int(x), int(y), cor)
