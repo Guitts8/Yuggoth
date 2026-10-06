@@ -28,6 +28,7 @@ document = ExtResource("5_credula")
 [resource]
 script = ExtResource("1_reply")
 id = &"resposta_dia_4"
+endereco = "Henry W. Akeley, Esq.\nGeneral Delivery\nBrattleboro, Vt."
 destinatario = "A Akeley — e à companhia, à polícia, a Keene"
 options = Array[ExtResource("2_option")]([SubResource("Resource_cetica"), SubResource("Resource_cautelosa"), SubResource("Resource_credula")])
 narracao_depois = ExtResource("6_nada")

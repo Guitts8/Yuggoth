@@ -15,6 +15,7 @@ document = ExtResource("3_doc")
 [resource]
 script = ExtResource("1_reply")
 id = &"oferta_dia_5"
+endereco = "Henry W. Akeley, Esq.\nGeneral Delivery\nBrattleboro, Vt."
 options = Array[ExtResource("2_option")]([SubResource("Resource_oferta")])
 narracao_depois = ExtResource("4_narr")
 cartao_depois = ExtResource("5_cartao")

@@ -5,9 +5,10 @@ extends Node3D
 ## estiver marcado, abre no Prólogo: cartão em tela preta, Wilmarth sentado à
 ## escrivaninha, e a caixa de cartas que leva de volta a maio.
 ##
-## Depois, o loop dos dias (GDD §5.1): o correio chega, o jogador lê e
-## investiga, responde a Akeley (ReplyData com id `resposta_dia_<N>`) e vai
-## para casa pela porta — que só abre depois da resposta. Conteúdo de cada dia
+## Depois, o loop dos dias (GDD §5.1): o correio chega pela fresta, o jogador lê
+## e investiga, responde a Akeley (ReplyData com id `resposta_dia_<N>`) e leva a
+## carta selada à porta, que é o correio: postar a resposta do dia o leva para
+## casa. Conteúdo de cada dia
 ## fica em nós com ConditionalNode (`dia == N`) dentro do vestido Miskatonic.
 ##
 ## Cena gerada por tools/gerar_escritorio.gd (ver o cabeçalho de lá).
@@ -27,6 +28,8 @@ const SONHO_DESCIDA := 4.0
 ## Ambiente sonoro de cada dia (índice = dia); faltando, vale `som_padrao`.
 @export var sons_dia: Array[AudioStream] = []
 @export var som_pena: AudioStream
+## A carta saindo pela porta, para o correio.
+@export var som_postar: AudioStream
 @export var linha_abertura: NarrationLine
 @export var linha_cartas: NarrationLine
 ## Cartão em tela preta ao começar cada dia; índice = dia. O do Dia 1 fecha o Prólogo.
@@ -205,20 +208,41 @@ func _entrar_pela_porta() -> void:
 		player.global_transform = marker.global_transform
 
 
+## Selada, a carta vai para a mão; quem a manda é a porta (_on_porta).
 func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
-	var fala := reply.narracao_depois if reply.narracao_depois else linha_resposta_selada
-	var interludio := reply.id == StringName("resposta_dia_%d" % dia_do_interludio)
-	if reply.cartao_depois == null and not interludio:
-		Narrator.say(fala)
+	Narrator.say(reply.narracao_depois if reply.narracao_depois else linha_resposta_selada)
+	CartaSaida.criar(miskatonic, reply)
+
+
+func _process(_delta: float) -> void:
+	porta.prompt = "Levar a carta ao correio" if CartaSaida.atual else "Ir para casa"
+
+
+## A porta é o correio: com a carta na mão, posta. A resposta do dia encerra o
+## dia (a do Dia 6, a demo); as outras (Dias 5 e 6) saltam no tempo até a volta
+## do correio. Sem carta, só sai depois de responder.
+func _on_porta(_by: Node) -> void:
+	if _saindo or _saltando:
 		return
-	await Narrator.say(fala)
-	if not is_inside_tree():
+	var carta := CartaSaida.atual
+	if carta == null:
+		if not _respondeu(dia()):
+			Events.notice_requested.emit("Ainda devo uma resposta ao Sr. Akeley.")
+			return
+		_fim_do_dia()
 		return
-	if interludio:
+	var reply := carta.reply
+	carta.postar()
+	AudioDirector.play_sfx(som_postar, -4.0)
+	if reply.id == StringName("resposta_dia_%d" % dia_do_interludio):
 		_para_o_interludio()
-	else:
-		# A carta vai e o tempo passa até a volta do correio (Dia 5).
+	elif reply.id == StringName("resposta_dia_%d" % dia()):
+		_fim_do_dia()
+	elif reply.cartao_depois:
+		# A carta vai e o tempo passa até a volta do correio.
+		_saltando = true
 		await SceneDirector.time_skip(reply.cartao_depois)
+		_saltando = false
 
 
 ## Fim do Dia 6 e da demo: a tinta da última carta, o cartão e o menu.
@@ -242,12 +266,7 @@ func _para_o_interludio() -> void:
 	Events.quit_to_menu_requested.emit()
 
 
-func _on_porta(_by: Node) -> void:
-	if not _respondeu(dia()):
-		Events.notice_requested.emit("Ainda devo uma resposta ao Sr. Akeley.")
-		return
-	if _saindo:
-		return
+func _fim_do_dia() -> void:
 	_saindo = true
 	await SceneDirector.fade_out(1.2)
 	if not is_inside_tree():

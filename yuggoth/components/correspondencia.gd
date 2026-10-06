@@ -12,7 +12,7 @@ extends Examinable
 ##                               por vez (`correio_<id>_tiradas`); depois, é um
 ##                               Examinable como os outros.
 ##
-## Uma coisa na mão por vez. Quando o nó começa a processar (o dia chega, ou a
+## Uma coisa na mão por vez (nem com a carta selada na mão, CartaSaida). Quando o nó começa a processar (o dia chega, ou a
 ## carta cruza o correio no escuro de um salto no tempo), toca `som_chegada` no
 ## lugar onde ele está: o envelope passando pela fresta, o pacote pousado no chão.
 
@@ -93,7 +93,7 @@ func tiradas() -> int:
 func can_interact(by: Node) -> bool:
 	match estado():
 		NO_CHAO:
-			return super(by) and na_mao == null
+			return super(by) and na_mao == null and CartaSaida.atual == null
 		NA_MAO:
 			return false
 	return super(by)

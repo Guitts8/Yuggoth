@@ -7,6 +7,11 @@ extends Resource
 
 @export var id: StringName
 @export var destinatario := "Ao Sr. Henry W. Akeley"
+## Escrito no envelope ao selar. A partir de julho, Akeley pede a Posta-Restante
+## de Brattleboro (livro cap. III).
+@export_multiline var endereco := "Henry W. Akeley, Esq.\nR.F.D. #2\nTownshend, Vt."
+## Carta registrada (a última, livro cap. IV): mais selos no envelope.
+@export var registrada := false
 @export var options: Array[ReplyOption] = []
 ## Dita depois de selar, no lugar da fala padrão do escritório.
 @export var narracao_depois: NarrationLine

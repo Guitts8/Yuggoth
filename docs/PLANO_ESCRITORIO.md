@@ -82,6 +82,37 @@ correio no chão era invisível. Fotos não tiradas no Dia 2 (ou 4) aparecem na 
 no dia seguinte. A mão não atravessa um load (volta ao chão); sair com algo na mão
 o deixa na mesa.
 
+## Fase 3b — Ajustes do playtest (2026-10-06)
+Depois de jogar a Fase 3. ✅ já feito: a assinatura ("H. W. A.") não fica mais
+sozinha numa folha. Decidido com o usuário, nesta ordem:
+
+1. **Correio de saída — a porta é o correio.** Selar tem animação (dobrar a folha,
+   envelopar, selo) e a carta vai **para a mão**. Na porta, "Pôr no correio": a
+   resposta do dia encerra o dia; as cartas intermediárias (oferta, renovação,
+   ânimo) disparam o salto no tempo; a carta registrada do Dia 6 leva à tinta.
+   Todo dia termina igual — saindo pela porta com a carta. (Resolve "uns dias
+   acabam sozinhos, outros pela porta".) ✅ `ReplyWriter` anima a selagem;
+   `CartaSaida` na mão; endereço por `ReplyData.endereco` (Brattleboro a partir de
+   julho), carta registrada com três selos.
+2. **Cartas do mesmo dia chegam amarradas** num maço com barbante (Dias 4 e 5);
+   desamarrado na mesa, os envelopes se separam. **Modelos refeitos:** a caixa de
+   cartas do Prólogo e o pacote do expresso (papel pardo, barbante de verdade).
+3. **Telefone com som:** chiado da linha, a telefonista, murmúrio de voz filtrada
+   sob cada legenda, o clique do gancho.
+4. **Lareira acesa pelo jogador** nas noites frias (Dias 5 e 6): "Acender a
+   lareira" — luz quente e trêmula, estalos. As noites deixam de ser difíceis de ver.
+5. **Lapso na própria sala** no lugar do corte seco dos saltos no tempo: sem tela
+   preta, a luz da janela passa de noite a manhã a noite, uma **folhinha** de
+   calendário na mesa perde as folhas (com som), e o texto do cartão aparece como
+   legenda sobre a cena.
+6. **Vinheta jogável de Boston** (Dia 4, livro cap. III): uma cena curta e fechada
+   fora do escritório — a conversa em pessoa com o funcionário do expresso — e de
+   volta à sala. Serve de molde para outras saídas do livro.
+7. **Sonho ou aparição em todos os dias** (2 a 6), para nenhum dia ficar morno;
+   sem susto (o limite de 2 jumpscares continua). Já certo: o **Mi-Go cruzando o
+   painel da cidade** à noite (silhueta 2D, uma vez, sem som). Os sonhos usam a
+   estética crua (`sonho`). Propostas a detalhar antes de fazer, uma por dia.
+
 ## Fase 4 — O mapa de Vermont
 Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da
 investigação**, como na referência). Textura gerada: contorno de Vermont, o

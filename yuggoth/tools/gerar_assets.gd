@@ -899,6 +899,7 @@ func _sons() -> void:
 	_wav(_pacote(), "pacote_chao", false)
 	_wav(_papel_mao(50), "papel_pegar", false)
 	_wav(_rasgo(), "papel_rasgando", false)
+	_wav(_selo_batido(), "selo_batido", false)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1226,6 +1227,19 @@ func _rasgo() -> PackedFloat32Array:
 		fibras.append(1.0 if rng.randf() > 0.6 else 0.35)
 	_atrito(b, int(0.05 * RATE), int(0.8 * RATE), func(t: float) -> float:
 		return 0.38 * minf(1.0, t * 12.0) * (1.0 - t * 0.5) * fibras[mini(int(t * 40.0), 39)], rng)
+	return b
+
+
+## O selo colado com a palma da mão sobre o envelope, na mesa: um tapa abafado.
+func _selo_batido() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 51
+	var b := _buf(0.45)
+	for i in b.size():
+		var env := exp(-i / 450.0)
+		b[i] = (rng.randf_range(-1, 1) * 0.8 + sin(TAU * 120.0 * i / RATE) * 0.5) * env * 0.8
+	_lowpass(b, 1400.0)
+	_atrito(b, int(0.02 * RATE), int(0.2 * RATE), func(t: float) -> float: return 0.05 * (1.0 - t), rng)
 	return b
 
 

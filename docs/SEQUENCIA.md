@@ -12,7 +12,11 @@ Legenda: ✅ jogável (arte e som provisórios) · ⏳ planejado
 
 **Escrever a Akeley**, em todos os dias: escolhe-se a abertura (o tom), a carta se
 escreve ao som da pena, e até selar dá para **amassar a folha (Esc) e escolher
-outra** quantas vezes quiser. Só selar decide.
+outra** quantas vezes quiser. Só selar decide. Selada, a folha se dobra em três,
+entra no envelope (endereçado a Townshend; a partir de julho, à Posta-Restante de
+Brattleboro), leva o selo — e a carta vai **para a mão**. **A porta é o correio:**
+"Levar a carta ao correio". A resposta do dia encerra o dia; as cartas no meio do
+dia (Dias 5 e 6) saltam no tempo até a volta do correio. Todo dia termina assim.
 
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
@@ -109,7 +113,7 @@ escolher como começar:
 A carta se escreve sozinha (som de pena) e vai para o dossiê. Narrador: *"Selei o
 envelope. Vai amanhã cedo, com o primeiro correio."*
 
-**Fim do dia:** a **porta** ("Ir para casa"). Antes da resposta: *"Ainda devo uma
+**Fim do dia:** levar a carta à **porta** ("Levar a carta ao correio"). Antes da resposta: *"Ainda devo uma
 resposta ao Sr. Akeley."* Depois: tela preta, cartão *"Fim de maio."*, **checkpoint**.
 
 ---
@@ -245,7 +249,7 @@ leitor, mais a cada carta).
 lamentavelmente trêmula. No dia 15 de agosto recebi uma carta frenética, que me
 perturbou muito."*
 
-As cartas cruzam o correio: cada carta selada **salta no tempo** (tela preta e
+As cartas cruzam o correio: cada carta posta na porta **salta no tempo** (tela preta e
 cartão); o que chega depois cai pela fresta no escuro (ouve-se) e está no chão
 junto à porta quando a luz volta.
 
@@ -354,7 +358,7 @@ salta de novo.
    praticamente completa — embora eu achasse que a fotografia falhara por algum
    descuido dele, na agitação."* (com `crenca` ≤ −1, a crença não está completa)
 
-**Fim do dia (e da demo):** sem porta. O fim da carta de quarta aparece no papel,
+**Fim do dia (e da demo):** levada a carta registrada à porta, o fim da carta de quarta aparece no papel,
 a câmera se aproxima até a **letra trêmula encher a tela**, a **tinta se espalha**
 em manchas até cobrir tudo e **seca num céu de fim de tarde** sobre os morros do
 vale (pixelado na grade do mundo) → tela preta, *"Fim da demonstração. A história
@@ -406,7 +410,7 @@ Yuggoth — O Despertar, Yuggoth — O Estudioso, Testemunha, Cinzas (GDD §7).
 | `dia` | 1–7 no escritório |
 | `crenca` | soma dos tons das respostas (−4…+4) |
 | `resposta_dia_N` | tom da resposta do dia N: −1, 0 ou 1 |
-| `escreveu_resposta_dia_N` | resposta do dia escrita (libera a porta) |
+| `escreveu_resposta_dia_N` | resposta do dia selada (vai para a mão; postá-la na porta encerra o dia) |
 | `leu_<documento>` | documento lido (ex.: `leu_carta_akeley_1`) |
 | `debate_encerrado` | Dia 2: deixou os opositores sem resposta |
 | `viu_*` | detalhes vistos nas fotos (`viu_garra_foto`, `viu_rastros_caverna`, `viu_circulo`, `viu_hieroglifos`, `viu_marca_casa`, `viu_akeley_foto`, `viu_foto_pegada`, `viu_foto_exercito`) |
