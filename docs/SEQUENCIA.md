@@ -14,6 +14,14 @@ Legenda: ✅ jogável (arte e som provisórios) · ⏳ planejado
 escreve ao som da pena, e até selar dá para **amassar a folha (Esc) e escolher
 outra** quantas vezes quiser. Só selar decide.
 
+**O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
+porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
+chão, junto à porta, iluminados pela luz do corredor que entra por baixo dela.
+**"Pegar o correio"** → o envelope fica na mão (uma coisa por vez) → mirar a
+escrivaninha, **"Pôr na mesa"** → **"Abrir com a espátula"** (som de papel rasgando)
+→ o conteúdo sai para a mesa; depois o envelope é examinável (carimbo, selos,
+letra). Pacotes que não passam na fresta ficam no chão junto à porta.
+
 | # | Parte | Data na história | Estado | Livro |
 |---|---|---|---|---|
 | — | Menu principal | — | ✅ | — |
@@ -76,8 +84,9 @@ qualquer dia, ler, escrever ou examinar abaixa o ambiente.)
 **Ao começar:** *"A carta chegou com o correio do meio-dia. Selo de Townshend, Vermont."*
 
 **Na sala:**
-- **Envelope de Townshend** (examinável): um selo de 2 centavos, carimbo
-  *TOWNSHEND — MAY 5 1928*, endereçado a *Albert N. Wilmarth, Esq., 118 Saltonstall St.*
+- **Envelope de Townshend**, no chão junto à porta (examinável depois de aberto): um
+  selo de 2 centavos, carimbo *TOWNSHEND — MAY 5 1928*, endereçado a *Albert N.
+  Wilmarth, Esq., 118 Saltonstall St.* Dentro:
 - **A carta de Akeley de 5 de maio, na íntegra** (cerca de 18 folhas): o forasteiro
   que discorda dele, as pegadas, a pedra negra de Round Hill, o fonógrafo com
   cilindro de cera, o espião que se matou, Brown, os cães policiais, o filho em
@@ -110,7 +119,10 @@ resposta ao Sr. Akeley."* Depois: tela preta, cartão *"Fim de maio."*, **checkp
 **Ao começar:** *"A resposta dele veio quase na volta do correio — e trazia, como prometido, várias fotografias."*
 
 **Na sala:**
-- **Envelope gordo de Townshend** (examinável): dois selos, carimbo *MAY 22 1928*.
+- **Envelope gordo de Townshend**, no chão junto à porta: dois selos, carimbo
+  *MAY 22 1928*. Aberto, sai a carta; as fotografias saem **uma por vez**
+  ("Tirar uma fotografia"), cada uma para o seu lugar na mesa — quem as arruma é o
+  jogador. (As que ficarem no envelope estão na mesa no dia seguinte.)
 - **A segunda carta** — 11 folhas de **letra cerrada ilegível**; o livro não a
   transcreve. As notas de Wilmarth (outra tinta) dizem o que havia: as transcrições
   do que se ouvia na mata, as formas rosadas, a narrativa cósmica, a lista de nomes
@@ -147,8 +159,10 @@ debate público sobre o horror de Vermont terminou para sempre."*; responder (28
 **Ao começar:** *"No fim de junho chegou o disco — despachado de Brattleboro, porque Akeley não confiava no ramal ao norte de lá."*
 
 **Na sala:**
-- **Pacote do American Railway Express**, aberto (etiqueta de Brattleboro a Arkham),
-  com o **estojo do cilindro de cera** (examinável: *"1º de maio de 1915"*).
+- **Pacote do American Railway Express**, no chão junto à porta (etiqueta de
+  Brattleboro a Arkham), amarrado com barbante. Na mesa, **"Cortar o barbante"**:
+  saem o bilhete, a transcrição e o **estojo do cilindro de cera** (examinável:
+  *"1º de maio de 1915"*).
 - **Bilhete de Akeley:** o medo das estradas, a Califórnia, e **Walter Brown** —
   suas pegadas viradas para a marca de garra.
 - **A transcrição de Akeley, na íntegra** (onde e quando gravou; o texto completo).
@@ -158,7 +172,8 @@ debate público sobre o horror de Vermont terminou para sempre."*; responder (28
 
 **O que fazer:**
 1. **Montar** a corneta, a manivela e a agulha (cada uma tirada do caixote).
-2. **Pôr o cilindro de cera** na máquina (sai do estojo).
+2. **Pôr o cilindro de cera** na máquina (sai do estojo; antes de abrir o pacote,
+   a máquina montada só diz *"Falta o cilindro de Akeley."*).
 3. **"Dar corda e baixar a agulha"** → o disco toca (~1 min), com **legendas**:
    ruídos; a voz humana culta ("...é o Senhor dos Bosques..." — "Iä!
    Shub-Niggurath!"); a **imitação zumbida** da fala; Azathoth, Yuggoth,
@@ -186,14 +201,14 @@ cilindro, nos dias seguintes.
 **Clima:** dia claro de julho.
 **Ao começar:** *"Na manhã de quarta-feira, 18 de julho, chegou um telegrama de Bellows Falls."*
 
-**Na sala:**
-- **Telegrama (Western Union):** a pedra vai no B. & M., trem nº 5508, sai de
-  Bellows Falls às 12h15, chega à North Station às 16h12.
-- **Carta de Akeley de julho** e o **envelope de Brattleboro** (carimbo *JUL 12*):
+**Na sala** (os dois no chão junto à porta; uma coisa na mão por vez):
+- **Telegrama (Western Union)**, no envelope amarelo: a pedra vai no B. & M., trem
+  nº 5508, sai de Bellows Falls às 12h15, chega à North Station às 16h12.
+- **Envelope de Brattleboro** (carimbo *JUL 12*) com a **carta de Akeley de julho**:
   outra carta extraviada; escreva para a Posta-Restante de Brattleboro; o homem
-  suspeito na agência do expresso; a rota da pedra por Keene.
-- **A foto do "exército" de pegadas** diante de uma linha de pegadas de cães (fica
-  com as outras nos dias seguintes).
+  suspeito na agência do expresso; a rota da pedra por Keene. Do mesmo envelope
+  sai **a foto do "exército" de pegadas** diante de uma linha de pegadas de cães
+  (fica com as outras nos dias seguintes).
 - **O telefone de parede**, ao lado da escrivaninha.
 
 **O que fazer:**
@@ -231,14 +246,14 @@ lamentavelmente trêmula. No dia 15 de agosto recebi uma carta frenética, que m
 perturbou muito."*
 
 As cartas cruzam o correio: cada carta selada **salta no tempo** (tela preta e
-cartão), e o que chega depois já está na mesa quando a luz volta.
+cartão); o que chega depois cai pela fresta no escuro (ouve-se) e está no chão
+junto à porta quando a luz volta.
 
-**Na sala (15 de agosto):**
+**Na sala (15 de agosto)** — dois envelopes de Brattleboro no chão (*AUG 7* e *AUG 14*):
 - **Carta do começo de agosto**: a pedra "não está mais nesta terra"; o tronco
   atravessado na estrada (dia 2), o tiro de raspão e as presenças na mata (5 e 6);
   nunca sai sem dois cães.
-- **Carta de 15 de agosto**, escrita no correio de Brattleboro, e o **envelope**
-  (carimbo *AUG 14*): a noite de 12 para 13, **3 dos 12 cães** mortos a tiro, as
+- **Carta de 15 de agosto**, escrita no correio de Brattleboro (envelope *AUG 14*): a noite de 12 para 13, **3 dos 12 cães** mortos a tiro, as
   pegadas de **Brown** entre as garras, o cabo telefônico cortado ao norte de
   Newfane, quatro cães novos e munição. Ao fechá-la: *"Minha atitude diante do caso
   passava depressa do científico para um alarme pessoal..."*
@@ -248,7 +263,7 @@ cartão), e o que chega depois já está na mesa quando a luz volta.
    chame a lei em seu socorro."*; ir a Vermont, falar com as autoridades. Narrador:
    *"A coisa se estendia assim. Haveria de me sugar para dentro dela, e me engolir?"*
    Cartão: *"Em resposta, porém, recebi apenas um telegrama de Bellows Falls."*
-2. **O telegrama** (Western Union, 17 de agosto): *"COMPREENDO SUA POSIÇÃO MAS NADA
+2. **O telegrama** (no envelope da Western Union, 17 de agosto): *"COMPREENDO SUA POSIÇÃO MAS NADA
    POSSO FAZER. NÃO TOME NENHUMA PROVIDÊNCIA PORQUE ISSO SÓ PODERIA PREJUDICAR A
    AMBOS. AGUARDE EXPLICAÇÃO."* — assinado **HENRY AKELY** (o de julho dizia AKELEY).
 3. **"Telegrafar a resposta a Akeley"** pelo telefone de parede → cartão: *"Mas o
@@ -288,9 +303,10 @@ mais a cada carta.
 terrores a relatar quando acusou o recebimento da minha carta."*
 
 As cartas cruzam o correio, como no Dia 5, mas agora **cada carta lida traz a
-seguinte**: ao fechá-la pela primeira vez, tela preta, cartão, e a próxima já está
-na mesa (`DocumentData.cartao_depois`). Uma carta chega por dia: 5, 6 e 7 de
-setembro. Reler pelo dossiê não salta de novo.
+seguinte**: ao fechá-la pela primeira vez, tela preta, cartão, e a próxima cai pela
+fresta no escuro (`DocumentData.cartao_depois`). Uma carta chega por dia: 5, 6 e 7
+de setembro (envelopes de Brattleboro, *SEP 3*, *4* e *5*). Reler pelo dossiê não
+salta de novo.
 
 **Na sala (31 de agosto):**
 - **Carta calma** (31 de agosto, composta das frases do livro) e o **envelope**
@@ -402,6 +418,8 @@ Yuggoth — O Despertar, Yuggoth — O Estudioso, Testemunha, Cinzas (GDD §7).
 | `comparou_assinatura` | Dia 5: comparou o telegrama com as cartas (liga a 1ª alteração de texto) |
 | `leu_carta_akeley_julho_ruivo` | releu a carta de julho alterada |
 | `viu_sombra_janela` | Dia 5: o vulto passou pela janela |
+| `correio_<id>` | o correio: 0 no chão, 1 na mão, 2 na mesa, 3 aberto (`dia_1`, `dia_2`, `dia_3` — o pacote —, `telegrama_pedra`, `julho`, `agosto`, `15_agosto`, `telegrama_akely`, `bilhete`, `28_agosto`, `setembro`, `segunda`, `terca`, `quarta`) |
+| `correio_<id>_tiradas` | fotografias tiradas do envelope (`dia_2`: 0–9; `julho`: 0–1) |
 | `exposicao` | 0–1; nunca aparece na tela |
 | `sonho` | 0–1; visual onírico em sequências (Prólogo) |
 

@@ -70,6 +70,18 @@ Componente novo **`Correspondencia`** (estado em `GameState`, `correio_<id>`):
   ficam no chão junto à porta, deixados pelo expresso — sem cena de entrega.
 - Os testes de cada dia passam a abrir o correio antes de ler.
 
+✅ Feito: `Correspondencia` (área filha do envelope/pacote, estende `Examinable`)
+e `MesaCorreio` (o tampo, mirável só com algo na mão). Todo o correio dos Dias 1–6
+chega pela fresta, inclusive o que cruza o correio no escuro dos saltos (o som
+toca sob o cartão). O pacote do Dia 3 fica no chão junto à porta; cortado o
+barbante, saem o bilhete, a transcrição e o estojo — e o fonógrafo só aceita o
+cilindro depois disso. A foto do exército (Dia 4) sai do envelope de julho. Dois
+telegramas vêm no envelope da Western Union. A luz do corredor entra pela fresta
+embaixo da porta (uma linha acesa e um brilho no chão): sem ela, nas noites, o
+correio no chão era invisível. Fotos não tiradas no Dia 2 (ou 4) aparecem na mesa
+no dia seguinte. A mão não atravessa um load (volta ao chão); sair com algo na mão
+o deixa na mesa.
+
 ## Fase 4 — O mapa de Vermont
 Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da
 investigação**, como na referência). Textura gerada: contorno de Vermont, o

@@ -746,6 +746,17 @@ func _miskatonic() -> void:
 
 	_dias(g)
 
+	# A luz do corredor entra pela fresta embaixo da porta: uma linha acesa e um
+	# brilho fraco no chão, onde o correio cai — nas noites, é o que o mostra.
+	_quad(g, "Fresta", Vector2(0.88, 0.012), Vector3(-1.0, 0.006, D - 0.062), Vector3(0, 180, 0), "vidro_aceso")
+	var corredor := _omni(g, "LuzCorredor", Vector3(-0.95, 0.12, D - 0.3), Color(1.0, 0.8, 0.55), 0.5, 2.2)
+	corredor.omni_attenuation = 1.6
+
+	# Com correspondência na mão, mirar o tampo a põe na mesa (some sem nada na mão).
+	var por := _area(g, MesaCorreio.new(), "PorNaMesa", Vector3(1.6, 0.1, 0.8), Vector3(0, MESA + 0.05, -2.2)) as MesaCorreio
+	por.unique_name_in_owner = true
+	por.prompt = "Pôr na mesa"
+
 	# A porta encerra o dia ("ir para casa"); só no escritório.
 	var sair := _area(g, Interactable.new(), "SairPorta", Vector3(0.9, 2.0, 0.2), Vector3(-1.0, 1.05, D - 0.12)) as Interactable
 	sair.unique_name_in_owner = true
@@ -851,6 +862,66 @@ func _envelope(parent: Node, nome: String, pos: Vector3, rot_y: float, props: Di
 	return e
 
 
+## Onde o correio cai, junto à porta: x, z e a rotação em y (graus). A marca
+## "Porta" (onde o jogador entra) fica em z 2,3; o envelope desliza para dentro.
+const CHAO_A := Vector3(-0.85, 1.75, 25)
+const CHAO_B := Vector3(-1.15, 1.6, -15)
+const CHAO_C := Vector3(-0.55, 1.95, 50)
+
+const REMETENTE_BRATTLEBORO := "H. W. Akeley\nGeneral Delivery, Brattleboro, Vt."
+const TELEGRAMA := {
+	remetente = "WESTERN UNION",
+	destinatario = "Prof. A. N. Wilmarth\nMiskatonic University\nArkham, Mass.",
+	selos = 0,
+	carimbo_data = "",
+}
+
+
+## Correspondência que chega pela fresta (Correspondencia): o envelope cai em
+## `chao` e, posto na mesa, fica em `mesa` (x, z e rotação em y, como CHAO_*).
+## Aberto, é examinável com `titulo` e `descricao`.
+func _correio(parent: Node, nome: String, id: StringName, chao: Vector3, mesa: Vector3, props: Dictionary, titulo: String, descricao: String) -> Correspondencia:
+	var env := _envelope(parent, nome, Vector3(chao.x, 0.001, chao.y), chao.z, props)
+	var c := _area(env, Correspondencia.new(), "Correio", Vector3(0.22, 0.05, 0.14)) as Correspondencia
+	c.id = id
+	c.mesa = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(mesa.z), 0)), Vector3(mesa.x, MESA + env.espessura() * 0.5, mesa.y))
+	c.title = titulo
+	c.description = descricao
+	c.initial_rotation = Vector3(90, 0, 0)
+	if props.get("selos", 1) == 0:
+		c.prompt_abrir = "Abrir o telegrama"
+		c.prompt_examinar = "Examinar o envelope do telegrama"
+	c.som_chegada = load(SFX_DIR + "correio_fresta.wav")
+	c.som_mao = load(SFX_DIR + "papel_pegar.wav")
+	c.som_abrir = load(SFX_DIR + "papel_rasgando.wav")
+	return c
+
+
+## A correspondência `id` foi aberta.
+func _aberto(id: StringName) -> ValueCondition:
+	return _cond_valor(StringName("correio_%s" % id), ValueCondition.Op.MAIOR_OU_IGUAL, Correspondencia.ABERTO)
+
+
+## O nó só aparece depois de aberta a correspondência `id`. Um ConditionalNode
+## por nó: se o nó já tem condição, combine com _aberto() nela.
+func _dentro(node: Node, id: StringName) -> void:
+	var cn := ConditionalNode.new()
+	cn.name = "NoCorreio"
+	cn.condition = _aberto(id)
+	_add(node, cn)
+
+
+## Peça tirada de um envelope (Correspondencia.retirar): aparece quando tirada,
+## ou de qualquer jeito a partir de `dia_fixo` (Wilmarth as tirou fora de cena).
+func _retirada(node: Node, id: StringName, n: int, dia_fixo: int) -> void:
+	var cn := ConditionalNode.new()
+	cn.name = "Retirada"
+	cn.condition = _composta(CompositeCondition.Mode.QUALQUER, [
+		_cond_valor(StringName("correio_%s_tiradas" % id), ValueCondition.Op.MAIOR_OU_IGUAL, n),
+		_cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, dia_fixo)])
+	_add(node, cn)
+
+
 func _examinavel(parent: Node, tamanho: Vector3, prompt: String, titulo: String, descricao: String) -> Examinable:
 	var ex := _area(parent, Examinable.new(), "Examinar", tamanho) as Examinable
 	ex.prompt = prompt
@@ -894,9 +965,9 @@ func _luz(parent: Node, vista: String, sol_cor: Color, sol_energia: float, sol_a
 
 func _dias(parent: Node) -> void:
 	_debate(parent)
-	_fotografias(parent)
+	var fotos := _fotografias(parent)
 	_dia_1(parent)
-	_dia_2(parent)
+	_dia_2(parent, fotos)
 	var dia3 := _dia_3(parent)
 	_fonografo(parent, dia3)
 	_dia_4(parent)
@@ -927,24 +998,41 @@ func _dia_6(parent: Node) -> void:
 	janela.notice = "Nenhuma lua. Só as nuvens, baixas e espessas."
 
 	# Fim de agosto: menos terrores. Wilmarth o anima de novo.
-	_folha(g, "CartaSetembro", Vector3(-0.1, MESA + 0.003, -2.1), -6, "carta_akeley_setembro", "Ler a carta", false)
-	var env := _envelope(g, "Envelope", Vector3(-0.15, MESA, -2.47), -4, {
-		remetente = "H. W. Akeley\nGeneral Delivery, Brattleboro, Vt.",
+	var setembro := _folha(g, "CartaSetembro", Vector3(-0.1, MESA + 0.003, -2.1), -6, "carta_akeley_setembro", "Ler a carta", false)
+	_dentro(setembro.get_parent(), &"setembro")
+	_correio(g, "Envelope", &"setembro", CHAO_A, Vector3(-0.15, -2.47, -4), {
+		remetente = REMETENTE_BRATTLEBORO,
 		carimbo_cidade = "BRATTLEBORO",
 		carimbo_data = "AUG 31\n1928",
-	})
-	_examinavel(env, Vector3(0.2, 0.04, 0.12), "Examinar o envelope", "Envelope de Brattleboro",
+	}, "Envelope de Brattleboro",
 		"A letra ainda treme, mas está mais firme do que em agosto. Carimbo de Brattleboro, 31 de agosto.")
 	var animo := _grupo_se(g, "Animo", _flag(&"narrou_cartao_5_setembro", true))
 	_escrever(animo, "animo_dia_6", &"leu_carta_akeley_setembro")
 
-	# Segunda, terça e quarta: uma por dia, cada uma chegando no escuro do salto.
-	var segunda := _grupo_se(g, "Segunda", _flag(&"narrou_cartao_5_setembro"))
-	_folha(segunda, "Folha", Vector3(0.2, MESA + 0.005, -2.0), 7, "carta_akeley_segunda", "Ler a carta de segunda-feira", false)
-	var terca := _grupo_se(g, "Terca", _flag(&"narrou_cartao_6_setembro"))
-	_folha(terca, "Folha", Vector3(-0.42, MESA + 0.007, -1.98), -9, "carta_akeley_terca", "Ler a carta de terça-feira", false)
-	var quarta := _grupo_se(g, "Quarta", _flag(&"narrou_cartao_7_setembro"))
-	_folha(quarta, "Folha", Vector3(0.02, MESA + 0.009, -1.9), 3, "carta_akeley_quarta", "Ler a carta de quarta-feira", false)
+	# Segunda, terça e quarta: uma por dia, cada uma caindo pela fresta no escuro
+	# do salto. As três escritas em Brattleboro (cap. IV).
+	var cartas := [
+		["Segunda", &"narrou_cartao_5_setembro", "carta_akeley_segunda", "Ler a carta de segunda-feira",
+			Vector3(0.2, MESA + 0.005, -2.0), 7, &"segunda", CHAO_B, Vector3(0.62, -2.2, 8), "SEP 3",
+			"A letra treme mais do que nunca. Carimbo de Brattleboro, 3 de setembro."],
+		["Terca", &"narrou_cartao_6_setembro", "carta_akeley_terca", "Ler a carta de terça-feira",
+			Vector3(-0.42, MESA + 0.007, -1.98), -9, &"terca", CHAO_C, Vector3(0.65, -1.93, -5), "SEP 4",
+			"O endereço é um rabisco que quase sai do envelope. Carimbo de Brattleboro, 4 de setembro."],
+		["Quarta", &"narrou_cartao_7_setembro", "carta_akeley_quarta", "Ler a carta de quarta-feira",
+			Vector3(0.02, MESA + 0.009, -1.9), 3, &"quarta", CHAO_A, Vector3(0.06, -2.48, 3), "SEP 5",
+			"Mal se lê o meu nome. Carimbo de Brattleboro, 5 de setembro."],
+	]
+	var quarta: Node3D
+	for c: Array in cartas:
+		var grupo := _grupo_se(g, c[0], _flag(c[1]))
+		var folha := _folha(grupo, "Folha", c[4], c[5], c[2], c[3], false)
+		_dentro(folha.get_parent(), c[6])
+		_correio(grupo, "Envelope", c[6], c[7], c[8], {
+			remetente = REMETENTE_BRATTLEBORO,
+			carimbo_cidade = "BRATTLEBORO",
+			carimbo_data = "%s\n1928" % c[9],
+		}, "Envelope de Brattleboro", c[10])
+		quarta = grupo
 	_escrever(quarta, "resposta_dia_6", &"leu_carta_akeley_quarta")
 
 
@@ -962,23 +1050,34 @@ func _dia_5(parent: Node) -> void:
 	janela.prompt = "Olhar"
 	janela.notice = "Só a chuva, escorrendo no vidro."
 
-	# 15 de agosto: as cartas trêmulas e a oferta de ir a Vermont.
-	_folha(g, "CartaAgosto", Vector3(-0.26, MESA + 0.003, -2.08), 9, "carta_akeley_agosto", "Ler a carta", false)
-	_folha(g, "Carta15", Vector3(0.0, MESA + 0.005, -2.12), -5, "carta_akeley_15_agosto", "Ler a carta de 15 de agosto", false)
-	var env := _envelope(g, "Envelope", Vector3(-0.12, MESA, -2.47), 5, {
-		remetente = "H. W. Akeley\nGeneral Delivery, Brattleboro, Vt.",
+	# 15 de agosto: as cartas trêmulas e a oferta de ir a Vermont. As duas
+	# chegaram juntas pela fresta.
+	var agosto := _folha(g, "CartaAgosto", Vector3(-0.26, MESA + 0.003, -2.08), 9, "carta_akeley_agosto", "Ler a carta", false)
+	_dentro(agosto.get_parent(), &"agosto")
+	_correio(g, "EnvelopeAgosto", &"agosto", CHAO_B, Vector3(0.1, -2.48, -3), {
+		remetente = REMETENTE_BRATTLEBORO,
+		carimbo_cidade = "BRATTLEBORO",
+		carimbo_data = "AUG 7\n1928",
+	}, "Envelope de Brattleboro",
+		"A letra treme tanto que o endereço desce em degraus. Carimbo de Brattleboro, 7 de agosto.")
+	var c15 := _folha(g, "Carta15", Vector3(0.0, MESA + 0.005, -2.12), -5, "carta_akeley_15_agosto", "Ler a carta de 15 de agosto", false)
+	_dentro(c15.get_parent(), &"15_agosto")
+	_correio(g, "Envelope", &"15_agosto", CHAO_A, Vector3(-0.12, -2.47, 5), {
+		remetente = REMETENTE_BRATTLEBORO,
 		carimbo_cidade = "BRATTLEBORO",
 		carimbo_data = "AUG 14\n1928",
-	})
-	_examinavel(env, Vector3(0.2, 0.04, 0.12), "Examinar o envelope", "Envelope de Brattleboro",
+	}, "Envelope de Brattleboro",
 		"Escrita no próprio correio de Brattleboro e posta ali mesmo: chegou sem demora. A letra mal se sustenta na linha.")
 	var oferta := _grupo_se(g, "Oferta", _flag(&"narrou_cartao_telegrama_akely", true))
 	_escrever(oferta, "oferta_dia_5", &"leu_carta_akeley_15_agosto")
 
 	# A resposta: um telegrama de Bellows Falls, assinado AKELY.
 	var tel := _grupo_se(g, "TelegramaAkely", _flag(&"narrou_cartao_telegrama_akely"))
+	_correio(tel, "EnvelopeTelegrama", &"telegrama_akely", CHAO_C, Vector3(0.62, -2.2, 12), TELEGRAMA,
+		"Telegrama de Bellows Falls", "O envelope amarelo da Western Union. Em resposta a uma carta inteira, só isto.")
 	var papel := _box(tel, "Papel", Vector3(0.2, 0.003, 0.14), Vector3(0.45, MESA + 0.0015, -1.94), "envelope")
 	papel.rotation_degrees.y = -10
+	_dentro(papel, &"telegrama_akely")
 	# Depois do bilhete, o mesmo papel serve para comparar (uma área por vez).
 	var comparando := _composta(CompositeCondition.Mode.TODAS, [_flag(&"leu_bilhete_akeley_agosto"), _flag(&"comparou_assinatura", true)])
 	var lendo := comparando.duplicate() as CompositeCondition
@@ -994,14 +1093,28 @@ func _dia_5(parent: Node) -> void:
 
 	# O bilhete: ele nunca mandou o telegrama. Depois, a carta que renova a oferta.
 	var bilhete := _grupo_se(g, "Bilhete", _flag(&"narrou_cartao_aprofundava"))
-	_folha(bilhete, "Folha", Vector3(-0.52, MESA + 0.005, -1.98), -7, "bilhete_akeley_agosto", "Ler o bilhete", false)
+	var folha_bilhete := _folha(bilhete, "Folha", Vector3(-0.52, MESA + 0.005, -1.98), -7, "bilhete_akeley_agosto", "Ler o bilhete", false)
+	_dentro(folha_bilhete.get_parent(), &"bilhete")
+	_correio(bilhete, "Envelope", &"bilhete", CHAO_A, Vector3(0.65, -1.93, -6), {
+		remetente = REMETENTE_BRATTLEBORO,
+		carimbo_cidade = "BRATTLEBORO",
+		carimbo_data = "AUG 22\n1928",
+	}, "Envelope de Brattleboro",
+		"Um envelope fino, endereçado às pressas. Carimbo de Brattleboro, 22 de agosto.")
 	var renovacao := _grupo_se(g, "Renovacao", _composta(CompositeCondition.Mode.TODAS,
 		[_flag(&"narrou_cartao_aprofundava"), _flag(&"narrou_cartao_28_agosto", true)]))
 	_escrever(renovacao, "renovacao_dia_5", &"comparou_assinatura")
 
 	# 28 de agosto: "uma saída digna". A resposta do dia (a que leva para casa).
 	var c28 := _grupo_se(g, "Carta28", _flag(&"narrou_cartao_28_agosto"))
-	_folha(c28, "Folha", Vector3(0.22, MESA + 0.007, -1.96), 6, "carta_akeley_28_agosto", "Ler a carta de 28 de agosto", false)
+	var folha28 := _folha(c28, "Folha", Vector3(0.22, MESA + 0.007, -1.96), 6, "carta_akeley_28_agosto", "Ler a carta de 28 de agosto", false)
+	_dentro(folha28.get_parent(), &"28_agosto")
+	_correio(c28, "Envelope", &"28_agosto", CHAO_C, Vector3(-0.05, -1.86, 4), {
+		remetente = REMETENTE_BRATTLEBORO,
+		carimbo_cidade = "BRATTLEBORO",
+		carimbo_data = "AUG 27\n1928",
+	}, "Envelope de Brattleboro",
+		"A letra continua trêmula, mas o envelope veio fechado com cuidado. Carimbo de Brattleboro, 27 de agosto.")
 	_escrever(c28, "resposta_dia_5", &"leu_carta_akeley_28_agosto")
 
 	# Depois do bilhete, quem olhar para a janela vê algo passar lá fora. Uma vez.
@@ -1028,17 +1141,20 @@ func _dia_4(parent: Node) -> void:
 	ler.prompt = "Ler o telegrama"
 	ler.remove_visual = false
 	ler.document = load("res://narrative/documents/telegrama_pedra.tres")
-	_folha(g, "CartaJulho", Vector3(0.36, MESA + 0.003, -2.02), 10, "carta_akeley_julho", "Ler a carta", false)
-	var env := _envelope(g, "Envelope", Vector3(-0.2, MESA, -2.47), 7, {
-		remetente = "H. W. Akeley\nGeneral Delivery, Brattleboro, Vt.",
+	_dentro(telegrama, &"telegrama_pedra")
+	_correio(g, "EnvelopeTelegrama", &"telegrama_pedra", CHAO_A, Vector3(0.08, -2.47, -6), TELEGRAMA,
+		"Telegrama de Bellows Falls", "O envelope amarelo da Western Union, trazido por um mensageiro de manhã cedo.")
+	var julho_carta := _folha(g, "CartaJulho", Vector3(0.36, MESA + 0.003, -2.02), 10, "carta_akeley_julho", "Ler a carta", false)
+	_dentro(julho_carta.get_parent(), &"julho")
+	var c := _correio(g, "Envelope", &"julho", CHAO_B, Vector3(-0.2, -2.47, 7), {
+		remetente = REMETENTE_BRATTLEBORO,
 		carimbo_cidade = "BRATTLEBORO",
 		carimbo_data = "JUL 12\n1928",
-	})
-	_examinavel(env, Vector3(0.2, 0.04, 0.12), "Examinar o envelope", "Envelope de Brattleboro",
+	}, "Envelope de Brattleboro",
 		"A letra de Akeley, mais trêmula. Carimbo de Brattleboro, 12 de julho — ele já não confia no correio de Townshend.")
 	_escrever(g, "resposta_dia_4", &"ligou_relato_keene")
 
-	# A foto de julho fica junto das outras, dali em diante.
+	# A foto de julho vem no envelope e fica junto das outras, dali em diante.
 	var julho := _grupo_se(parent, "FotografiaJulho", _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, 4))
 	var foto := Fotografia.new()
 	foto.name = "Foto10"
@@ -1046,6 +1162,8 @@ func _dia_4(parent: Node) -> void:
 	foto.position = Vector3(-0.25, MESA + Fotografia.ESPESSURA * 0.5, -2.33)
 	foto.rotation_degrees.y = 6
 	_add(julho, foto)
+	_retirada(foto, &"julho", 1, 5)
+	c.retirar = [foto]
 	var ex := _examinavel(foto, Vector3(0.13, 0.03, 0.1), "Examinar a fotografia", "Fotografia — o exército de pegadas",
 		"Repulsivamente perturbadora: um verdadeiro exército de pegadas em fila, de frente para uma linha igualmente cerrada e resoluta de pegadas de cães. Tirada depois de uma noite em que os cães se superaram em latidos e uivos.")
 	ex.flag = &"viu_foto_exercito"
@@ -1088,10 +1206,32 @@ func _dia_3(parent: Node) -> Node3D:
 	var transcricao := _folha(g, "Transcricao", Vector3(0.25, MESA + 0.003, -2.05), -12, "transcricao_disco", "Ler a transcrição", false)
 	transcricao.get_parent().set_meta(&"treme", true)
 	bilhete.get_parent().set_meta(&"treme", true)
+	_dentro(bilhete.get_parent(), &"dia_3")
+	_dentro(transcricao.get_parent(), &"dia_3")
 
-	# O pacote do expresso, aberto, com o estojo do cilindro de cera.
-	var pacote := _group(g, "Pacote", Vector3(-0.42, MESA, -2.38), 14)
+	# O pacote do expresso não passa na fresta: fica no chão junto à porta. Na
+	# mesa, cortado o barbante, saem o bilhete, a transcrição e o estojo do cilindro.
+	var pacote := _group(g, "Pacote", Vector3(-0.45, 0, 2.45), 10)
 	_box(pacote, "Caixa", Vector3(0.24, 0.1, 0.16), Vector3(0, 0.05, 0), "caixa_cartas")
+	var barbante := _group(pacote, "Barbante")
+	_box(barbante, "Comprido", Vector3(0.245, 0.104, 0.006), Vector3(0, 0.05, 0), "lencol")
+	_box(barbante, "Curto", Vector3(0.006, 0.104, 0.165), Vector3(0, 0.05, 0), "lencol")
+	var pac := _area(pacote, Correspondencia.new(), "Correio", Vector3(0.28, 0.14, 0.2), Vector3(0, 0.05, 0)) as Correspondencia
+	pac.id = &"dia_3"
+	# Na ponta leste da mesa: no lugar antigo (oeste) tampava as fotografias.
+	pac.mesa = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(-8), 0)), Vector3(0.64, MESA, -2.12))
+	pac.prompt_pegar = "Pegar o pacote"
+	pac.prompt_abrir = "Cortar o barbante"
+	pac.prompt_examinar = "Examinar o pacote"
+	pac.title = "O pacote do expresso"
+	pac.description = "American Railway Express, despachado de Brattleboro: Akeley não confiava no ramal ao norte de lá."
+	pac.initial_rotation = Vector3(25, 20, 0)
+	pac.fechado = barbante
+	pac.mao_posicao = Vector3(0.19, -0.26, -0.56)
+	pac.mao_rotacao = Vector3(22, -24, 0)
+	pac.som_chegada = load(SFX_DIR + "pacote_chao.wav")
+	pac.som_mao = load(SFX_DIR + "papel_pegar.wav")
+	pac.som_abrir = load(SFX_DIR + "papel_rasgando.wav")
 	var etiqueta := Label3D.new()
 	etiqueta.name = "Etiqueta"
 	etiqueta.text = "AMERICAN RAILWAY EXPRESS\nfrom H. W. AKELEY — BRATTLEBORO, VT.\nto A. N. WILMARTH — ARKHAM, MASS."
@@ -1102,7 +1242,9 @@ func _dia_3(parent: Node) -> Node3D:
 	etiqueta.position = Vector3(0, 0.05, 0.081)
 	etiqueta.alpha_cut = Label3D.ALPHA_CUT_DISCARD
 	_add(pacote, etiqueta)
-	var estojo := _grupo_se(g, "Estojo", _flag(&"fono_cilindro", true))
+	# Sai do pacote aberto; vai para a máquina com o cilindro.
+	var estojo := _grupo_se(g, "Estojo", _composta(CompositeCondition.Mode.TODAS,
+		[_aberto(&"dia_3"), _flag(&"fono_cilindro", true)]))
 	estojo.position = Vector3(-0.15, MESA + 0.03, -2.34)
 	var tubo := _cyl(estojo, "Tubo", 0.03, 0.03, 0.11, Vector3.ZERO, "envelope", 10)
 	tubo.rotation_degrees.z = 90
@@ -1224,6 +1366,7 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 	f.zumbido = load(SFX_DIR + "zumbido.wav")
 	f.narracao_depois = load("res://narrative/narration/depois_do_disco.tres")
 	f.luz = dia3.get_node("Abajur/Luz")
+	f.cilindro_chegou = _aberto(&"dia_3")
 	var tremem: Array[Node3D] = []
 	for n in dia3.get_children():
 		if n.has_meta(&"treme"):
@@ -1234,29 +1377,32 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 func _dia_1(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 1)
 	_luz(g, "vista_dia", Color(1.0, 0.86, 0.62), 7.0, Vector3(-0.4, 0, 0.6), Vector3(0.8, 3.4, -D - 1.5), 1.0)
-	_folha(g, "Carta", Vector3(-0.22, MESA + 0.004, -2.12), 12, "carta_akeley_1", "Ler a carta")
-	var env := _envelope(g, "Envelope", Vector3(-0.5, MESA, -2.32), 10, {
+	var carta := _folha(g, "Carta", Vector3(-0.22, MESA + 0.004, -2.12), 12, "carta_akeley_1", "Ler a carta")
+	_dentro(carta.get_parent(), &"dia_1")
+	_correio(g, "Envelope", &"dia_1", CHAO_A, Vector3(-0.5, -2.32, 10), {
 		remetente = "H. W. Akeley\nR.F.D. #2, Townshend, Vt.",
 		carimbo_data = "MAY 5\n1928",
-	})
-	_examinavel(env, Vector3(0.2, 0.04, 0.12), "Examinar o envelope", "Envelope de Townshend",
+	}, "Envelope de Townshend",
 		"Uma letra apertada, de aparência arcaica — de quem obviamente não se misturou muito com o mundo. Selo de dois centavos; carimbo de Townshend, 5 de maio.")
 	_escrever(g, "resposta_dia_1", &"leu_carta_akeley_1")
 
 
-func _dia_2(parent: Node) -> void:
+## A carta e as fotografias vêm no mesmo envelope gordo; aberto, as fotos saem
+## uma por vez, cada uma para o seu lugar na mesa (`fotos`, de _fotografias).
+func _dia_2(parent: Node, fotos: Array[Node3D]) -> void:
 	var g := _grupo_do_dia(parent, 2)
 	# Fim de tarde: sol baixo e alaranjado, entrando quase na horizontal.
 	_luz(g, "vista_entardecer", Color(1.0, 0.58, 0.32), 5.5, Vector3(-0.6, 0.5, 1.8), Vector3(1.2, 2.2, -D - 1.5), 0.55)
-	_folha(g, "Carta", Vector3(0.0, MESA + 0.004, -2.1), -6, "carta_akeley_2", "Ler a carta", true, 0.014)
-	var env := _envelope(g, "Envelope", Vector3(-0.2, MESA, -2.47), 6, {
+	var carta := _folha(g, "Carta", Vector3(0.0, MESA + 0.004, -2.1), -6, "carta_akeley_2", "Ler a carta", true, 0.014)
+	_dentro(carta.get_parent(), &"dia_2")
+	var c := _correio(g, "Envelope", &"dia_2", CHAO_A, Vector3(-0.2, -2.47, 6), {
 		remetente = "H. W. Akeley\nR.F.D. #2, Townshend, Vt.",
 		carimbo_data = "MAY 22\n1928",
 		selos = 2,
 		volumoso = true,
-	})
-	_examinavel(env, Vector3(0.2, 0.05, 0.12), "Examinar o envelope", "Envelope gordo de Townshend",
+	}, "Envelope gordo de Townshend",
 		"A mesma letra apertada. Dois selos — a carta pesa. Carimbo de Townshend, 22 de maio.")
+	c.retirar = fotos
 	_escrever(g, "resposta_dia_2", &"leu_carta_akeley_2")
 
 
@@ -1319,10 +1465,12 @@ const FOTOS := [
 ]
 
 
-func _fotografias(parent: Node) -> void:
+## Devolve as fotos na ordem em que saem do envelope do Dia 2.
+func _fotografias(parent: Node) -> Array[Node3D]:
 	var g := _grupo_se(parent, "Fotografias", _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, 2))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 2
+	var fotos: Array[Node3D] = []
 	for i in FOTOS.size():
 		var info: Array = FOTOS[i]
 		var foto := Fotografia.new()
@@ -1331,6 +1479,8 @@ func _fotografias(parent: Node) -> void:
 		foto.position = Vector3(-0.7 + (i % 3) * 0.15, MESA + Fotografia.ESPESSURA * 0.5 + (i % 2) * 0.0005, -2.47 + (i / 3) * 0.14)
 		foto.rotation_degrees.y = rng.randf_range(-9, 9)
 		_add(g, foto)
+		_retirada(foto, &"dia_2", i + 1, 3)
+		fotos.append(foto)
 		var ex := _examinavel(foto, Vector3(0.13, 0.03, 0.1), "Examinar a fotografia", info[1], info[2])
 		if info.size() > 4:
 			ex.flag = info[4].flag
@@ -1345,3 +1495,4 @@ func _fotografias(parent: Node) -> void:
 			hs.min_zoom = h[3]
 			hs.exposure = h[4]
 			_add(foto, hs)
+	return fotos

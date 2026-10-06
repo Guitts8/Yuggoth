@@ -28,7 +28,8 @@ const TINTA := Color(0.1, 0.09, 0.16)
 	set(v):
 		carimbo_data = v
 		_reconstruir()
-@export_range(1, 4) var selos := 1:
+## Zero selos e `carimbo_data` vazio: envelope de telegrama, entregue em mãos.
+@export_range(0, 4) var selos := 1:
 	set(v):
 		selos = v
 		_reconstruir()
@@ -36,6 +37,11 @@ const TINTA := Color(0.1, 0.09, 0.16)
 @export var volumoso := false:
 	set(v):
 		volumoso = v
+		_reconstruir()
+## Aberto com a espátula: a fenda escura ao longo da borda de cima.
+@export var aberto := false:
+	set(v):
+		aberto = v
 		_reconstruir()
 
 
@@ -50,7 +56,9 @@ func espessura() -> float:
 ## Peças geradas têm nome começando com "_": são refeitas a cada mudança e não
 ## vão para o .tscn. Uma cópia (ex.: no ExamineViewer) as refaz no _ready.
 func _reconstruir() -> void:
-	if not is_inside_tree():
+	# Antes do _ready (cópia, ou um filho mexendo nele no próprio _ready), o
+	# _ready reconstrói de qualquer jeito.
+	if not is_node_ready():
 		return
 	for child in get_children():
 		if child.name.begins_with("_"):
@@ -70,16 +78,22 @@ func _reconstruir() -> void:
 		var x := direita - selo_w * 0.5 - i * (selo_w + 0.002)
 		_mesh("_Selo%d" % i, quad, Vector3(x, topo + 0.0004, -ALTURA * 0.5 + 0.02), _mat("selo"), true)
 
-	var carimbo := QuadMesh.new()
-	carimbo.size = Vector2(0.07, 0.035)
-	var cx := direita - selos * (selo_w + 0.002) - 0.006
-	var pos := Vector3(cx, topo + 0.0008, -ALTURA * 0.5 + 0.02)
-	_mesh("_Carimbo", carimbo, pos, _mat("carimbo"), true)
-	# Texto dentro do círculo do carimbo (o círculo fica à esquerda da textura).
-	var circulo := pos + Vector3(-0.07 * (0.5 - 15.5 / 64.0), 0.0004, 0.0)
-	# Fonte grande com pixel pequeno: o texto sai nítido de perto (no exame).
-	_texto("_CarimboTexto", "%s\n%s" % [carimbo_cidade, carimbo_data], circulo, 48, 0.000055,
-		["Courier New", "Courier", "monospace"], HORIZONTAL_ALIGNMENT_CENTER, Color(TINTA, 0.85))
+	if not carimbo_data.is_empty():
+		var carimbo := QuadMesh.new()
+		carimbo.size = Vector2(0.07, 0.035)
+		var cx := direita - selos * (selo_w + 0.002) - 0.006
+		var pos := Vector3(cx, topo + 0.0008, -ALTURA * 0.5 + 0.02)
+		_mesh("_Carimbo", carimbo, pos, _mat("carimbo"), true)
+		# Texto dentro do círculo do carimbo (o círculo fica à esquerda da textura).
+		var circulo := pos + Vector3(-0.07 * (0.5 - 15.5 / 64.0), 0.0004, 0.0)
+		# Fonte grande com pixel pequeno: o texto sai nítido de perto (no exame).
+		_texto("_CarimboTexto", "%s\n%s" % [carimbo_cidade, carimbo_data], circulo, 48, 0.000055,
+			["Courier New", "Courier", "monospace"], HORIZONTAL_ALIGNMENT_CENTER, Color(TINTA, 0.85))
+
+	if aberto:
+		var fenda := QuadMesh.new()
+		fenda.size = Vector2(LARGURA - 0.012, 0.0035)
+		_mesh("_Fenda", fenda, Vector3(0, topo + 0.0004, -ALTURA * 0.5 + 0.003), _mat("esmalte_preto"), true)
 
 	var letra := ["Segoe Script", "Brush Script MT", "cursive"]
 	if not remetente.is_empty():

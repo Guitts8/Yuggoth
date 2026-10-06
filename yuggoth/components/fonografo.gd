@@ -25,6 +25,8 @@ const PECAS := {&"fono_corneta": "a corneta", &"fono_manivela": "a manivela", &"
 @export var luz: Light3D
 ## Objetos (papéis) que tremem enquanto a voz zumbida fala.
 @export var tremer: Array[Node3D] = []
+## O cilindro está à mão (o pacote do expresso foi aberto). Vazio = sempre.
+@export var cilindro_chegou: Condition
 
 var _som: AudioStreamPlayer3D
 var _atual: Gravacao
@@ -68,6 +70,10 @@ func parar() -> void:
 		_parar()
 
 
+func _tem_cilindro() -> bool:
+	return GameState.has_flag(&"fono_cilindro") or cilindro_chegou == null or cilindro_chegou.is_met()
+
+
 func faltando() -> PackedStringArray:
 	var falta := PackedStringArray()
 	for flag: StringName in PECAS:
@@ -79,7 +85,7 @@ func faltando() -> PackedStringArray:
 func _atualizar_prompt() -> void:
 	if tocando():
 		prompt = "Levantar a agulha"
-	elif not faltando().is_empty():
+	elif not faltando().is_empty() or not _tem_cilindro():
 		prompt = "Examinar o fonógrafo"
 	elif not GameState.has_flag(&"fono_cilindro"):
 		prompt = "Pôr o cilindro de cera"
@@ -96,6 +102,9 @@ func _on_interact(_by: Node) -> void:
 	var falta := faltando()
 	if not falta.is_empty():
 		Events.notice_requested.emit("Ainda falta montar %s." % ", ".join(falta))
+		return
+	if not _tem_cilindro():
+		Events.notice_requested.emit("Montada. Falta o cilindro de Akeley.")
 		return
 	if not GameState.has_flag(&"fono_cilindro"):
 		GameState.set_flag(&"fono_cilindro")

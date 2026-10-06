@@ -894,6 +894,11 @@ func _sons() -> void:
 	_wav(_disco("res://narrative/gravacoes/disco_1915_longo.tres", 60), "disco_longo", false)
 	_wav(_zumbido(), "zumbido", true)
 	_wav(_campainha(), "campainha", true)
+	# O correio (Escritório v2, Fase 3): pela fresta, na mão, aberto.
+	_wav(_fresta(), "correio_fresta", false)
+	_wav(_pacote(), "pacote_chao", false)
+	_wav(_papel_mao(50), "papel_pegar", false)
+	_wav(_rasgo(), "papel_rasgando", false)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1160,6 +1165,67 @@ func _campainha() -> PackedFloat32Array:
 		var golpe := 0.5 + 0.5 * signf(sin(TAU * 20.0 * t))
 		var sino := sin(TAU * 1180.0 * t) * 0.5 + sin(TAU * 1460.0 * t) * 0.35 + sin(TAU * 2950.0 * t) * 0.15
 		b[i] = sino * (0.4 + 0.6 * golpe) * 0.6 * minf(1.0, (2.0 - t) * 8.0)
+	return b
+
+
+## Atrito de papel: ruído com passa-alta, para os sons do correio.
+func _atrito(b: PackedFloat32Array, de: int, ate: int, amp: Callable, rng: RandomNumberGenerator) -> void:
+	var hp := 0.0
+	var prev := 0.0
+	for i in range(de, mini(ate, b.size())):
+		var r := rng.randf_range(-1, 1)
+		hp = 0.85 * (hp + r - prev)
+		prev = r
+		b[i] += hp * amp.call(float(i - de) / (ate - de))
+
+
+## Um envelope empurrado por baixo da porta: arrasta na soleira e bate de leve no chão.
+func _fresta() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 47
+	var b := _buf(1.1)
+	_atrito(b, 0, int(0.55 * RATE), func(t: float) -> float: return 0.3 * sin(PI * t) * (0.7 + 0.3 * sin(t * 40.0)), rng)
+	var tapa := int(0.62 * RATE)
+	for j in 2500:
+		b[tapa + j] += rng.randf_range(-1, 1) * 0.45 * exp(-j / 260.0)
+	_lowpass(b, 5000.0)
+	return b
+
+
+## Um pacote pousado no chão do corredor: baque surdo e o papelão rangendo.
+func _pacote() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 48
+	var b := _buf(0.8)
+	for i in b.size():
+		var env := exp(-i / 900.0)
+		b[i] = (rng.randf_range(-1, 1) * 0.6 + sin(TAU * 70.0 * i / RATE) * 0.8) * env
+	_lowpass(b, 600.0)
+	_atrito(b, int(0.08 * RATE), int(0.45 * RATE), func(t: float) -> float: return 0.06 * (1.0 - t), rng)
+	return b
+
+
+## Papel na mão (pegar, pousar, tirar uma fotografia do envelope).
+func _papel_mao(seed: int) -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed
+	var b := _buf(0.4)
+	_atrito(b, 0, b.size(), func(t: float) -> float: return 0.22 * sin(PI * t) * (0.5 + 0.5 * absf(sin(t * 23.0))), rng)
+	_lowpass(b, 6000.0)
+	return b
+
+
+## A espátula correndo pela dobra do envelope: rasgos curtos, irregulares.
+func _rasgo() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 49
+	var b := _buf(0.9)
+	# Uma fibra cedendo a cada ~20 ms: umas estalam, outras só arrastam.
+	var fibras := PackedFloat32Array()
+	for k in 40:
+		fibras.append(1.0 if rng.randf() > 0.6 else 0.35)
+	_atrito(b, int(0.05 * RATE), int(0.8 * RATE), func(t: float) -> float:
+		return 0.38 * minf(1.0, t * 12.0) * (1.0 - t * 0.5) * fibras[mini(int(t * 40.0), 39)], rng)
 	return b
 
 
