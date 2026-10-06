@@ -1,6 +1,6 @@
 extends Node
-## Descartável: a animação de selar e a carta na mão (Dia 1) em SHOT_DIR, com
-## prefixo SHOT_TAG.
+## Descartável: o maço de cartas do Prólogo, o pacote do expresso (Dia 3) e o
+## maço do Dia 5, em SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -12,36 +12,46 @@ func _ready() -> void:
 	root.boot_to_menu = false
 	add_child(root)
 	await _s(0.5)
+	# Prólogo: o maço na mesa de 1930.
 	GameState.reset()
-	GameState.set_flag(&"prologo_concluido")
-	GameState.set_value(&"dia", 4)
-	GameState.set_flag(&"ligou_relato_keene")
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(1.0)
+	await _s(6.0)
 	var esc: Escritorio = root.find_child("Escritorio", true, false)
-	var player := esc.player
 	Narrator.cancel()
-	player.global_position = Vector3(0, 0, -1.35)
-	player.rotation.y = 0
-	player.head.rotation.x = deg_to_rad(-30)
-	var writer = root.get_node("UI/ReplyWriter")
-	var escrever: WriteReply = esc.find_child("Dia4", true, false).get_node("Escrever")
-	escrever.interact(player)
-	await _s(0.3)
-	writer._choose(escrever.reply.options[1])
-	writer._finish_writing()
-	await _s(0.3)
-	_shot("%s_0_escrita" % tag)
-	writer._seal()
-	var t := 0.0
-	for marca in [0.6, 1.15, 1.6, 2.05, 2.75, 3.4]:
-		await _s(marca - t)
-		t = marca
-		_shot("%s_%.2f" % [tag, marca])
-	await _s(1.5)
-	_shot("%s_mao" % tag)
+	_mirar(esc.player, Vector3(0.0, 0, -1.55), esc.caixa.global_position)
+	await _s(1.0)
+	_shot("%s_prologo" % tag)
+	for dia in [3, 5]:
+		GameState.reset()
+		GameState.set_flag(&"prologo_concluido")
+		GameState.set_value(&"dia", dia)
+		await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+		await _s(1.0)
+		esc = root.find_child("Escritorio", true, false)
+		Narrator.cancel()
+		var no_chao: Correspondencia = esc.find_child("Dia%d" % dia, true, false).get_node("%s/Correio" % ("Pacote" if dia == 3 else "Maco"))
+		var alvo := no_chao.get_visual().global_position
+		_mirar(esc.player, alvo + Vector3(0.0, 0, -0.9), alvo)
+		await _s(1.0)
+		Narrator.cancel()
+		_shot("%s_d%d_chao" % [tag, dia])
+		no_chao.interact(esc.player)
+		(esc.get_node(^"%PorNaMesa") as MesaCorreio).interact(esc.player)
+		_mirar(esc.player, Vector3(0.1, 0, -1.4), Vector3(0.1, 0.78, -2.15))
+		await _s(1.0)
+		_shot("%s_d%d_mesa" % [tag, dia])
+		no_chao.interact(esc.player)
+		await _s(1.0)
+		_shot("%s_d%d_aberto" % [tag, dia])
 	SaveSystem.delete_save()
 	get_tree().quit()
+
+
+func _mirar(player: Player, de: Vector3, ponto: Vector3) -> void:
+	player.global_position = de
+	player.look_at(Vector3(ponto.x, de.y, ponto.z))
+	var olho := de + Vector3(0, player.eye_height, 0)
+	player.head.rotation.x = atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 
 
 func _shot(name: String) -> void:

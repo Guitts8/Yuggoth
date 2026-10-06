@@ -122,7 +122,8 @@ func _materiais() -> void:
 	_mat("papel", "papel", {world = 4.0})
 	_mat("latao", "latao", {world = 3.0})
 	_mat("cinzas", "cinzas", {world = 2.0})
-	_mat("caixa_cartas", "caixa_cartas", {world = 1.0 / 0.3})
+	_mat("papel_pardo", "papel_pardo", {world = 3.0})
+	_mat("barbante", "barbante", {world = 40.0})
 	_mat("mostrador", "mostrador", {})
 	_mat("ferro", "cinzas", {world = 4.0, cor = Color(0.5, 0.5, 0.55)})
 	_mat("vista_noite", "vista_noite", {unlit = true})
@@ -333,6 +334,40 @@ func _lote(parent: Node, name: String, pecas: Array, mat: String) -> MeshInstanc
 	mi.material_override = m[mat]
 	_add(parent, mi)
 	return mi
+
+
+## Barbante em cruz em volta de uma caixa de tamanho `tam` (base em y 0, centrada
+## em x/z), com o nó e um laço em cima. Devolve o grupo (para sumir ao desamarrar).
+func _barbante(parent: Node, tam: Vector3, rot_laco := 0.0) -> Node3D:
+	var b := _group(parent, "Barbante")
+	var f := 0.004  # espessura do fio
+	_box(b, "Comprido", Vector3(tam.x + f, tam.y + f, f), Vector3(0, tam.y / 2, 0), "barbante")
+	_box(b, "Curto", Vector3(f, tam.y + f, tam.z + f), Vector3(0, tam.y / 2, 0), "barbante")
+	var no := _group(b, "No", Vector3(0, tam.y + f, 0), rot_laco)
+	_box(no, "Volta", Vector3(0.012, 0.008, 0.012), Vector3(0, 0.002, 0), "barbante")
+	for s in [-1, 1]:
+		var laco := _cyl(no, "Laco%d" % s, 0.016, 0.016, 0.004, Vector3(s * 0.02, 0.003, 0), "barbante", 6)
+		laco.scale = Vector3(1.3, 1, 0.7)
+		var ponta := _box(no, "Ponta%d" % s, Vector3(0.004, 0.003, 0.035), Vector3(s * 0.012, 0.001, 0.02), "barbante")
+		ponta.rotation_degrees.y = s * 25
+	return b
+
+
+## Um maço de `n` cartas amarradas com barbante (base em y 0): envelopes de cores
+## e alinhamentos um pouco diferentes, numa malha só.
+func _maco(parent: Node, nome: String, n: int, seed: int) -> Node3D:
+	var g := _group(parent, nome)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed
+	var esp := 0.0045
+	var pecas := []
+	for i in n:
+		var cor := Color(1, 1, 1).lerp(Color(0.86, 0.8, 0.68), rng.randf())
+		pecas.append([Vector3(Envelope.LARGURA, esp, Envelope.ALTURA), Vector3(rng.randf_range(-0.006, 0.006), esp * (i + 0.5), rng.randf_range(-0.004, 0.004)),
+			Vector3(0, rng.randf_range(-4, 4), 0), cor])
+	_lote(g, "Envelopes", pecas, "envelope")
+	_barbante(g, Vector3(Envelope.LARGURA, esp * n, Envelope.ALTURA), 15)
+	return g
 
 
 ## Corpo estático com uma caixa de colisão por item: [tamanho, posição].
@@ -630,10 +665,12 @@ func _gabinete_1930() -> void:
 	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
 	_chuva(g)
 
-	# Escrivaninha: a caixa de cartas, a folha do relato, tinteiro e lamparina.
-	# A caixa fica no centro de uma repetição da textura (barbante centrado).
-	var caixa := _box(g, "Caixa", Vector3(0.32, 0.12, 0.24), Vector3(-0.45, 0.84, -2.25), "caixa_cartas")
-	var exam := _area(caixa, Examinable.new(), "CaixaCartas", Vector3(0.4, 0.2, 0.32)) as Examinable
+	# Escrivaninha: as cartas de Akeley (um maço amarrado), a folha do relato,
+	# tinteiro e lamparina.
+	var caixa := _maco(g, "Caixa", 14, 7)
+	caixa.position = Vector3(-0.45, MESA, -2.25)
+	caixa.rotation_degrees.y = 12
+	var exam := _area(caixa, Examinable.new(), "CaixaCartas", Vector3(0.26, 0.14, 0.18), Vector3(0, 0.05, 0)) as Examinable
 	exam.unique_name_in_owner = true
 	exam.prompt = "Examinar"
 	exam.title = "As cartas de Henry Akeley"
@@ -903,6 +940,27 @@ func _aberto(id: StringName) -> ValueCondition:
 	return _cond_valor(StringName("correio_%s" % id), ValueCondition.Op.MAIOR_OU_IGUAL, Correspondencia.ABERTO)
 
 
+## Cartas que chegaram juntas: um maço amarrado cai em `chao`; posto na mesa
+## (`mesa`) e desamarrado, some, e as `cartas` (ocultas até ali) ficam soltas na
+## mesa, cada uma no seu lugar, para abrir uma a uma.
+func _amarradas(parent: Node, id: StringName, chao: Vector3, mesa: Vector3, cartas: Array[Correspondencia]) -> Correspondencia:
+	var maco := _maco(parent, "Maco", cartas.size(), 5)
+	maco.position = Vector3(chao.x, 0.001, chao.y)
+	maco.rotation_degrees.y = chao.z
+	var c := _area(maco, Correspondencia.new(), "Correio", Vector3(0.24, 0.06, 0.16), Vector3(0, 0.02, 0)) as Correspondencia
+	c.id = id
+	c.mesa = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(mesa.z), 0)), Vector3(mesa.x, MESA, mesa.y))
+	c.prompt_abrir = "Desamarrar o maço"
+	c.some_ao_abrir = true
+	c.soltar = cartas
+	c.som_chegada = load(SFX_DIR + "correio_fresta.wav")
+	c.som_mao = load(SFX_DIR + "papel_pegar.wav")
+	c.som_abrir = load(SFX_DIR + "papel_pegar.wav")
+	for carta in cartas:
+		_dentro(carta.get_parent(), id)
+	return c
+
+
 ## O nó só aparece depois de aberta a correspondência `id`. Um ConditionalNode
 ## por nó: se o nó já tem condição, combine com _aberto() nela.
 func _dentro(node: Node, id: StringName) -> void:
@@ -1052,10 +1110,10 @@ func _dia_5(parent: Node) -> void:
 	janela.notice = "Só a chuva, escorrendo no vidro."
 
 	# 15 de agosto: as cartas trêmulas e a oferta de ir a Vermont. As duas
-	# chegaram juntas pela fresta.
+	# chegaram juntas, amarradas num maço; desamarrado na mesa, ficam soltas.
 	var agosto := _folha(g, "CartaAgosto", Vector3(-0.26, MESA + 0.003, -2.08), 9, "carta_akeley_agosto", "Ler a carta", false)
 	_dentro(agosto.get_parent(), &"agosto")
-	_correio(g, "EnvelopeAgosto", &"agosto", CHAO_B, Vector3(0.1, -2.48, -3), {
+	var c_agosto := _correio(g, "EnvelopeAgosto", &"agosto", CHAO_B, Vector3(0.1, -2.48, -3), {
 		remetente = REMETENTE_BRATTLEBORO,
 		carimbo_cidade = "BRATTLEBORO",
 		carimbo_data = "AUG 7\n1928",
@@ -1063,12 +1121,13 @@ func _dia_5(parent: Node) -> void:
 		"A letra treme tanto que o endereço desce em degraus. Carimbo de Brattleboro, 7 de agosto.")
 	var c15 := _folha(g, "Carta15", Vector3(0.0, MESA + 0.005, -2.12), -5, "carta_akeley_15_agosto", "Ler a carta de 15 de agosto", false)
 	_dentro(c15.get_parent(), &"15_agosto")
-	_correio(g, "Envelope", &"15_agosto", CHAO_A, Vector3(-0.12, -2.47, 5), {
+	var c_15 := _correio(g, "Envelope", &"15_agosto", CHAO_A, Vector3(-0.12, -2.47, 5), {
 		remetente = REMETENTE_BRATTLEBORO,
 		carimbo_cidade = "BRATTLEBORO",
 		carimbo_data = "AUG 14\n1928",
 	}, "Envelope de Brattleboro",
 		"Escrita no próprio correio de Brattleboro e posta ali mesmo: chegou sem demora. A letra mal se sustenta na linha.")
+	_amarradas(g, &"agosto_maco", CHAO_A, Vector3(-0.05, -1.86, 4), [c_agosto, c_15])
 	var oferta := _grupo_se(g, "Oferta", _flag(&"narrou_cartao_telegrama_akely", true))
 	_escrever(oferta, "oferta_dia_5", &"leu_carta_akeley_15_agosto")
 
@@ -1213,10 +1272,11 @@ func _dia_3(parent: Node) -> Node3D:
 	# O pacote do expresso não passa na fresta: fica no chão junto à porta. Na
 	# mesa, cortado o barbante, saem o bilhete, a transcrição e o estojo do cilindro.
 	var pacote := _group(g, "Pacote", Vector3(-0.45, 0, 2.45), 10)
-	_box(pacote, "Caixa", Vector3(0.24, 0.1, 0.16), Vector3(0, 0.05, 0), "caixa_cartas")
-	var barbante := _group(pacote, "Barbante")
-	_box(barbante, "Comprido", Vector3(0.245, 0.104, 0.006), Vector3(0, 0.05, 0), "lencol")
-	_box(barbante, "Curto", Vector3(0.006, 0.104, 0.165), Vector3(0, 0.05, 0), "lencol")
+	var tam := Vector3(0.24, 0.1, 0.16)
+	_box(pacote, "Caixa", tam, Vector3(0, tam.y / 2, 0), "papel_pardo")
+	var barbante := _barbante(pacote, tam, -20)
+	# A etiqueta do expresso colada na tampa, fora do caminho do barbante.
+	_quad(pacote, "Etiqueta", Vector2(0.1, 0.06), Vector3(-0.065, tam.y + 0.001, 0.04), Vector3(-90, 0, 0), "envelope")
 	var pac := _area(pacote, Correspondencia.new(), "Correio", Vector3(0.28, 0.14, 0.2), Vector3(0, 0.05, 0)) as Correspondencia
 	pac.id = &"dia_3"
 	# Na ponta leste da mesa: no lugar antigo (oeste) tampava as fotografias.
@@ -1234,13 +1294,14 @@ func _dia_3(parent: Node) -> Node3D:
 	pac.som_mao = load(SFX_DIR + "papel_pegar.wav")
 	pac.som_abrir = load(SFX_DIR + "papel_rasgando.wav")
 	var etiqueta := Label3D.new()
-	etiqueta.name = "Etiqueta"
-	etiqueta.text = "AMERICAN RAILWAY EXPRESS\nfrom H. W. AKELEY — BRATTLEBORO, VT.\nto A. N. WILMARTH — ARKHAM, MASS."
+	etiqueta.name = "EtiquetaTexto"
+	etiqueta.text = "AMERICAN RAILWAY EXPRESS\nFrom H. W. Akeley, Brattleboro, Vt.\nTo A. N. Wilmarth, Arkham, Mass."
 	etiqueta.font_size = 40
-	etiqueta.pixel_size = 0.00012
+	etiqueta.pixel_size = 0.00006
 	etiqueta.modulate = Color(0.12, 0.1, 0.12)
 	etiqueta.outline_size = 0
-	etiqueta.position = Vector3(0, 0.05, 0.081)
+	etiqueta.position = Vector3(-0.065, tam.y + 0.0015, 0.04)
+	etiqueta.rotation_degrees.x = -90
 	etiqueta.alpha_cut = Label3D.ALPHA_CUT_DISCARD
 	_add(pacote, etiqueta)
 	# Sai do pacote aberto; vai para a máquina com o cilindro.

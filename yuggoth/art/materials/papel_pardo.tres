@@ -1,16 +1,16 @@
 [gd_resource type="ShaderMaterial" format=3]
 
-[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_7j21p"]
-[ext_resource type="Texture2D" path="res://art/textures/caixa_cartas.png" id="2_wiwyc"]
+[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_uio32"]
+[ext_resource type="Texture2D" path="res://art/textures/papel_pardo.png" id="2_6hr7p"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_7j21p")
-shader_parameter/albedo_tex = ExtResource("2_wiwyc")
+shader = ExtResource("1_uio32")
+shader_parameter/albedo_tex = ExtResource("2_6hr7p")
 shader_parameter/albedo_color = null
 shader_parameter/uv_scale = null
 shader_parameter/world_uv = true
-shader_parameter/tiles_per_meter = 3.3333333333333335
+shader_parameter/tiles_per_meter = 3.0
 shader_parameter/snap_scale = null
 shader_parameter/affine_near = null
 shader_parameter/affine_far = null

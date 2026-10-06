@@ -495,8 +495,15 @@ func _ready() -> void:
 	var oferta: WriteReply = dia5.get_node("Oferta/Escrever")
 	var telegrama5: Node3D = dia5.get_node("TelegramaAkely")
 	_check(not oferta.can_interact(player) and not telegrama5.visible, "antes da carta de 15 de agosto, nada a responder")
-	await _abrir_correio(esc, dia5.get_node("EnvelopeAgosto/Correio"))
-	await _abrir_correio(esc, dia5.get_node("Envelope/Correio"))
+	var soltas: Array[Correspondencia] = [dia5.get_node("EnvelopeAgosto/Correio"), dia5.get_node("Envelope/Correio")]
+	_check(not soltas[0].get_visual().visible and not soltas[1].get_visual().visible, "Dia 5: as duas cartas chegam amarradas num maço")
+	await _abrir_correio(esc, dia5.get_node("Maco/Correio"))
+	_check(not dia5.get_node("Maco").visible and soltas.all(func(c: Correspondencia) -> bool:
+		return c.get_visual().visible and c.estado() == Correspondencia.NA_MESA), "desamarrado, as cartas ficam soltas na mesa, fechadas")
+	await _check_alcance(esc, "Dia 5, maço desamarrado")
+	for c in soltas:
+		c.interact(player)
+	await _frames(2)
 	_check(dia5.get_node("CartaAgosto").visible and dia5.get_node("Carta15").visible, "Dia 5: as duas cartas de agosto abertas")
 	dia5.get_node("Carta15/Ler").interact(player)
 	await _frames(2)

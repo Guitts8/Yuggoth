@@ -2,21 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cu22afm15vftc"
-path.s3tc="res://.godot/imported/caixa_cartas.png-a294d9543a5d4bcb63b863253d75ac08.s3tc.ctex"
+uid="uid://crbt3iy8aols7"
+path="res://.godot/imported/papel_pardo.png-6bc3aa1b321876d496cc4470f42a1c3b.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/textures/caixa_cartas.png"
-dest_files=["res://.godot/imported/caixa_cartas.png-a294d9543a5d4bcb63b863253d75ac08.s3tc.ctex"]
+source_file="res://art/textures/papel_pardo.png"
+dest_files=["res://.godot/imported/papel_pardo.png-6bc3aa1b321876d496cc4470f42a1c3b.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -24,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -38,4 +37,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

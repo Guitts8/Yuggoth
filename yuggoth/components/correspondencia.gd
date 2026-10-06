@@ -34,6 +34,10 @@ static var na_mao: Correspondencia
 @export var prompt_retirar := "Tirar uma fotografia"
 ## Some ao abrir (o barbante do pacote).
 @export var fechado: Node3D
+## Um maço amarrado: ao desamarrar, estas cartas ficam soltas na mesa (cada uma
+## no seu `mesa`, ainda fechadas), e o maço some (`some_ao_abrir`).
+@export var soltar: Array[Correspondencia] = []
+@export var some_ao_abrir := false
 @export_group("Na mão")
 ## Posição e rotação (graus) do visual em relação à câmera.
 @export var mao_posicao := Vector3(0.17, -0.17, -0.42)
@@ -109,6 +113,8 @@ func _on_interact(by: Node) -> void:
 		NA_MESA:
 			GameState.set_value(chave(), ABERTO)
 			_tocar(som_abrir)
+			for carta in soltar:
+				GameState.set_value(carta.chave(), NA_MESA)
 		ABERTO:
 			if tiradas() < retirar.size():
 				_retirar()
@@ -164,9 +170,12 @@ func _atualizar() -> void:
 		visual.set(&"aberto", e == ABERTO)
 	if fechado:
 		fechado.visible = e != ABERTO
+	var sumiu := some_ao_abrir and e == ABERTO
+	if some_ao_abrir:
+		visual.visible = not sumiu
 	# Na mão não se mira a si mesma (nem tampa a mira da mesa).
-	visible = e != NA_MAO
-	_forma.set_deferred(&"disabled", e == NA_MAO)
+	visible = e != NA_MAO and not sumiu
+	_forma.set_deferred(&"disabled", e == NA_MAO or sumiu)
 	match e:
 		NO_CHAO:
 			prompt = prompt_pegar

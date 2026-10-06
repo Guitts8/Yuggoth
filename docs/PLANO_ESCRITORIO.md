@@ -97,6 +97,10 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
 2. **Cartas do mesmo dia chegam amarradas** num maço com barbante (Dias 4 e 5);
    desamarrado na mesa, os envelopes se separam. **Modelos refeitos:** a caixa de
    cartas do Prólogo e o pacote do expresso (papel pardo, barbante de verdade).
+   ✅ Maço no Dia 5 (`Correspondencia.soltar`); no Dia 4 o telegrama segue avulso
+   (vem por mensageiro, não pelo correio). O Prólogo virou um maço de 14 cartas
+   com laço; o pacote, papel pardo com barbante e etiqueta na tampa. Sai a textura
+   `caixa_cartas`.
 3. **Telefone com som:** chiado da linha, a telefonista, murmúrio de voz filtrada
    sob cada legenda, o clique do gancho.
 4. **Lareira acesa pelo jogador** nas noites frias (Dias 5 e 6): "Acender a

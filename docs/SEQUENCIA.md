@@ -253,7 +253,7 @@ As cartas cruzam o correio: cada carta posta na porta **salta no tempo** (tela p
 cartão); o que chega depois cai pela fresta no escuro (ouve-se) e está no chão
 junto à porta quando a luz volta.
 
-**Na sala (15 de agosto)** — dois envelopes de Brattleboro no chão (*AUG 7* e *AUG 14*):
+**Na sala (15 de agosto)** — dois envelopes de Brattleboro (*AUG 7* e *AUG 14*) chegam **amarrados num maço**; na mesa, "Desamarrar o maço", e as duas cartas ficam soltas para abrir:
 - **Carta do começo de agosto**: a pedra "não está mais nesta terra"; o tronco
   atravessado na estrada (dia 2), o tiro de raspão e as presenças na mata (5 e 6);
   nunca sai sem dois cães.

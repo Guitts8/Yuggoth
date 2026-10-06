@@ -36,7 +36,8 @@ func _texturas() -> void:
 	_save(_papel(), "papel")
 	_save(_latao(), "latao")
 	_save(_cinzas(), "cinzas")
-	_save(_caixa_cartas(), "caixa_cartas")
+	_save(_papel_pardo(), "papel_pardo")
+	_save(_barbante(), "barbante")
 	_save(_mostrador(), "mostrador")
 	_save(_vista(false), "vista_noite")
 	_save(_vista(true), "vista_dia")
@@ -345,13 +346,30 @@ func _cinzas() -> Image:
 	return img
 
 
-func _caixa_cartas() -> Image:
-	var img := _madeira(Color(0.42, 0.3, 0.2), 26, 0)
-	# Barbante cruzado no meio da tampa.
-	for i in 64:
-		for d in 2:
-			img.set_pixel(31 + d, i, Color(0.78, 0.7, 0.52))
-			img.set_pixel(i, 31 + d, Color(0.78, 0.7, 0.52))
+## Papel pardo de embrulho (o pacote do expresso): fibras compridas e vincos.
+func _papel_pardo() -> Image:
+	var img := _img()
+	var fibra := _noise(26, 0.5)
+	var mancha := _noise(27, 0.05)
+	for y in 64:
+		for x in 64:
+			var f := 0.92 + fibra.get_noise_2d(x * 0.3, y * 2.0) * 0.08 + mancha.get_noise_2d(x, y) * 0.07
+			# Dois vincos do embrulho.
+			if absi(x - 21) < 1 or absi(y - 44) < 1:
+				f *= 0.86
+			elif x == 22 or y == 45:
+				f *= 1.06
+			img.set_pixel(x, y, _shade(Color(0.6, 0.45, 0.29), f))
+	return img
+
+
+## Barbante de algodão: fios torcidos em diagonal.
+func _barbante() -> Image:
+	var img := _img(16, 16)
+	for y in 16:
+		for x in 16:
+			var torcido := 0.85 + 0.15 * sin((x + y) * PI / 2.0)
+			img.set_pixel(x, y, _shade(Color(0.8, 0.7, 0.5), torcido))
 	return img
 
 
