@@ -127,6 +127,23 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    `Sonhos/NoiteN` com `sonhando == N` (o grupo `Dias` some), `sonhos[N]` = a flag
    que acorda. Fase 3b concluída; falta o playtest do usuário.
 
+## Fase 3c — Ajustes do playtest 2 (2026-10-06)
+1. **Pular, só para testes:** segurar uma tecla acelera tudo (conversas, cartões,
+   lapsos); fora do jogo exportado.
+2. **Papéis invisíveis:** o telegrama e outras folhas ficavam dentro do mata-borrão.
+3. **O correio do chão, de uma vez:** "Pegar o correio" junta tudo o que caiu.
+4. **Zoom da visão** (botão direito / Z), para ler a folhinha e os papéis de longe.
+5. **As cartas escritas "quebradas":** rever a formatação de cada resposta no papel.
+6. **Vozes ao telefone** diferentes das vozes do disco (o disco tem de impactar).
+7. **A pedra do sonho** longe demais no exame.
+8. **O lapso:** Wilmarth vira para a janela; o dia nasce, entardece e anoitece devagar.
+9. **Selar em 3D**, devagar, na mesa (a folha dobra, entra no envelope, a aba,
+   o selo) — no lugar da animação 2D; o envelope na mão já está ótimo.
+10. **Boston:** o rapaz atende pela porta entreaberta, franco e gentil, sem convidar.
+11. **A criatura:** menos rosa e menos clara.
+12. **A cidade da janela em 3D** (pequena, ao longe), para comparar com o painel.
+13. **A passagem para o sonho:** a definir (dormir em casa? a preparação? um diário?).
+
 ## Fase 4 — O mapa de Vermont
 Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da
 investigação**, como na referência). Textura gerada: contorno de Vermont, o

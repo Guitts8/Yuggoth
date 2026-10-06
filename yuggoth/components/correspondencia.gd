@@ -12,14 +12,16 @@ extends Examinable
 ##                               por vez (`correio_<id>_tiradas`); depois, é um
 ##                               Examinable como os outros.
 ##
-## Uma coisa na mão por vez (nem com a carta selada na mão, CartaSaida). Quando o nó começa a processar (o dia chega, ou a
-## carta cruza o correio no escuro de um salto no tempo), toca `som_chegada` no
-## lugar onde ele está: o envelope passando pela fresta, o pacote pousado no chão.
+## Pegar o correio junta tudo o que está no chão (uma pilha na mão); pôr na mesa
+## pousa tudo, cada um no seu lugar. Com a carta selada na mão (CartaSaida), não
+## se pega nada. Quando o nó começa a processar (o dia chega, ou a carta cruza o
+## correio no escuro de um salto no tempo), toca `som_chegada` no lugar onde ele
+## está: o envelope passando pela fresta, o pacote pousado no chão.
 
 enum { NO_CHAO, NA_MAO, NA_MESA, ABERTO }
 
-## A correspondência na mão do jogador, ou null.
-static var na_mao: Correspondencia
+## A correspondência na mão do jogador (a pilha, na ordem em que foi pega).
+static var na_mao: Array[Correspondencia] = []
 
 @export var id: StringName
 ## Lugar do visual na escrivaninha (no espaço do pai dele).
@@ -56,6 +58,7 @@ var _chegou := false
 
 func _ready() -> void:
 	super()
+	add_to_group(&"correspondencia")
 	_chao = get_visual().transform
 	_forma = get_node(^"CollisionShape3D")
 	_som = AudioStreamPlayer3D.new()
@@ -71,14 +74,13 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
-	if na_mao == self:
-		na_mao = null
+	na_mao.erase(self)
 
 
 func _notification(what: int) -> void:
 	# O dia acabou (ou a sala trocou de vestido) com isto na mão: fica na mesa.
-	if what == NOTIFICATION_DISABLED and na_mao == self:
-		na_mao = null
+	if what == NOTIFICATION_DISABLED and self in na_mao:
+		na_mao.erase(self)
 		GameState.set_value(chave(), NA_MESA)
 
 
@@ -97,7 +99,7 @@ func tiradas() -> int:
 func can_interact(by: Node) -> bool:
 	match estado():
 		NO_CHAO:
-			return super(by) and na_mao == null and CartaSaida.atual == null
+			return super(by) and na_mao.is_empty() and CartaSaida.atual == null
 		NA_MAO:
 			return false
 	return super(by)
@@ -106,9 +108,12 @@ func can_interact(by: Node) -> bool:
 func _on_interact(by: Node) -> void:
 	match estado():
 		NO_CHAO:
-			_camera = get_viewport().get_camera_3d()
-			na_mao = self
-			GameState.set_value(chave(), NA_MAO)
+			# Tudo o que caiu pela fresta vem junto, este por cima.
+			var camera := get_viewport().get_camera_3d()
+			for c: Correspondencia in get_tree().get_nodes_in_group(&"correspondencia"):
+				if c != self and c.estado() == NO_CHAO and c.is_visible_in_tree() and c.can_process():
+					c._pegar(camera)
+			_pegar(camera)
 			_tocar(som_mao)
 		NA_MESA:
 			GameState.set_value(chave(), ABERTO)
@@ -122,12 +127,20 @@ func _on_interact(by: Node) -> void:
 				super(by)
 
 
-## Chamado pela MesaCorreio: da mão para o lugar dele na escrivaninha.
-func pousar() -> void:
-	if na_mao == self:
-		na_mao = null
-	GameState.set_value(chave(), NA_MESA)
-	_tocar(som_mao)
+func _pegar(camera: Camera3D) -> void:
+	_camera = camera
+	na_mao.append(self)
+	GameState.set_value(chave(), NA_MAO)
+
+
+## Chamado pela MesaCorreio: da mão para a escrivaninha, cada um no seu lugar.
+static func pousar_tudo() -> void:
+	var pilha := na_mao.duplicate()
+	na_mao.clear()
+	for c in pilha:
+		GameState.set_value(c.chave(), NA_MESA)
+	if not pilha.is_empty():
+		pilha[0]._tocar(pilha[0].som_mao)
 
 
 func _retirar() -> void:
@@ -150,8 +163,11 @@ func _process(_delta: float) -> void:
 			_som.stream = som_chegada
 			_som.play()
 	if estado() == NA_MAO and is_instance_valid(_camera):
-		var rot := Basis.from_euler(mao_rotacao * PI / 180.0)
-		get_visual().global_transform = _camera.global_transform * Transform3D(rot, mao_posicao)
+		# Na pilha, os de baixo um pouco atrás e deslocados (0 = o de cima).
+		var i := na_mao.size() - 1 - na_mao.find(self)
+		var rot := Basis.from_euler((mao_rotacao + Vector3(0, i * 4.0, -i * 3.0)) * PI / 180.0)
+		var pos := mao_posicao + Vector3(-0.018, 0.012, -0.008) * i
+		get_visual().global_transform = _camera.global_transform * Transform3D(rot, pos)
 
 
 func _on_value_changed(key: StringName, _value: Variant) -> void:

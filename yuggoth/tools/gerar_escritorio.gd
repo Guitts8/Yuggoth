@@ -594,9 +594,10 @@ func _miskatonic() -> void:
 	_cyl(g, "Tinteiro", 0.03, 0.035, 0.05, Vector3(0.36, 0.805, -2.32), "ferro", 6)
 	var pena := _box(g, "Pena", Vector3(0.01, 0.01, 0.2), Vector3(0.3, 0.79, -2.12), "lencol")
 	pena.rotation_degrees.y = 25
-	_box(g, "MataBorrao", Vector3(0.5, 0.008, 0.36), Vector3(0.05, 0.784, -2.12), "estofado")
+	# Fino e rente ao tampo: os papéis por cima dele (a 2 mm ou mais) não se enterram.
+	_box(g, "MataBorrao", Vector3(0.5, 0.003, 0.36), Vector3(0.05, MESA + 0.0015, -2.12), "estofado")
 	for s in [-1, 1]:
-		_box(g, "Cantoneira%d" % s, Vector3(0.05, 0.012, 0.37), Vector3(0.05 + s * 0.24, 0.786, -2.12), "feltro")
+		_box(g, "Cantoneira%d" % s, Vector3(0.05, 0.005, 0.37), Vector3(0.05 + s * 0.24, MESA + 0.0025, -2.12), "feltro")
 	var espatula := _group(g, "Espatula", Vector3(-0.68, MESA, -1.9), 80)
 	_box(espatula, "Lamina", Vector3(0.15, 0.003, 0.016), Vector3(-0.04, 0.0015, 0), "ferro")
 	_box(espatula, "Cabo", Vector3(0.07, 0.01, 0.018), Vector3(0.07, 0.005, 0), "latao")
@@ -1009,7 +1010,7 @@ func _dia_5(parent: Node) -> void:
 	var tel := _grupo_se(g, "TelegramaAkely", _flag(&"narrou_cartao_telegrama_akely"))
 	_correio(tel, "EnvelopeTelegrama", &"telegrama_akely", CHAO_C, Vector3(0.62, -2.2, 12), TELEGRAMA,
 		"Telegrama de Bellows Falls", "O envelope amarelo da Western Union. Em resposta a uma carta inteira, só isto.")
-	var papel := _box(tel, "Papel", Vector3(0.2, 0.003, 0.14), Vector3(0.45, MESA + 0.0015, -1.94), "envelope")
+	var papel := _box(tel, "Papel", Vector3(0.2, 0.003, 0.14), Vector3(0.45, MESA + 0.0045, -1.94), "envelope")
 	papel.rotation_degrees.y = -10
 	_dentro(papel, &"telegrama_akely")
 	# Depois do bilhete, o mesmo papel serve para comparar (uma área por vez).
@@ -1075,7 +1076,7 @@ func _dia_4(parent: Node) -> void:
 	_quad(noite, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
 	_omni(noite, "Lua", Vector3(0, 2.2, -2.6), Color(0.5, 0.6, 0.9), 0.4, 5.0)
 	_abajur(noite)
-	var telegrama := _box(g, "Telegrama", Vector3(0.2, 0.003, 0.14), Vector3(0.02, MESA + 0.0015, -2.12), "envelope")
+	var telegrama := _box(g, "Telegrama", Vector3(0.2, 0.003, 0.14), Vector3(0.02, MESA + 0.0045, -2.12), "envelope")
 	telegrama.rotation_degrees.y = -4
 	var ler := _area(telegrama, DocumentPickup.new(), "Ler", Vector3(0.24, 0.06, 0.18)) as DocumentPickup
 	ler.prompt = "Ler o telegrama"
@@ -1099,7 +1100,8 @@ func _dia_4(parent: Node) -> void:
 	var foto := Fotografia.new()
 	foto.name = "Foto10"
 	foto.imagem = load(TEX_DIR + "foto_exercito.png")
-	foto.position = Vector3(-0.25, MESA + Fotografia.ESPESSURA * 0.5, -2.33)
+	# A ponta passa por cima do mata-borrão.
+	foto.position = Vector3(-0.25, MESA + 0.0035 + Fotografia.ESPESSURA * 0.5, -2.33)
 	foto.rotation_degrees.y = 6
 	_add(julho, foto)
 	_retirada(foto, &"julho", 1, 5)

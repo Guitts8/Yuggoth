@@ -258,12 +258,12 @@ func _ready() -> void:
 	_check(correio1.prompt == "Pegar o correio" and not mesa.can_interact(player) and not mesa.visible, "sem nada na mão, a mesa não pede nada")
 	correio1.interact(player)
 	await _frames(2)
-	_check(Correspondencia.na_mao == correio1 and correio1.get_visual().global_position.distance_to(player.camera.global_position) < 0.6,
+	_check(Correspondencia.na_mao == [correio1] and correio1.get_visual().global_position.distance_to(player.camera.global_position) < 0.6,
 		"pegar o correio: o envelope na mão")
 	_check(mesa.can_interact(player) and mesa.visible and not correio1.visible, "na mão: mirar a mesa para pôr o envelope")
 	mesa.interact(player)
 	await _frames(2)
-	_check(Correspondencia.na_mao == null and correio1.get_visual().transform.is_equal_approx(correio1.mesa) \
+	_check(Correspondencia.na_mao.is_empty() and correio1.get_visual().transform.is_equal_approx(correio1.mesa) \
 		and correio1.prompt == "Abrir com a espátula" and not mesa.visible, "pôr na mesa: o envelope no lugar dele")
 	_check(not carta_mesa.visible, "fechado, a carta continua no envelope")
 	correio1.interact(player)
@@ -330,7 +330,7 @@ func _ready() -> void:
 	var correio2: Correspondencia = dia2.get_node("Envelope/Correio")
 	correio2.interact(player)
 	await _frames(1)
-	_check(Correspondencia.na_mao == correio2, "Dia 2: o envelope gordo na mão")
+	_check(Correspondencia.na_mao == [correio2], "Dia 2: o envelope gordo na mão")
 	await _abrir_correio(esc, correio2)
 	_check(dia2.get_node("Carta").visible and correio2.prompt == "Tirar uma fotografia", "aberto: a carta na mesa; as fotos esperam no envelope")
 	var lugar_foto: Vector3 = lista_fotos[0].position
@@ -454,7 +454,8 @@ func _ready() -> void:
 	var correio_julho: Correspondencia = dia4.get_node("Envelope/Correio")
 	correio_tel.interact(player)
 	await _frames(1)
-	_check(not correio_julho.can_interact(player), "uma coisa na mão por vez")
+	_check(correio_julho in Correspondencia.na_mao and correio_tel in Correspondencia.na_mao and not correio_julho.can_interact(player),
+		"pegar o correio junta tudo o que caiu pela fresta")
 	await _abrir_correio(esc, correio_tel)
 	_check(correio_julho.can_interact(player) and dia4.get_node("Telegrama").visible, "telegrama aberto; a mão livre para a carta de julho")
 	await _abrir_correio(esc, correio_julho)
@@ -801,12 +802,15 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 
 ## Como o jogador: pegar o correio do chão, pôr na mesa e abrir.
 func _abrir_correio(esc: Escritorio, correio: Correspondencia) -> void:
-	correio.interact(esc.player)
-	await _frames(2)
-	(esc.get_node(^"%PorNaMesa") as MesaCorreio).interact(esc.player)
-	await _frames(1)
-	correio.interact(esc.player)
-	await _frames(2)
+	if correio.estado() == Correspondencia.NO_CHAO:
+		correio.interact(esc.player)
+		await _frames(2)
+	if correio.estado() == Correspondencia.NA_MAO:
+		(esc.get_node(^"%PorNaMesa") as MesaCorreio).interact(esc.player)
+		await _frames(1)
+	if correio.estado() == Correspondencia.NA_MESA:
+		correio.interact(esc.player)
+		await _frames(2)
 
 
 ## Vira o corpo e a cabeça do player para o ponto e espera a mira atualizar.
@@ -831,6 +835,36 @@ func _check_alcance(esc: Node3D, quando: String, limites := Vector2(2.3, 2.8)) -
 	await _frames(2)
 	var fora := _inalcancaveis(esc, limites)
 	_check(fora.is_empty(), "%s: toda interação visível ao alcance da mira %s" % [quando, fora if fora else ""])
+	var enterrados := _enterrados(esc)
+	_check(enterrados.is_empty(), "%s: nenhum papel enterrado no mata-borrão %s" % [quando, enterrados if enterrados else ""])
+
+
+## Papéis visíveis (folhas, envelopes, telegramas, fotos) cujo topo fica abaixo
+## do topo do mata-borrão ou das cantoneiras onde se sobrepõem: somem na mesa.
+func _enterrados(fase: Node3D) -> PackedStringArray:
+	var tampas: Array[MeshInstance3D] = []
+	for nome in ["MataBorrao", "Cantoneira-1", "Cantoneira1"]:
+		var t := fase.find_child(nome, true, false) as MeshInstance3D
+		if t and t.is_visible_in_tree():
+			tampas.append(t)
+	var fora := PackedStringArray()
+	for mi: MeshInstance3D in fase.find_children("*", "MeshInstance3D", true, false):
+		if mi in tampas or not mi.is_visible_in_tree() or mi.material_override == null:
+			continue
+		var mat := mi.material_override.resource_path.get_file().get_basename()
+		if mat not in ["papel", "envelope", "cartao_foto"]:
+			continue
+		var caixa := mi.global_transform * mi.get_aabb()
+		if caixa.size.y > 0.05:
+			continue
+		for t in tampas:
+			var tampa := t.global_transform * t.get_aabb()
+			var cruza := caixa.position.x < tampa.end.x and caixa.end.x > tampa.position.x \
+				and caixa.position.z < tampa.end.z and caixa.end.z > tampa.position.z
+			if cruza and caixa.end.y < tampa.end.y + 0.0005:
+				fora.append(String(fase.get_path_to(mi)))
+				break
+	return fora
 
 
 func _check(ok: bool, label: String) -> void:

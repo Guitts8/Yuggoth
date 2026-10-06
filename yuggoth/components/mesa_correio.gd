@@ -1,7 +1,7 @@
 class_name MesaCorreio
 extends Interactable
 ## A escrivaninha enquanto há correspondência na mão: mirar o tampo e "Pôr na
-## mesa" (Correspondencia.pousar). Sem nada na mão, sai da mira e da física —
+## mesa" (Correspondencia.pousar_tudo). Sem nada na mão, sai da mira e da física —
 ## não tampa o que está sobre a mesa.
 
 var _forma: CollisionShape3D
@@ -18,15 +18,15 @@ func _physics_process(_delta: float) -> void:
 
 
 func can_interact(by: Node) -> bool:
-	return super(by) and Correspondencia.na_mao != null
+	return super(by) and not Correspondencia.na_mao.is_empty()
 
 
 func _atualizar() -> void:
-	var on := Correspondencia.na_mao != null
+	var on := not Correspondencia.na_mao.is_empty()
 	if visible != on or _forma.disabled == on:
 		visible = on
 		_forma.set_deferred(&"disabled", not on)
 
 
 func _on_interact(_by: Node) -> void:
-	Correspondencia.na_mao.pousar()
+	Correspondencia.pousar_tudo()

@@ -20,6 +20,10 @@ signal stood_up
 @export var bob_amount := 0.03
 @export var bob_frequency := 5.5
 
+## Segurando "zoom_visao" (botão direito, Z): o campo de visão aperta para ler de
+## longe (a folhinha, um papel na mesa), e a mira fica mais lenta.
+@export var zoom_fov := 32.0
+
 @export_group("Interação")
 @export var interact_distance := 2.0
 
@@ -37,6 +41,7 @@ var _target_prompt := ""
 var _bob_t := 0.0
 var _bob_weight := 0.0
 var _last_bob_sin := 0.0
+var _fov_base := 75.0
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
@@ -49,6 +54,7 @@ func _ready() -> void:
 	ray.target_position = Vector3(0, 0, -interact_distance)
 	ray.add_exception(self)
 	head.position.y = eye_height
+	_fov_base = camera.fov
 	Events.modal_changed.connect(_on_modal_changed)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if not footstep_sounds.is_empty():
@@ -125,7 +131,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _look(delta: Vector2) -> void:
-	delta *= Settings.get_value(&"sensibilidade")
+	delta *= Settings.get_value(&"sensibilidade") * camera.fov / _fov_base
 	if Settings.get_value(&"inverter_y"):
 		delta.y = -delta.y
 	rotate_y(-delta.x)
@@ -137,6 +143,8 @@ func _update_head(delta: float, crouching: bool) -> void:
 	if seated:
 		target_height = seated_eye_height
 	head.position.y = lerpf(head.position.y, target_height, 1.0 - exp(-10.0 * delta))
+	var zoom := input_enabled and Input.is_action_pressed(&"zoom_visao")
+	camera.fov = lerpf(camera.fov, zoom_fov if zoom else _fov_base, 1.0 - exp(-8.0 * delta))
 
 	var ground_speed := Vector2(velocity.x, velocity.z).length()
 	var moving := is_on_floor() and ground_speed > 0.15
