@@ -42,7 +42,7 @@ const SONHO_DESCIDA := 4.0
 ## Cartão depois da tinta. Na demo o jogo acaba aí e volta ao menu; no jogo
 ## completo, aqui entra a troca para a fazenda.
 @export var linha_fim_demo: NarrationLine
-## Segundos depois da abertura até o narrador lembrar das cartas.
+## Segundos depois de ler a folha do relato até o narrador lembrar das cartas.
 @export var dica_cartas_apos := 8.0
 
 var _lembrando := false
@@ -120,6 +120,11 @@ func _prologo() -> void:
 	await SceneDirector.release_black(2.5)
 	if not is_inside_tree():
 		return
+	# A caixa só abre depois da folha do relato; a dica vem depois de lê-la.
+	while not GameState.has_flag(&"leu_relato_folha_1") or Events.is_modal_open:
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
 	await get_tree().create_timer(dica_cartas_apos).timeout
 	if not is_inside_tree():
 		return

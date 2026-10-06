@@ -1,7 +1,8 @@
 extends Control
 ## Wilmarth escreve a Akeley (GDD §5.1). Primeiro o jogador escolhe como a
 ## carta começa (o tom); depois ela se escreve sozinha, ao som da pena. Antes
-## de escolher dá para desistir (Esc) e voltar depois; escolhido, está escrito.
+## de escolher dá para desistir (Esc) e voltar depois; escolhida, dá para
+## amassar a folha (Esc) e começar outra quantas vezes quiser. Só selar decide.
 
 const CHARS_PER_SECOND := 70.0
 
@@ -45,7 +46,14 @@ func open(reply: ReplyData) -> void:
 	body.hide()
 	for child in choices.get_children():
 		child.queue_free()
-	for option in reply.options:
+	_mostrar_aberturas()
+	show()
+	Events.modal_changed.emit(true)
+	_focar_primeira()
+
+
+func _mostrar_aberturas() -> void:
+	for option in _reply.options:
 		var button := Button.new()
 		button.text = "“%s”" % option.resumo
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -59,10 +67,27 @@ func open(reply: ReplyData) -> void:
 		choices.add_child(button)
 	choices.show()
 	footer.text = "Como começar a carta?    [Esc] mais tarde"
-	show()
-	Events.modal_changed.emit(true)
-	if choices.get_child_count() > 0:
-		(choices.get_child(0) as Button).grab_focus()
+
+
+func _focar_primeira() -> void:
+	for child in choices.get_children():
+		if not child.is_queued_for_deletion():
+			(child as Button).grab_focus()
+			return
+
+
+## Amassa a folha: de volta às aberturas, nada decidido.
+func _recomecar() -> void:
+	if _tween:
+		_tween.kill()
+		_tween = null
+	_pen.stop()
+	_chosen = null
+	body.text = ""
+	body.hide()
+	choices.show()
+	footer.text = "Como começar a carta?    [Esc] mais tarde"
+	_focar_primeira()
 
 
 func _choose(option: ReplyOption) -> void:
@@ -71,7 +96,7 @@ func _choose(option: ReplyOption) -> void:
 	body.text = option.document.resolve_pages()[0] if option.document else option.resumo
 	body.visible_ratio = 0.0
 	body.show()
-	footer.text = ""
+	footer.text = "[E] escrever de uma vez    [Esc] recomeçar"
 	var length := body.get_parsed_text().length()
 	_tween = create_tween()
 	_tween.tween_property(body, "visible_ratio", 1.0, length / CHARS_PER_SECOND)
@@ -85,7 +110,7 @@ func _finish_writing() -> void:
 		_tween = null
 	body.visible_ratio = 1.0
 	_pen.stop()
-	footer.text = "[E] selar o envelope"
+	footer.text = "[E] selar o envelope    [Esc] recomeçar"
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -102,8 +127,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				focused.pressed.emit()
 				get_viewport().set_input_as_handled()
 		return
-	if event.is_action_pressed(&"interagir") or event.is_action_pressed(&"ui_cancel") \
-			or event.is_action_pressed(&"ui_accept"):
+	if event.is_action_pressed(&"ui_cancel"):
+		_recomecar()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"interagir") or event.is_action_pressed(&"ui_accept"):
 		if _tween:
 			_finish_writing()  # pressa: mostra o resto de uma vez
 		else:

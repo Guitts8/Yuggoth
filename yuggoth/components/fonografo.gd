@@ -35,6 +35,7 @@ var _repouso: Dictionary[Node3D, Vector3] = {}
 
 func _ready() -> void:
 	super()
+	add_to_group(&"fonografo")
 	_som = AudioStreamPlayer3D.new()
 	_som.name = "Som"
 	_som.bus = &"Voice"
@@ -47,6 +48,24 @@ func _ready() -> void:
 
 func tocando() -> bool:
 	return _som != null and _som.playing
+
+
+## Durante um telefonema o fonógrafo não toca (o Telefone levanta a agulha ao atender).
+func can_interact(by: Node) -> bool:
+	return super(by) and not _ao_telefone()
+
+
+func _ao_telefone() -> bool:
+	for t: Telefone in get_tree().get_nodes_in_group(&"telefone"):
+		if t.em_ligacao():
+			return true
+	return false
+
+
+## Levanta a agulha, se estiver tocando.
+func parar() -> void:
+	if tocando():
+		_parar()
 
 
 func faltando() -> PackedStringArray:

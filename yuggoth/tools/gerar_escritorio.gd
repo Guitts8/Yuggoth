@@ -483,6 +483,8 @@ func _gabinete_1930() -> void:
 	exam.title = "As cartas de Henry Akeley"
 	exam.description = "Amarradas com barbante. O papel ainda cheira a terra úmida."
 	exam.initial_rotation = Vector3(25, 20, 0)
+	# Primeiro o relato (a folha na mesa); só então as cartas que levam a maio.
+	exam.condition = _flag(&"leu_relato_folha_1")
 
 	var folha := _box(g, "Folha", Vector3(0.24, 0.006, 0.32), Vector3(0.12, 0.783, -2.1), "papel")
 	folha.rotation_degrees.y = -8

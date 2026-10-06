@@ -873,13 +873,14 @@ func _pena() -> PackedFloat32Array:
 func _tarde(passaros := true) -> PackedFloat32Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 33
-	var b := _buf(8.5)
+	var b := _buf(16.0)
 	for i in b.size():
 		b[i] = rng.randf_range(-1, 1) * 0.12
 	_lowpass(b, 400.0)  # cidade distante
-	for k in (9 if passaros else 0):  # pássaros: varreduras curtas de seno
+	# Pássaros: poucos e longe (varreduras curtas de seno), não um bando na janela.
+	for k in (4 if passaros else 0):
 		var at := rng.randi_range(0, b.size() - RATE)
-		var f0 := rng.randf_range(2600, 3600)
+		var f0 := rng.randf_range(2400, 3200)
 		var notas := rng.randi_range(2, 4)
 		for nota in notas:
 			var start := at + nota * int(0.14 * RATE)
@@ -887,7 +888,7 @@ func _tarde(passaros := true) -> PackedFloat32Array:
 			for j in dur:
 				var t := float(j) / dur
 				var f := f0 + sin(t * PI) * 900.0
-				b[start + j] += sin(TAU * f * j / RATE) * sin(t * PI) * 0.08
+				b[start + j] += sin(TAU * f * j / RATE) * sin(t * PI) * 0.04
 	return _seamless(b, 0.5)
 
 

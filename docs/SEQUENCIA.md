@@ -10,6 +10,10 @@ GDD v0.4.
 
 Legenda: ✅ jogável (arte e som provisórios) · ⏳ planejado
 
+**Escrever a Akeley**, em todos os dias: escolhe-se a abertura (o tom), a carta se
+escreve ao som da pena, e até selar dá para **amassar a folha (Esc) e escolher
+outra** quantas vezes quiser. Só selar decide.
+
 | # | Parte | Data na história | Estado | Livro |
 |---|---|---|---|---|
 | — | Menu principal | — | ✅ | — |
@@ -49,13 +53,14 @@ inverter eixo, tela cheia), Sair. **Esc** durante o jogo abre a pausa.
 2. O jogador está **sentado** à escrivaninha, de frente para a janela com chuva.
    Tentar andar o faz levantar.
 3. **Na sala:**
-   - mesa: a **caixa das cartas de Akeley**, amarrada com barbante (examinável), a
-     **folha do relato** (o começo do livro, 2 páginas; lida, não vai para o dossiê),
+   - mesa: a **folha do relato** (o começo do livro, 2 páginas; lida, não vai para
+     o dossiê) e a **caixa das cartas de Akeley**, amarrada com barbante — que só
+     se deixa examinar **depois de ler a folha**,
      tinteiro, pena, lamparina;
    - **lareira** apagada — *"As cinzas estão frias. Não acendo a lareira desde que voltei."*;
    - **janela** — *"Chove sobre Arkham desde o fim da tarde."*;
    - uma poltrona coberta por lençol, a estante, o relógio, a porta.
-4. Depois de alguns segundos, o narrador: *"As cartas dele continuam sobre a mesa.
+4. Alguns segundos depois de ler a folha, o narrador: *"As cartas dele continuam sobre a mesa.
    Não desfaço o nó desde setembro."*
 5. **Examinar a caixa e devolvê-la** → a sala se reorganiza: o **sonho** sobe (a
    estética crua do PS1), as luzes morrem, tela preta, cartão *"Maio de 1928."*, e a
@@ -66,7 +71,8 @@ inverter eixo, tela cheia), Sair. **Esc** durante o jogo abre a pausa.
 ---
 
 ## 1. Dia 1 — A primeira carta ✅ (5–9 de maio)
-**Clima:** tarde ensolarada, pássaros, o relógio tiquetaqueando.
+**Clima:** tarde ensolarada, pássaros ao longe, o relógio tiquetaqueando. (Em
+qualquer dia, ler, escrever ou examinar abaixa o ambiente.)
 **Ao começar:** *"A carta chegou com o correio do meio-dia. Selo de Townshend, Vermont."*
 
 **Na sala:**

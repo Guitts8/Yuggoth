@@ -5,6 +5,9 @@ extends Node
 ## O zumbido é o leitmotiv: toca no bus Whisper e `exposicao` controla volume,
 ## filtro, distorção e pitch. Fica mudo até alguém chamar set_hum() — no
 ## escritório, isso acontece depois do disco (Dia 3).
+##
+## Com uma UI modal aberta (ler uma carta, escrever, examinar), o ambiente
+## abaixa: os pássaros da tarde não disputam com a leitura.
 
 const AMBIENCE_FADE := 2.0
 ## Velocidade com que o zumbido persegue `exposicao` (igual ao pós do GameRoot).
@@ -15,6 +18,9 @@ const HUM_DB := Vector2(-30.0, -6.0)
 const HUM_CUTOFF_HZ := Vector2(400.0, 5000.0)
 const HUM_DRIVE := Vector2(0.0, 0.45)
 const HUM_PITCH := Vector2(1.0, 0.94)
+## Ganho do bus Ambience com um modal aberto, e quão rápido (dB/s) chega lá.
+const DUCK_DB := -16.0
+const DUCK_SPEED := 30.0
 
 var _ambience: Array[AudioStreamPlayer] = []
 var _ambience_active := 0
@@ -28,6 +34,7 @@ var _whisper_bus := -1
 var _lowpass: AudioEffectLowPassFilter
 var _distortion: AudioEffectDistortion
 var _pitch: AudioEffectPitchShift
+var _duck: AudioEffectAmplify
 
 
 func _ready() -> void:
@@ -37,6 +44,12 @@ func _ready() -> void:
 		_ambience.append(_make_player(&"Ambience"))
 	_hum = _make_player(&"Whisper")
 	_hum.volume_db = -80.0
+
+	# Separado do volume do bus (que é a preferência do jogador, em Settings).
+	var ambience_bus := AudioServer.get_bus_index(&"Ambience")
+	if ambience_bus >= 0:
+		_duck = AudioEffectAmplify.new()
+		AudioServer.add_bus_effect(ambience_bus, _duck)
 
 	_whisper_bus = AudioServer.get_bus_index(&"Whisper")
 	if _whisper_bus < 0:
@@ -56,6 +69,9 @@ func _process(delta: float) -> void:
 	var target := GameState.get_number(&"exposicao")
 	_shown_exposure = move_toward(_shown_exposure, target, delta * EXPOSURE_FOLLOW)
 	_update_whisper(_shown_exposure)
+	if _duck:
+		var duck := DUCK_DB if Events.is_modal_open else 0.0
+		_duck.volume_db = move_toward(_duck.volume_db, duck, delta * DUCK_SPEED)
 
 
 ## Troca o ambiente com crossfade. `null` silencia.

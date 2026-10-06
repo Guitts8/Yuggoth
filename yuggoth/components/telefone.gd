@@ -17,6 +17,7 @@ var _toque: AudioStreamPlayer3D
 
 func _ready() -> void:
 	super()
+	add_to_group(&"telefone")
 	_toque = AudioStreamPlayer3D.new()
 	_toque.name = "Campainha"
 	_toque.stream = campainha
@@ -60,6 +61,9 @@ func _on_interact(_by: Node) -> void:
 func _falar(l: Ligacao) -> void:
 	_em_ligacao = true
 	_toque.stop()
+	# Ninguém fala ao telefone com o disco tocando: atender levanta a agulha.
+	for f: Fonografo in get_tree().get_nodes_in_group(&"fonografo"):
+		f.parar()
 	for fala in l.falas:
 		var segundos := maxf(SEG_MINIMO, fala.length() * SEG_POR_CHAR)
 		Events.subtitle_requested.emit(fala, segundos)
