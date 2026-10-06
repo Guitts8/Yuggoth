@@ -1,6 +1,6 @@
 extends Node
-## Descartável: o lapso (um dia), a pedra do sonho no exame e a criatura no céu,
-## em SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável: o corredor da pensão em Boston, antes e depois de bater, em
+## SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -12,52 +12,35 @@ func _ready() -> void:
 	root.boot_to_menu = false
 	add_child(root)
 	await _s(0.5)
-	# O lapso: de pé no meio da sala, olhando para a lareira; ele vira para a janela.
 	GameState.reset()
 	GameState.set_flag(&"prologo_concluido")
-	GameState.set_value(&"dia", 6)
-	GameState.set_flag(&"tocou_disco")
-	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(1.0)
-	var esc: Escritorio = root.find_child("Escritorio", true, false)
-	Narrator.cancel()
-	esc.player.global_position = Vector3(0.2, 0, -0.8)
-	esc.player.rotation.y = -PI / 2
-	esc.player.head.rotation.x = 0.0
-	await _s(0.5)
-	esc.passar_tempo(load("res://narrative/narration/cartao_6_setembro.tres"))
-	var t := 0.0
-	for marca in [1.8, 2.6, 3.6, 5.3, 6.5, 7.6]:
-		await _s(marca - t)
-		t = marca
-		_shot("%s_lapso_%.1f" % [tag, marca])
-	while esc.em_lapso:
-		await _s(0.2)
-	# A criatura (Dia 3, depois do disco).
-	GameState.set_value(&"dia", 3)
-	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(1.0)
-	esc = root.find_child("Escritorio", true, false)
-	Narrator.cancel()
-	esc.player.global_position = Vector3(0, 0, -1.4)
-	esc.player.rotation = Vector3.ZERO
-	esc.player.head.rotation.x = deg_to_rad(8)
-	await _s(2.1)
-	_shot("%s_migo" % tag)
-	# A pedra do sonho, no exame.
 	GameState.set_value(&"dia", 4)
-	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(0.5)
-	esc = root.find_child("Escritorio", true, false)
-	Narrator.cancel()
-	await SceneDirector.fade_out(0.1)
-	esc._sonhar(4)
+	await SceneDirector.change_level("res://levels/boston/boston.tscn", &"Entrada")
+	await _s(2.5)
+	var boston: Boston = root.find_child("Boston", true, false)
+	_shot("%s_corredor" % tag)
+	var player := boston.player
+	_mirar(player, Vector3(0.05, 0, -0.55), Vector3(0.95, 1.45, -1.35))
+	await _s(0.6)
+	_shot("%s_porta" % tag)
+	boston.get_node("%Bater").interact(player)
+	await _s(4.5)
+	_shot("%s_fresta" % tag)
+	_mirar(player, Vector3(-0.3, 0, -1.2), Vector3(1.0, 1.65, -1.22))
+	await _s(0.6)
+	var rapaz: Interlocutor = boston.get_node("%Conversa")
+	rapaz.interact(player)
 	await _s(3.0)
-	esc.find_child("Noite4", true, false).get_node("Pedra/Examinar").interact(esc.player)
-	await _s(1.0)
-	_shot("%s_pedra" % tag)
+	_shot("%s_conversa" % tag)
 	SaveSystem.delete_save()
 	get_tree().quit()
+
+
+func _mirar(player: Player, de: Vector3, ponto: Vector3) -> void:
+	player.global_position = de
+	player.look_at(Vector3(ponto.x, de.y, ponto.z))
+	var olho := de + Vector3(0, player.eye_height, 0)
+	player.head.rotation.x = atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 
 
 func _shot(name: String) -> void:

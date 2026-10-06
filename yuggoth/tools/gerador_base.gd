@@ -30,7 +30,11 @@ func _salvar(caminho: String) -> void:
 	get_tree().quit(0 if err == OK else 1)
 
 func _mat(name: String, tex: String, o: Dictionary) -> void:
-	var mat := ShaderMaterial.new()
+	var path := MAT_DIR + name + ".tres"
+	# Já carregado (por _carregar_materiais): refaz no mesmo recurso, sem duplicar o caminho.
+	var mat := ResourceLoader.load(path) as ShaderMaterial if ResourceLoader.has_cached(path) else ShaderMaterial.new()
+	for p in [&"world_uv", &"tiles_per_meter", &"uv_scale", &"albedo_color"]:
+		mat.set_shader_parameter(p, null)
 	mat.shader = load("res://shaders/psx_unlit.gdshader" if o.get("unlit", false) else "res://shaders/psx_lit.gdshader")
 	mat.set_shader_parameter(&"albedo_tex", load(TEX_DIR + tex + ".png"))
 	if o.has("world"):
@@ -40,7 +44,6 @@ func _mat(name: String, tex: String, o: Dictionary) -> void:
 		mat.set_shader_parameter(&"uv_scale", o.scale)
 	if o.has("cor"):
 		mat.set_shader_parameter(&"albedo_color", o.cor)
-	var path := MAT_DIR + name + ".tres"
 	ResourceSaver.save(mat, path, ResourceSaver.FLAG_CHANGE_PATH)
 	m[name] = load(path)
 

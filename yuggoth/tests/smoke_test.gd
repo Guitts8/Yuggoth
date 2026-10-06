@@ -337,7 +337,7 @@ func _ready() -> void:
 	correio2.interact(player)
 	await _frames(1)
 	_check(lista_fotos[0].visible and not lista_fotos[1].visible, "tirar uma fotografia: uma por vez")
-	await _seconds(0.6)
+	await _until(func() -> bool: return lista_fotos[0].position.is_equal_approx(lugar_foto), 5.0)
 	_check(lista_fotos[0].position.is_equal_approx(lugar_foto), "a fotografia vai para o lugar dela na mesa")
 	for i in 8:
 		correio2.interact(player)
@@ -497,14 +497,20 @@ func _ready() -> void:
 	player = boston.player
 	var rapaz: Interlocutor = boston.get_node("%Conversa")
 	var saida: Interactable = boston.get_node("%Saida")
-	_check(rapaz.can_interact(player) and rapaz.prompt == "Perguntar pelo homem de Keene" and not saida.can_interact(player),
-		"o rapaz espera as perguntas; ainda não se volta")
-	await _check_alcance(boston, "Boston", Vector2(1.8, 2.1))
+	var bater: StateInteractable = boston.get_node("%Bater")
+	_check(bater.can_interact(player) and not rapaz.can_interact(player) and not saida.can_interact(player),
+		"o corredor da pensão: a porta do rapaz, fechada; ainda não se volta")
+	bater.interact(player)
+	await _until(func() -> bool: return GameState.has_flag(&"porta_aberta_boston"), 20.0)
+	await _frames(2)
+	_check(rapaz.can_interact(player) and rapaz.prompt == "Apresentar-se" and boston.folha.rotation_degrees.y > 30.0,
+		"batida a porta, ele abre uma fresta")
+	await _check_alcance(boston, "Boston, porta fechada", Vector2(0.6, 2.8))
 	var sonho_max := 0.0
 	var falas_boston: Array[String] = []
 	var ouvir_boston := func(texto: String, _s: float) -> void: falas_boston.append(texto)
 	Events.subtitle_requested.connect(ouvir_boston)
-	for i in 3:
+	for i in 4:
 		rapaz.interact(player)
 		await _frames(1)
 		while rapaz.em_conversa():
@@ -512,6 +518,7 @@ func _ready() -> void:
 			await get_tree().process_frame
 	Events.subtitle_requested.disconnect(ouvir_boston)
 	_check(falas_boston.any(func(f: String) -> bool: return f.contains("não tenho certeza nem disso")), "nem tem certeza de que o reconheceria")
+	await _check_alcance(boston, "Boston, pela fresta", Vector2(0.6, 2.8))
 	_check(sonho_max > 0.3, "falando da voz de Keene, a sala amolece")
 	await _until(func() -> bool: return is_zero_approx(GameState.get_number(&"sonho")), 10.0)
 	_check(is_zero_approx(GameState.get_number(&"sonho")) and saida.can_interact(player), "nada de novo: a porta leva de volta a Arkham")
@@ -890,7 +897,10 @@ func _press(action: StringName) -> void:
 	event.action = action
 	event.pressed = true
 	Input.parse_input_event(event)
-	await _frames(2)
+	# Quadros de processo (a entrada é despachada neles): com o tempo acelerado,
+	# vários quadros de física cabem num só, e `_frames` não bastava.
+	for i in 3:
+		await get_tree().process_frame
 
 
 ## Espera a condição valer (ou o tempo esgotar, em segundos de jogo).

@@ -940,6 +940,9 @@ func _sons() -> void:
 	_wav(_fosforo(), "fosforo", false)
 	_wav(_lareira(), "lareira", true)
 	_wav(_sonho_drone(), "sonho", true)
+	# Boston: bater à porta da pensão, a porta que abre uma fresta.
+	_wav(_batidas(), "batidas_porta", false)
+	_wav(_rangido(), "porta_rangendo", false)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1407,6 +1410,38 @@ func _fosforo() -> PackedFloat32Array:
 	_lowpass(sopro, 500.0)
 	for i in b.size():
 		b[i] += sopro[i]
+	return b
+
+
+## Três batidas com os nós dos dedos numa porta de madeira.
+func _batidas() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 59
+	var b := _buf(1.2)
+	for k in 3:
+		var at := int((0.05 + k * 0.26 + (0.04 if k == 2 else 0.0)) * RATE)
+		for j in 2600:
+			var env := exp(-j / 260.0)
+			b[at + j] += (sin(TAU * 140.0 * j / RATE) * 0.7 + rng.randf_range(-1, 1) * 0.5) * env * 0.8
+	_lowpass(b, 1800.0)
+	return b
+
+
+## Uma porta velha abrindo devagar: um rangido que sobe e cai, com o trinco antes.
+func _rangido() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 60
+	var b := _buf(1.6)
+	_clique(b, 0, 1500.0, 0.4, rng)
+	var fase := 0.0
+	for i in range(int(0.25 * RATE), int(1.5 * RATE)):
+		var t := float(i) / RATE - 0.25
+		var f := 330.0 + sin(t * 2.4) * 120.0 + sin(t * 17.0) * 15.0
+		fase += f / RATE
+		var dente := fmod(fase, 1.0) * 2.0 - 1.0
+		var env := sin(PI * t / 1.25) * (0.6 + 0.4 * absf(sin(t * 9.0)))
+		b[i] += (dente * 0.3 + rng.randf_range(-1, 1) * 0.08) * env
+	_lowpass(b, 2500.0)
 	return b
 
 

@@ -246,8 +246,9 @@ cilindro, nos dias seguintes.
    deu o nome de **Stanley Adams** e tinha uma voz tão grossa e zumbida que o
    deixava tonto e sonolento.
 6. **Boston** (vinheta jogável): *"Naquela noite fui a Boston falar com o
-   funcionário, tendo obtido no escritório o nome e o endereço dele."* O quarto de
-   pensão do rapaz, à noite (o boné e o paletó do expresso no gancho). Três
+   funcionário, tendo obtido no escritório o nome e o endereço dele."* O corredor
+   da pensão, à noite: Wilmarth bate à porta 7; o rapaz abre só uma fresta e
+   responde dali, franco e gentil, sem convidar a entrar. Apresentar-se e três
    perguntas — o homem de Keene, a voz (a sala amolece enquanto ele fala dela: *"Me
    deixava tonto e com sono, só de ouvir"*), se o reconheceria (*"não tenho certeza
    nem disso"*). *"Era um rapaz franco e simpático, mas vi que não podia acrescentar

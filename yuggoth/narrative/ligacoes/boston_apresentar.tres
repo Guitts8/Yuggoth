@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Ligacao" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/ligacao.gd" id="1_lig"]
+
+[resource]
+script = ExtResource("1_lig")
+id = &"boston_apresentar"
+prompt = "Apresentar-se"
+falas = PackedStringArray("Funcionário: Pois não?", "Wilmarth: Perdoe a hora. Sou o professor Wilmarth, de Arkham — a caixa que não chegou no 5508 era minha. A companhia me deu o seu endereço.", "Funcionário: Ah... o senhor da pedra. Pode perguntar, professor. Não sei se vou ajudar muito.")
