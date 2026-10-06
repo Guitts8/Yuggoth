@@ -918,6 +918,11 @@ func _sons() -> void:
 	_wav(_papel_mao(50), "papel_pegar", false)
 	_wav(_rasgo(), "papel_rasgando", false)
 	_wav(_selo_batido(), "selo_batido", false)
+	# O telefone (Dia 4): gancho, manivela, a linha e um murmúrio de voz.
+	_wav(_gancho(), "telefone_gancho", false)
+	_wav(_manivela(), "telefone_manivela", false)
+	_wav(_linha_telefone(), "telefone_linha", true)
+	_wav(_voz_telefone(), "telefone_voz", true)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1259,6 +1264,110 @@ func _selo_batido() -> PackedFloat32Array:
 	_lowpass(b, 1400.0)
 	_atrito(b, int(0.02 * RATE), int(0.2 * RATE), func(t: float) -> float: return 0.05 * (1.0 - t), rng)
 	return b
+
+
+## Passa-alta de um polo, no lugar (o que sobra tirando o grave).
+func _highpass(b: PackedFloat32Array, cutoff: float) -> void:
+	var grave := b.duplicate()
+	_lowpass(grave, cutoff)
+	for i in b.size():
+		b[i] -= grave[i]
+
+
+## Ressonador de dois polos (um formante), da entrada para a saída.
+func _ressoar(x: PackedFloat32Array, out: PackedFloat32Array, de: int, ate: int, freq: float, banda: float, ganho: float) -> void:
+	var r := exp(-PI * banda / RATE)
+	var a1 := 2.0 * r * cos(TAU * freq / RATE)
+	var a2 := -r * r
+	var y1 := 0.0
+	var y2 := 0.0
+	for i in range(de, ate):
+		var y := (1.0 - r) * x[i] + a1 * y1 + a2 * y2
+		y2 = y1
+		y1 = y
+		out[i] += y * ganho
+
+
+## O fone saindo e voltando ao gancho: dois estalos metálicos.
+func _gancho() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 52
+	var b := _buf(0.3)
+	_clique(b, 0, 1700.0, 0.5, rng)
+	_clique(b, int(0.09 * RATE), 2300.0, 0.3, rng)
+	return b
+
+
+## A manivela do magneto chamando a telefonista: o zumbido do dínamo e as
+## sinetas batendo junto.
+func _manivela() -> PackedFloat32Array:
+	var b := _buf(1.3)
+	for i in b.size():
+		var t := float(i) / RATE
+		var volta := 0.5 + 0.5 * sin(TAU * 3.0 * t)  # a mão girando
+		var dinamo := signf(sin(TAU * 18.0 * (1.0 + 0.2 * volta) * t)) * 0.15
+		var sino := (sin(TAU * 1180.0 * t) * 0.5 + sin(TAU * 1460.0 * t) * 0.3) * (0.5 + 0.5 * signf(sin(TAU * 18.0 * t)))
+		b[i] = (dinamo + sino * 0.35) * volta * minf(1.0, (1.3 - t) * 6.0) * minf(1.0, t * 20.0)
+	_lowpass(b, 4000.0)
+	return b
+
+
+## A linha interurbana de 1928: chiado na banda do telefone, estalos de vez em quando.
+func _linha_telefone() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 53
+	var b := _buf(5.0)
+	for i in b.size():
+		b[i] = rng.randf_range(-1, 1) * 0.12
+	for k in 40:
+		var at := rng.randi_range(0, b.size() - 300)
+		var amp := rng.randf_range(0.1, 0.45)
+		for j in 200:
+			b[at + j] += rng.randf_range(-1, 1) * amp * exp(-j / 30.0)
+	# Um zumbido elétrico baixo da rede.
+	for i in b.size():
+		b[i] += sin(TAU * 60.0 * i / RATE) * 0.03
+	_highpass(b, 300.0)
+	_lowpass(b, 3000.0)
+	return _seamless(b, 0.3)
+
+
+## Uma voz ao longe, na banda do telefone: sílabas de vogais sintéticas, sem
+## palavra nenhuma (a legenda diz o que é dito). Toca com pitch por interlocutor.
+func _voz_telefone() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 54
+	var b := _buf(6.0)
+	var pulso := PackedFloat32Array()
+	pulso.resize(b.size())
+	var fase := 0.0
+	for i in b.size():
+		var t := float(i) / RATE
+		var f0 := 125.0 + sin(t * 1.7) * 14.0 + sin(t * 5.3) * 5.0
+		fase += f0 / RATE
+		pulso[i] = (fmod(fase, 1.0) * 2.0 - 1.0) + rng.randf_range(-0.1, 0.1)
+	const VOGAIS := [Vector2(730, 1090), Vector2(530, 1840), Vector2(390, 1990), Vector2(570, 840), Vector2(440, 1020), Vector2(300, 870)]
+	var i := 0
+	while i < b.size():
+		var dur := int(rng.randf_range(0.12, 0.26) * RATE)
+		var fim := mini(i + dur, b.size())
+		var v: Vector2 = VOGAIS[rng.randi_range(0, VOGAIS.size() - 1)]
+		_ressoar(pulso, b, i, fim, v.x, 90.0, 1.0)
+		_ressoar(pulso, b, i, fim, v.y, 120.0, 0.6)
+		for j in range(i, fim):
+			b[j] *= sin(PI * float(j - i) / (fim - i))
+		i = fim
+		# Às vezes uma pausa entre palavras.
+		if rng.randf() < 0.25:
+			i += int(rng.randf_range(0.08, 0.3) * RATE)
+	_highpass(b, 300.0)
+	_lowpass(b, 2800.0)
+	var pico := 0.0
+	for s in b:
+		pico = maxf(pico, absf(s))
+	for k in b.size():
+		b[k] = clampf(b[k] / maxf(pico, 0.001) * 1.6, -1.0, 1.0) * 0.5
+	return _seamless(b, 0.2)
 
 
 func _passo(seed: int) -> PackedFloat32Array:

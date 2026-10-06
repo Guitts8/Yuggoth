@@ -469,6 +469,8 @@ func _ready() -> void:
 		if id == &"agencia_arkham":
 			await _frames(1)
 			_check(not esc.fonografo.tocando() and not esc.fonografo.can_interact(player), "atender levanta a agulha; ao telefone, o fonógrafo não toca")
+			await _until(func() -> bool: return tel._linha.playing, 10.0)
+			_check(tel._linha.playing and tel._voz.playing, "dada a manivela: o chiado da linha e a voz da telefonista")
 		await _until(func() -> bool: return GameState.has_flag(StringName("ligou_%s" % id)) and not tel.em_ligacao(), 60.0)
 	_check(GameState.has_flag(&"ligou_telegrama_noturno") and not SceneDirector.hold_black, "agência, Boston e o telegrama noturno; salto para sexta")
 	_check(tel.atual() != null and tel.atual().recebida and tel.prompt == "Atender o telefone", "sexta-feira: o telefone toca")

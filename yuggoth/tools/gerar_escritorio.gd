@@ -1245,6 +1245,10 @@ func _telefone(parent: Node) -> void:
 	var tel := _area(g, Telefone.new(), "Telefone", Vector3(0.36, 0.45, 0.3), Vector3(0, 0, -0.08)) as Telefone
 	tel.unique_name_in_owner = true
 	tel.campainha = load(SFX_DIR + "campainha.wav")
+	tel.gancho = load(SFX_DIR + "telefone_gancho.wav")
+	tel.manivela = load(SFX_DIR + "telefone_manivela.wav")
+	tel.linha = load(SFX_DIR + "telefone_linha.wav")
+	tel.voz = load(SFX_DIR + "telefone_voz.wav")
 	var ligs: Array[Ligacao] = []
 	for id in ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene", "resposta_telegrama"]:
 		ligs.append(load("res://narrative/ligacoes/%s.tres" % id))

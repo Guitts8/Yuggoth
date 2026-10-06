@@ -102,7 +102,7 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    com laço; o pacote, papel pardo com barbante e etiqueta na tampa. Sai a textura
    `caixa_cartas`.
 3. **Telefone com som:** chiado da linha, a telefonista, murmúrio de voz filtrada
-   sob cada legenda, o clique do gancho.
+   sob cada legenda, o clique do gancho. ✅ (sons sintetizados provisórios)
 4. **Lareira acesa pelo jogador** nas noites frias (Dias 5 e 6): "Acender a
    lareira" — luz quente e trêmula, estalos. As noites deixam de ser difíceis de ver.
 5. **Lapso na própria sala** no lugar do corte seco dos saltos no tempo: sem tela

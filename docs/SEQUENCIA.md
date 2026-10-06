@@ -213,7 +213,7 @@ cilindro, nos dias seguintes.
   suspeito na agência do expresso; a rota da pedra por Keene. Do mesmo envelope
   sai **a foto do "exército" de pegadas** diante de uma linha de pegadas de cães
   (fica com as outras nos dias seguintes).
-- **O telefone de parede**, ao lado da escrivaninha.
+- **O telefone de parede**, ao lado da escrivaninha. Cada ligação tem som: o fone sai do gancho, a manivela chama a telefonista, a linha chia, e sob cada legenda ouve-se, baixo e sem palavras, a voz de quem fala.
 
 **O que fazer:**
 1. Ler o telegrama → *"...Fiquei a quinta-feira inteira de manhã à espera dela —
