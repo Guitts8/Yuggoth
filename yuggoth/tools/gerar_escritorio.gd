@@ -140,6 +140,11 @@ func _materiais() -> void:
 	_mat("sombra", "sombra", {})
 	# A criatura cruzando o céu da cidade (Dias 3 e 6): silhueta sem luz.
 	_mat("migo", "migo", {unlit = true})
+	# A cidade em 3D (experimento): silhuetas de noite, sem luz.
+	_mat("cidade", "reboco", {unlit = true, world = 0.5, cor = Color(0.03, 0.028, 0.045)})
+	_mat("cidade_telhado", "reboco", {unlit = true, world = 0.5, cor = Color(0.06, 0.058, 0.085)})
+	_mat("cidade_ceu", "reboco", {unlit = true, world = 0.02, cor = Color(0.045, 0.06, 0.12)})
+	_mat("cidade_janela", "papel", {unlit = true, world = 4.0, cor = Color(0.62, 0.46, 0.2)})
 	# Os sonhos entre os dias.
 	_mat("pegada", "pegada_garra", {})
 	_mat("vista_circulo", "vista_circulo", {unlit = true})
@@ -620,6 +625,7 @@ func _miskatonic() -> void:
 	corredor.omni_attenuation = 1.6
 
 	_lapso(g)
+	_cidade_3d(g)
 
 	# Com correspondência na mão, mirar o tampo a põe na mesa (some sem nada na mão).
 	var por := _area(g, MesaCorreio.new(), "PorNaMesa", Vector3(1.6, 0.1, 0.8), Vector3(0, MESA + 0.05, -2.2)) as MesaCorreio
@@ -636,6 +642,79 @@ func _miskatonic() -> void:
 	_box(a, "Movel", Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0), "madeira_escura")
 	_box(a, "Juncao", Vector3(0.01, 0.8, 0.01), Vector3(0, 0.45, -0.255), "ferro")
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
+
+
+## Experimento (playtest 2): Arkham em 3D lá fora, no lugar do painel — telhados de
+## duas águas e mansardas, chaminés, janelas acesas e a torre gótica da
+## Miskatonic com o mostrador aceso, pequenos, longe (12 a 45 m) e abaixo do olhar. Só com a flag
+## `cidade_3d` (tecla C, em build de depuração: Depuracao); então os painéis
+## "Vista" da janela somem. Materiais sem luz nem névoa (psx_unlit), como o painel.
+func _cidade_3d(g: Node3D) -> void:
+	var c := _grupo_se(g, "Cidade3D", _flag(&"cidade_3d"))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 1928
+	var casas := []
+	var telhados := []
+	var janelas := []
+	for fileira in 5:
+		var z := -12.0 - fileira * 7.0
+		var x := -22.0 - rng.randf_range(0, 2)
+		while x < 22.0:
+			var w := rng.randf_range(3.0, 6.0)
+			var h := rng.randf_range(4.0, 9.0) + fileira * 1.2
+			var d := rng.randf_range(4.0, 6.0)
+			# O escritório olha a cidade de cima (um andar alto, no morro): a rua a -8 m.
+			var pos := Vector3(x + w / 2, h / 2 - 8.0, z - d / 2)
+			casas.append([Vector3(w, h, d), pos, Vector3.ZERO, Color.WHITE])
+			# Telhado de duas águas (ou mansarda, mais íngreme), cumeeira de leste a oeste.
+			var mansarda := rng.randf() < 0.35
+			var inclina := 58.0 if mansarda else 36.0
+			var aba := d * 0.5 / cos(deg_to_rad(inclina))
+			for lado in [-1, 1]:
+				telhados.append([Vector3(w + 0.2, 0.12, aba), pos + Vector3(0, h / 2 + aba * sin(deg_to_rad(inclina)) * 0.5, lado * d * 0.25),
+					Vector3(lado * inclina, 0, 0), Color.WHITE])
+			if rng.randf() < 0.7:
+				telhados.append([Vector3(0.35, 1.4, 0.35), pos + Vector3(rng.randf_range(-w, w) * 0.3, h / 2 + 0.9, 0), Vector3.ZERO, Color.WHITE])
+			# Janelas acesas na fachada (a que olha para a sala, +Z), poucas.
+			for k in rng.randi_range(1, 7):
+				var jx := pos.x + rng.randf_range(-w, w) * 0.35
+				var jy := pos.y + rng.randf_range(-h, h) * 0.4
+				janelas.append([Vector3(0.32, 0.45, 0.05), Vector3(jx, jy, z + 0.03), Vector3.ZERO, Color.WHITE])
+			x += w + rng.randf_range(0.2, 1.5)
+	_lote_sem_luz(c, "Casas", casas, "cidade")
+	_lote_sem_luz(c, "Telhados", telhados, "cidade_telhado")
+	_lote_sem_luz(c, "Janelas", janelas, "cidade_janela")
+	# O céu da noite, atrás de tudo.
+	_quad(c, "Ceu", Vector2(200.0, 90.0), Vector3(0, 15.0, -70.0), Vector3.ZERO, "cidade_ceu")
+
+	# A torre da Miskatonic: o fuste, o campanário com o mostrador aceso, os
+	# pináculos e a agulha — onde está no painel (à direita, atrás da cidade).
+	var torre := _group(c, "Torre", Vector3(5.5, -8.0, -34.0))
+	torre.scale = Vector3.ONE * 0.8
+	_box(torre, "Fuste", Vector3(2.2, 16.0, 2.2), Vector3(0, 8.0, 0), "cidade")
+	_box(torre, "Campanario", Vector3(2.6, 3.0, 2.6), Vector3(0, 17.5, 0), "cidade")
+	_quad(torre, "Mostrador", Vector2(1.4, 1.4), Vector3(0, 17.6, 1.31), Vector3.ZERO, "vidro_aceso")
+	var agulha := _cyl(torre, "Agulha", 0.0, 1.5, 7.0, Vector3(0, 22.5, 0), "cidade_telhado", 4)
+	agulha.rotation_degrees.y = 45
+	for sx in [-1, 1]:
+		for sz in [-1, 1]:
+			_cyl(torre, "Pinaculo%d%d" % [sx, sz], 0.0, 0.25, 2.5, Vector3(sx * 1.2, 20.2, sz * 1.2), "cidade_telhado", 4)
+	for k in 3:
+		_quad(torre, "Ogiva%d" % k, Vector2(0.35, 1.3), Vector3(0, 6.0 + k * 3.5, 1.11), Vector3.ZERO, "vidro_aceso" if k == 1 else "cidade_telhado")
+
+	# Sem os painéis na janela enquanto a cidade 3D aparece.
+	for vista: Node in g.find_children("Vista", "MeshInstance3D", true, false):
+		var cn := ConditionalNode.new()
+		cn.name = "SemCidade3D"
+		cn.condition = _flag(&"cidade_3d", true)
+		_add(vista, cn)
+
+
+## Como _lote, mas para os materiais sem luz da cidade (cor só da textura).
+func _lote_sem_luz(parent: Node, nome: String, pecas: Array, mat: String) -> MeshInstance3D:
+	var mi := _lote(parent, nome, pecas, mat)
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mi
 
 
 ## O tempo passando na sala (Lapso): a folhinha no peitoril da janela, de frente

@@ -141,7 +141,7 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    o selo) — no lugar da animação 2D; o envelope na mão já está ótimo.
 10. **Boston:** o rapaz atende pela porta entreaberta, franco e gentil, sem convidar.
 11. **A criatura:** menos rosa e menos clara.
-12. **A cidade da janela em 3D** (pequena, ao longe), para comparar com o painel.
+12. ✅ (experimento) **A cidade da janela em 3D** (pequena, ao longe), para comparar com o painel: tecla C em build de depuração; por ora só de noite.
 13. **A passagem para o sonho:** a definir (dormir em casa? a preparação? um diário?).
 
 ## Fase 4 — O mapa de Vermont

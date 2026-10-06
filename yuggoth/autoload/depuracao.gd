@@ -2,6 +2,7 @@ extends Node
 ## Só para testes — não existe no jogo exportado (some fora de build de
 ## depuração): segurar F acelera tudo VELOCIDADE vezes (falas do narrador,
 ## telefonemas, cartões, lapsos, sonhos, animações), com um aviso no canto.
+## C troca a vista da janela entre o painel e a cidade em 3D (flag `cidade_3d`).
 
 const VELOCIDADE := 8.0
 const TECLA := KEY_F
@@ -27,6 +28,14 @@ func _ready() -> void:
 	_aviso.add_theme_constant_override(&"outline_size", 6)
 	_aviso.hide()
 	camada.add_child(_aviso)
+
+
+func _input(event: InputEvent) -> void:
+	var tecla := event as InputEventKey
+	if tecla and tecla.pressed and not tecla.echo and tecla.physical_keycode == KEY_C:
+		var on := not GameState.has_flag(&"cidade_3d")
+		GameState.set_flag(&"cidade_3d", on)
+		Events.notice_requested.emit("(teste) Janela: %s" % ("cidade em 3D" if on else "painel"))
 
 
 func _process(_delta: float) -> void:

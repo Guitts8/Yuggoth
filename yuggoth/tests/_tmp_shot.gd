@@ -1,6 +1,6 @@
 extends Node
-## Descartável: a Selagem na mesa (Dia 3, noite), quadro a quadro, em SHOT_DIR,
-## com prefixo SHOT_TAG.
+## Descartável: a janela com o painel e com a cidade em 3D (Dia 3, noite, e a
+## criatura passando), em SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -12,29 +12,28 @@ func _ready() -> void:
 	root.boot_to_menu = false
 	add_child(root)
 	await _s(0.5)
-	GameState.reset()
-	GameState.set_flag(&"prologo_concluido")
-	GameState.set_value(&"dia", 3)
-	GameState.set_flag(&"tocou_disco")
-	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(1.0)
-	var esc: Escritorio = root.find_child("Escritorio", true, false)
-	Narrator.cancel()
-	esc.player.global_position = Vector3(0.1, 0, -1.35)
-	esc.player.rotation.y = 0
-	esc.player.head.rotation.x = deg_to_rad(-20)
-	var writer = root.get_node("UI/ReplyWriter")
-	var reply: ReplyData = load("res://narrative/replies/resposta_dia_3.tres")
-	writer.open(reply)
-	await _s(0.3)
-	writer._choose(reply.options[1])
-	writer._finish_writing()
-	writer._seal()
-	var t := 0.0
-	for marca in [1.0, 2.6, 3.9, 5.2, 6.6, 8.0, 9.4, 10.6, 11.9, 13.5]:
-		await _s(marca - t)
-		t = marca
-		_shot("%s_%05.1f" % [tag, marca])
+	for cidade in [false, true]:
+		GameState.reset()
+		GameState.set_flag(&"prologo_concluido")
+		GameState.set_value(&"dia", 3)
+		GameState.set_flag(&"cidade_3d", cidade)
+		await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+		await _s(1.0)
+		var esc: Escritorio = root.find_child("Escritorio", true, false)
+		Narrator.cancel()
+		esc.player.global_position = Vector3(0, 0, -1.4)
+		esc.player.rotation = Vector3.ZERO
+		esc.player.head.rotation.x = deg_to_rad(8)
+		await _s(0.6)
+		_shot("%s_%s" % [tag, "cidade" if cidade else "painel"])
+		GameState.set_flag(&"tocou_disco")
+		await _s(2.1)
+		_shot("%s_%s_migo" % [tag, "cidade" if cidade else "painel"])
+		esc.player.global_position = Vector3(-0.6, 0, -2.0)
+		esc.player.look_at(Vector3(0.3, 0, -6.0))
+		esc.player.head.rotation.x = deg_to_rad(5)
+		await _s(0.6)
+		_shot("%s_%s_perto" % [tag, "cidade" if cidade else "painel"])
 	SaveSystem.delete_save()
 	get_tree().quit()
 
