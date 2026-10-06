@@ -28,7 +28,9 @@ escrivaninha, **"Pôr na mesa"** → **"Abrir com a espátula"** (som de papel r
 letra). Pacotes que não passam na fresta ficam no chão junto à porta.
 
 **Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5, entre a porta e o cartão do
-dia seguinte: o escritório transformado, na estética crua, com a névoa e um grave
+dia seguinte (⏳ a passagem vai mudar: postada a resposta, Wilmarth anota o dia num
+**diário** na mesa; nas noites de sonho a letra falha e ele adormece ali mesmo, a sala
+virando o sonho sem tela preta; acorda de manhã debruçado no diário): o escritório transformado, na estética crua, com a névoa e um grave
 que bate devagar; dá para andar; nada salta. Acorda-se numa ação, e vem o dia.
 | Noite | O sonho | Acorda |
 |---|---|---|

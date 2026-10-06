@@ -125,25 +125,92 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    comigo"), `Aparicao` com asas batendo (`batida`), silhueta rosada apagada.
    ✅ Os sonhos na noite entre os dias (2→3, 3→4, 4→5, 5→6): `Escritorio._sonhar`,
    `Sonhos/NoiteN` com `sonhando == N` (o grupo `Dias` some), `sonhos[N]` = a flag
-   que acorda. Fase 3b concluída; falta o playtest do usuário.
+   que acorda. Fase 3b concluída e jogada pelo usuário (→ Fase 3c).
 
 ## Fase 3c — Ajustes do playtest 2 (2026-10-06)
-1. **Pular, só para testes:** segurar uma tecla acelera tudo (conversas, cartões,
-   lapsos); fora do jogo exportado.
-2. **Papéis invisíveis:** o telegrama e outras folhas ficavam dentro do mata-borrão.
-3. **O correio do chão, de uma vez:** "Pegar o correio" junta tudo o que caiu.
-4. **Zoom da visão** (botão direito / Z), para ler a folhinha e os papéis de longe.
-5. **As cartas escritas "quebradas":** rever a formatação de cada resposta no papel.
-6. **Vozes ao telefone** diferentes das vozes do disco (o disco tem de impactar).
-7. **A pedra do sonho** longe demais no exame.
-8. **O lapso:** Wilmarth vira para a janela; o dia nasce, entardece e anoitece devagar.
-9. ✅ **Selar em 3D**, devagar, na mesa (a folha dobra, entra no envelope, a aba,
-   o selo) — no lugar da animação 2D; o envelope na mão já está ótimo.
-10. **Boston:** o rapaz atende pela porta entreaberta, franco e gentil, sem convidar.
-11. **A criatura:** menos rosa e menos clara.
-12. ✅ (experimento) **A cidade da janela em 3D** (pequena, ao longe), para comparar com o painel: tecla C em build de depuração; por ora só de noite.
-13. **A passagem para o sonho:** a definir (dormir em casa? a preparação? um diário?).
+O usuário jogou a Fase 3b. O que pediu, o porquê, e o que foi feito:
 
+1. ✅ **Pular, só para testes** — os testes dele demoravam nas conversas e
+   cartões. Segurar **F** acelera tudo 8× (`autoload/depuracao.gd`, some fora de
+   build de depuração). Commit `3c6062c`.
+2. ✅ **Papéis invisíveis** — o telegrama (e a foto do exército) ficavam dentro do
+   mata-borrão. O mata-borrão ficou rente ao tampo; o teste de fumaça agora confere
+   em todo momento que nenhum papel visível fica abaixo dele. `3c6062c`.
+3. ✅ **O correio de uma vez** — "pegar uma carta por vez não faz sentido". Pegar o
+   correio junta tudo o que caiu (uma pilha na mão); pôr na mesa pousa tudo.
+   `Correspondencia.na_mao` virou lista. `3c6062c`.
+4. ✅ **Zoom da visão** — não dava para ler a folhinha. Segurar botão direito / Z /
+   analógico esquerdo aperta o FOV (ação `zoom_visao`). `3c6062c`.
+5. ✅ **Cartas escritas "quebradas"** — no dossiê, a letra é maior que no papel de
+   escrita: as respostas se partiam em duas folhas, a segunda só com o fim e a
+   assinatura; e o itálico (o latim) não aparecia na letra de mão. O leitor aperta
+   a letra (até 80%) quando sobraria uma folha; [i]/[b] viram FontVariation
+   (inclinada/engrossada). `0a1ddf5`.
+6. ✅ **Vozes do telefone ≠ vozes do disco** — o murmúrio usava a receita da voz
+   humana do disco, e o disco precisa impactar. Agora é voz soprada, abafada, com
+   o chiado do microfone de carvão. `eec287d`.
+7. ✅ **A pedra do sonho** longe demais no exame — o enquadramento contava a luz
+   junto da pedra. O ExamineViewer enquadra só geometria e tira luzes/sons da
+   cópia. `eec287d`.
+8. ✅ **O lapso** — Wilmarth ficava travado olhando para onde estava, e passava
+   rápido demais. Agora vira devagar para a janela, e cada dia nasce (rosado),
+   clareia, entardece (laranja) e anoitece; 7 s por dia (vários dias dividem 15 s,
+   mínimo 3,5 s cada). `eec287d`.
+9. ✅ **Selar em 3D, devagar** — a animação 2D "parecia slide de PowerPoint" (o
+   envelope na mão, ao contrário, foi aprovado como "EXCELENTE"). `Selagem`: Wilmarth
+   senta à mesa, a folha dobra em três, o envelope chega de costas, a folha entra,
+   a aba fecha, vira, o selo é batido, sobe para a mão; ele se levanta. `0252bf6`.
+10. ✅ **Boston** — "não imagino ele nos recebendo": o rapaz agora responde pela
+    porta entreaberta, no corredor da pensão, franco e gentil, sem convidar.
+    `a7b9c41`.
+11. ✅ **A criatura** — "menos rosa e claro": cinza-violáceo escuro. `eec287d`.
+12. ✅ (experimento) **A cidade da janela em 3D**, pequena e longe, para comparar com
+    o painel: tecla **C** em build de depuração; só de noite. **O usuário ainda vai
+    comparar e decidir** qual fica. `3ce2f91`.
+13. ⏳ **A passagem para o sonho** — no playtest, o sonho "começa muito
+    abruptamente", sem parecer sonho: nada mostrava que Wilmarth foi dormir.
+    **Decidido (opção 2 + 3): a preparação no escritório + o diário.** Ver abaixo.
+
+### A passagem para o sonho (decidida, a fazer)
+Opções que foram consideradas: (1) uma cena em casa, indo dormir — a mais clara,
+mas um cenário novo, mais caro e longo; (2) a preparação, adormecer à mesa no
+próprio escritório — barata e contínua (a sala vira sonho sem corte), mas
+sozinha é sutil; (3) um diário — dá voz interior a Wilmarth e reaproveita a
+linguagem da tinta, mas é mais leitura e não mostra o sono. **Escolhida: 2 + 3.**
+
+- **Um ritual fixo, toda noite:** postada a resposta do dia, a porta não encerra
+  o dia de imediato — Wilmarth volta à mesa para **anotar o dia no diário**
+  (um caderno na escrivaninha; "Anotar o dia"). Assim todo dia termina do mesmo
+  jeito e o jogador nunca sabe se aquela noite terá sonho.
+- **A entrada é curta:** uma ou duas linhas que se escrevem sozinhas (som de
+  pena), compostas com frases do conto quando der (💭 no que for invenção). Sem
+  escolha de tom — não é mais leitura do que precisa.
+- **Noite sem sonho:** a última linha termina; ele fecha o caderno, levanta, e o
+  dia acaba (fade, cartão do dia seguinte), como hoje.
+- **Noite com sonho (depois dos Dias 2–5):** a última linha **falha** — a letra
+  cai, a pena para, a tinta escorre; a visão pesa (pálpebra: escurece e abre
+  devagar), a lâmpada baixa, **o relógio parado volta a bater**; ele encosta na
+  cadeira, e a sala vira o sonho em volta dele, **sem tela preta**
+  (`Escritorio._sonhar` passa a começar daqui, sentado).
+- **Ao acordar:** de manhã, debruçado na mesa, o diário aberto com a linha
+  borrada — fica claro que foi sonho. Só então o cartão/o dia seguinte.
+- O diário vai para o dossiê (as entradas acumulam); no jogo completo pode virar
+  peça narrativa (a moldura de 1930).
+- A porta continua sendo o correio: **postar a resposta do dia não encerra mais o
+  dia — leva à mesa, ao diário** (a última coisa do dia, Dias 1–5). No Dia 6 (o
+  fim da demo) não há diário: a carta registrada leva à tinta, como hoje.
+
+### Pendências pequenas, anotadas no playtest 2
+- "Deixar sem resposta" (Dia 2) confundiu: o texto da ação pode virar algo como
+  "Encerrar o debate nos jornais" (o usuário ainda não pediu a troca).
+- A cidade 3D, se aprovada, precisa das outras horas (dia, entardecer, chuva) e de
+  substituir o painel de vez; se não, sai.
+
+## Próximos passos (em ordem)
+1. **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
+2. Playtest do usuário (Prólogo ao fim da demo) — inclusive comparar painel × cidade 3D (C).
+3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
+4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 ## Fase 4 — O mapa de Vermont
 Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da
 investigação**, como na referência). Textura gerada: contorno de Vermont, o
