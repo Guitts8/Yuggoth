@@ -426,6 +426,11 @@ func _ready() -> void:
 	await _frames(2)
 	Events.subtitle_requested.disconnect(ouvir)
 	_check(not fono.tocando() and AudioDirector.is_hum_on(), "levantar a agulha; o zumbido fica")
+	player.global_position = Vector3(0, 0, -1.4)
+	player.rotation = Vector3.ZERO
+	player.head.rotation.x = deg_to_rad(8)
+	await _until(func() -> bool: return GameState.has_flag(&"viu_criatura_ceu_3"), 5.0)
+	_check(GameState.has_flag(&"viu_criatura_ceu_3"), "depois do disco, olhando a janela, algo cruza o céu da cidade")
 	escrever3.interact(player)
 	await _frames(1)
 	writer._choose(escrever3.reply.options[1])

@@ -118,6 +118,8 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    sem susto (o limite de 2 jumpscares continua). Já certo: o **Mi-Go cruzando o
    painel da cidade** à noite (silhueta 2D, uma vez, sem som). Os sonhos usam a
    estética crua (`sonho`). Propostas a detalhar antes de fazer, uma por dia.
+   ✅ A criatura no céu: Dia 3 (depois do disco) e Dia 6 (depois de "falaram
+   comigo"), `Aparicao` com asas batendo (`batida`), silhueta rosada apagada.
 
 ## Fase 4 — O mapa de Vermont
 Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da

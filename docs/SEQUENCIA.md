@@ -202,6 +202,9 @@ debate público sobre o horror de Vermont terminou para sempre."*; responder (28
    | cauteloso | "A segunda voz, não sei descrever. Comparemos as notas." |
    | crédulo — o do livro | "Encontramos uma pista de alianças antigas entre eles e certos homens." |
 
+7. 💭 Depois do disco, quem olhar pela janela vê, uma vez e sem som, **uma criatura
+   alada cruzar o céu da cidade**, na frente do mostrador aceso da torre.
+
 **Fim do dia:** porta → *"18 de julho de 1928."* A máquina fica montada, com o
 cilindro, nos dias seguintes.
 
@@ -364,6 +367,9 @@ salta de novo.
    carta registrada. Naquele momento, a minha crença em tudo o que Akeley contara era
    praticamente completa — embora eu achasse que a fotografia falhara por algum
    descuido dele, na agitação."* (com `crenca` ≤ −1, a crença não está completa)
+
+💭 Depois da carta de terça ("falaram comigo"), a criatura cruza de novo o céu sem
+lua, para quem estiver olhando pela janela.
 
 **Fim do dia (e da demo):** levada a carta registrada à porta, o fim da carta de quarta aparece no papel,
 a câmera se aproxima até a **letra trêmula encher a tela**, a **tinta se espalha**

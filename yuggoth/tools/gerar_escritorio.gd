@@ -139,6 +139,8 @@ func _materiais() -> void:
 	_mat("vidro_verde", "papel", {world = 6.0, cor = Color(0.22, 0.6, 0.3)})
 	# O vulto que passa pela janela no Dia 5 (iluminado só pelo abajur).
 	_mat("sombra", "sombra", {})
+	# A criatura cruzando o céu da cidade (Dias 3 e 6): silhueta sem luz.
+	_mat("migo", "migo", {unlit = true})
 
 
 func _mat(name: String, tex: String, o: Dictionary) -> void:
@@ -1123,6 +1125,8 @@ func _dia_6(parent: Node) -> void:
 	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
 	_abajur(g)
 	_lareira_noite(g, 6)
+	# Depois de "falaram comigo", de novo — no céu sem lua.
+	_criatura_no_ceu(g, _flag(&"leu_carta_akeley_terca"), &"viu_criatura_ceu_6")
 	var janela := _area(g, StateInteractable.new(), "OlharJanela", Vector3(1.6, 1.5, 0.2), Vector3(0, 1.65, -D)) as StateInteractable
 	janela.prompt = "Olhar"
 	janela.notice = "Nenhuma lua. Só as nuvens, baixas e espessas."
@@ -1337,6 +1341,8 @@ func _dia_3(parent: Node) -> Node3D:
 	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
 	_omni(g, "Lua", Vector3(0, 2.2, -2.6), Color(0.5, 0.6, 0.9), 0.4, 5.0)
 	_abajur(g)
+	# Depois do disco, algo cruza o céu da cidade.
+	_criatura_no_ceu(g, _flag(&"tocou_disco"), &"viu_criatura_ceu_3")
 
 	var bilhete := _folha(g, "Bilhete", Vector3(-0.05, MESA + 0.003, -2.16), 8, "bilhete_disco", "Ler o bilhete", false)
 	var transcricao := _folha(g, "Transcricao", Vector3(0.25, MESA + 0.003, -2.05), -12, "transcricao_disco", "Ler a transcrição", false)
@@ -1500,6 +1506,26 @@ func _lareira_noite(parent: Node, n: int) -> void:
 	crepitar.unit_size = 2.5
 	_add(fogo, crepitar)
 	acender.som = load(SFX_DIR + "fosforo.wav")
+
+
+## Uma das criaturas cruzando o céu da cidade, à noite: uma silhueta 2D sobre o
+## painel da janela, passando na frente do mostrador aceso da torre, uma vez, sem
+## som — só para quem estiver olhando (Aparicao). Nada confirma o que foi visto.
+func _criatura_no_ceu(parent: Node, cond: Condition, flag: StringName) -> void:
+	var migo := Aparicao.new()
+	migo.name = "Criatura"
+	migo.position = Vector3(-1.5, 1.72, -D - 1.12)
+	migo.deslocamento = Vector3(3.8, 0.32, 0)
+	migo.duracao = 2.4
+	migo.atraso = 0.6
+	migo.angulo = 20.0
+	migo.batida = 0.35
+	migo.batidas = 4.0
+	migo.condition = cond
+	migo.flag = flag
+	migo.exposure = 0.03
+	_add(parent, migo)
+	_quad(migo, "Silhueta", Vector2(0.48, 0.29), Vector3.ZERO, Vector3.ZERO, "migo")
 
 
 ## Lugar da lâmpada de banqueiro na mesa.

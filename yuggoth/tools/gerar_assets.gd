@@ -51,6 +51,7 @@ func _texturas() -> void:
 	_save(_cortina(), "cortina")
 	_save(_gota(), "gota")
 	_save(_chama(), "chama")
+	_save(_migo(), "migo")
 	_save(_sombra(), "sombra")
 	# Correspondência.
 	_save(_papel_envelope(), "papel_envelope")
@@ -1412,6 +1413,67 @@ func _lareira() -> PackedFloat32Array:
 		b[i] = b[i] * 0.5 + estalos[i]
 	return _seamless(b, 0.4)
 
+
+## Silhueta de longe de uma das criaturas voando (livro: corpo de crustáceo,
+## asas membranosas, a cabeça um elipsoide de anéis em vez de rosto). Contra o
+## céu da janela, só a forma: um rosado apagado, que o azul da noite não engole.
+func _migo() -> Image:
+	var img := _img(48, 32)
+	var cor := Color(0.26, 0.18, 0.2)
+	var pinta := func(x: float, y: float) -> void:
+		if x >= 0 and y >= 0 and x < 48 and y < 32:
+			img.set_pixel(int(x), int(y), cor)
+	var risco := func(a: Vector2, b: Vector2) -> void:
+		for k in 24:
+			var p := a.lerp(b, k / 23.0)
+			pinta.call(p.x, p.y)
+	# Corpo de crustáceo: segmentos que afinam para trás, caídos.
+	for k in 6:
+		var c := Vector2(24.0 - k * 2.6, 16.0 + k * 1.3)
+		var r := Vector2(2.6 - k * 0.3, 1.8 - k * 0.2)
+		for y in 32:
+			for x in 48:
+				if Vector2((x - c.x) / r.x, (y - c.y) / r.y).length() < 1.0:
+					pinta.call(x, y)
+	# A "cabeça": um elipsoide de dobras, com antenas curtas eriçadas.
+	for y in 32:
+		for x in 48:
+			if Vector2((x - 29.0) / 2.4, (y - 14.0) / 2.0).length() < 1.0 and (x + y) % 3 != 0:
+				pinta.call(x, y)
+	for k in 5:
+		risco.call(Vector2(29.5 + k * 0.5, 12.5), Vector2(30.0 + k * 1.2, 10.0 - (k % 2)))
+	# Asas largas e esfarrapadas, com nervuras, abertas para cima.
+	var ombro := Vector2(23, 14)
+	for asa: Array in [[Vector2(3, 3), Vector2(13, 0)], [Vector2(40, 1), Vector2(31, 0)]]:
+		var a: Vector2 = asa[0]
+		var b: Vector2 = asa[1]
+		for y in 32:
+			for x in 48:
+				var p := Vector2(x, y)
+				# Dentro do triângulo ombro-a-b (coordenadas baricêntricas).
+				var v0 := b - ombro
+				var v1 := a - ombro
+				var v2 := p - ombro
+				var den := v0.x * v1.y - v1.x * v0.y
+				var u := (v2.x * v1.y - v1.x * v2.y) / den
+				var w := (v0.x * v2.y - v2.x * v0.y) / den
+				if u >= 0 and w >= 0 and u + w <= 1.0 and not (u + w > 0.8 and (x * 7 + y * 3) % 4 == 0):
+					pinta.call(x, y)
+		risco.call(ombro, a)
+		risco.call(ombro, (a + b) * 0.5)
+	# Pernas compridas pendendo, articuladas; as da frente com pinças.
+	for k in 4:
+		var base := Vector2(21.0 + k * 2.0, 17.0)
+		var joelho := base + Vector2(-1.0 + k * 0.6, 6.0)
+		risco.call(base, joelho)
+		risco.call(joelho, joelho + Vector2(1.5 + k * 0.4, 6.0 - k))
+	for k in 2:
+		var base := Vector2(28.0, 16.0 + k)
+		var ponta := base + Vector2(9.0, 4.0 + k * 3.0)
+		risco.call(base, ponta)
+		risco.call(ponta, ponta + Vector2(1.5, -2.0))
+		risco.call(ponta, ponta + Vector2(2.0, 1.0))
+	return img
 
 ## Chama (para billboards): gota com borda irregular, amarela embaixo, vermelha na ponta.
 func _chama() -> Image:

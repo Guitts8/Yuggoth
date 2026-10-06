@@ -18,6 +18,9 @@ extends Node3D
 ## Ângulo máximo (graus) entre o centro da tela e o meio do percurso.
 @export var angulo := 22.0
 @export var distancia := 6.0
+## Asas batendo: a escala vertical oscila tanto assim (0 = parado), `batidas` por segundo.
+@export var batida := 0.0
+@export var batidas := 5.0
 
 
 func _ready() -> void:
@@ -50,7 +53,15 @@ func _passar() -> void:
 	if not is_inside_tree():
 		return
 	visible = true
+	var asas: Tween
+	if batida > 0.0:
+		var base := scale
+		asas = create_tween().set_loops()
+		asas.tween_property(self, "scale:y", base.y * (1.0 - batida), 0.5 / batidas)
+		asas.tween_property(self, "scale:y", base.y * (1.0 + batida), 0.5 / batidas)
 	var tween := create_tween()
 	tween.tween_property(self, "position", position + deslocamento, duracao)
 	await tween.finished
+	if asas:
+		asas.kill()
 	visible = false
