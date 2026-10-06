@@ -15,6 +15,8 @@ extends Node3D
 
 const SONHO_SUBIDA := 2.5
 const SONHO_DESCIDA := 4.0
+## Onde a folha escrita deita para ser selada: no mata-borrão, o envelope à frente.
+const SELAGEM_POS := Vector3(0.05, 0.784, -2.2)
 
 @export var env_1930: Environment
 @export var env_dia: Environment
@@ -45,6 +47,9 @@ const SONHO_DESCIDA := 4.0
 @export var som_pena: AudioStream
 ## A carta saindo pela porta, para o correio.
 @export var som_postar: AudioStream
+## Dobrar a folha, o envelope; o selo batido (Selagem).
+@export var som_papel: AudioStream
+@export var som_selo: AudioStream
 @export var linha_abertura: NarrationLine
 @export var linha_cartas: NarrationLine
 ## Cartão em tela preta ao começar cada dia; índice = dia. O do Dia 1 fecha o Prólogo.
@@ -75,6 +80,8 @@ var _saltando := false
 var _cartao_no_lapso := false
 ## Durante um salto no tempo dentro do dia (o lapso e o cartão dele).
 var em_lapso := false
+## Durante a Selagem (a carta sendo dobrada e selada na mesa).
+var selando := false
 var _energias: Dictionary[Light3D, float] = {}
 
 @onready var gabinete: Node3D = $Gabinete1930
@@ -249,10 +256,23 @@ func _entrar_pela_porta() -> void:
 		player.global_transform = marker.global_transform
 
 
-## Selada, a carta vai para a mão; quem a manda é a porta (_on_porta).
+## Selada a resposta, a carta é dobrada, envelopada e selada na mesa, devagar
+## (Selagem), e vai para a mão; quem a manda é a porta (_on_porta).
 func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
-	Narrator.say(reply.narracao_depois if reply.narracao_depois else linha_resposta_selada)
+	selando = true
+	player.input_enabled = false
+	var selagem := Selagem.new()
+	var onde := Transform3D(Basis.IDENTITY, SELAGEM_POS)
+	await selagem.tocar(miskatonic, onde, reply, player, som_papel, som_selo)
+	if not is_inside_tree():
+		return
 	CartaSaida.criar(miskatonic, reply)
+	selagem.queue_free()
+	# Selada, ele se levanta com a carta na mão.
+	player.stand()
+	selando = false
+	player.input_enabled = not Events.is_modal_open
+	Narrator.say(reply.narracao_depois if reply.narracao_depois else linha_resposta_selada)
 
 
 func _process(_delta: float) -> void:
@@ -263,7 +283,7 @@ func _process(_delta: float) -> void:
 ## dia (a do Dia 6, a demo); as outras (Dias 5 e 6) saltam no tempo até a volta
 ## do correio. Sem carta, só sai depois de responder.
 func _on_porta(_by: Node) -> void:
-	if _saindo or _saltando or em_lapso:
+	if _saindo or _saltando or em_lapso or selando:
 		return
 	var carta := CartaSaida.atual
 	if carta == null:

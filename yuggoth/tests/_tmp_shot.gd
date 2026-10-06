@@ -1,6 +1,6 @@
 extends Node
-## Descartável: o corredor da pensão em Boston, antes e depois de bater, em
-## SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável: a Selagem na mesa (Dia 3, noite), quadro a quadro, em SHOT_DIR,
+## com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -14,33 +14,29 @@ func _ready() -> void:
 	await _s(0.5)
 	GameState.reset()
 	GameState.set_flag(&"prologo_concluido")
-	GameState.set_value(&"dia", 4)
-	await SceneDirector.change_level("res://levels/boston/boston.tscn", &"Entrada")
-	await _s(2.5)
-	var boston: Boston = root.find_child("Boston", true, false)
-	_shot("%s_corredor" % tag)
-	var player := boston.player
-	_mirar(player, Vector3(0.05, 0, -0.55), Vector3(0.95, 1.45, -1.35))
-	await _s(0.6)
-	_shot("%s_porta" % tag)
-	boston.get_node("%Bater").interact(player)
-	await _s(4.5)
-	_shot("%s_fresta" % tag)
-	_mirar(player, Vector3(-0.3, 0, -1.2), Vector3(1.0, 1.65, -1.22))
-	await _s(0.6)
-	var rapaz: Interlocutor = boston.get_node("%Conversa")
-	rapaz.interact(player)
-	await _s(3.0)
-	_shot("%s_conversa" % tag)
+	GameState.set_value(&"dia", 3)
+	GameState.set_flag(&"tocou_disco")
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+	await _s(1.0)
+	var esc: Escritorio = root.find_child("Escritorio", true, false)
+	Narrator.cancel()
+	esc.player.global_position = Vector3(0.1, 0, -1.35)
+	esc.player.rotation.y = 0
+	esc.player.head.rotation.x = deg_to_rad(-20)
+	var writer = root.get_node("UI/ReplyWriter")
+	var reply: ReplyData = load("res://narrative/replies/resposta_dia_3.tres")
+	writer.open(reply)
+	await _s(0.3)
+	writer._choose(reply.options[1])
+	writer._finish_writing()
+	writer._seal()
+	var t := 0.0
+	for marca in [1.0, 2.6, 3.9, 5.2, 6.6, 8.0, 9.4, 10.6, 11.9, 13.5]:
+		await _s(marca - t)
+		t = marca
+		_shot("%s_%05.1f" % [tag, marca])
 	SaveSystem.delete_save()
 	get_tree().quit()
-
-
-func _mirar(player: Player, de: Vector3, ponto: Vector3) -> void:
-	player.global_position = de
-	player.look_at(Vector3(ponto.x, de.y, ponto.z))
-	var olho := de + Vector3(0, player.eye_height, 0)
-	player.head.rotation.x = atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 
 
 func _shot(name: String) -> void:

@@ -12,9 +12,10 @@ Legenda: ✅ jogável (arte e som provisórios) · ⏳ planejado
 
 **Escrever a Akeley**, em todos os dias: escolhe-se a abertura (o tom), a carta se
 escreve ao som da pena, e até selar dá para **amassar a folha (Esc) e escolher
-outra** quantas vezes quiser. Só selar decide. Selada, a folha se dobra em três,
-entra no envelope (endereçado a Townshend; a partir de julho, à Posta-Restante de
-Brattleboro), leva o selo — e a carta vai **para a mão**. **A porta é o correio:**
+outra** quantas vezes quiser. Só selar decide. Selada, Wilmarth senta à mesa e,
+devagar, a folha se dobra em três e entra no envelope (endereçado a Townshend; a
+partir de julho, à Posta-Restante de Brattleboro), a aba fecha, o selo é batido —
+e a carta vai **para a mão**. **A porta é o correio:**
 "Levar a carta ao correio". A resposta do dia encerra o dia; as cartas no meio do
 dia (Dias 5 e 6) saltam no tempo até a volta do correio. Todo dia termina assim.
 

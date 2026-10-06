@@ -51,6 +51,8 @@ func _ready() -> void:
 	cena.set("som_sonho", load(SFX_DIR + "sonho.wav"))
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
 	cena.set("som_postar", load(SFX_DIR + "papel_pegar.wav"))
+	cena.set("som_papel", load(SFX_DIR + "papel_pegar.wav"))
+	cena.set("som_selo", load(SFX_DIR + "selo_batido.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))
 	cena.set("linha_cartas", load("res://narrative/narration/prologo_cartas.tres"))
 	var cartoes: Array[NarrationLine] = [null,

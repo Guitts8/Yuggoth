@@ -25,6 +25,8 @@ static func criar(parent: Node, carta: ReplyData) -> CartaSaida:
 	env.destinatario = carta.endereco
 	env.remetente = "A. N. Wilmarth\nMiskatonic University\nArkham, Mass."
 	env.selos = 3 if carta.registrada else 1
+	# A folha dobrada dentro: o mesmo envelope da Selagem.
+	env.volumoso = true
 	# Ainda sem carimbo: o correio é que carimba.
 	env.carimbo_data = ""
 	c.add_child(env)

@@ -1,10 +1,8 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://ui/reply_writer.gd" id="1_writer"]
 [ext_resource type="AudioStream" path="res://audio/placeholder/pena.wav" id="2_pena"]
 [ext_resource type="Theme" path="res://ui/menu/menu_theme.tres" id="3_theme"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/papel_pegar.wav" id="4_papel"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/selo_batido.wav" id="5_selo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
 content_margin_left = 64.0
@@ -25,8 +23,6 @@ grow_vertical = 2
 theme = ExtResource("3_theme")
 script = ExtResource("1_writer")
 pen_sound = ExtResource("2_pena")
-paper_sound = ExtResource("4_papel")
-stamp_sound = ExtResource("5_selo")
 
 [node name="Dim" type="ColorRect" parent="."]
 layout_mode = 1

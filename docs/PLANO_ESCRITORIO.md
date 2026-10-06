@@ -137,7 +137,7 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
 6. **Vozes ao telefone** diferentes das vozes do disco (o disco tem de impactar).
 7. **A pedra do sonho** longe demais no exame.
 8. **O lapso:** Wilmarth vira para a janela; o dia nasce, entardece e anoitece devagar.
-9. **Selar em 3D**, devagar, na mesa (a folha dobra, entra no envelope, a aba,
+9. ✅ **Selar em 3D**, devagar, na mesa (a folha dobra, entra no envelope, a aba,
    o selo) — no lugar da animação 2D; o envelope na mão já está ótimo.
 10. **Boston:** o rapaz atende pela porta entreaberta, franco e gentil, sem convidar.
 11. **A criatura:** menos rosa e menos clara.
