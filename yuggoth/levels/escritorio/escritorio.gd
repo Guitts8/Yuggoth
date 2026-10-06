@@ -33,6 +33,15 @@ const SONHO_DESCIDA := 4.0
 ## Ditas uma vez ao entrar no escritório com a flag marcada (voltando de outra
 ## fase): flag → linha. Ex.: `voltou_de_boston` → a noite em claro escrevendo cartas.
 @export var linhas_volta: Dictionary[StringName, NarrationLine] = {}
+@export_group("Sonhos")
+## A noite depois de cada dia que tem sonho (chave = o dia que acabou) → a flag
+## que acorda (posta pelo próprio sonho: chegar à janela, levantar a agulha...).
+@export var sonhos: Dictionary[int, StringName] = {}
+@export var env_sonho: Environment
+@export var som_sonho: AudioStream
+## Segundos até acordar sozinho, se o jogador não fizer nada.
+@export var duracao_sonho := 90.0
+@export_group("")
 @export var som_pena: AudioStream
 ## A carta saindo pela porta, para o correio.
 @export var som_postar: AudioStream
@@ -306,6 +315,9 @@ func _fim_do_dia() -> void:
 	SceneDirector.hold_black = true
 	# Falas que sobraram do dia que acabou não atravessam para o seguinte.
 	Narrator.cancel()
+	await _sonhar(dia())
+	if not is_inside_tree():
+		return
 	GameState.add(&"dia", 1)
 	GameState.set_value(&"data", _data_inicio())
 	_vestir(false)
@@ -319,6 +331,41 @@ func _fim_do_dia() -> void:
 	SaveSystem.checkpoint()
 	_saindo = false
 	_inicio_do_dia()
+
+
+## A noite depois do dia `noite`, se houver sonho para ela (docs/PLANO_ESCRITORIO.md,
+## Fase 3b): no escuro, a sala vira a do sonho (`sonhando` = noite: o conteúdo
+## dos dias some, o grupo `Sonhos/NoiteN` aparece), a estética crua no máximo,
+## e o jogador anda por ela até a flag de `sonhos[noite]` (acordar), ou o tempo
+## acabar. Então o sono pesa, escurece, e a sala volta a ser a do dia seguinte.
+func _sonhar(noite: int) -> void:
+	if not sonhos.has(noite):
+		return
+	var acordar: StringName = sonhos[noite]
+	GameState.set_value(&"sonhando", noite)
+	GameState.set_value(&"sonho", 1.0)
+	world_env.environment = env_sonho
+	AudioDirector.play_ambience(som_sonho, 1.0)
+	var marca := get_node_or_null(^"Sonho") as Node3D
+	if marca:
+		player.global_transform = marca.global_transform
+	await SceneDirector.release_black(2.5)
+	var t := 0.0
+	while t < duracao_sonho and not (GameState.has_flag(acordar) and not Events.is_modal_open and not Narrator.is_speaking()):
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
+		t += get_process_delta_time()
+	await get_tree().create_timer(1.5).timeout
+	if not is_inside_tree():
+		return
+	await SceneDirector.fade_out(3.0)
+	if not is_inside_tree():
+		return
+	SceneDirector.hold_black = true
+	Narrator.cancel()
+	GameState.set_value(&"sonhando", 0)
+	GameState.set_value(&"sonho", 0.0)
 
 
 ## O dia virou noite sem acabar (Dia 4: a volta de Boston): noiteceu_dia_<N>.

@@ -46,6 +46,9 @@ func _ready() -> void:
 	cena.set("som_noite", load(SFX_DIR + "noite.wav"))
 	var volta: Dictionary[StringName, NarrationLine] = {&"voltou_de_boston": load("res://narrative/narration/depois_relato.tres")}
 	cena.set("linhas_volta", volta)
+	# Os sonhos (Escritorio._sonhar; o conteúdo vem de _sonhos).
+	cena.set("env_sonho", _env_sonho())
+	cena.set("som_sonho", load(SFX_DIR + "sonho.wav"))
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
 	cena.set("som_postar", load(SFX_DIR + "papel_pegar.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))
@@ -86,6 +89,7 @@ func _ready() -> void:
 	_add(cena, player)
 	_spawn("Cadeira", Vector3(0, 0, -1.3))
 	_spawn("Porta", Vector3(-1.0, 0, 2.3))
+	_spawn("Sonho", Vector3(-1.0, 0, 2.2))
 
 	_salvar(OUT)
 
@@ -134,6 +138,12 @@ func _materiais() -> void:
 	_mat("sombra", "sombra", {})
 	# A criatura cruzando o céu da cidade (Dias 3 e 6): silhueta sem luz.
 	_mat("migo", "migo", {unlit = true})
+	# Os sonhos entre os dias.
+	_mat("pegada", "pegada_garra", {})
+	_mat("vista_circulo", "vista_circulo", {unlit = true})
+	_mat("vista_plataforma", "vista_plataforma", {unlit = true})
+	_mat("homem_magro", "homem_magro", {unlit = true})
+	_mat("pedra_negra", "pedra_negra", {world = 4.0})
 
 
 func _env_1930() -> Environment:
@@ -148,6 +158,16 @@ func _env_1930() -> Environment:
 	e.fog_density = 1.0
 	e.fog_depth_begin = 2.0
 	e.fog_depth_end = 10.0
+	return e
+
+
+## Os sonhos: escuro, com uma névoa verde-acinzentada que come o fundo da sala.
+func _env_sonho() -> Environment:
+	var e := _env_1930()
+	e.ambient_light_color = Color(0.05, 0.06, 0.055)
+	e.fog_light_color = Color(0.05, 0.07, 0.06)
+	e.fog_depth_begin = 1.5
+	e.fog_depth_end = 7.0
 	return e
 
 
@@ -586,7 +606,9 @@ func _miskatonic() -> void:
 	_cesto(g)
 	_cortinas(g)
 
-	_dias(g)
+	# Os dias somem enquanto se sonha (Escritorio._sonhar).
+	_dias(_grupo_se(g, "Dias", _cond_valor(&"sonhando", ValueCondition.Op.IGUAL, 0)))
+	_sonhos(g)
 
 	# A luz do corredor entra pela fresta embaixo da porta: uma linha acesa e um
 	# brilho fraco no chão, onde o correio cai — nas noites, é o que o mostra.
@@ -1090,7 +1112,8 @@ func _dia_4(parent: Node) -> void:
 
 ## Telefone de parede (caixa de madeira, manivela, fone no gancho), na parede
 ## leste, ao lado da escrivaninha. Só se usa quando há ligação disponível.
-func _telefone(parent: Node) -> void:
+## O do sonho da noite do Dia 5 é outro, com a sua ligação (`ids`).
+func _telefone(parent: Node, ids: Array = ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene", "resposta_telegrama"], nome := "Telefone") -> Telefone:
 	var g := _group(parent, "TelefoneParede", Vector3(W - 0.07, 1.45, -2.25), 90)
 	_box(g, "Caixa", Vector3(0.24, 0.38, 0.12), Vector3.ZERO, "madeira_clara")
 	for s in [-1, 1]:
@@ -1100,17 +1123,18 @@ func _telefone(parent: Node) -> void:
 	bocal.rotation_degrees.x = 90
 	_cyl(g, "Fone", 0.018, 0.022, 0.12, Vector3(-0.15, -0.02, -0.02), "ferro", 8)
 	_box(g, "Manivela", Vector3(0.012, 0.08, 0.012), Vector3(0.14, 0.02, -0.03), "ferro")
-	var tel := _area(g, Telefone.new(), "Telefone", Vector3(0.36, 0.45, 0.3), Vector3(0, 0, -0.08)) as Telefone
-	tel.unique_name_in_owner = true
+	var tel := _area(g, Telefone.new(), nome, Vector3(0.36, 0.45, 0.3), Vector3(0, 0, -0.08)) as Telefone
+	tel.unique_name_in_owner = nome == "Telefone"
 	tel.campainha = load(SFX_DIR + "campainha.wav")
 	tel.gancho = load(SFX_DIR + "telefone_gancho.wav")
 	tel.manivela = load(SFX_DIR + "telefone_manivela.wav")
 	tel.linha = load(SFX_DIR + "telefone_linha.wav")
 	tel.voz = load(SFX_DIR + "telefone_voz.wav")
 	var ligs: Array[Ligacao] = []
-	for id in ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene", "resposta_telegrama"]:
+	for id in ids:
 		ligs.append(load("res://narrative/ligacoes/%s.tres" % id))
 	tel.conversas = ligs
+	return tel
 
 
 ## Dia 3 (cap. III): o disco chega de Brattleboro. Noite; abajur na mesa.
@@ -1284,6 +1308,167 @@ func _lareira_noite(parent: Node, n: int) -> void:
 	crepitar.unit_size = 2.5
 	_add(fogo, crepitar)
 	acender.som = load(SFX_DIR + "fosforo.wav")
+
+
+## Os sonhos da noite depois de cada dia (Escritorio._sonhar): cada um num grupo
+## `Sonhos/NoiteN` que só existe com `sonhando == N`, enquanto o conteúdo dos dias
+## some. Sem susto; acordam numa ação (a flag de `sonhos`).
+func _sonhos(parent: Node) -> void:
+	var s := _group(parent, "Sonhos")
+	var noite := func(n: int) -> Node3D:
+		return _grupo_se(s, "Noite%d" % n, _cond_valor(&"sonhando", ValueCondition.Op.IGUAL, n))
+	_sonho_garras(noite.call(2))
+	_sonho_disco(noite.call(3))
+	_sonho_pedra(noite.call(4))
+	_sonho_telefone(noite.call(5))
+	var acordar: Dictionary[int, StringName] = {
+		2: &"narrou_sonho_garra", 3: &"acordou_noite_3", 4: &"viu_pedra_sonho", 5: &"ligou_sonho_telefone",
+	}
+	cena.set("sonhos", acordar)
+
+
+## Noite do Dia 2 (as fotografias): marcas de garra, de lama, da porta
+## até a mesa, subindo por ela até a janela, que dá para o círculo de pedras.
+## Acorda ao chegar à mesa ("Chamei-a de pegada...").
+func _sonho_garras(g: Node3D) -> void:
+	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.15), Vector3.ZERO, "vista_circulo")
+	_omni(g, "Lua", Vector3(0.2, 2.2, -2.4), Color(0.5, 0.6, 0.9), 1.4, 7.0)
+	# A luz fria que deita no chão e mostra o caminho das marcas (acima do tapete).
+	var caminho := SpotLight3D.new()
+	caminho.name = "Caminho"
+	caminho.transform = Transform3D(Basis.looking_at(Vector3(0.1, -1, -0.25)), Vector3(-0.6, 2.8, 1.2))
+	caminho.light_color = Color(0.6, 0.68, 0.85)
+	caminho.light_energy = 2.2
+	caminho.spot_angle = 50.0
+	caminho.spot_range = 5.0
+	_add(g, caminho)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 22
+	# O caminho: da porta ao pé da mesa; depois o tampo e o peitoril.
+	var de := Vector2(-1.0, 2.75)
+	var ate := Vector2(-0.05, -1.75)
+	var rumo := rad_to_deg(atan2(-(ate - de).x, -(ate - de).y))
+	for k in 12:
+		var p := de.lerp(ate, k / 11.0) + Vector2(0.12 if k % 2 else -0.12, 0)
+		_quad(g, "Pegada%d" % k, Vector2(0.32, 0.32), Vector3(p.x, 0.014, p.y), Vector3(-90, rumo, 0), "pegada")
+	for k in 3:
+		var p := Vector3(-0.1 + (0.1 if k % 2 else -0.1), MESA + 0.004, -1.95 - k * 0.22)
+		_quad(g, "PegadaMesa%d" % k, Vector2(0.2, 0.2), p, Vector3(-90, 0, 0), "pegada")
+	_quad(g, "PegadaPeitoril", Vector2(0.18, 0.18), Vector3(0.0, JANELA_Y.x + 0.035, -D + 0.02), Vector3(-90, 0, 0), "pegada")
+	var gatilho := NarrationTrigger.new()
+	gatilho.line = load("res://narrative/narration/sonho_garra.tres")
+	_area(g, gatilho, "AoPeDaMesa", Vector3(1.6, 2.0, 0.6), Vector3(0, 1.0, -1.5))
+
+
+## Noite do Dia 3 (o disco): tudo escuro; só o fonógrafo, na mesa, sob uma luz,
+## tocando sozinho. Acorda ao levantar a agulha.
+func _sonho_disco(g: Node3D) -> void:
+	# De lado para quem chega: a corneta se vê de perfil, virada para a sala.
+	var f := _group(g, "Fonografo", Vector3(0, MESA, -2.2), 120)
+	_box(f, "Caixa", Vector3(0.34, 0.14, 0.24), Vector3(0, 0.07, 0), "madeira_clara")
+	var cera := _cyl(f, "Cera", 0.032, 0.032, 0.11, Vector3(0, 0.19, 0.02), "cinzas", 10)
+	cera.rotation_degrees.z = 90
+	var cone := _cyl(f, "Corneta", 0.2, 0.015, 0.5, Vector3(0.0, 0.42, -0.18), "latao", 10)
+	cone.rotation_degrees = Vector3(-60, 0, 0)
+	var luz := SpotLight3D.new()
+	luz.name = "Luz"
+	luz.transform = Transform3D(Basis.looking_at(Vector3.DOWN, Vector3.FORWARD), Vector3(0, 1.6, 0))
+	luz.light_color = Color(0.9, 0.85, 0.6)
+	luz.light_energy = 4.5
+	luz.spot_angle = 26.0
+	luz.spot_range = 3.0
+	luz.shadow_enabled = true
+	_add(f, luz)
+	var disco := AudioStreamPlayer3D.new()
+	disco.name = "Disco"
+	disco.stream = load(SFX_DIR + "disco_longo.wav")
+	disco.autoplay = true
+	disco.bus = &"Voice"
+	disco.unit_size = 3.0
+	_add(f, disco)
+	var agulha := _area(f, StateInteractable.new(), "Agulha", Vector3(0.45, 0.5, 0.4), Vector3(0, 0.2, 0)) as StateInteractable
+	agulha.prompt = "Levantar a agulha"
+	agulha.changes = {&"acordou_noite_3": 1.0}
+	agulha.additive = false
+
+
+## Noite do Dia 4 (a pedra que não chega): a pedra negra está na mesa; pela
+## janela, a plataforma de Keene à noite e um homem magro de costas, e a voz
+## zumbida. Acorda depois de examinar a pedra (o sono pesa).
+func _sonho_pedra(g: Node3D) -> void:
+	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.15), Vector3.ZERO, "vista_plataforma")
+	_quad(g, "Homem", Vector2(0.26, 0.65), Vector3(0.45, 1.2, -D - 0.85), Vector3.ZERO, "homem_magro")
+	_omni(g, "Janela", Vector3(0.3, 1.8, -2.6), Color(0.85, 0.75, 0.55), 0.6, 4.0)
+	var pedra := _group(g, "Pedra", Vector3(-0.05, MESA, -2.3), 8)
+	_box(pedra, "Bloco", Vector3(0.3, 0.55, 0.14), Vector3(0, 0.275, 0), "pedra_negra")
+	var lasca := _box(pedra, "Lasca", Vector3(0.22, 0.2, 0.13), Vector3(0.06, 0.5, 0.005), "pedra_negra")
+	lasca.rotation_degrees.z = 32
+	var ex := _area(pedra, Examinable.new(), "Examinar", Vector3(0.4, 0.65, 0.3), Vector3(0, 0.3, 0)) as Examinable
+	ex.prompt = "Examinar a pedra"
+	ex.title = "A pedra negra"
+	ex.description = "A grande pedra negra de Round Hill — a que nunca chegou. Que princípios geométricos guiaram o corte dela, eu não saberia dizer. Distingo poucos hieróglifos, mas um ou dois me dão um choque."
+	ex.flag = &"viu_pedra_sonho"
+	var luz := _omni(pedra, "Luz", Vector3(0.3, 0.9, 0.4), Color(0.7, 0.75, 0.9), 1.2, 2.5)
+	luz.shadow_enabled = true
+	var voz := AudioStreamPlayer3D.new()
+	voz.name = "Voz"
+	voz.stream = load(SFX_DIR + "zumbido.wav")
+	voz.autoplay = true
+	voz.bus = &"Whisper"
+	voz.volume_db = -4.0
+	voz.position = Vector3(0.45, 1.3, -D - 0.6)
+	voz.unit_size = 3.0
+	_add(g, voz)
+
+
+## Noite do Dia 5 (o telegrama AKELY): chove dentro da sala; o telefone toca.
+## Atendido, só um zumbido na linha, soletrando. Acorda ao desligar.
+func _sonho_telefone(g: Node3D) -> void:
+	_omni(g, "Penumbra", Vector3(0.5, 2.4, -1.0), Color(0.45, 0.5, 0.65), 0.7, 7.0)
+	var chuva := _chuva_dentro(g)
+	chuva.name = "ChuvaDentro"
+	var som := AudioStreamPlayer3D.new()
+	som.name = "Chuva"
+	som.stream = load(SFX_DIR + "chuva.wav")
+	som.autoplay = true
+	som.bus = &"Ambience"
+	som.position = Vector3(0, 2.0, 0)
+	som.unit_size = 6.0
+	_add(g, som)
+	var tel := _telefone(g, ["sonho_telefone"], "TelefoneSonho")
+	tel.voz = load(SFX_DIR + "zumbido.wav")
+	tel.voz_db = -6.0
+
+
+## Chuva caindo dentro da sala, do teto ao chão, em toda a planta.
+func _chuva_dentro(parent: Node) -> GPUParticles3D:
+	var p := GPUParticles3D.new()
+	p.position = Vector3(0, H - 0.1, 0)
+	p.amount = 500
+	p.lifetime = 0.6
+	p.visibility_aabb = AABB(Vector3(-W, -H, -D), Vector3(2 * W, H + 0.5, 2 * D))
+	var proc := ParticleProcessMaterial.new()
+	proc.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	proc.emission_box_extents = Vector3(W - 0.1, 0.05, D - 0.1)
+	proc.direction = Vector3(0.03, -1, 0)
+	proc.spread = 2.0
+	proc.initial_velocity_min = 5.0
+	proc.initial_velocity_max = 6.5
+	p.process_material = proc
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.015, 0.22)
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+	mat.billboard_keep_scale = true
+	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	mat.albedo_texture = load(TEX_DIR + "gota.png")
+	mat.albedo_color = Color(0.55, 0.6, 0.75, 0.6)
+	quad.material = mat
+	p.draw_pass_1 = quad
+	_add(parent, p)
+	return p
 
 
 ## Uma das criaturas cruzando o céu da cidade, à noite: uma silhueta 2D sobre o

@@ -123,6 +123,9 @@ sozinha numa folha. Decidido com o usuário, nesta ordem:
    estética crua (`sonho`). Propostas a detalhar antes de fazer, uma por dia.
    ✅ A criatura no céu: Dia 3 (depois do disco) e Dia 6 (depois de "falaram
    comigo"), `Aparicao` com asas batendo (`batida`), silhueta rosada apagada.
+   ✅ Os sonhos na noite entre os dias (2→3, 3→4, 4→5, 5→6): `Escritorio._sonhar`,
+   `Sonhos/NoiteN` com `sonhando == N` (o grupo `Dias` some), `sonhos[N]` = a flag
+   que acorda. Fase 3b concluída; falta o playtest do usuário.
 
 ## Fase 4 — O mapa de Vermont
 Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da

@@ -66,6 +66,12 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 |---|---|
 | **O funcionário do expresso** (Boston, Dia 4) | Rapaz "franco e simpático", sentado à mesa do quarto de pensão, de camisa e colete, mangas arregaçadas, cabelo curto. Hoje é um boneco de caixas (`gerar_boston._funcionario`). Precisa de rosto legível de perto e de um rig simples (cabeça e mãos), sentado. |
 
+### Sonhos
+| Objeto | Notas |
+|---|---|
+| **A pedra negra** (sonho da noite do Dia 4) | Cerca de 1 × 2 pés, de pé, superfície curva irregular, "princípios geométricos" estranhos no corte; hieróglifos rasos. Hoje são duas caixas com `pedra_negra.png`. |
+| **Marca de garra** | Decalque (`pegada_garra.png`): almofada central e pares de pinças serrilhadas em direções opostas (cap. II). |
+
 ### B — presença constante
 
 | Objeto | Notas |

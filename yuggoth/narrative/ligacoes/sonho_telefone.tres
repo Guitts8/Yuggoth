@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Ligacao" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/ligacao.gd" id="1_lig"]
+
+[resource]
+script = ExtResource("1_lig")
+id = &"sonho_telefone"
+prompt = "Atender o telefone"
+recebida = true
+falas = PackedStringArray("(SÓ UM ZUMBIDO NA LINHA)", "Voz zumbida: A...", "Voz zumbida: ...K... E... L... Y.")

@@ -378,6 +378,7 @@ func _ready() -> void:
 	await writer._seal()
 	_check(GameState.get_value(&"crenca") == 2, "duas respostas crédulas: crença 2")
 	esc.porta.interact(player)
+	await _sonho_no_teste(esc, 2, func() -> void: esc.player.global_position = Vector3(0, 0, -1.5))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 3 and not SceneDirector.hold_black and not esc._saindo, 20.0)
 	_check(GameState.get_value(&"dia") == 3 and fotos.visible and not dia2.visible, "Dia 3: as fotografias ficam, a carta do Dia 2 não")
 
@@ -437,6 +438,7 @@ func _ready() -> void:
 	writer._finish_writing()
 	await writer._seal()
 	esc.porta.interact(player)
+	await _sonho_no_teste(esc, 3, func() -> void: esc.find_child("Noite3", true, false).get_node("Fonografo/Agulha").interact(esc.player))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 4 and not SceneDirector.hold_black and not esc._saindo, 20.0)
 	_check(GameState.get_value(&"dia") == 4 and fono.is_visible_in_tree() and esc.find_child("Cilindro", true, false).visible, "Dia 4: a máquina fica montada, com o cilindro")
 
@@ -535,6 +537,7 @@ func _ready() -> void:
 	writer._finish_writing()
 	await writer._seal()
 	esc.porta.interact(player)
+	await _sonho_no_teste(esc, 4, func() -> void: esc.find_child("Noite4", true, false).get_node("Pedra/Examinar").interact(esc.player))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 5 and not SceneDirector.hold_black and not esc._saindo, 30.0)
 	_check(GameState.get_value(&"dia") == 5 and not tel.can_interact(player), "Dia 5: o telefone volta a ficar mudo")
 
@@ -645,6 +648,7 @@ func _ready() -> void:
 	await writer._seal()
 	_check(GameState.get_value(&"resposta_dia_5") == 0 and GameState.get_number(&"crenca") == crenca_antes, "a resposta animadora (a do livro) não mexe na crença")
 	esc.porta.interact(player)
+	await _sonho_no_teste(esc, 5, func() -> void: esc.find_child("TelefoneSonho", true, false).interact(esc.player))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 6 and not SceneDirector.hold_black and not esc._saindo, 30.0)
 	_check(GameState.get_value(&"dia") == 6 and not dia5.visible, "ir para casa leva a setembro")
 
@@ -775,6 +779,24 @@ func _inalcancaveis(esc: Node3D, limites := Vector2(2.3, 2.8)) -> PackedStringAr
 		if not achou:
 			fora.append(String(esc.get_path_to(alvo)))
 	return fora
+
+
+## A noite entre os dias: espera o sonho `n` clarear, confere que é sonho (a
+## estética crua, os dias sumidos, o grupo da noite) e acorda com `acordar`.
+func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
+	await _until(func() -> bool: return GameState.get_value(&"sonhando") == n and not SceneDirector.hold_black, 30.0)
+	var grupo: Node3D = esc.find_child("Noite%d" % n, true, false)
+	_check(GameState.get_value(&"sonhando") == n and is_equal_approx(GameState.get_number(&"sonho"), 1.0) and grupo.visible
+		and not esc.find_child("Dias", true, false).visible and esc.player.input_enabled, "a noite do Dia %d: o sonho" % n)
+	await _check_alcance(esc, "Sonho da noite %d" % n)
+	acordar.call()
+	await _frames(2)
+	var viewer: Control = esc.get_tree().root.find_child("ExamineViewer", true, false)
+	if viewer and viewer.visible:
+		await _seconds(0.5)
+		viewer.close()
+	await _until(func() -> bool: return GameState.get_value(&"sonhando") == 0, 60.0)
+	_check(GameState.get_value(&"sonhando") == 0 and is_zero_approx(GameState.get_number(&"sonho")), "acordar do sonho da noite %d" % n)
 
 
 ## Como o jogador: pegar o correio do chão, pôr na mesa e abrir.

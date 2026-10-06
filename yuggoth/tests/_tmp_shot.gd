@@ -1,6 +1,5 @@
 extends Node
-## Descartável: a vinheta de Boston e a volta ao escritório de noite, em
-## SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável: os quatro sonhos entre os dias, em SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -12,36 +11,35 @@ func _ready() -> void:
 	root.boot_to_menu = false
 	add_child(root)
 	await _s(0.5)
-	GameState.reset()
-	GameState.set_flag(&"prologo_concluido")
-	GameState.set_value(&"dia", 4)
-	GameState.set_flag(&"tocou_disco")
-	await SceneDirector.change_level("res://levels/boston/boston.tscn", &"Entrada")
-	await _s(2.5)
-	var boston: Boston = root.find_child("Boston", true, false)
-	_shot("%s_entrada" % tag)
-	var player := boston.player
-	player.global_position = Vector3(-0.2, 0, 0.2)
-	player.look_at(Vector3(1.05, 0, -1.15))
-	player.head.rotation.x = deg_to_rad(-12)
-	await _s(0.8)
-	_shot("%s_rapaz" % tag)
-	var rapaz: Interlocutor = boston.get_node("%Conversa")
-	rapaz.interact(player)
-	while rapaz.em_conversa():
-		await _s(0.2)
-	rapaz.interact(player)
-	await _s(5.5)
-	_shot("%s_voz" % tag)
-	while rapaz.em_conversa():
-		await _s(0.2)
-	GameState.set_flag(&"voltou_de_boston")
-	GameState.set_flag(&"anoiteceu_dia_4")
-	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta")
-	await _s(2.0)
-	_shot("%s_volta" % tag)
+	# [noite, de onde, para onde olhar]
+	var vistas := [[2, Vector3(-1.0, 0, 2.2), Vector3(-0.2, 0.2, -1.4)],
+		[3, Vector3(0.0, 0, -1.0), Vector3(0.0, 0.95, -2.2)],
+		[4, Vector3(0.0, 0, -1.3), Vector3(0.2, 1.1, -3.0)],
+		[5, Vector3(-0.8, 0, 0.2), Vector3(2.4, 1.3, -2.2)]]
+	for v: Array in vistas:
+		GameState.reset()
+		GameState.set_flag(&"prologo_concluido")
+		GameState.set_value(&"dia", v[0])
+		GameState.set_flag(&"tocou_disco")
+		await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+		await _s(0.5)
+		var esc: Escritorio = root.find_child("Escritorio", true, false)
+		Narrator.cancel()
+		await SceneDirector.fade_out(0.1)
+		esc._sonhar(v[0])
+		await _s(1.0)
+		_mirar(esc.player, v[1], v[2])
+		await _s(3.5)
+		_shot("%s_noite%d" % [tag, v[0]])
 	SaveSystem.delete_save()
 	get_tree().quit()
+
+
+func _mirar(player: Player, de: Vector3, ponto: Vector3) -> void:
+	player.global_position = de
+	player.look_at(Vector3(ponto.x, de.y, ponto.z))
+	var olho := de + Vector3(0, player.eye_height, 0)
+	player.head.rotation.x = atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 
 
 func _shot(name: String) -> void:

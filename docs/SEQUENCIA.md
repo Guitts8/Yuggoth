@@ -26,6 +26,16 @@ escrivaninha, **"Pôr na mesa"** → **"Abrir com a espátula"** (som de papel r
 → o conteúdo sai para a mesa; depois o envelope é examinável (carimbo, selos,
 letra). Pacotes que não passam na fresta ficam no chão junto à porta.
 
+**Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5, entre a porta e o cartão do
+dia seguinte: o escritório transformado, na estética crua, com a névoa e um grave
+que bate devagar; dá para andar; nada salta. Acorda-se numa ação, e vem o dia.
+| Noite | O sonho | Acorda |
+|---|---|---|
+| Dia 2 (as fotos) | Marcas de garra, de lama, da porta até a mesa, subindo por ela até a janela, que dá para o morro com o círculo de pedras | ao chegar à mesa: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
+| Dia 3 (o disco) | Tudo escuro; só o fonógrafo na mesa, sob uma luz, tocando sozinho a gravação longa | ao levantar a agulha |
+| Dia 4 (a pedra) | A pedra negra que nunca chegou está na mesa; pela janela, a plataforma de Keene, o trem parado, um homem magro de costas; a voz zumbida | ao examinar a pedra |
+| Dia 5 (AKELY) | Chove dentro da sala; o telefone toca | atendido: só um zumbido na linha, soletrando *A... K... E... L... Y.* |
+
 **O tempo passa na própria sala:** nos saltos dentro de um dia (Dias 4 a 6), não há
 tela preta. O jogador fica parado; a sala escurece, a **folhinha** no peitoril da
 janela perde uma folha por dia (com som), a luz fria da manhã entra e vai embora, e

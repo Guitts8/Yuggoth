@@ -54,6 +54,12 @@ func _texturas() -> void:
 	_save(_gota(), "gota")
 	_save(_chama(), "chama")
 	_save(_migo(), "migo")
+	# Os sonhos entre os dias (Fase 3b).
+	_save(_pegada_garra(), "pegada_garra")
+	_save(_vista_circulo(), "vista_circulo")
+	_save(_vista_plataforma(), "vista_plataforma")
+	_save(_homem_magro(), "homem_magro")
+	_save(_pedra_negra(), "pedra_negra")
 	_save(_sombra(), "sombra")
 	# Correspondência.
 	_save(_papel_envelope(), "papel_envelope")
@@ -933,6 +939,7 @@ func _sons() -> void:
 	# A lareira (noites dos Dias 5 e 6).
 	_wav(_fosforo(), "fosforo", false)
 	_wav(_lareira(), "lareira", true)
+	_wav(_sonho_drone(), "sonho", true)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1396,6 +1403,23 @@ func _fosforo() -> PackedFloat32Array:
 	return b
 
 
+## O fundo dos sonhos: um grave que bate devagar (duas notas quase iguais) e um
+## sopro que vem e vai.
+func _sonho_drone() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 58
+	var b := _buf(12.0)
+	var sopro := _buf(12.0)
+	for i in sopro.size():
+		sopro[i] = rng.randf_range(-1, 1)
+	_lowpass(sopro, 300.0)
+	for i in b.size():
+		var t := float(i) / RATE
+		var grave := sin(TAU * 55.0 * t) * 0.3 + sin(TAU * 58.2 * t) * 0.3 + sin(TAU * 110.4 * t) * 0.08
+		b[i] = grave + sopro[i] * 2.5 * (0.5 + 0.5 * sin(TAU * t / 6.0))
+	return _seamless(b, 1.0)
+
+
 ## Lenha queimando: o ronco grave das chamas e estalos soltos.
 func _lareira() -> PackedFloat32Array:
 	var rng := RandomNumberGenerator.new()
@@ -1479,6 +1503,126 @@ func _migo() -> Image:
 		risco.call(ponta, ponta + Vector2(1.5, -2.0))
 		risco.call(ponta, ponta + Vector2(2.0, 1.0))
 	return img
+
+## Pinta com `cor` os pixels de `img` onde `dentro(x, y)` vale.
+func _pintar(img: Image, cor: Color, dentro: Callable) -> void:
+	for y in img.get_height():
+		for x in img.get_width():
+			if dentro.call(float(x), float(y)):
+				img.set_pixel(x, y, cor)
+
+
+## Distância de p ao segmento a-b.
+static func _dist_seg(p: Vector2, a: Vector2, b: Vector2) -> float:
+	var t := clampf((p - a).dot(b - a) / maxf((b - a).length_squared(), 0.0001), 0.0, 1.0)
+	return p.distance_to(a.lerp(b, t))
+
+
+## A marca de garra na lama (livro, cap. II: "de uma almofada central, pares de
+## pinças serrilhadas se projetavam em direções opostas"). Topo da marca para -Y.
+func _pegada_garra() -> Image:
+	var img := _img(32, 32)
+	img.fill(Color(0, 0, 0, 0))
+	var lama := Color(0.13, 0.09, 0.06)
+	_pintar(img, lama, func(x: float, y: float) -> bool:
+		var p := Vector2(x, y)
+		if Vector2((x - 15.5) / 4.5, (y - 15.5) / 3.6).length() < 1.0:
+			return true
+		for lado in [-1.0, 1.0]:
+			for k in [-1.0, 1.0]:
+				var a := Vector2(15.5 + lado * 3.5, 15.5 + k * 2.0)
+				var b := Vector2(15.5 + lado * 14.0, 15.5 + k * 6.5)
+				if _dist_seg(p, a, b) < 1.3:
+					return true
+				# Os dentes da serra, para dentro.
+				for t in range(1, 5):
+					var d := a.lerp(b, t / 5.0)
+					if _dist_seg(p, d, d + Vector2(0, -k * 2.2)) < 0.7:
+						return true
+		return false)
+	return img
+
+
+## Céu de noite em gradiente (para as vistas dos sonhos).
+func _ceu(img: Image, alto: Color, baixo: Color) -> void:
+	for y in img.get_height():
+		var c := alto.lerp(baixo, y / float(img.get_height() - 1))
+		for x in img.get_width():
+			img.set_pixel(x, y, c)
+
+
+## Sonho da noite do Dia 2: um morro selvagem e, no alto, o círculo de pedras de pé.
+func _vista_circulo() -> Image:
+	var img := _img(VW, VH)
+	_ceu(img, Color(0.03, 0.04, 0.08), Color(0.08, 0.09, 0.12))
+	var morro := func(x: float) -> float: return 72.0 - 30.0 * exp(-pow((x - 140.0) / 60.0, 2.0))
+	_pintar(img, Color(0.02, 0.025, 0.025), func(x: float, y: float) -> bool: return y > morro.call(x))
+	for i in 9:
+		var x := 112.0 + i * 7.0
+		var topo: float = morro.call(x) - 7.0 - float(i % 3) * 2.0
+		_pintar(img, Color(0.17, 0.17, 0.19), func(px: float, py: float) -> bool:
+			return px >= x and px < x + 3.0 and py >= topo and py < morro.call(x) + 1.0)
+	return img
+
+
+## Sonho da noite do Dia 4: a plataforma de Keene à noite, um poste de luz e o
+## trem parado com as janelas acesas.
+func _vista_plataforma() -> Image:
+	var img := _img(VW, VH)
+	_ceu(img, Color(0.02, 0.025, 0.05), Color(0.06, 0.06, 0.08))
+	# O trem: um vagão comprido, com a fileira de janelas acesas.
+	_pintar(img, Color(0.03, 0.03, 0.035), func(x: float, y: float) -> bool: return x > 30 and y > 46 and y < 96)
+	_pintar(img, Color(0.5, 0.38, 0.16), func(x: float, y: float) -> bool:
+		return x > 34 and y > 56 and y < 70 and int(x) % 22 < 13)
+	# A plataforma, e o poste com a sua auréola.
+	_pintar(img, Color(0.07, 0.065, 0.06), func(x: float, y: float) -> bool: return y >= 96)
+	_pintar(img, Color(0.05, 0.05, 0.05), func(x: float, y: float) -> bool: return absf(x - 200.0) < 1.5 and y > 30 and y < 96)
+	for y in VH:
+		for x in VW:
+			var d := Vector2(x - 200.0, y - 30.0).length()
+			if d < 16.0:
+				var c := img.get_pixel(x, y).lerp(Color(0.9, 0.75, 0.45), (1.0 - d / 16.0) * 0.8)
+				img.set_pixel(x, y, c)
+	return img
+
+
+## O homem magro de costas, na plataforma: casaco escuro, cabelo cor de areia.
+func _homem_magro() -> Image:
+	var img := _img(16, 40)
+	img.fill(Color(0, 0, 0, 0))
+	_pintar(img, Color(0.05, 0.045, 0.045), func(x: float, y: float) -> bool:
+		var meia := 3.2 if y > 9 else 0.0
+		if y > 9 and y < 37:
+			meia = 3.6 - (y - 9) * 0.03
+		return y > 9 and y < 38 and absf(x - 7.5) < meia and not (y > 30 and absf(x - 7.5) < 0.6))
+	_pintar(img, Color(0.5, 0.38, 0.22), func(x: float, y: float) -> bool:
+		return Vector2((x - 7.5) / 2.3, (y - 6.0) / 3.2).length() < 1.0)
+	return img
+
+
+## A pedra negra de Round Hill: quase preta, com hieróglifos rasos que pegam luz.
+func _pedra_negra() -> Image:
+	var img := _img()
+	var n := _noise(64, 0.2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 64
+	for y in 64:
+		for x in 64:
+			var v := 0.06 + n.get_noise_2d(x, y) * 0.03
+			img.set_pixel(x, y, Color(v, v, v * 1.05))
+	for fila in 6:
+		var x := 4
+		while x < 58:
+			var y := 6 + fila * 10
+			var glifo := rng.randi_range(0, 3)
+			for k in 6:
+				var px := x + (k if glifo % 2 == 0 else (k % 3) * 2)
+				var py := y + (k / 2 if glifo < 2 else 5 - k)
+				if px < 64 and py < 64:
+					img.set_pixel(px, py, Color(0.16, 0.16, 0.18))
+			x += rng.randi_range(6, 9)
+	return img
+
 
 ## Chama (para billboards): gota com borda irregular, amarela embaixo, vermelha na ponta.
 func _chama() -> Image:
