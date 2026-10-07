@@ -570,7 +570,7 @@ func resolve_pages() -> Array[String]:
 
 **Risco aceito:** o Ato III, maior risco de design, é validado por último. Como nada da demo depende da fazenda, mudanças nele não afetam o que já foi lançado.
 
-**Estado (2026-10-05):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–6 jogáveis com arte e som provisórios (gerados por script), com o fim da demo (a tinta → o céu de Vermont → menu); falta a arte e o som finais do escritório (revisão visual planejada: low-poly facetado, luz da lâmpada por pixel), a voz do disco e o visual de sonho (pendente: definir o que falta além da intensidade). O que cada parte já tem: `docs/SEQUENCIA.md`.
+**Estado (2026-10-07):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–6 jogáveis com o fim da demo (a tinta → o céu de Vermont → menu). O **escritório v2** (`docs/PLANO_ESCRITORIO.md`, o diário de bordo) já fez o look-dev (luz por pixel, facetas, lâmpada de banqueiro, 480 linhas), a sala nova, o correio pela fresta, a selagem em 3D e a porta como correio, o telefone com som, a lareira, o lapso na própria sala, a vinheta de Boston, a criatura no céu, os sonhos entre os dias e o diário que leva a eles. Tudo ainda com arte e som provisórios (gerados por script). Falta no marco E: o playtest do v2, o mapa de Vermont, a sala que acumula, as estranhezas, a arte e o som finais (`docs/ARTE.md`) e a voz de Noyes no disco. Falta no marco Demo: opções de acessibilidade (jitter/afim/FOV — ainda não existem em `Settings`), presets de export (ainda não há `export_presets.cfg`) e o playtest com 5+ pessoas. O que cada parte já tem: `docs/SEQUENCIA.md`.
 
 ### 12.1 Riscos
 | Risco | Mitigação |
@@ -595,7 +595,7 @@ func resolve_pages() -> Array[String]:
 - [ ] No 2b, o planar entre terraços precisa de física própria ou basta um salto guiado por `Path3D`?
 - [ ] Haverá dublagem das cartas (leitura em voz alta opcional) ou apenas texto?
 - [ ] Usar Dialogue Manager ou sistema de diálogo próprio?
-- [ ] Resolução de renderização definitiva (480×270 vs 320×180).
+- [x] ~~Resolução de renderização definitiva~~ → ~480 linhas (shrink inteiro: 540 em 1080p), decidido no look-dev do escritório v2.
 - [ ] Nomes definitivos dos cães (o conto não os nomeia).
 - [ ] No Interlúdio, abrir a porta mostra algo (uma silhueta, por um frame) ou a lamparina apaga antes?
 - [ ] Extras se sobrar tempo: biblioteca da Miskatonic (*Necronomicon*) e agência de transporte em Keene (a pedra some).

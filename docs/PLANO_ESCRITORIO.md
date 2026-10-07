@@ -231,12 +231,36 @@ linguagem da tinta, mas é mais leitura e não mostra o sono. **Escolhida: 2 + 3
 - A cidade 3D, se aprovada, precisa das outras horas (dia, entardecer, chuva) e de
   substituir o painel de vez; se não, sai.
 
+## Onde estamos (revisão de 2026-10-07)
+**Ok (feito e commitado):** fases 1, 2, 3, 3b e 3c inteiras, inclusive a passagem
+para o sonho (`55cf59e`). Teste de fumaça passando no último commit. Prólogo → fim
+da demo jogável de ponta a ponta, com arte e som provisórios.
+
+**Esperando o usuário (decisões, não código):**
+- O playtest 3 (Prólogo ao fim da demo), com atenção ao diário: o ritmo da escrita
+  e do sono, se a letra se lê debruçado, se o acordar de manhã deixa claro que foi sonho.
+- Aprovar os **textos das 5 entradas do diário** (`diario_dia_1..5`, compostos com
+  frases do conto; ver FIDELIDADE).
+- **Painel × cidade 3D** (tecla C): se a 3D ficar, faltam as outras horas (dia,
+  entardecer, chuva) e tirar o painel; se não, o experimento sai.
+- O **visual do sonho** (pendência antiga, de antes do v2): com a realidade mais rica,
+  ver se o contraste já basta ou o que falta (cor, pós, movimento, geometria).
+- "Deixar sem resposta" (Dia 2): trocar o texto da ação ou não.
+
+**A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
+(GDD §12): opções de acessibilidade (tremor, afim, FOV — ainda não há nenhuma em
+`Settings`), presets de export (ainda não há `export_presets.cfg`) e o playtest com
+5+ pessoas. Fora do código e ainda sem dono: arte final (`docs/ARTE.md`, nenhum
+`.glb` ainda), som final e a voz de Noyes no disco.
+
 ## Próximos passos (em ordem)
 1. ✅ **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
 2. Playtest do usuário (Prólogo ao fim da demo) — inclusive comparar painel × cidade 3D (C),
-   e o diário: o ritmo da escrita e do sono, e se a letra se lê.
+   e o diário: o ritmo da escrita e do sono, e se a letra se lê. O que ele pedir vira a
+   **Fase 3d**, aqui, no mesmo formato da 3c.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
+
 ## Fase 4 — O mapa de Vermont
 Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da
 investigação**, como na referência). Textura gerada: contorno de Vermont, o

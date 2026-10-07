@@ -44,6 +44,9 @@ constante na sala; **C** = melhora, mas a caixa provisória aguenta.
 | **Fotografias de Akeley** | chegam no Dia 2 | Examináveis com lupa. Plano com espessura e borda de papel fotográfico; a imagem (pegadas, pedra negra) é textura — eu posso gerar uma versão borrada provisória. |
 | **Mãos de Wilmarth** | primeira pessoa | GDD §3.2: "mãos visíveis ao segurar documentos". Segurando papel e segurando a lamparina. Low-poly, punho da camisa e paletó. Precisa de rig simples. |
 | **Lamparina a querosene** | mesa (1928) e na mão (Ato III) | Tanque de latão, chaminé de vidro, botão da chama. É o objeto mais importante do jogo (GDD §8.1). |
+| **Diário de Wilmarth** (`Diario`) | mesa, à esquerda do mata-borrão; fim dos Dias 1–5 | Caderno de capa vermelha, ~15 × 21 cm. Abre diante da cadeira e é visto **debruçado, a palmo do rosto**: capa e lombada como peças (a capa gira para abrir); as páginas são uma textura viva (SubViewport), então o modelo só precisa de dois planos de miolo com pouca curvatura. Também aparece de manhã, com a tinta borrada, sob a cabeça dele. |
+| **Pena e tinteiro** | mesa | A pena escreve o diário em cena (segue a letra, tomba nas noites de sonho): ponta, haste e pluma, pivô na ponta. |
+| **Folhinha** (calendário de folhas) | peitoril da janela | Perde uma folha por dia no Lapso; o número precisa ler com o zoom. Bloco e folha que cai como peças separadas. |
 
 ### Correspondência e fotografias (prontas para receber modelo)
 Envelopes e fotografias são **props com lógica separada do visual** (`yuggoth/props/`):
@@ -64,7 +67,7 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 ### Personagens
 | Objeto | Notas |
 |---|---|
-| **O funcionário do expresso** (Boston, Dia 4) | Rapaz "franco e simpático", sentado à mesa do quarto de pensão, de camisa e colete, mangas arregaçadas, cabelo curto. Hoje é um boneco de caixas (`gerar_boston._funcionario`). Precisa de rosto legível de perto e de um rig simples (cabeça e mãos), sentado. |
+| **O funcionário do expresso** (Boston, Dia 4) | Rapaz "franco e simpático", de camisa e colete, mangas arregaçadas, cabelo curto. Responde **pela fresta da porta** do quarto de pensão (só meio corpo e o rosto aparecem). Hoje é um boneco de primitivas (`gerar_boston`). Precisa de rosto legível de perto e de um rig simples (cabeça e uma mão na porta), de pé. |
 
 ### Sonhos
 | Objeto | Notas |
@@ -91,7 +94,7 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 
 ### C — a caixa provisória aguenta
 
-Quadro de cortiça, armário do fonógrafo, tapete, tinteiro e pena, castiçais do
+Quadro de cortiça, armário do fonógrafo, tapete, castiçais do
 consolo, lambri (textura `lambri.png`), cortinas (faixas em zigue-zague), cesto de
 papéis, espátula de cartas, mata-borrão, máquina de escrever. O **vulto da janela** (Dia 5) é um plano com textura
 recortada e deve continuar vago: só melhorar a silhueta, nunca mostrá-lo nítido.
