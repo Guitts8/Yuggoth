@@ -322,8 +322,22 @@ func _ready() -> void:
 	_check(escrever.reply.options[2].document in GameState.dossier, "a resposta escrita vai para o dossiê")
 	_check(not escrever.can_interact(player), "não dá para responder duas vezes")
 	esc.porta.interact(player)
-	await _until(func() -> bool: return GameState.get_value(&"dia") == 2 and not SceneDirector.hold_black and not esc._saindo, 20.0)
-	_check(GameState.get_value(&"dia") == 2, "ir para casa avança para o Dia 2")
+	await _frames(2)
+	_check(GameState.get_value(&"dia") == 1 and GameState.get_value(&"diario") == 1 and not esc._saindo and CartaSaida.atual == null,
+		"postada a resposta, o dia não acaba: falta o diário")
+	esc.porta.interact(player)
+	await _frames(2)
+	_check(GameState.get_value(&"dia") == 1 and not esc._saindo, "sem o diário, a porta não leva para casa")
+	var anotar: Interactable = esc.diario.get_node("Anotar")
+	_check(anotar.can_interact(player) and anotar.is_visible_in_tree(), "o caderno na mesa: \"Anotar o dia\"")
+	await _anotar(esc)
+	await _until(func() -> bool: return esc.diario.aberto, 20.0)
+	_check(esc.diario.aberto and player.seated, "Wilmarth senta e o diário abre diante dele")
+	var entrada1: DocumentData = esc.diario_entradas[1]
+	_check(entrada1 in GameState.dossier, "a entrada do dia vai para o dossiê")
+	await _until(func() -> bool: return GameState.get_value(&"dia") == 2 and not SceneDirector.hold_black and not esc._saindo, 60.0)
+	_check(GameState.get_value(&"dia") == 2, "anotado o dia (sem sonho), ir para casa avança para o Dia 2")
+	_check(not esc.diario.aberto and not player.seated and esc.diario.transform.is_equal_approx(esc.diario._casa), "o caderno de volta ao lugar, fechado")
 	_check(not esc.find_child("Dia1", true, false).visible, "objetos do Dia 1 somem no Dia 2")
 	_check(SaveSystem.has_save(), "checkpoint no começo do dia")
 
@@ -385,7 +399,7 @@ func _ready() -> void:
 	await _selar(esc, writer)
 	_check(GameState.get_value(&"crenca") == 2, "duas respostas crédulas: crença 2")
 	esc.porta.interact(player)
-	await _sonho_no_teste(esc, 2, func() -> void: esc.player.global_position = Vector3(0, 0, -1.5))
+	await _sonho_no_teste(esc, 2, func() -> void: esc.player.global_position = Vector3(-1.0, 0, 2.4))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 3 and not SceneDirector.hold_black and not esc._saindo, 20.0)
 	_check(GameState.get_value(&"dia") == 3 and fotos.visible and not dia2.visible, "Dia 3: as fotografias ficam, a carta do Dia 2 não")
 
@@ -811,7 +825,17 @@ func _inalcancaveis(esc: Node3D, limites := Vector2(2.3, 2.8)) -> PackedStringAr
 ## A noite entre os dias: espera o sonho `n` clarear, confere que é sonho (a
 ## estética crua, os dias sumidos, o grupo da noite) e acorda com `acordar`.
 func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
-	await _until(func() -> bool: return GameState.get_value(&"sonhando") == n and not SceneDirector.hold_black, 30.0)
+	_check(GameState.get_value(&"dia") == n and GameState.get_value(&"diario") == n, "Dia %d: postada a resposta, falta o diário" % n)
+	await _anotar(esc)
+	# Adormece à mesa: a sala vira o sonho em volta dele, sem tela preta.
+	var escuro := 0.0
+	var t := 0.0
+	while t < 90.0 and not (GameState.get_value(&"sonhando") == n and esc.player.input_enabled):
+		escuro = maxf(escuro, SceneDirector._fade.modulate.a)
+		await get_tree().process_frame
+		t += get_process_delta_time()
+	_check(escuro < 0.5 and not SceneDirector.hold_black and esc.player.seated, "a noite do Dia %d: adormece à mesa, sem tela preta" % n)
+	_check(esc.diario.aberto and esc.diario._mancha.raio > 0.0, "a última linha falhou: a tinta escorre no diário")
 	var grupo: Node3D = esc.find_child("Noite%d" % n, true, false)
 	_check(GameState.get_value(&"sonhando") == n and is_equal_approx(GameState.get_number(&"sonho"), 1.0) and grupo.visible
 		and not esc.find_child("Dias", true, false).visible and esc.player.input_enabled, "a noite do Dia %d: o sonho" % n)
@@ -822,8 +846,16 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 	if viewer and viewer.visible:
 		await _seconds(0.5)
 		viewer.close()
-	await _until(func() -> bool: return GameState.get_value(&"sonhando") == 0, 60.0)
+	await _until(func() -> bool: return GameState.get_value(&"sonhando") == 0 and not SceneDirector.hold_black, 60.0)
 	_check(GameState.get_value(&"sonhando") == 0 and is_zero_approx(GameState.get_number(&"sonho")), "acordar do sonho da noite %d" % n)
+	_check(GameState.get_value(&"dia") == n and esc.player.seated and esc.diario.aberto and esc.find_child("Dias", true, false).visible
+		and esc.lapso.sol.light_energy > 0.0, "de manhã, debruçado no diário aberto, a aurora na janela")
+
+
+## Postada a resposta do dia: "Anotar o dia" no caderno, como o jogador.
+func _anotar(esc: Escritorio) -> void:
+	(esc.diario.get_node("Anotar") as Interactable).interact(esc.player)
+	await _frames(1)
 
 
 ## Selar como o jogador e esperar a Selagem na mesa terminar (a carta na mão).

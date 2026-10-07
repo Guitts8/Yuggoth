@@ -74,6 +74,12 @@ func _ready() -> void:
 	cena.set("linha_resposta_selada", load("res://narrative/narration/resposta_selada.tres"))
 	cena.set("ultima_carta", load("res://narrative/documents/carta_akeley_quarta.tres"))
 	cena.set("linha_fim_demo", load("res://narrative/narration/fim_da_demo.tres"))
+	# O diário, ao fim de cada dia (Dias 1 a 5): as entradas e a fala ao postar.
+	var entradas: Array[DocumentData] = [null]
+	for n in range(1, 6):
+		entradas.append(load("res://narrative/documents/diario_dia_%d.tres" % n))
+	cena.set("diario_entradas", entradas)
+	cena.set("linha_diario", load("res://narrative/narration/diario_lembrete.tres"))
 
 	var env := WorldEnvironment.new()
 	env.name = "WorldEnvironment"
@@ -91,7 +97,6 @@ func _ready() -> void:
 	_add(cena, player)
 	_spawn("Cadeira", Vector3(0, 0, -1.3))
 	_spawn("Porta", Vector3(-1.0, 0, 2.3))
-	_spawn("Sonho", Vector3(-1.0, 0, 2.2))
 
 	_salvar(OUT)
 
@@ -609,6 +614,7 @@ func _miskatonic() -> void:
 	_box(espatula, "Lamina", Vector3(0.15, 0.003, 0.016), Vector3(-0.04, 0.0015, 0), "ferro")
 	_box(espatula, "Cabo", Vector3(0.07, 0.01, 0.018), Vector3(0.07, 0.005, 0), "latao")
 	_abajur_peca(g)
+	_diario(g, pena)
 
 	_arquivo(g)
 	_cesto(g)
@@ -642,6 +648,25 @@ func _miskatonic() -> void:
 	_box(a, "Movel", Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0), "madeira_escura")
 	_box(a, "Juncao", Vector3(0.01, 0.8, 0.01), Vector3(0, 0.45, -0.255), "ferro")
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
+
+
+## O diário de Wilmarth (Diario): um caderno fechado à esquerda do mata-borrão.
+## "Anotar o dia" só depois de postada a resposta do dia (`diario` = o dia); aberto,
+## fica diante da cadeira, sobre o mata-borrão, e a pena da mesa escreve nele.
+func _diario(g: Node3D, pena: Node3D) -> void:
+	var d := Diario.new()
+	d.name = "Diario"
+	d.position = Vector3(-0.5, MESA, -1.99)
+	d.rotation_degrees.y = 8
+	_add(g, d)
+	d.unique_name_in_owner = true
+	d.pena = pena
+	d.som_pena = load(SFX_DIR + "pena.wav")
+	d.som_papel = load(SFX_DIR + "papel_pegar.wav")
+	d.lugar_aberto = Transform3D(Basis.IDENTITY, Vector3(-0.02, MESA + 0.003, -2.02))
+	var anotar := _area(d, Interactable.new(), "Anotar", Vector3(Diario.LARGURA + 0.02, 0.06, Diario.FUNDO + 0.02), Vector3(Diario.LARGURA * 0.5, 0.03, 0)) as Interactable
+	anotar.prompt = "Anotar o dia"
+	anotar.condition = _cond_valor(&"diario", ValueCondition.Op.MAIOR_OU_IGUAL, 1)
 
 
 ## Experimento (playtest 2): Arkham em 3D lá fora, no lugar do painel — telhados de
@@ -1414,8 +1439,9 @@ func _sonhos(parent: Node) -> void:
 
 
 ## Noite do Dia 2 (as fotografias): marcas de garra, de lama, da porta
-## até a mesa, subindo por ela até a janela, que dá para o círculo de pedras.
-## Acorda ao chegar à mesa ("Chamei-a de pegada...").
+## até a mesa onde ele dorme, subindo por ela até a janela, que dá para o
+## círculo de pedras. Acorda ao seguir as marcas de volta até a porta, onde
+## começam ("Chamei-a de pegada...").
 func _sonho_garras(g: Node3D) -> void:
 	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.15), Vector3.ZERO, "vista_circulo")
 	_omni(g, "Lua", Vector3(0.2, 2.2, -2.4), Color(0.5, 0.6, 0.9), 1.4, 7.0)
@@ -1443,14 +1469,14 @@ func _sonho_garras(g: Node3D) -> void:
 	_quad(g, "PegadaPeitoril", Vector2(0.18, 0.18), Vector3(0.0, JANELA_Y.x + 0.035, -D + 0.02), Vector3(-90, 0, 0), "pegada")
 	var gatilho := NarrationTrigger.new()
 	gatilho.line = load("res://narrative/narration/sonho_garra.tres")
-	_area(g, gatilho, "AoPeDaMesa", Vector3(1.6, 2.0, 0.6), Vector3(0, 1.0, -1.5))
+	_area(g, gatilho, "NaPorta", Vector3(1.4, 2.0, 0.9), Vector3(-1.0, 1.0, 2.4))
 
 
 ## Noite do Dia 3 (o disco): tudo escuro; só o fonógrafo, na mesa, sob uma luz,
 ## tocando sozinho. Acorda ao levantar a agulha.
 func _sonho_disco(g: Node3D) -> void:
 	# De lado para quem chega: a corneta se vê de perfil, virada para a sala.
-	var f := _group(g, "Fonografo", Vector3(0, MESA, -2.2), 120)
+	var f := _group(g, "Fonografo", Vector3(0.05, MESA, -2.36), 120)
 	_box(f, "Caixa", Vector3(0.34, 0.14, 0.24), Vector3(0, 0.07, 0), "madeira_clara")
 	var cera := _cyl(f, "Cera", 0.032, 0.032, 0.11, Vector3(0, 0.19, 0.02), "cinzas", 10)
 	cera.rotation_degrees.z = 90

@@ -47,6 +47,8 @@ const COR_TARDE := Color(1.0, 0.55, 0.25)
 
 var passando := false
 var _ambiente_base := -1.0
+## A manhã de depois de um sonho (amanhecer): as luzes como estavam.
+var _manha: Dictionary[Light3D, float] = {}
 
 
 ## O Environment é um recurso da cena, compartilhado: saindo no meio, não pode
@@ -54,6 +56,7 @@ var _ambiente_base := -1.0
 func _exit_tree() -> void:
 	if passando and _ambiente_base >= 0.0:
 		ambiente.environment.ambient_light_energy = _ambiente_base
+	desfazer_manha()
 
 
 ## Dia do ano (1 = 1º de janeiro) de uma data de 1928.
@@ -125,6 +128,31 @@ func passar(de: int, ate: int, no_escuro: Callable) -> void:
 		l.light_energy = luzes[l]
 	env.ambient_light_energy = ambiente_base
 	passando = false
+
+
+## Manhã cedo, de uma vez (acordar debruçado na mesa depois de um sonho, no
+## escuro): a sala quase apagada, a lâmpada que ardeu a noite toda fraca, e a
+## aurora entrando pela janela. `desfazer_manha()` devolve a sala como estava.
+func amanhecer() -> void:
+	desfazer_manha()
+	for l: Light3D in sala.find_children("*", "Light3D", true, false):
+		if l != sol and l.is_visible_in_tree():
+			_manha[l] = l.light_energy
+			l.light_energy *= 0.12
+	sol.light_color = COR_AURORA
+	sol.light_energy = sol_energia * 0.5
+	_vista(vista_tarde)
+
+
+func desfazer_manha() -> void:
+	if _manha.is_empty():
+		return
+	for l in _manha:
+		if is_instance_valid(l):
+			l.light_energy = _manha[l]
+	_manha.clear()
+	sol.light_energy = 0.0
+	_vista(null)
 
 
 ## Uma das paisagens do lapso na frente da do dia corrente (null: nenhuma).

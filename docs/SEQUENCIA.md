@@ -16,8 +16,16 @@ outra** quantas vezes quiser. Só selar decide. Selada, Wilmarth senta à mesa e
 devagar, a folha se dobra em três e entra no envelope (endereçado a Townshend; a
 partir de julho, à Posta-Restante de Brattleboro), a aba fecha, o selo é batido —
 e a carta vai **para a mão**. **A porta é o correio:**
-"Levar a carta ao correio". A resposta do dia encerra o dia; as cartas no meio do
-dia (Dias 5 e 6) saltam no tempo até a volta do correio. Todo dia termina assim.
+"Levar a carta ao correio". As cartas no meio do dia (Dias 5 e 6) saltam no tempo
+até a volta do correio. Postada a resposta do dia, falta só **o diário** 💭 (Dias 1
+a 5): *"Faltava só anotar o dia no diário, como eu fazia ao fim de cada dia."* — o
+caderno vermelho à esquerda do mata-borrão, **"Anotar o dia"**. Wilmarth senta, o
+caderno vem para diante dele e abre (à esquerda, a entrada anterior), ele se debruça
+e a pena da mesa escreve a entrada do dia, ao som dela; a entrada vai para o
+dossiê. **Todo dia termina assim**, e o jogador nunca sabe se aquela noite terá
+sonho: sem sonho (Dia 1), ele fecha o caderno, levanta, e vem o cartão do dia
+seguinte; com sonho, a última linha falha (ver *Os sonhos*). A porta, sem carta na
+mão, só lembra: *"Antes de ir, anotar o dia no diário."*
 
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
@@ -27,14 +35,20 @@ escrivaninha, **"Pôr na mesa"** → **"Abrir com a espátula"** (som de papel r
 → o conteúdo sai para a mesa; depois o envelope é examinável (carimbo, selos,
 letra). Pacotes que não passam na fresta ficam no chão junto à porta.
 
-**Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5, entre a porta e o cartão do
-dia seguinte (⏳ a passagem vai mudar: postada a resposta, Wilmarth anota o dia num
-**diário** na mesa; nas noites de sonho a letra falha e ele adormece ali mesmo, a sala
-virando o sonho sem tela preta; acorda de manhã debruçado no diário): o escritório transformado, na estética crua, com a névoa e um grave
-que bate devagar; dá para andar; nada salta. Acorda-se numa ação, e vem o dia.
+**Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5, no diário: a última linha
+da entrada **falha** — a letra desce, torta e cada vez mais clara, a escrita fica
+lenta e para no meio da palavra; a pena tomba na página e a tinta se espalha e
+escorre. As pálpebras pesam (fecham e abrem devagar), a lâmpada baixa, **o relógio
+parado volta a bater**; ele encosta na cadeira e, de olhos quase fechados, a sala
+apaga e vira o sonho em volta dele — **sem tela preta** —, e os olhos abrem nele.
+Ele continua sentado à mesa, o diário aberto à frente: o escritório transformado,
+na estética crua, com a névoa e um grave que bate devagar; andar o levanta; nada
+salta. Acorda-se numa ação: o sono escurece a tela, e ele acorda **de manhã,
+debruçado no diário** (a linha borrada, a aurora rosada pela janela, a lâmpada que
+ardeu a noite toda quase apagada); ergue a cabeça, e então o cartão do dia seguinte.
 | Noite | O sonho | Acorda |
 |---|---|---|
-| Dia 2 (as fotos) | Marcas de garra, de lama, da porta até a mesa, subindo por ela até a janela, que dá para o morro com o círculo de pedras | ao chegar à mesa: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
+| Dia 2 (as fotos) | Marcas de garra, de lama, da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá para o morro com o círculo de pedras | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
 | Dia 3 (o disco) | Tudo escuro; só o fonógrafo na mesa, sob uma luz, tocando sozinho a gravação longa | ao levantar a agulha |
 | Dia 4 (a pedra) | A pedra negra que nunca chegou está na mesa; pela janela, a plataforma de Keene, o trem parado, um homem magro de costas; a voz zumbida | ao examinar a pedra |
 | Dia 5 (AKELY) | Chove dentro da sala; o telefone toca | atendido: só um zumbido na linha, soletrando *A... K... E... L... Y.* |
@@ -133,7 +147,10 @@ A carta se escreve sozinha (som de pena) e vai para o dossiê. Narrador: *"Selei
 envelope. Vai amanhã cedo, com o primeiro correio."*
 
 **Fim do dia:** levar a carta à **porta** ("Levar a carta ao correio"). Antes da resposta: *"Ainda devo uma
-resposta ao Sr. Akeley."* Depois: tela preta, cartão *"Fim de maio."*, **checkpoint**.
+resposta ao Sr. Akeley."* Postada, **o diário**: *"9 de maio. Respondi a Akeley. Pelas
+regras comuns, eu deveria rir dessas extravagâncias; mas algo no tom da carta me faz
+levá-la a sério. Não pode ser como ele pensa. E, no entanto, merece investigação."*
+Noite sem sonho: fecha o caderno, levanta; tela preta, cartão *"Fim de maio."*, **checkpoint**.
 
 ---
 
@@ -443,7 +460,9 @@ Yuggoth — O Despertar, Yuggoth — O Estudioso, Testemunha, Cinzas (GDD §7).
 | `dia` | 1–7 no escritório |
 | `crenca` | soma dos tons das respostas (−4…+4) |
 | `resposta_dia_N` | tom da resposta do dia N: −1, 0 ou 1 |
-| `escreveu_resposta_dia_N` | resposta do dia selada (vai para a mão; postá-la na porta encerra o dia) |
+| `escreveu_resposta_dia_N` | resposta do dia selada (vai para a mão; postada na porta, falta o diário) |
+| `diario` | o dia cuja entrada falta anotar (postada a resposta do dia); 0 = nada a anotar |
+| `sonhando` | a noite cujo sonho está em cena (0 = acordado) |
 | `leu_<documento>` | documento lido (ex.: `leu_carta_akeley_1`) |
 | `debate_encerrado` | Dia 2: deixou os opositores sem resposta |
 | `viu_*` | detalhes vistos nas fotos (`viu_garra_foto`, `viu_rastros_caverna`, `viu_circulo`, `viu_hieroglifos`, `viu_marca_casa`, `viu_akeley_foto`, `viu_foto_pegada`, `viu_foto_exercito`) |

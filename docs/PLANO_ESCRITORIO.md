@@ -167,11 +167,12 @@ O usuário jogou a Fase 3b. O que pediu, o porquê, e o que foi feito:
 12. ✅ (experimento) **A cidade da janela em 3D**, pequena e longe, para comparar com
     o painel: tecla **C** em build de depuração; só de noite. **O usuário ainda vai
     comparar e decidir** qual fica. `3ce2f91`.
-13. ⏳ **A passagem para o sonho** — no playtest, o sonho "começa muito
+13. ✅ **A passagem para o sonho** — no playtest, o sonho "começa muito
     abruptamente", sem parecer sonho: nada mostrava que Wilmarth foi dormir.
     **Decidido (opção 2 + 3): a preparação no escritório + o diário.** Ver abaixo.
+    Feito em 2026-10-07 (commit "Escritório v2: o diário e a passagem para o sonho").
 
-### A passagem para o sonho (decidida, a fazer)
+### A passagem para o sonho (feita)
 Opções que foram consideradas: (1) uma cena em casa, indo dormir — a mais clara,
 mas um cenário novo, mais caro e longo; (2) a preparação, adormecer à mesa no
 próprio escritório — barata e contínua (a sala vira sonho sem corte), mas
@@ -200,6 +201,30 @@ linguagem da tinta, mas é mais leitura e não mostra o sono. **Escolhida: 2 + 3
   dia — leva à mesa, ao diário** (a última coisa do dia, Dias 1–5). No Dia 6 (o
   fim da demo) não há diário: a carta registrada leva à tinta, como hoje.
 
+**Como ficou** (conferido em captura; o teste de fumaça cobre os Dias 1–5):
+- `components/diario.gd` (`Diario`): o caderno vermelho à esquerda do mata-borrão,
+  com a área `Anotar` (condição `diario >= 1`; fora da física quando não vale).
+  Aberto, vem para diante da cadeira; as duas páginas são uma textura
+  (SubViewport) com pautas, a entrada anterior à esquerda e a do dia à direita,
+  escrita letra a letra pela **pena da mesa**, que segue a última letra. Debruçado
+  (`Player.debrucado`) e com a vista apertada (`Player.fov_forcado`), a letra se lê
+  na resolução do mundo.
+- As entradas: `narrative/documents/diario_dia_1..5` (vão para o dossiê). Nas noites
+  de sonho a última linha vem em `[queda]` (`QuedaTextEffect`: cada letra mais
+  baixa, torta e clara — também no dossiê); a escrita desacelera e para no meio da
+  palavra, a pena tomba, a tinta se espalha e escorre (`Diario.Mancha`).
+- O sono (`Escritorio._adormecer`): `Palpebras` (`ui/`, sombras curvas que fecham
+  sem chegar ao preto) piscam pesadas; o relógio volta a bater; as luzes baixam e a
+  estética crua sobe; ele encosta na cadeira; no quase escuro, de olhos quase
+  fechados, troca-se para o sonho (`sonhando`), e as luzes do sonho sobem enquanto os
+  olhos abrem. O sonho começa sentado (a marca `Sonho` saiu).
+- Ao acordar (`_acordar`): na tela preta do fim do sonho, a sala do dia, ele
+  debruçado sobre o diário aberto com a linha borrada, e a aurora pela janela
+  (`Lapso.amanhecer`). Os olhos abrem, ele ergue a cabeça, e vem o cartão.
+- Ajustes nos sonhos: a Noite 2 acorda ao seguir as marcas **de volta até a porta**
+  (o gatilho ficava ao pé da cadeira, onde ele agora começa); o fonógrafo da Noite 3
+  foi para o fundo da mesa, atrás do diário aberto.
+
 ### Pendências pequenas, anotadas no playtest 2
 - "Deixar sem resposta" (Dia 2) confundiu: o texto da ação pode virar algo como
   "Encerrar o debate nos jornais" (o usuário ainda não pediu a troca).
@@ -207,8 +232,9 @@ linguagem da tinta, mas é mais leitura e não mostra o sono. **Escolhida: 2 + 3
   substituir o painel de vez; se não, sai.
 
 ## Próximos passos (em ordem)
-1. **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
-2. Playtest do usuário (Prólogo ao fim da demo) — inclusive comparar painel × cidade 3D (C).
+1. ✅ **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
+2. Playtest do usuário (Prólogo ao fim da demo) — inclusive comparar painel × cidade 3D (C),
+   e o diário: o ritmo da escrita e do sono, e se a letra se lê.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 ## Fase 4 — O mapa de Vermont

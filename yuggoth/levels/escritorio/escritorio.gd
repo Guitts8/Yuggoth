@@ -7,8 +7,9 @@ extends Node3D
 ##
 ## Depois, o loop dos dias (GDD §5.1): o correio chega pela fresta, o jogador lê
 ## e investiga, responde a Akeley (ReplyData com id `resposta_dia_<N>`) e leva a
-## carta selada à porta, que é o correio: postar a resposta do dia o leva para
-## casa. Conteúdo de cada dia
+## carta selada à porta, que é o correio. Postada a resposta do dia, falta só o
+## diário (`Diario`): anotado o dia, ele vai para casa — ou, nas noites de
+## sonho, adormece à mesa e a sala vira o sonho. Conteúdo de cada dia
 ## fica em nós com ConditionalNode (`dia == N`) dentro do vestido Miskatonic.
 ##
 ## Cena gerada por tools/gerar_escritorio.gd (ver o cabeçalho de lá).
@@ -35,9 +36,14 @@ const SELAGEM_POS := Vector3(0.05, 0.784, -2.2)
 ## Ditas uma vez ao entrar no escritório com a flag marcada (voltando de outra
 ## fase): flag → linha. Ex.: `voltou_de_boston` → a noite em claro escrevendo cartas.
 @export var linhas_volta: Dictionary[StringName, NarrationLine] = {}
-@export_group("Sonhos")
+@export_group("Diário e sonhos")
+## A entrada do diário de cada dia (índice = dia), escrita ao fim dele. Nas
+## noites de sonho, a última linha é a que o sono derruba ([queda]).
+@export var diario_entradas: Array[DocumentData] = []
+## Dita ao postar a resposta do dia: falta anotar o dia.
+@export var linha_diario: NarrationLine
 ## A noite depois de cada dia que tem sonho (chave = o dia que acabou) → a flag
-## que acorda (posta pelo próprio sonho: chegar à janela, levantar a agulha...).
+## que acorda (posta pelo próprio sonho: chegar à porta, levantar a agulha...).
 @export var sonhos: Dictionary[int, StringName] = {}
 @export var env_sonho: Environment
 @export var som_sonho: AudioStream
@@ -83,6 +89,9 @@ var em_lapso := false
 ## Durante a Selagem (a carta sendo dobrada e selada na mesa).
 var selando := false
 var _energias: Dictionary[Light3D, float] = {}
+## Environments (recursos compartilhados) escurecidos no meio do sono: voltam
+## se a fase sair antes.
+var _ambientes: Dictionary[Environment, float] = {}
 
 @onready var gabinete: Node3D = $Gabinete1930
 @onready var miskatonic: Node3D = $Miskatonic
@@ -92,6 +101,7 @@ var _energias: Dictionary[Light3D, float] = {}
 @onready var relogio: AudioStreamPlayer3D = $Estrutura/Relogio/Tique
 @onready var fonografo: Fonografo = %Fonografo
 @onready var player: Player = $Player
+@onready var diario: Diario = %Diario
 
 
 func _ready() -> void:
@@ -100,6 +110,7 @@ func _ready() -> void:
 	player.lamp.available = false
 	SceneDirector.tempo = self
 	porta.interacted.connect(_on_porta)
+	diario.get_node(^"Anotar").interacted.connect(_on_anotar)
 	Events.reply_written.connect(_on_reply_written)
 	Events.document_closed.connect(_on_document_closed)
 	# Depois do disco, o zumbido nunca mais vai embora (vale também em 1930).
@@ -117,6 +128,8 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if SceneDirector.tempo == self:
 		SceneDirector.tempo = null
+	for env in _ambientes:
+		env.ambient_light_energy = _ambientes[env]
 
 
 func _vestir(em_1930: bool) -> void:
@@ -279,9 +292,9 @@ func _process(_delta: float) -> void:
 	porta.prompt = "Levar a carta ao correio" if CartaSaida.atual else "Ir para casa"
 
 
-## A porta é o correio: com a carta na mão, posta. A resposta do dia encerra o
-## dia (a do Dia 6, a demo); as outras (Dias 5 e 6) saltam no tempo até a volta
-## do correio. Sem carta, só sai depois de responder.
+## A porta é o correio: com a carta na mão, posta. A resposta do dia deixa só o
+## diário por fazer (a do Dia 6 encerra a demo); as outras (Dias 5 e 6) saltam
+## no tempo até a volta do correio. Sem carta, o dia não acaba pela porta.
 func _on_porta(_by: Node) -> void:
 	if _saindo or _saltando or em_lapso or selando:
 		return
@@ -290,7 +303,9 @@ func _on_porta(_by: Node) -> void:
 		if not _respondeu(dia()):
 			Events.notice_requested.emit("Ainda devo uma resposta ao Sr. Akeley.")
 			return
-		_fim_do_dia()
+		# Postada (ou perdida num load, com a mão vazia): falta o diário.
+		GameState.set_value(&"diario", dia())
+		Events.notice_requested.emit("Antes de ir, anotar o dia no diário.")
 		return
 	var reply := carta.reply
 	carta.postar()
@@ -298,7 +313,8 @@ func _on_porta(_by: Node) -> void:
 	if reply.id == StringName("resposta_dia_%d" % dia_do_interludio):
 		_para_o_interludio()
 	elif reply.id == StringName("resposta_dia_%d" % dia()):
-		_fim_do_dia()
+		GameState.set_value(&"diario", dia())
+		Narrator.say(linha_diario)
 	elif reply.cartao_depois:
 		# A carta vai e o tempo passa até a volta do correio.
 		_saltando = true
@@ -327,17 +343,58 @@ func _para_o_interludio() -> void:
 	Events.quit_to_menu_requested.emit()
 
 
+## O diário (docs/PLANO_ESCRITORIO.md, "A passagem para o sonho"), a última
+## coisa de cada dia, dos Dias 1 a 5: postada a resposta do dia (`diario` = o
+## dia), Wilmarth senta e a entrada se escreve. Noite sem sonho: fecha o
+## caderno, levanta, e o dia acaba. Noite de sonho: a última linha falha, ele
+## adormece à mesa e a sala vira o sonho, sem tela preta; acorda de manhã
+## debruçado no diário. O jogador nunca sabe de antemão qual das duas será.
+func _on_anotar(_by: Node) -> void:
+	if _saindo or _saltando or em_lapso or selando:
+		return
+	_saindo = true
+	var n := dia()
+	GameState.set_value(&"diario", 0)
+	# Falas que sobraram do dia não atravessam a noite.
+	Narrator.cancel()
+	player.input_enabled = false
+	var entrada := _entrada(n)
+	if entrada:
+		GameState.add_document(entrada)
+	var sonha := sonhos.has(n)
+	await diario.anotar(entrada, _entrada(n - 1), player, sonha)
+	if not is_inside_tree():
+		return
+	if sonha:
+		await _sonhar(n)
+	else:
+		await diario.fechar(player)
+		if not is_inside_tree():
+			return
+		player.stand()
+		await get_tree().create_timer(0.8).timeout
+	if not is_inside_tree():
+		return
+	_fim_do_dia()
+
+
+func _entrada(n: int) -> DocumentData:
+	return diario_entradas[n] if n > 0 and n < diario_entradas.size() else null
+
+
 func _fim_do_dia() -> void:
 	_saindo = true
 	await SceneDirector.fade_out(1.2)
 	if not is_inside_tree():
 		return
 	SceneDirector.hold_black = true
-	# Falas que sobraram do dia que acabou não atravessam para o seguinte.
 	Narrator.cancel()
-	await _sonhar(dia())
-	if not is_inside_tree():
-		return
+	# A sala de amanhã: o caderno no lugar, a manhã desfeita, Wilmarth de pé.
+	lapso.desfazer_manha()
+	diario.repor()
+	player.stand()
+	player.debrucado = 0.0
+	player.fov_forcado = 0.0
 	GameState.add(&"dia", 1)
 	GameState.set_value(&"data", _data_inicio())
 	_vestir(false)
@@ -350,26 +407,22 @@ func _fim_do_dia() -> void:
 		return
 	SaveSystem.checkpoint()
 	_saindo = false
+	player.input_enabled = not Events.is_modal_open
 	_inicio_do_dia()
 
 
-## A noite depois do dia `noite`, se houver sonho para ela (docs/PLANO_ESCRITORIO.md,
-## Fase 3b): no escuro, a sala vira a do sonho (`sonhando` = noite: o conteúdo
-## dos dias some, o grupo `Sonhos/NoiteN` aparece), a estética crua no máximo,
-## e o jogador anda por ela até a flag de `sonhos[noite]` (acordar), ou o tempo
-## acabar. Então o sono pesa, escurece, e a sala volta a ser a do dia seguinte.
+## A noite depois do dia `noite` (docs/PLANO_ESCRITORIO.md, "A passagem para o
+## sonho"): Wilmarth adormece à mesa e a sala vira a do sonho em volta dele
+## (`sonhando` = noite: o conteúdo dos dias some, o grupo `Sonhos/NoiteN`
+## aparece; a estética crua no máximo). Ele anda por ela até a flag de
+## `sonhos[noite]` (acordar), ou o tempo acabar; então o sono pesa, escurece,
+## e ele acorda de manhã, debruçado no diário.
 func _sonhar(noite: int) -> void:
-	if not sonhos.has(noite):
-		return
 	var acordar: StringName = sonhos[noite]
-	GameState.set_value(&"sonhando", noite)
-	GameState.set_value(&"sonho", 1.0)
-	world_env.environment = env_sonho
-	AudioDirector.play_ambience(som_sonho, 1.0)
-	var marca := get_node_or_null(^"Sonho") as Node3D
-	if marca:
-		player.global_transform = marca.global_transform
-	await SceneDirector.release_black(2.5)
+	await _adormecer(noite)
+	if not is_inside_tree():
+		return
+	player.input_enabled = not Events.is_modal_open
 	var t := 0.0
 	while t < duracao_sonho and not (GameState.has_flag(acordar) and not Events.is_modal_open and not Narrator.is_speaking()):
 		await get_tree().process_frame
@@ -379,13 +432,119 @@ func _sonhar(noite: int) -> void:
 	await get_tree().create_timer(1.5).timeout
 	if not is_inside_tree():
 		return
+	player.input_enabled = false
 	await SceneDirector.fade_out(3.0)
 	if not is_inside_tree():
 		return
 	SceneDirector.hold_black = true
 	Narrator.cancel()
+	await _acordar()
+
+
+## A última linha falhou (Diario.anotar): o sono pesa à mesa. As pálpebras caem
+## e abrem devagar, a lâmpada baixa, o relógio parado volta a bater; ele encosta
+## na cadeira e, de olhos quase fechados, no quase escuro, a sala vira a do
+## sonho — sem tela preta. As luzes do sonho sobem enquanto os olhos abrem.
+func _adormecer(noite: int) -> void:
+	var palpebras := Palpebras.new()
+	add_child(palpebras)
+	relogio.play()
+	var luzes := _luzes_acesas()
+	var env := world_env.environment
+	var ambiente := env.ambient_light_energy
+	_ambientes[env] = ambiente
+	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
+	t.tween_method(_set_sonho, 0.0, 0.35, 7.0)
+	for l in luzes:
+		t.tween_property(l, ^"light_energy", luzes[l] * 0.4, 7.0)
+	for k: Array in [[0.55, 1.6], [0.1, 1.3], [0.8, 2.0], [0.3, 2.0]]:
+		await palpebras.fechar(k[0], k[1])
+		if not is_inside_tree():
+			return
+
+	# Encosta na cadeira; a sala some no escuro.
+	player.fov_forcado = 0.0
+	var encosta := player.create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	encosta.tween_property(player, ^"debrucado", 0.0, 3.0)
+	encosta.tween_property(player.head, ^"rotation:x", deg_to_rad(-4.0), 3.0)
+	t = create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
+	t.tween_method(_set_sonho, 0.35, 1.0, 3.0)
+	for l in luzes:
+		t.tween_property(l, ^"light_energy", 0.0, 3.0)
+	t.tween_property(env, ^"ambient_light_energy", ambiente * 0.05, 3.0)
+	palpebras.fechar(0.93, 3.0)
+	await t.finished
+	if not is_inside_tree():
+		return
+
+	# A troca, no quase escuro.
+	GameState.set_value(&"sonhando", noite)
+	env.ambient_light_energy = ambiente
+	_ambientes.erase(env)
+	for l in luzes:
+		l.light_energy = luzes[l]
+	world_env.environment = env_sonho
+	AudioDirector.play_ambience(som_sonho, 2.5)
+	var acender := _luzes_acesas()
+	var sonho_ambiente := env_sonho.ambient_light_energy
+	_ambientes[env_sonho] = sonho_ambiente
+	env_sonho.ambient_light_energy = 0.0
+	t = create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
+	for l in acender:
+		l.light_energy = 0.0
+		t.tween_property(l, ^"light_energy", acender[l], 3.5)
+	t.tween_property(env_sonho, ^"ambient_light_energy", sonho_ambiente, 3.5)
+	await palpebras.fechar(0.0, 3.5)
+	if not is_inside_tree():
+		return
+	if t.is_running():
+		await t.finished
+	_ambientes.erase(env_sonho)
+	palpebras.queue_free()
+
+
+## De manhã, debruçado na mesa (no escuro do fim do sonho): a sala do dia, o
+## diário aberto com a linha borrada, a aurora pela janela. Os olhos abrem, ele
+## se ergue — e então o dia seguinte (_fim_do_dia).
+func _acordar() -> void:
 	GameState.set_value(&"sonhando", 0)
 	GameState.set_value(&"sonho", 0.0)
+	world_env.environment = _ambiente_do_dia()
+	AudioDirector.play_ambience(_som_do_dia(), 2.0)
+	lapso.amanhecer()
+	player.global_position = diario.cadeira(player)
+	player.seated = true
+	player.debrucado = 1.0
+	var p := diario.pagina()
+	player.rotation.y = atan2(-(p.x - player.global_position.x), -(p.z - player.global_position.z))
+	# A cabeça desce sozinha (Player._update_head); depois, os olhos no diário.
+	await get_tree().create_timer(0.5).timeout
+	if not is_inside_tree():
+		return
+	var olho := player.camera.global_position
+	player.head.rotation.x = atan2(p.y - olho.y, Vector2(p.x - olho.x, p.z - olho.z).length())
+	await SceneDirector.release_black(3.0)
+	if not is_inside_tree():
+		return
+	await get_tree().create_timer(2.0).timeout
+	if not is_inside_tree():
+		return
+	var t := player.create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(player, ^"debrucado", 0.0, 2.5)
+	t.tween_property(player.head, ^"rotation:x", deg_to_rad(-12.0), 2.5)
+	await t.finished
+	if not is_inside_tree():
+		return
+	await get_tree().create_timer(1.2).timeout
+
+
+## As luzes visíveis da Miskatonic e a energia de cada uma.
+func _luzes_acesas() -> Dictionary[Light3D, float]:
+	var luzes: Dictionary[Light3D, float] = {}
+	for l: Light3D in miskatonic.find_children("*", "Light3D", true, false):
+		if l.is_visible_in_tree():
+			luzes[l] = l.light_energy
+	return luzes
 
 
 ## O dia virou noite sem acabar (Dia 4: a volta de Boston): noiteceu_dia_<N>.

@@ -35,6 +35,11 @@ signal stood_up
 var input_enabled := true
 ## Sentado só olha em volta; tentar andar levanta (Prólogo, GDD §5.0).
 var seated := false
+## Debruçado sobre a mesa (0 a 1; o diário, o sono): sentado, a cabeça vai à
+## frente e desce.
+var debrucado := 0.0
+## Campo de visão imposto por uma cena (a página do diário); 0 = o de sempre.
+var fov_forcado := 0.0
 
 var _target: Interactable
 var _target_prompt := ""
@@ -141,10 +146,12 @@ func _look(delta: Vector2) -> void:
 func _update_head(delta: float, crouching: bool) -> void:
 	var target_height := crouch_eye_height if crouching else eye_height
 	if seated:
-		target_height = seated_eye_height
+		target_height = seated_eye_height - 0.2 * debrucado
 	head.position.y = lerpf(head.position.y, target_height, 1.0 - exp(-10.0 * delta))
+	head.position.z = -0.3 * debrucado if seated else 0.0
 	var zoom := input_enabled and Input.is_action_pressed(&"zoom_visao")
-	camera.fov = lerpf(camera.fov, zoom_fov if zoom else _fov_base, 1.0 - exp(-8.0 * delta))
+	var fov := fov_forcado if fov_forcado > 0.0 else (zoom_fov if zoom else _fov_base)
+	camera.fov = lerpf(camera.fov, fov, 1.0 - exp(-8.0 * delta))
 
 	var ground_speed := Vector2(velocity.x, velocity.z).length()
 	var moving := is_on_floor() and ground_speed > 0.15

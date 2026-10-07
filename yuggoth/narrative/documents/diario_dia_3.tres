@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"diario_dia_3"
+title = "Meu diário — 3 de julho"
+style = 0
+pages = PackedStringArray("3 de julho.
+Ouvi o disco. Primeiro a voz humana, culta, quase de Boston; depois a outra. Estremeço só de lembrar como me atingiu.
+[queda]Escrevo isto e o zumbido continua, baixo, como se[/queda]")
+exposure_on_read = 0.0

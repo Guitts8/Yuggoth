@@ -19,6 +19,7 @@ func _ready() -> void:
 	body.install_effect(WhisperTextEffect.new())
 	body.install_effect(IllegibleTextEffect.new())
 	body.install_effect(TremorTextEffect.new())
+	body.install_effect(QuedaTextEffect.new())
 	Events.document_requested.connect(open)
 
 

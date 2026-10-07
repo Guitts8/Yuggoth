@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
+
+[resource]
+script = ExtResource("1_doc")
+id = &"diario_dia_4"
+title = "Meu diário — 21 de julho"
+style = 0
+pages = PackedStringArray("21 de julho.
+A pedra não chegou. Em Keene, um homem magro e ruivo, de voz grossa e zumbida, discutiu com o funcionário do expresso — que ficou tonto e sonolento ao ouvi-lo.
+[queda]Eu também, agora, tão[/queda]")
+exposure_on_read = 0.0
