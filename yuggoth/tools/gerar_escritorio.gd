@@ -577,7 +577,14 @@ func _lareira(parent: Node) -> void:
 	_box(g, "Consolo", Vector3(prof + 0.16, 0.08, 1.9), Vector3(-(prof + 0.16) / 2, 1.15, 0), "madeira_escura")
 	for s in [-1, 1]:
 		_cyl(g, "Castical%d" % s, 0.025, 0.04, 0.2, Vector3(-0.3, 1.29, s * 0.7), "latao", 6)
-	_colisao(g, "Colisao", [[Vector3(0.7, H, 1.9), Vector3(-0.35, H / 2, 0)]])
+	# A boca fica livre (a mira alcança a lenha, "Acender a lareira"): os pilares,
+	# o peito da chaminé acima da boca e o consolo, que avança mais.
+	_colisao(g, "Colisao", [
+		[Vector3(prof, 0.85, 0.55), Vector3(-prof / 2, 0.425, -0.675)],
+		[Vector3(prof, 0.85, 0.55), Vector3(-prof / 2, 0.425, 0.675)],
+		[Vector3(prof, H - 0.85, 1.9), Vector3(-prof / 2, (H + 0.85) / 2, 0)],
+		[Vector3(prof + 0.16, 0.1, 1.9), Vector3(-(prof + 0.16) / 2, 1.15, 0)],
+	])
 
 
 ## Poltrona de clube olhando para -Z local (gire o grupo para orientar; Fase 3d:

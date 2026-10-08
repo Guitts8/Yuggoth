@@ -303,6 +303,49 @@ foi feito. Commits: `30e90f6` (itens 1–5), `8385fa6` (6), `d2e98ce` (7), `6560
      uma paisagem a óleo sobre a lareira e dois diplomas na parede leste.
    Ainda por ver com o usuário: o que mais parece tosco depois desta passada.
 
+## Fase 3e — Ajustes do playtest 4 (2026-10-08)
+O usuário jogou do Prólogo ao começo do Dia 5, onde o jogo congelou. Aprovou: a
+cidade em 3D (*"ficou lindo"*), o chão, a ideia da calha. O princípio que vale para
+tudo daqui em diante: **a câmera nunca fica presa** — *"a cabeça deve dar liberdade
+para o jogador, pois é quase a única que ele tem"*. Cenas que sentam ou aproximam
+Wilmarth podem levar o olhar até a ação, mas o mouse continua mexendo a cabeça.
+O que pediu, o porquê, e o que foi feito:
+
+1. **Bug: a noite 5 quebrou** — sem como acender a lareira; sem fogo, nem o copo
+   nem a poltrona. Causa: a caixa de colisão da lareira cobria a boca e a lenha, e o
+   raio da mira batia nela antes de chegar a "Acender a lareira". O teste de alcance
+   não via porque disparava raios de dentro da caixa.
+2. **Bug: congelou ao mexer no envelope** (Dia 5, logo depois da lareira; a janela
+   parou). Rodava pelo editor — provável erro de script pausando no depurador. Não
+   reproduzido ainda com o save dele (maço, cartas soltas e exame funcionam).
+3. **Câmera livre no diário** — fica na distância de escrever, mas o mouse olha.
+4. **Selar**: a folha ainda passa por cima do envelope ao entrar (tirando da mesa
+   parece normal); câmera livre durante a dobra; fechar a carta mais rápido.
+5. **A calha**: a ideia é ótima, a animação não — a porta atravessa Wilmarth e ele
+   põe a carta na calha de muito longe. Pedido: abrir a porta, ir até a calha,
+   depositar a carta e voltar.
+6. **Ir para casa pelo corredor** — agora que o corredor existe, o fim do dia sai
+   por ele.
+7. **A poltrona e a cadeira**: a cadeira no meio da sala não faz sentido; a poltrona
+   vai para o lado da lareira, com uma mesinha de apoio para as bebidas. O uísque é
+   escondido (Lei Seca): não fica à vista na mesa.
+8. **Diário**: em vários dias a letra sai do caderno; ao encher a folha, ele vira
+   para a próxima e continua.
+9. **A noite do disco**: o disco começa antes de ele dormir; o sonho é genérico (o
+   fonógrafo só muda de lugar, para cima da mesa). Pedido: ele "revive" o que o disco
+   grava, em sonho, de relance.
+10. **3D em vez de painel**: a janela nos sonhos; o mi-go que passa na janela
+    (Dia 5) com modelo; a janelinha do corredor da pensão, em Boston.
+11. **Conversa com opções** embaixo da tela, para escolher (como Skyrim).
+12. **Lapso — decidido: janela viva, câmera livre.** Ele se volta para a janela, o
+    mouse continua livre; Arkham passa as horas acelerada (o sol cruza, a sombra do
+    caixilho varre a sala, as janelas da cidade acendem e apagam, as nuvens correm),
+    uma folha da folhinha cai por dia, e o cartão entra no escuro.
+13. **Acabamento, segunda passada**: a estante e os livros, a estrutura da janela, a
+    **lareira** (principalmente), a disposição dos móveis; e a cidade à noite um pouco
+    mais clara, para se ver a noite.
+14. Ainda por validar no playtest 5: do Dia 5 ao fim da demo.
+
 ## Onde estamos (revisão de 2026-10-08)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho (`55cf59e`)
 e a **3d inteira** (playtest 3, `30e90f6`..`6560d44`, mais `b0c89f1`). Teste de fumaça
@@ -348,11 +391,10 @@ de acabamento sem essa lista.
 ## Próximos passos (em ordem)
 1. ✅ **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
-2b. **← AQUI.** O usuário joga o **playtest 4** (a checklist em "Onde estamos"): a
-   calha, o café/uísque, as noites 3 e 5, e **o que ainda parece tosco** depois da
-   passada de acabamento. A lista dele vira a **Fase 3e** (pode incluir uma segunda
-   passada de acabamento). Ainda abertos: aprovar as entradas do diário (as 3 e 5
-   mudaram) e as falas `sono_disco`/`sono_fogo`, o visual do sonho e "Deixar sem resposta".
+2b. ✅ O usuário jogou o **playtest 4** (até o começo do Dia 5) → **Fase 3e**.
+2c. **← AQUI.** A **Fase 3e** (acima), item por item, um commit cada; depois o
+   playtest 5 (do Dia 5 ao fim). Ainda abertos: aprovar as entradas do diário e as
+   falas `sono_disco`/`sono_fogo`, o visual do sonho e "Deixar sem resposta".
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

@@ -814,6 +814,8 @@ func _inalcancaveis(esc: Node3D, limites := Vector2(2.3, 2.8)) -> PackedStringAr
 						continue
 					var q := PhysicsRayQueryParameters3D.create(origem, centro, 3, [(esc.get_node(^"Player") as Player).get_rid()])
 					q.collide_with_areas = true
+					# De dentro de um móvel não se mira (a lareira inteira tapava a lenha).
+					q.hit_from_inside = true
 					if space.intersect_ray(q).get("collider") == alvo:
 						achou = true
 						break
