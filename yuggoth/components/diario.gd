@@ -111,12 +111,13 @@ func _process(delta: float) -> void:
 		# A pena sobe e desce um pouco, de letra em letra.
 		ponta += Vector3.UP * absf(sin(_t * 23.0)) * 0.004
 		pena.global_transform = _pena_em(ponta, Vector3(0.35, 0.85, 0.4))
-	if _escrevendo and _player:
+	if _escrevendo and _player and not _player.desviou_o_olhar():
 		_seguir_a_pena(delta)
 
 
 ## Escrevendo, os olhos vão atrás da pena, com atraso (a linha corre, ele a
-## acompanha e volta ao começo da seguinte), e a cabeça respira um pouco.
+## acompanha e volta ao começo da seguinte), e a cabeça respira um pouco —
+## até o jogador mexer a cabeça (a câmera é dele, playtest 4).
 func _seguir_a_pena(delta: float) -> void:
 	var alvo := global_transform * _na_pagina(_ponta_px() + Vector2(-30.0, 6.0))
 	var olho := _player.camera.global_position

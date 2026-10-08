@@ -36,9 +36,20 @@ const DEBRUCAR_AVANCA := 0.28
 @export var footstep_sounds: Array[AudioStream] = []
 @export var footstep_volume_db := -8.0
 
-var input_enabled := true
+## Andar e interagir. Desligado por uma cena (selar, o diário, a calha, o lapso),
+## a cabeça continua livre (playtest 4: "a cabeça deve dar liberdade para o
+## jogador, pois é quase a única que ele tem"): o mouse soma um desvio à direção
+## que a cena dá; devolvido o controle, o desvio vira a direção do corpo e da cabeça.
+var input_enabled := true:
+	set(v):
+		if v and not input_enabled:
+			_assumir_olhar()
+		input_enabled = v
 ## Sentado só olha em volta; tentar andar levanta (Prólogo, GDD §5.0).
 var seated := false
+## Levado por uma cena (a calha, a porta): a cena move o corpo, sem a física
+## (passa pela porta aberta e pelos móveis); os passos e o balanço continuam.
+var conduzido := false
 ## Debruçado sobre a mesa (0 a 1; o diário, o sono): sentado, a cabeça vai à
 ## frente e desce.
 var debrucado := 0.0
@@ -51,6 +62,9 @@ var _bob_t := 0.0
 var _bob_weight := 0.0
 var _last_bob_sin := 0.0
 var _fov_base := 75.0
+## O desvio do olhar durante uma cena: (yaw, pitch), em radianos.
+var _olhar_extra := Vector2.ZERO
+var _pos_antes := Vector3.ZERO
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
@@ -113,15 +127,19 @@ func olhar_para(ponto: Vector3, segundos: float, de := global_position) -> Tween
 	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(self, ^"rotation:y", rotation.y + angle_difference(rotation.y, yaw), segundos)
 	t.tween_property(head, ^"rotation:x", clampf(pitch, deg_to_rad(-85.0), deg_to_rad(85.0)), segundos)
+	# A cena leva o olhar a algo novo: o desvio do mouse volta junto.
+	if _olhar_extra != Vector2.ZERO:
+		t.tween_property(self, ^"_olhar_extra", Vector2.ZERO, segundos)
 	return t
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and pode_olhar():
+		_look(event.relative * mouse_sensitivity)
+		return
 	if not input_enabled:
 		return
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		_look(event.relative * mouse_sensitivity)
-	elif event.is_action_pressed("interagir") and _target:
+	if event.is_action_pressed("interagir") and _target:
 		_target.interact(self)
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("lamparina_mais"):
@@ -144,6 +162,7 @@ func _physics_process(delta: float) -> void:
 				stand()
 			move = Vector2.ZERO
 			crouching = false
+	if pode_olhar():
 		var look := Input.get_vector(&"olhar_esquerda", &"olhar_direita", &"olhar_cima", &"olhar_baixo")
 		if look != Vector2.ZERO:
 			_look(look * gamepad_look_speed * delta)
@@ -154,11 +173,16 @@ func _physics_process(delta: float) -> void:
 	velocity.x = lerpf(velocity.x, wish.x, k)
 	velocity.z = lerpf(velocity.z, wish.z, k)
 	# Sentado (a cadeira, a poltrona), fica onde a cena o pôs: a física o
-	# empurraria para fora da colisão do móvel.
-	if seated:
+	# empurraria para fora da colisão do móvel. Conduzido, quem anda é a cena; a
+	# velocidade (do passo e do balanço) vem do quanto ele andou.
+	if conduzido:
+		velocity = (global_position - _pos_antes) / maxf(delta, 0.0001)
+		velocity.y = 0.0
+	elif seated:
 		velocity = Vector3.ZERO
 	else:
 		move_and_slide()
+	_pos_antes = global_position
 
 	_update_head(delta, crouching)
 	_update_target()
@@ -168,8 +192,35 @@ func _look(delta: Vector2) -> void:
 	delta *= Settings.get_value(&"sensibilidade") * camera.fov / _fov_base
 	if Settings.get_value(&"inverter_y"):
 		delta.y = -delta.y
-	rotate_y(-delta.x)
-	head.rotation.x = clampf(head.rotation.x - delta.y, deg_to_rad(-85.0), deg_to_rad(85.0))
+	if input_enabled:
+		rotate_y(-delta.x)
+		head.rotation.x = clampf(head.rotation.x - delta.y, deg_to_rad(-85.0), deg_to_rad(85.0))
+		return
+	# Numa cena: o desvio, por cima da direção que ela dá.
+	_olhar_extra.x = wrapf(_olhar_extra.x - delta.x, -PI, PI)
+	_olhar_extra.y = clampf(_olhar_extra.y - delta.y, deg_to_rad(-85.0) - head.rotation.x, deg_to_rad(85.0) - head.rotation.x)
+
+
+## O mouse mexe a cabeça sempre que está preso — também numa cena (e folheando
+## o diário, que é modal mas não solta o mouse). As telas o soltam.
+func pode_olhar() -> bool:
+	return input_enabled or Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+
+
+## Numa cena, o jogador mexeu a cabeça por conta própria (a cena para de
+## conduzir o olhar: o diário deixa de seguir a pena).
+func desviou_o_olhar() -> bool:
+	return _olhar_extra != Vector2.ZERO
+
+
+## O controle voltou: o desvio da cena vira a direção do corpo e da cabeça.
+func _assumir_olhar() -> void:
+	if _olhar_extra == Vector2.ZERO:
+		return
+	rotation.y += _olhar_extra.x
+	head.rotation.x = clampf(head.rotation.x + _olhar_extra.y, deg_to_rad(-85.0), deg_to_rad(85.0))
+	_olhar_extra = Vector2.ZERO
+	camera.basis = Basis.IDENTITY
 
 
 func _update_head(delta: float, crouching: bool) -> void:
@@ -189,6 +240,14 @@ func _update_head(delta: float, crouching: bool) -> void:
 		_bob_t += delta * bob_frequency * (ground_speed / walk_speed)
 	var s := sin(_bob_t)
 	camera.position = Vector3(cos(_bob_t * 0.5) * bob_amount * 0.6, s * bob_amount, 0.0) * _bob_weight
+	# O desvio de uma cena: a câmera desfaz o pitch da cabeça, gira o yaw extra
+	# em torno da vertical e refaz o pitch somado (sem rolar o horizonte).
+	if _olhar_extra != Vector2.ZERO:
+		var p := head.rotation.x
+		var q := clampf(_olhar_extra.y, deg_to_rad(-85.0) - p, deg_to_rad(85.0) - p)
+		camera.basis = Basis(Vector3.RIGHT, -p) * Basis(Vector3.UP, _olhar_extra.x) * Basis(Vector3.RIGHT, p + q)
+	elif camera.basis != Basis.IDENTITY:
+		camera.basis = Basis.IDENTITY
 	# Passo no ponto mais baixo do balanço.
 	if moving and _last_bob_sin > -0.95 and s <= -0.95:
 		footstep.emit()

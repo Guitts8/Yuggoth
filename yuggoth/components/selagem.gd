@@ -4,7 +4,8 @@ extends Node3D
 ## escrita está deitada no mata-borrão; dobra-se em três, de baixo e de cima; o
 ## envelope desliza para junto dela, de costas, a aba aberta; a folha entra; a
 ## aba fecha; o envelope vira (o endereço de Akeley) e leva o selo; e sobe para a
-## mão. Wilmarth senta à mesa para isso e não se mexe enquanto dura.
+## mão. Wilmarth senta à mesa para isso e não sai dali enquanto dura; a vista vai
+## à carta, mas a cabeça continua livre (Player, playtest 4).
 ##
 ## `await Selagem.new().tocar(...)`: devolve o Envelope, já no lugar da mão (quem
 ## chama o troca pela CartaSaida). Peças montadas em código; nada vai para o .tscn.
@@ -76,9 +77,13 @@ func tocar(pai: Node3D, onde: Transform3D, reply: ReplyData, player: Player, som
 	if not is_inside_tree():
 		return null
 
-	await _girar(baixo, -177.0, 1.1)
+	# Dobras rentes (a 180°): inclinadas uns graus, a ponta da aba subia mais que a
+	# espessura do envelope e aparecia por cima dele ao entrar (playtest 4). As
+	# camadas ficam 1,5 mm uma acima da outra; dobrada, a folha tem 7,5 mm e o
+	# envelope, 12.
+	await _girar(baixo, -180.0, 1.1)
 	await _pausa(0.3)
-	await _girar(cima, 175.0, 1.1)
+	await _girar(cima, 180.0, 1.1)
 	await _pausa(0.4)
 
 	# O envelope chega pela esquerda e para junto da folha.
@@ -90,8 +95,9 @@ func tocar(pai: Node3D, onde: Transform3D, reply: ReplyData, player: Player, som
 	await _pausa(0.3)
 
 	# A folha dobrada vai até a boca do envelope, por cima da aba deitada, na
-	# altura de dentro do bolso; e entra.
-	var dentro := 0.003
+	# altura de dentro do bolso (as paredes têm 0,8 mm; sobra folga em cima e
+	# embaixo); e entra.
+	var dentro := 0.0024
 	var boca := Vector3(junto.x, dentro, junto.z - Envelope.ALTURA * 0.5 - terco * 0.5 - 0.014)
 	t = _tween()
 	t.tween_property(folha, ^"position", boca, 0.9 * RITMO)
@@ -101,34 +107,35 @@ func tocar(pai: Node3D, onde: Transform3D, reply: ReplyData, player: Player, som
 	t.tween_property(folha, ^"position", Vector3(junto.x, dentro, junto.z + 0.004), 1.2 * RITMO).set_ease(Tween.EASE_IN_OUT)
 	await t.finished
 	folha.visible = false
-	await _pausa(0.3)
+	await _pausa(0.15)
 
 	# A aba fecha por cima: sobe da mesa às costas do envelope enquanto dobra.
+	# Daqui em diante, mais ligeiro (playtest 4: "pode acelerar a fechada").
 	_tocar(_som_papel)
 	t = _tween().set_parallel()
-	t.tween_property(aba, ^"rotation_degrees:x", 0.0, 0.8 * RITMO)
-	t.tween_property(aba, ^"position:y", aba_fechada, 0.8 * RITMO)
+	t.tween_property(aba, ^"rotation_degrees:x", 0.0, 0.45 * RITMO)
+	t.tween_property(aba, ^"position:y", aba_fechada, 0.45 * RITMO)
 	await t.finished
 	# Fechado: o envelope volta a ser a peça inteira.
 	bolso.queue_free()
 	env.get_node(^"_Papel").visible = true
-	await _pausa(0.4)
+	await _pausa(0.2)
 
 	# Vira o envelope: o endereço; e o selo, batido com a palma.
 	t = _tween().set_parallel()
-	t.tween_property(env, ^"position:y", junto.y + 0.06, 0.5 * RITMO)
-	t.chain().tween_property(env, ^"rotation:z", 0.0, 0.8 * RITMO)
-	t.chain().tween_property(env, ^"position:y", junto.y, 0.4 * RITMO)
+	t.tween_property(env, ^"position:y", junto.y + 0.06, 0.3 * RITMO)
+	t.chain().tween_property(env, ^"rotation:z", 0.0, 0.5 * RITMO)
+	t.chain().tween_property(env, ^"position:y", junto.y, 0.25 * RITMO)
 	await t.finished
 	aba.visible = false
-	await _pausa(0.5)
+	await _pausa(0.3)
 	env.selos = 3 if reply.registrada else 1
 	_tocar(_som_selo)
 	t = _tween()
 	t.tween_property(env, ^"position:y", junto.y - 0.003, 0.06)
 	t.tween_property(env, ^"position:y", junto.y, 0.12)
 	await t.finished
-	await _pausa(0.9)
+	await _pausa(0.6)
 
 	# Para a mão: ele ergue a cabeça junto (olhando a mesa, a mão ficaria dentro
 	# dela), e o envelope sobe do tampo antes de vir.
