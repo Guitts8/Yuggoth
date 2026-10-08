@@ -281,9 +281,26 @@ foi feito:
    Acorda onde dormiu; o fogo, de manhã, apagado. Sentado, o Player não passa pela
    física (a poltrona o empurraria). Sons novos: `servir`, `gaveta`. As entradas 3 e
    5 do diário perderam a última linha caída (ver FIDELIDADE).
-8. **O escritório e a vista lá fora** parecem toscos perto das animações:
-   **materiais e texturas, móveis e objetos, a vista da janela.** (A luz e a
-   composição não incomodaram.) Uma passada de acabamento com capturas antes/depois.
+8. ✅ (primeira passada) **O escritório e a vista lá fora** parecem toscos perto das
+   animações: **materiais e texturas, móveis e objetos, a vista da janela.** (A luz e
+   a composição não incomodaram.) Uma passada de acabamento com capturas antes/depois.
+   Feito:
+   - **A vista é Arkham em 3D** em todas as horas (`tools/cidade_arkham.gd`,
+     `shaders/cidade.gdshader` e `ceu.gdshader`): casas coloniais de empena e de
+     telhado holandês, de tábuas pintadas, com chaminés; sobrados de tijolo no
+     centro; duas igrejas brancas com campanário; a torre gótica e um prédio da
+     universidade; olmos; o rio e os morros; céu com nuvens que correm e estrelas à
+     noite; névoa de distância por hora (dia, entardecer, noite, chuva); janelas que
+     acendem à noite. Isso decide o painel × cidade 3D: fica a 3D, e o painel antigo
+     só aparece com a tecla C (depuração, flag `painel`), para comparar.
+   - **Texturas** em 128 px: madeira de veio fino (sem as juntas pretas), assoalho de
+     tábuas estreitas com emendas desencontradas, papel de parede com ornamento de folha.
+   - **Móveis:** a escrivaninha com borda moldurada, rodapé e frentes de gaveta; a
+     cadeira de banqueiro (pé giratório, braços, balaústres); a poltrona de clube
+     (pés torneados, braços rolados, orelhas).
+   - **A sala:** cornija em volta do teto, florão e lustre de globo, alizar na porta,
+     uma paisagem a óleo sobre a lareira e dois diplomas na parede leste.
+   Ainda por ver com o usuário: o que mais parece tosco depois desta passada.
 
 ## Onde estamos (revisão de 2026-10-07)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b e 3c inteiras, inclusive a passagem
@@ -309,9 +326,11 @@ da demo jogável de ponta a ponta, com arte e som provisórios.
 
 ## Próximos passos (em ordem)
 1. ✅ **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
-2. Playtest do usuário (Prólogo ao fim da demo) — inclusive comparar painel × cidade 3D (C),
-   e o diário: o ritmo da escrita e do sono, e se a letra se lê. O que ele pedir vira a
-   **Fase 3d**, aqui, no mesmo formato da 3c.
+2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
+2b. O usuário olha a 3d: a calha, o café/uísque, as noites 3 e 5, e **o que ainda
+   parece tosco** depois da passada de acabamento (pode virar uma segunda passada).
+   Ainda abertos: aprovar as entradas do diário (as 3 e 5 mudaram), o visual do sonho
+   e "Deixar sem resposta".
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

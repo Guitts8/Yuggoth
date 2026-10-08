@@ -22,9 +22,11 @@ func _init() -> void:
 # --- Texturas ----------------------------------------------------------------
 
 func _texturas() -> void:
-	_save(_madeira(Color(0.36, 0.22, 0.13), 11, 16), "madeira_escura")
-	_save(_madeira(Color(0.52, 0.36, 0.22), 12, 0), "madeira_clara")
+	_save(_madeira(Color(0.34, 0.2, 0.12), 11, 0), "madeira_escura")
+	_save(_madeira(Color(0.47, 0.32, 0.19), 12, 0), "madeira_clara")
 	_save(_porta(), "porta")
+	_save(_quadro(), "quadro")
+	_save(_diploma(), "diploma")
 	_save(_assoalho(), "assoalho")
 	_save(_papel_parede(), "papel_parede")
 	_save(_reboco(), "reboco")
@@ -97,23 +99,27 @@ func _shade(c: Color, f: float) -> Color:
 	return Color(clampf(c.r * f, 0, 1), clampf(c.g * f, 0, 1), clampf(c.b * f, 0, 1), c.a)
 
 
-## Veios verticais; `junta` > 0 desenha a junta entre tábuas a cada N px.
-func _madeira(base: Color, seed: int, junta: int) -> Image:
-	var img := _img()
-	var n := _noise(seed, 0.07)
-	for y in 64:
-		for x in 64:
-			var g := n.get_noise_2d(x * 5.0, y * 0.35)
-			var veio := sin((x + g * 7.0) * 1.1) * 0.5 + 0.5
-			var f := 0.84 + veio * 0.16 + g * 0.08
+## Madeira de móvel (Fase 3d: o veio fino, sem as juntas pretas de antes):
+## veios verticais finos e ondulados e variação de tom. `junta` > 0 ainda
+## desenha a junta entre tábuas a cada N px.
+func _madeira(base: Color, seed: int, junta: int, tam := 128) -> Image:
+	var img := _img(tam, tam)
+	var n := _noise(seed, 0.035)
+	var fino := _noise(seed + 100, 0.6)
+	for y in tam:
+		for x in tam:
+			var g := n.get_noise_2d(x * 2.2, y * 0.25)
+			# O veio: linhas finas que ondulam com o ruído largo.
+			var veio := pow(absf(sin((x + g * 14.0) * 0.9)), 6.0)
+			var f := 0.9 + g * 0.1 - veio * 0.12 + fino.get_noise_2d(x * 3.0, y * 0.4) * 0.035
 			if junta > 0 and x % junta == 0:
-				f *= 0.55
+				f *= 0.72
 			img.set_pixel(x, y, _shade(base, f))
 	return img
 
 
 func _porta() -> Image:
-	var img := _madeira(Color(0.33, 0.2, 0.12), 13, 0)
+	var img := _madeira(Color(0.33, 0.2, 0.12), 13, 0, 64)
 	# Duas almofadas (painéis) com sombra embaixo/direita e luz em cima/esquerda.
 	for r: Rect2i in [Rect2i(10, 6, 44, 22), Rect2i(10, 36, 44, 22)]:
 		for x in range(r.position.x, r.end.x):
@@ -125,43 +131,127 @@ func _porta() -> Image:
 	return img
 
 
+## Paisagem a óleo escurecida pelo verniz (o quadro sobre a lareira, Fase 3d):
+## o céu de fim de tarde, morros em camadas, um rio e uma árvore; pinceladas.
+func _quadro() -> Image:
+	var w := 96
+	var h := 64
+	var img := _img(w, h)
+	var n := _noise(71, 0.08)
+	var pincel := _noise(72, 0.35)
+	for y in h:
+		for x in w:
+			var t := float(y) / h
+			var c := Color(0.62, 0.52, 0.34).lerp(Color(0.32, 0.36, 0.38), clampf(1.0 - t * 2.2, 0.0, 1.0))
+			# Os morros: duas cristas, a de trás mais clara.
+			var crista1 := 0.42 + n.get_noise_1d(x * 1.5) * 0.08
+			var crista2 := 0.55 + n.get_noise_1d(x * 2.5 + 40.0) * 0.1
+			if t > crista1:
+				c = Color(0.3, 0.32, 0.24)
+			if t > crista2:
+				c = Color(0.2, 0.22, 0.14)
+			# O rio, uma faixa clara que serpenteia embaixo.
+			var rio := 0.8 + sin(x * 0.09) * 0.04
+			if absf(t - rio) < 0.025:
+				c = Color(0.5, 0.48, 0.38)
+			# A árvore à esquerda.
+			if x > 14 and x < 30 and t > 0.25 and t < 0.62 and Vector2((x - 22) / 8.0, (t - 0.4) / 0.15).length() < 1.0:
+				c = Color(0.16, 0.18, 0.1)
+			if x >= 21 and x <= 23 and t >= 0.5 and t < 0.75:
+				c = Color(0.14, 0.1, 0.07)
+			var f := 0.9 + pincel.get_noise_2d(x * 2.0, y * 0.6) * 0.12
+			# O verniz escurece as bordas.
+			var borda := minf(minf(x, w - 1 - x) / 14.0, minf(y, h - 1 - y) / 10.0)
+			f *= lerpf(0.6, 1.0, clampf(borda, 0.0, 1.0))
+			img.set_pixel(x, y, _shade(c, f))
+	return img
+
+
+## Um diploma emoldurado: o papel creme, o título em linhas escuras, as linhas
+## do texto e o selo vermelho embaixo.
+func _diploma() -> Image:
+	var w := 48
+	var h := 64
+	var img := _img(w, h)
+	var n := _noise(73, 0.1)
+	for y in h:
+		for x in w:
+			var f := 0.95 + n.get_noise_2d(x, y) * 0.04
+			var c := Color(0.86, 0.82, 0.7)
+			if x < 3 or x > w - 4 or y < 3 or y > h - 4:
+				c = Color(0.7, 0.62, 0.45)
+			elif (y == 10 or y == 11) and x > 8 and x < w - 9:
+				c = Color(0.2, 0.17, 0.14)
+			elif y > 18 and y < 44 and y % 4 == 0 and x > 7 and x < w - 8 - (y * 7) % 9:
+				c = Color(0.45, 0.42, 0.36)
+			if Vector2(x - 34, y - 52).length() < 5.0:
+				c = Color(0.6, 0.12, 0.1)
+			img.set_pixel(x, y, _shade(c, f))
+	return img
+
+
 func _mul(img: Image, x: int, y: int, f: float) -> void:
 	img.set_pixel(x, y, _shade(img.get_pixel(x, y), f))
 
 
+## Assoalho de tábuas estreitas de carvalho (~8 cm com world 0,8), de
+## comprimentos diferentes, emendas desencontradas, cada trecho num tom, o veio
+## ao longo da tábua; as frestas escuras, mas não pretas.
 func _assoalho() -> Image:
-	var img := _img()
-	var n := _noise(14, 0.06)
+	var tam := 128
+	var img := _img(tam, tam)
+	var n := _noise(14, 0.05)
+	var fino := _noise(114, 0.5)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 14
-	var base := Color(0.40, 0.27, 0.17)
-	for row in 4:
-		var offset := rng.randi_range(0, 63)
-		var tom := rng.randf_range(0.85, 1.1)
-		for y in range(row * 16, row * 16 + 16):
-			for x in 64:
-				var g := n.get_noise_2d(x * 0.35, y * 5.0 + row * 40)
-				var f := tom * (0.86 + g * 0.14 + sin((y + g * 5.0) * 1.3) * 0.05)
-				if y % 16 == 0 or (x + offset) % 64 == 0:
-					f *= 0.5
+	var base := Color(0.34, 0.23, 0.15)
+	var linhas := 16
+	var alt := tam / linhas
+	for row in linhas:
+		# Duas emendas por fileira, em pontos sorteados.
+		var e1 := rng.randi_range(0, tam - 1)
+		var e2 := posmod(e1 + rng.randi_range(40, 88), tam)
+		var tons := [rng.randf_range(0.82, 1.12), rng.randf_range(0.82, 1.12)]
+		for y in range(row * alt, row * alt + alt):
+			for x in tam:
+				var trecho := 0 if posmod(x - e1, tam) < posmod(e2 - e1, tam) else 1
+				var g := n.get_noise_2d(x * 0.3 + trecho * 77.0, y * 3.0 + row * 50)
+				var veio := pow(absf(sin((y + g * 4.0) * 2.1 + x * 0.02)), 8.0)
+				var f: float = tons[trecho] * (0.9 + g * 0.1 - veio * 0.1 + fino.get_noise_2d(x, y * 2.0) * 0.03)
+				if y % alt == 0:
+					f *= 0.62
+				elif x == e1 or x == e2:
+					f *= 0.68
 				img.set_pixel(x, y, _shade(base, f))
 	return img
 
 
+## Papel de parede de 1920: listras duplas finas e, entre elas, um ornamento de
+## folha (um damasco simples) num verde mais escuro, com a impressão gasta.
 func _papel_parede() -> Image:
-	var img := _img()
-	var n := _noise(15, 0.05)
-	var base := Color(0.34, 0.38, 0.30)
-	for y in 64:
-		for x in 64:
-			var f := 0.95 + n.get_noise_2d(x, y) * 0.06
-			if x % 16 == 0 or x % 16 == 1:
-				f *= 1.12  # listra
-			# Losango pequeno entre as listras.
-			var lx := absi((x % 16) - 8)
-			var ly := absi((y % 16) - 8)
-			if lx + ly == 3:
-				f *= 1.18
+	var tam := 128
+	var img := _img(tam, tam)
+	var n := _noise(15, 0.04)
+	var gasto := _noise(115, 0.15)
+	var base := Color(0.33, 0.37, 0.29)
+	for y in tam:
+		for x in tam:
+			var f := 0.96 + n.get_noise_2d(x, y) * 0.05
+			var px := x % 32
+			if px == 0 or px == 3:
+				f *= 1.1
+			# A folha em losango, deslocada meia casa a cada fileira.
+			var ox := ((x + (16 if (y / 32) % 2 else 0)) % 32) - 16
+			var oy := (y % 32) - 16
+			var folha := absf(ox) / 9.0 + absf(oy) / 13.0
+			if folha < 1.0 and folha > 0.62:
+				f *= 0.84
+			elif folha <= 0.25:
+				f *= 0.88
+			elif ox == 0 and absi(oy) < 12:
+				f *= 0.92
+			# A impressão gasta: o ornamento esmaece aos pedaços.
+			f = lerpf(f, 0.96, clampf(gasto.get_noise_2d(x, y) * 1.5, 0.0, 0.6))
 			img.set_pixel(x, y, _shade(base, f))
 	return img
 
@@ -196,7 +286,7 @@ func _tijolo() -> Image:
 ## Lambri de madeira escura: duas almofadas lado a lado, com travessas em cima e
 ## embaixo. Uma repetição = 0,9 m (a altura do lambri, com world_uv).
 func _lambri() -> Image:
-	var img := _madeira(Color(0.3, 0.18, 0.1), 33, 0)
+	var img := _madeira(Color(0.3, 0.18, 0.1), 33, 0, 64)
 	for y in 64:
 		for x in 64:
 			var px := x % 32

@@ -22,6 +22,8 @@ const JANELA_Y := Vector2(0.9, 2.4)
 ## Altura do lambri (até o peitoril da janela).
 const LAMBRI := 0.9
 
+## Arkham em 3D pela janela (Fase 3d): as malhas montadas uma vez, uma vista por hora.
+var _cidade = preload("res://tools/cidade_arkham.gd").new()
 ## A folha da porta (feita em _estrutura; a calha a abre).
 var _folha_porta: Node3D
 ## A gaveta da escrivaninha que guarda o frasco (feita em _escrivaninha; Bebida).
@@ -118,6 +120,8 @@ func _materiais() -> void:
 	_mat("madeira_escura", "madeira_escura", {world = 2.0})
 	_mat("madeira_clara", "madeira_clara", {world = 2.0})
 	_mat("porta", "porta", {})
+	_mat("quadro", "quadro", {})
+	_mat("diploma", "diploma", {})
 	_mat("esmalte_verde", "aco", {world = 6.0, cor = Color(0.24, 0.36, 0.27)})
 	_mat("porcelana", "papel", {world = 6.0, cor = Color(1.08, 1.06, 1.0)})
 	_mat("cafe", "papel", {world = 6.0, cor = Color(0.14, 0.08, 0.04)})
@@ -161,10 +165,6 @@ func _materiais() -> void:
 	# A criatura cruzando o céu da cidade (Dias 3 e 6): silhueta sem luz.
 	_mat("migo", "migo", {unlit = true})
 	# A cidade em 3D (experimento): silhuetas de noite, sem luz.
-	_mat("cidade", "reboco", {unlit = true, world = 0.5, cor = Color(0.03, 0.028, 0.045)})
-	_mat("cidade_telhado", "reboco", {unlit = true, world = 0.5, cor = Color(0.06, 0.058, 0.085)})
-	_mat("cidade_ceu", "reboco", {unlit = true, world = 0.02, cor = Color(0.045, 0.06, 0.12)})
-	_mat("cidade_janela", "papel", {unlit = true, world = 4.0, cor = Color(0.62, 0.46, 0.2)})
 	# Os sonhos entre os dias.
 	_mat("pegada", "pegada_garra", {})
 	_mat("vista_circulo", "vista_circulo", {unlit = true})
@@ -348,6 +348,14 @@ func _estrutura() -> void:
 	_box(p, "BatenteL", Vector3(0.08, 2.2, 0.06), Vector3(0.5, 1.1, -0.03), "madeira_clara")
 	_box(p, "BatenteAlto", Vector3(1.08, 0.08, 0.06), Vector3(0, 2.18, -0.03), "madeira_clara")
 
+	# O alizar da porta, do lado da sala: os montantes e a verga com a cimalha.
+	for s in [-1, 1]:
+		_box(p, "Alizar%d" % (s + 1), Vector3(0.1, PORTA_H + 0.12, 0.025), Vector3(s * (PORTA_L / 2 + 0.07), (PORTA_H + 0.12) / 2, -0.07), "madeira_escura")
+	_box(p, "AlizarVerga", Vector3(PORTA_L + 0.3, 0.14, 0.03), Vector3(0, PORTA_H + 0.12, -0.07), "madeira_escura")
+	_box(p, "AlizarCimalha", Vector3(PORTA_L + 0.38, 0.04, 0.06), Vector3(0, PORTA_H + 0.21, -0.08), "madeira_escura")
+
+	_acabamento(e)
+
 	var rel := _group(e, "Relogio", Vector3(1.2, 1.85, D))
 	_box(rel, "Caixa", Vector3(0.36, 0.64, 0.12), Vector3(0, 0, -0.06), "madeira_escura")
 	_quad(rel, "Mostrador", Vector2(0.26, 0.26), Vector3(0, 0.12, -0.125), Vector3(0, 180, 0), "mostrador")
@@ -376,6 +384,26 @@ func _estrutura() -> void:
 
 
 # --- Mobília comum ---------------------------------------------------------------
+
+## O acabamento da sala (Fase 3d, "feito nas coxas"): a cornija em volta do teto,
+## em dois degraus; o florão e o lustre de globo no meio do teto (apagado: as
+## luzes são as da mesa, da janela e do fogo).
+func _acabamento(e: Node3D) -> void:
+	var c := _group(e, "Cornija")
+	for t: Array in [["N", Vector3(2 * W, 0, 0), Vector3(0, 0, -D), Vector3(0, 0, 1)], ["S", Vector3(2 * W, 0, 0), Vector3(0, 0, D), Vector3(0, 0, -1)],
+			["O", Vector3(0, 0, 2 * D), Vector3(-W, 0, 0), Vector3(1, 0, 0)], ["L", Vector3(0, 0, 2 * D), Vector3(W, 0, 0), Vector3(-1, 0, 0)]]:
+		var ao_longo: Vector3 = t[1]
+		var dentro: Vector3 = t[3]
+		for degrau: Array in [[0.1, 0.035, 0.05], [0.045, 0.08, 0.1]]:
+			var fundo: float = degrau[1]
+			var tam: Vector3 = ao_longo + Vector3(absf(dentro.x), 0, absf(dentro.z)) * fundo + Vector3(0, degrau[0], 0)
+			_box(c, "Cornija%s%d" % [t[0], int(degrau[0] * 1000)], tam, t[2] + dentro * fundo / 2 + Vector3(0, H - degrau[2], 0), "madeira_escura")
+	var centro := Vector3(0, H, 0.2)
+	_cyl(e, "Florao", 0.16, 0.12, 0.03, centro - Vector3(0, 0.015, 0), "teto", 10)
+	_cyl(e, "LustreHaste", 0.008, 0.008, 0.5, centro - Vector3(0, 0.27, 0), "latao", 6)
+	_cyl(e, "LustreCopa", 0.06, 0.04, 0.05, centro - Vector3(0, 0.54, 0), "latao", 8)
+	_cyl(e, "LustreGlobo", 0.14, 0.09, 0.2, centro - Vector3(0, 0.66, 0), "porcelana", 10)
+
 
 func _mobilia() -> void:
 	var mob := _group(cena, "Mobilia")
@@ -417,17 +445,28 @@ func _cabideiro(parent: Node) -> void:
 	_colisao(cab, "Colisao", [[Vector3(0.45, 1.8, 0.45), Vector3(0, 0.9, -0.05)]])
 
 
+## A escrivaninha de pedestal duplo (Fase 3d: com acabamento): o tampo com a
+## borda moldurada, os dois gaveteiros sobre um rodapé, cada gaveta com a frente
+## saliente e o puxador de latão, e a gaveta do meio sob o tampo.
 func _escrivaninha(parent: Node) -> void:
 	var g := _group(parent, "Escrivaninha", Vector3(0, 0, -2.2))
-	_box(g, "Tampo", Vector3(1.6, 0.06, 0.8), Vector3(0, 0.75, 0), "madeira_escura")
+	_box(g, "Tampo", Vector3(1.6, 0.045, 0.8), Vector3(0, 0.7575, 0), "madeira_escura")
+	_box(g, "Borda", Vector3(1.64, 0.025, 0.84), Vector3(0, 0.7225, 0), "madeira_escura")
 	for s in [-1, 1]:
 		var lado := "O" if s < 0 else "L"
-		_box(g, "Gaveteiro" + lado, Vector3(0.42, 0.72, 0.74), Vector3(s * 0.57, 0.36, 0), "madeira_escura")
+		var x: float = s * 0.57
+		_box(g, "Gaveteiro" + lado, Vector3(0.42, 0.62, 0.74), Vector3(x, 0.4, 0), "madeira_escura")
+		_box(g, "Rodape" + lado, Vector3(0.44, 0.09, 0.76), Vector3(x, 0.045, 0), "madeira_escura")
 		for k in 3:
 			if s > 0 and k == 0:
 				continue  # a gaveta de cima, à direita, abre (frente e puxador são dela)
-			_box(g, "Puxador%s%d" % [lado, k], Vector3(0.08, 0.02, 0.02), Vector3(s * 0.57, 0.6 - k * 0.22, 0.38), "latao")
-	_box(g, "Fundo", Vector3(0.72, 0.5, 0.03), Vector3(0, 0.47, -0.3), "madeira_escura")
+			var y := 0.6 - k * 0.19
+			_box(g, "Frente%s%d" % [lado, k], Vector3(0.38, 0.17, 0.02), Vector3(x, y, 0.38), "madeira_escura")
+			_box(g, "Puxador%s%d" % [lado, k], Vector3(0.08, 0.02, 0.02), Vector3(x, y, 0.4), "latao")
+	# A gaveta do meio (a do lápis), rasa, e o painel do fundo.
+	_box(g, "FrenteMeio", Vector3(0.66, 0.07, 0.02), Vector3(0, 0.66, 0.38), "madeira_escura")
+	_box(g, "PuxadorMeio", Vector3(0.1, 0.015, 0.02), Vector3(0, 0.66, 0.4), "latao")
+	_box(g, "Fundo", Vector3(0.72, 0.55, 0.03), Vector3(0, 0.42, -0.3), "madeira_escura")
 	# A gaveta de cima, à direita: guarda o frasco de uísque (Bebida, Fase 3d).
 	var gaveta := _group(g, "Gaveta", Vector3(0.57, 0.6, 0.0))
 	_gaveta_mesa = gaveta
@@ -439,14 +478,25 @@ func _escrivaninha(parent: Node) -> void:
 	_colisao(g, "Colisao", [[Vector3(1.6, 0.78, 0.8), Vector3(0, 0.39, 0)]])
 
 
+## A cadeira de escritório de carvalho, de banqueiro (Fase 3d): o pé giratório de
+## quatro garras, o assento arredondado, os braços curvos e o encosto de balaústres
+## com o travessão de cima. Sem colisão: o jogador senta nela.
 func _cadeira(parent: Node) -> void:
-	# Sem colisão: o jogador começa sentado nela.
 	var g := _group(parent, "Cadeira", Vector3(0, 0, -1.3))
-	_box(g, "Assento", Vector3(0.46, 0.05, 0.44), Vector3(0, 0.46, 0), "madeira_clara")
-	for x in [-0.2, 0.2]:
-		for z in [-0.19, 0.19]:
-			_box(g, "Perna%d%d" % [signf(x), signf(z)], Vector3(0.04, 0.46, 0.04), Vector3(x, 0.23, z), "madeira_clara")
-	_box(g, "Encosto", Vector3(0.46, 0.42, 0.04), Vector3(0, 0.74, 0.2), "madeira_clara")
+	for i in 4:
+		var pe := _box(g, "Pe%d" % i, Vector3(0.05, 0.04, 0.3), Vector3(0, 0.05, 0), "madeira_clara")
+		pe.rotation_degrees = Vector3(-14, 45 + i * 90, 0)
+		pe.position = Vector3(sin(deg_to_rad(45 + i * 90)), 0, cos(deg_to_rad(45 + i * 90))) * 0.13 + Vector3(0, 0.06, 0)
+	_cyl(g, "Coluna", 0.03, 0.04, 0.32, Vector3(0, 0.25, 0), "ferro", 8)
+	_cyl(g, "Assento", 0.25, 0.23, 0.045, Vector3(0, 0.44, 0), "madeira_clara", 12)
+	for s in [-1, 1]:
+		_box(g, "Braco%d" % (s + 1), Vector3(0.045, 0.025, 0.36), Vector3(s * 0.23, 0.64, -0.02), "madeira_clara")
+		_box(g, "BracoApoio%d" % (s + 1), Vector3(0.03, 0.18, 0.03), Vector3(s * 0.23, 0.54, -0.16), "madeira_clara")
+		_box(g, "Montante%d" % (s + 1), Vector3(0.035, 0.4, 0.035), Vector3(s * 0.21, 0.66, 0.2), "madeira_clara")
+	for k in 5:
+		_box(g, "Balaustre%d" % k, Vector3(0.018, 0.28, 0.018), Vector3(-0.12 + k * 0.06, 0.62, 0.21), "madeira_clara")
+	var trav := _box(g, "Travessao", Vector3(0.48, 0.07, 0.03), Vector3(0, 0.82, 0.22), "madeira_clara")
+	trav.rotation_degrees.x = 8
 
 
 const CORES_LIVRO := [Color(0.5, 0.13, 0.1), Color(0.16, 0.3, 0.18), Color(0.14, 0.17, 0.36),
@@ -530,12 +580,28 @@ func _lareira(parent: Node) -> void:
 	_colisao(g, "Colisao", [[Vector3(0.7, H, 1.9), Vector3(-0.35, H / 2, 0)]])
 
 
-## Poltrona olhando para -Z local (gire o grupo para orientar).
+## Poltrona de clube olhando para -Z local (gire o grupo para orientar; Fase 3d:
+## com acabamento): os pés torneados, a saia, a almofada solta do assento, os
+## braços rolados, o encosto inclinado com as orelhas.
 func _poltrona(g: Node3D, mat: String) -> void:
-	_box(g, "Assento", Vector3(0.75, 0.42, 0.72), Vector3(0, 0.21, 0), mat)
-	_box(g, "Encosto", Vector3(0.75, 0.9, 0.14), Vector3(0, 0.6, 0.33), mat)
+	for x in [-0.3, 0.3]:
+		for z in [-0.28, 0.28]:
+			_cyl(g, "Pe%d%d" % [signf(x), signf(z)], 0.025, 0.018, 0.1, Vector3(x, 0.05, z), "madeira_escura", 6)
+	_box(g, "Base", Vector3(0.76, 0.26, 0.7), Vector3(0, 0.23, 0.01), mat)
+	_box(g, "Almofada", Vector3(0.54, 0.11, 0.56), Vector3(0, 0.41, -0.04), mat)
+	_box(g, "Frente", Vector3(0.56, 0.05, 0.05), Vector3(0, 0.38, -0.32), mat)
 	for s in [-1, 1]:
-		_box(g, "Braco%d" % s, Vector3(0.12, 0.62, 0.72), Vector3(s * 0.38, 0.31, 0), mat)
+		_box(g, "Braco%d" % s, Vector3(0.12, 0.3, 0.66), Vector3(s * 0.32, 0.5, 0.0), mat)
+		# O rolo do braço, por cima e por fora.
+		var rolo := _cyl(g, "Rolo%d" % s, 0.075, 0.075, 0.68, Vector3(s * 0.33, 0.65, -0.01), mat, 8)
+		rolo.rotation_degrees.x = 90
+		var orelha := _box(g, "Orelha%d" % s, Vector3(0.1, 0.42, 0.18), Vector3(s * 0.31, 0.92, 0.24), mat)
+		orelha.rotation_degrees.y = -s * 10
+	var encosto := _box(g, "Encosto", Vector3(0.56, 0.62, 0.14), Vector3(0, 0.8, 0.29), mat)
+	encosto.rotation_degrees.x = -10
+	var topo := _cyl(g, "TopoEncosto", 0.07, 0.07, 0.58, Vector3(0, 1.1, 0.33), mat, 8)
+	topo.rotation_degrees.z = 90
+	_box(g, "Costas", Vector3(0.76, 0.6, 0.06), Vector3(0, 0.62, 0.34), mat)
 	_colisao(g, "Colisao", [[Vector3(0.9, 1.0, 0.8), Vector3(0, 0.5, 0.05)]])
 
 
@@ -543,7 +609,7 @@ func _poltrona(g: Node3D, mat: String) -> void:
 
 func _gabinete_1930() -> void:
 	var g := _group(cena, "Gabinete1930")
-	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_vista(g, "chuva", "vista_noite")
 	_chuva(g)
 
 	# Escrivaninha: as cartas de Akeley (um maço amarrado), a folha do relato,
@@ -665,6 +731,7 @@ func _miskatonic() -> void:
 
 	_arquivo(g)
 	_cesto(g)
+	_quadros(g)
 	_cortinas(g)
 
 	# Os dias somem enquanto se sonha (Escritorio._sonhar).
@@ -679,7 +746,6 @@ func _miskatonic() -> void:
 
 	_corredor(g)
 	_lapso(g)
-	_cidade_3d(g)
 
 	# Com correspondência na mão, mirar o tampo a põe na mesa (some sem nada na mão).
 	var por := _area(g, MesaCorreio.new(), "PorNaMesa", Vector3(1.6, 0.1, 0.8), Vector3(0, MESA + 0.05, -2.2)) as MesaCorreio
@@ -696,6 +762,20 @@ func _miskatonic() -> void:
 	_box(a, "Movel", Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0), "madeira_escura")
 	_box(a, "Juncao", Vector3(0.01, 0.8, 0.01), Vector3(0, 0.45, -0.255), "ferro")
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
+
+
+## O que pende nas paredes do escritório (Fase 3d): uma paisagem a óleo sobre a
+## lareira, em moldura dourada, e os dois diplomas de Wilmarth na parede leste,
+## ao sul da lareira.
+func _quadros(g: Node3D) -> void:
+	var face := W - 0.4
+	var q := _group(g, "QuadroLareira", Vector3(face, 1.95, -0.6))
+	_box(q, "Moldura", Vector3(0.04, 0.6, 0.82), Vector3(-0.02, 0, 0), "latao")
+	_quad(q, "Tela", Vector2(0.7, 0.48), Vector3(-0.042, 0, 0), Vector3(0, -90, 0), "quadro")
+	for k in 2:
+		var d := _group(g, "Diploma%d" % k, Vector3(W, 1.55 + k * 0.05, 1.05 + k * 0.5))
+		_box(d, "Moldura", Vector3(0.025, 0.36, 0.3), Vector3(-0.0125, 0, 0), "madeira_escura")
+		_quad(d, "Papel", Vector2(0.24, 0.3), Vector3(-0.026, 0, 0), Vector3(0, -90, 0), "diploma")
 
 
 ## O corredor da Miskatonic atrás da porta e, na parede da frente, a calha de
@@ -913,77 +993,25 @@ func _diario(g: Node3D, pena: Node3D) -> void:
 	ler.prompt = "Ler o diário"
 
 
-## Experimento (playtest 2): Arkham em 3D lá fora, no lugar do painel — telhados de
-## duas águas e mansardas, chaminés, janelas acesas e a torre gótica da
-## Miskatonic com o mostrador aceso, pequenos, longe (12 a 45 m) e abaixo do olhar. Só com a flag
-## `cidade_3d` (tecla C, em build de depuração: Depuracao); então os painéis
-## "Vista" da janela somem. Materiais sem luz nem névoa (psx_unlit), como o painel.
-func _cidade_3d(g: Node3D) -> void:
-	var c := _grupo_se(g, "Cidade3D", _flag(&"cidade_3d"))
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 1928
-	var casas := []
-	var telhados := []
-	var janelas := []
-	for fileira in 5:
-		var z := -12.0 - fileira * 7.0
-		var x := -22.0 - rng.randf_range(0, 2)
-		while x < 22.0:
-			var w := rng.randf_range(3.0, 6.0)
-			var h := rng.randf_range(4.0, 9.0) + fileira * 1.2
-			var d := rng.randf_range(4.0, 6.0)
-			# O escritório olha a cidade de cima (um andar alto, no morro): a rua a -8 m.
-			var pos := Vector3(x + w / 2, h / 2 - 8.0, z - d / 2)
-			casas.append([Vector3(w, h, d), pos, Vector3.ZERO, Color.WHITE])
-			# Telhado de duas águas (ou mansarda, mais íngreme), cumeeira de leste a oeste.
-			var mansarda := rng.randf() < 0.35
-			var inclina := 58.0 if mansarda else 36.0
-			var aba := d * 0.5 / cos(deg_to_rad(inclina))
-			for lado in [-1, 1]:
-				telhados.append([Vector3(w + 0.2, 0.12, aba), pos + Vector3(0, h / 2 + aba * sin(deg_to_rad(inclina)) * 0.5, lado * d * 0.25),
-					Vector3(lado * inclina, 0, 0), Color.WHITE])
-			if rng.randf() < 0.7:
-				telhados.append([Vector3(0.35, 1.4, 0.35), pos + Vector3(rng.randf_range(-w, w) * 0.3, h / 2 + 0.9, 0), Vector3.ZERO, Color.WHITE])
-			# Janelas acesas na fachada (a que olha para a sala, +Z), poucas.
-			for k in rng.randi_range(1, 7):
-				var jx := pos.x + rng.randf_range(-w, w) * 0.35
-				var jy := pos.y + rng.randf_range(-h, h) * 0.4
-				janelas.append([Vector3(0.32, 0.45, 0.05), Vector3(jx, jy, z + 0.03), Vector3.ZERO, Color.WHITE])
-			x += w + rng.randf_range(0.2, 1.5)
-	_lote_sem_luz(c, "Casas", casas, "cidade")
-	_lote_sem_luz(c, "Telhados", telhados, "cidade_telhado")
-	_lote_sem_luz(c, "Janelas", janelas, "cidade_janela")
-	# O céu da noite, atrás de tudo.
-	_quad(c, "Ceu", Vector2(200.0, 90.0), Vector3(0, 15.0, -70.0), Vector3.ZERO, "cidade_ceu")
-
-	# A torre da Miskatonic: o fuste, o campanário com o mostrador aceso, os
-	# pináculos e a agulha — onde está no painel (à direita, atrás da cidade).
-	var torre := _group(c, "Torre", Vector3(5.5, -8.0, -34.0))
-	torre.scale = Vector3.ONE * 0.8
-	_box(torre, "Fuste", Vector3(2.2, 16.0, 2.2), Vector3(0, 8.0, 0), "cidade")
-	_box(torre, "Campanario", Vector3(2.6, 3.0, 2.6), Vector3(0, 17.5, 0), "cidade")
-	_quad(torre, "Mostrador", Vector2(1.4, 1.4), Vector3(0, 17.6, 1.31), Vector3.ZERO, "vidro_aceso")
-	var agulha := _cyl(torre, "Agulha", 0.0, 1.5, 7.0, Vector3(0, 22.5, 0), "cidade_telhado", 4)
-	agulha.rotation_degrees.y = 45
-	for sx in [-1, 1]:
-		for sz in [-1, 1]:
-			_cyl(torre, "Pinaculo%d%d" % [sx, sz], 0.0, 0.25, 2.5, Vector3(sx * 1.2, 20.2, sz * 1.2), "cidade_telhado", 4)
-	for k in 3:
-		_quad(torre, "Ogiva%d" % k, Vector2(0.35, 1.3), Vector3(0, 6.0 + k * 3.5, 1.11), Vector3.ZERO, "vidro_aceso" if k == 1 else "cidade_telhado")
-
-	# Sem os painéis na janela enquanto a cidade 3D aparece.
-	for vista: Node in g.find_children("Vista", "MeshInstance3D", true, false):
-		var cn := ConditionalNode.new()
-		cn.name = "SemCidade3D"
-		cn.condition = _flag(&"cidade_3d", true)
-		_add(vista, cn)
-
-
-## Como _lote, mas para os materiais sem luz da cidade (cor só da textura).
-func _lote_sem_luz(parent: Node, nome: String, pecas: Array, mat: String) -> MeshInstance3D:
-	var mi := _lote(parent, nome, pecas, mat)
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	return mi
+## A vista da janela (Fase 3d): Arkham em 3D na hora pedida ("dia", "entardecer",
+## "noite", "chuva"; tools/cidade_arkham.gd). O painel antigo continua por baixo,
+## só com a flag `painel` (tecla C em depuração), para comparar.
+func _vista(parent: Node, hora: String, painel: String, nome := "Vista", z := -D - 1.2) -> Node3D:
+	var v := _group(parent, nome)
+	var quad := _quad(v, "Painel", Vector2(5.0, 3.0), Vector3(0, 1.6, z), Vector3.ZERO, painel)
+	var so_painel := ConditionalNode.new()
+	so_painel.name = "SoComPainel"
+	so_painel.condition = _flag(&"painel")
+	_add(quad, so_painel)
+	var cidade: Node3D = _cidade.vista(hora)
+	_add(v, cidade)
+	for filho in cidade.get_children():
+		filho.owner = cena
+	var sem_painel := ConditionalNode.new()
+	sem_painel.name = "SemPainel"
+	sem_painel.condition = _flag(&"painel", true)
+	_add(cidade, sem_painel)
+	return v
 
 
 ## O tempo passando na sala (Lapso): a folhinha no peitoril da janela, de frente
@@ -1007,10 +1035,10 @@ func _lapso(g: Node3D) -> void:
 	sol.shadow_enabled = true
 	_add(lapso, sol)
 	lapso.sol = sol
-	var vista := _quad(lapso, "VistaDia", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.18), Vector3.ZERO, "vista_dia")
+	var vista := _vista(lapso, "dia", "vista_dia", "VistaDia", -D - 1.18)
 	vista.visible = false
 	lapso.vista_dia = vista
-	var tarde := _quad(lapso, "VistaTarde", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.17), Vector3.ZERO, "vista_entardecer")
+	var tarde := _vista(lapso, "entardecer", "vista_entardecer", "VistaTarde", -D - 1.17)
 	tarde.visible = false
 	lapso.vista_tarde = tarde
 
@@ -1254,7 +1282,7 @@ func _escrever(parent: Node, resposta: String, carta_lida: StringName) -> void:
 
 ## Luz de um dia: vista da janela, sol entrando e preenchimento.
 func _luz(parent: Node, vista: String, sol_cor: Color, sol_energia: float, sol_alvo: Vector3, sol_pos: Vector3, preench: float) -> void:
-	_quad(parent, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, vista)
+	_vista(parent, {"vista_dia": "dia", "vista_entardecer": "entardecer"}.get(vista, "noite"), vista)
 	var sol := SpotLight3D.new()
 	sol.name = "Sol"
 	sol.transform = Transform3D(Basis.looking_at(sol_alvo - sol_pos), sol_pos)
@@ -1288,7 +1316,7 @@ func _dias(parent: Node) -> void:
 ## Noite sem lua.
 func _dia_6(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 6)
-	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_vista(g, "noite", "vista_noite")
 	_abajur(g)
 	_lareira_noite(g, 6)
 	# Depois de "falaram comigo", de novo — no céu sem lua.
@@ -1343,7 +1371,7 @@ func _dia_6(parent: Node) -> void:
 ## `narrou_<cartão>`. Noite de chuva; um vulto passa pela janela (não confirmado).
 func _dia_5(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 5)
-	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_vista(g, "chuva", "vista_noite")
 	_chuva(g)
 	_abajur(g)
 	_lareira_noite(g, 5)
@@ -1441,7 +1469,7 @@ func _dia_4(parent: Node) -> void:
 	var tarde := _grupo_se(g, "Tarde", _flag(&"anoiteceu_dia_4", true))
 	_luz(tarde, "vista_dia", Color(1.0, 0.9, 0.7), 7.5, Vector3(-0.3, 0, 0.4), Vector3(0.6, 3.6, -D - 1.5), 1.1)
 	var noite := _grupo_se(g, "Noite", _flag(&"anoiteceu_dia_4"))
-	_quad(noite, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_vista(noite, "noite", "vista_noite")
 	_omni(noite, "Lua", Vector3(0, 2.2, -2.6), Color(0.5, 0.6, 0.9), 0.4, 5.0)
 	_abajur(noite)
 	var telegrama := _box(g, "Telegrama", Vector3(0.2, 0.003, 0.14), Vector3(0.02, MESA + 0.0045, -2.12), "envelope")
@@ -1510,7 +1538,7 @@ func _telefone(parent: Node, ids: Array = ["agencia_arkham", "boston", "telegram
 ## Dia 3 (cap. III): o disco chega de Brattleboro. Noite; abajur na mesa.
 func _dia_3(parent: Node) -> Node3D:
 	var g := _grupo_do_dia(parent, 3)
-	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.2), Vector3.ZERO, "vista_noite")
+	_vista(g, "noite", "vista_noite")
 	_omni(g, "Lua", Vector3(0, 2.2, -2.6), Color(0.5, 0.6, 0.9), 0.4, 5.0)
 	_abajur(g)
 	# Depois do disco, algo cruza o céu da cidade.

@@ -15,6 +15,10 @@ func _ready() -> void:
 	add_child(root)
 	await _s(0.5)
 
+	if OS.get_environment("SHOT_SO") == "sala":
+		await _sala()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_SO") == "sono":
 		await _sono()
 		get_tree().quit()
@@ -136,6 +140,31 @@ func _sono() -> void:
 		await _serie("noite%d" % n, [1.0, 2.5, 4.5, 8.0, 14.0, 20.0])
 		GameState.set_flag(e.sonhos[n])
 		await _serie("acordar%d" % n, [6.0, 9.0, 12.0, 15.0, 18.0])
+
+
+## A sala de vários pontos, de dia (Dia 1) e de noite (Dia 5, fogo aceso).
+func _sala() -> void:
+	var vistas := [
+		["porta", Vector3(-0.9, 0, 2.4), Vector3(0.0, 1.0, -2.2)],
+		["cadeira", Vector3(0.05, 0, -1.35), Vector3(0.05, 0.9, -2.6)],
+		["leste", Vector3(-1.2, 0, 0.2), Vector3(2.5, 1.0, -0.6)],
+		["oeste", Vector3(1.2, 0, 0.0), Vector3(-2.5, 1.2, -1.2)],
+		["janela", Vector3(0.0, 0, -1.6), Vector3(0.0, 1.7, -3.5)],
+		["mesa", Vector3(0.6, 0, -1.4), Vector3(-0.1, 0.78, -2.2)],
+		["sul", Vector3(0.5, 0, -1.8), Vector3(-0.5, 1.2, 3.0)],
+	]
+	for d in [1, 5]:
+		GameState.reset()
+		GameState.set_flag(&"lareira_dia_5")
+		var e := await _escritorio(d)
+		Narrator.cancel()
+		for v: Array in vistas:
+			e.player.global_position = v[1]
+			e.player.look_at(Vector3(v[2].x, v[1].y, v[2].z))
+			var olho := e.player.global_position + Vector3(0, 1.62, 0)
+			e.player.head.rotation.x = atan2(v[2].y - olho.y, Vector2(v[2].x - olho.x, v[2].z - olho.z).length())
+			await _s(0.6)
+			_shot("%s_d%d_%s" % [tag, d, v[0]])
 
 
 func _escritorio(dia: int) -> Escritorio:
