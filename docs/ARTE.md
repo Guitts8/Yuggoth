@@ -86,18 +86,19 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 | **Arquivo de aço** | Quatro gavetas, verde-oliva, canto nordeste. A máquina de escrever fica guardada em cima (só decoração). |
 | **Cabideiro** | Canto sudeste, com chapéu de feltro e sobretudo. O sobretudo provisório é um cilindro achatado: o que mais ganha com modelo. |
 | **Lareira** | Tijolo, consolo de madeira, grelha de ferro. Funciona acesa e apagada. |
-| **Poltrona** | Estofada, de leitura. Aparece também coberta por lençol (versão "drapeada" ajuda). |
+| **Poltrona** | Estofada, de leitura, ao lado da lareira com uma mesinha de apoio (Fase 3e). Aparece também coberta por lençol (versão "drapeada" ajuda). |
 | **Janela de guilhotina** | Caixilho de madeira com vidraças; a vista é um plano atrás. |
 | **Relógio de parede** | Ponteiros e pêndulo como peças separadas (o relógio **para** no Dia 2). |
-| **Porta** | Com almofadas, batente e maçaneta; não precisa abrir. |
+| **Porta** | Com almofadas, batente e maçaneta; **abre** (dobradiça a oeste) para o corredor, a calha e a escada (Fase 3e). |
 | **Telefone de parede** | Caixa de madeira com duas campainhas de latão, bocal, fone no gancho e manivela (Dia 4). Fone e manivela como peças separadas. |
 
 ### C — a caixa provisória aguenta
 
 Quadro de cortiça, armário do fonógrafo, tapete, castiçais do
 consolo, lambri (textura `lambri.png`), cortinas (faixas em zigue-zague), cesto de
-papéis, espátula de cartas, mata-borrão, máquina de escrever. O **vulto da janela** (Dia 5) é um plano com textura
-recortada e deve continuar vago: só melhorar a silhueta, nunca mostrá-lo nítido.
+papéis, espátula de cartas, mata-borrão, máquina de escrever. O **mi-go** (Dia 5 na janela, Dias 3 e 6 no céu, o bosque da noite 3) já é 3D provisório
+(`props/migo.gd`, do cap. I); um `.glb` como filho `Modelo` o substitui. Deve continuar
+visto só de relance, nunca nítido.
 
 ### Texturas que melhorariam muito
 - **Papel de parede** (o atual é um padrão simples de listras e losangos).
