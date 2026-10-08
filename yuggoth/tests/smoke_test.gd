@@ -774,6 +774,27 @@ func _ready() -> void:
 	_check(not SceneDirector.hold_black, "depois da demo, a tela preta não fica presa")
 	Engine.time_scale = 1.0
 
+	# Depuração (playtest 5): F8 pula o dia; o seguinte encontra o que espera do pulado.
+	var depuracao := root.get_node_or_null(^"/root/Depuracao")
+	if depuracao:
+		GameState.reset()
+		GameState.set_flag(&"prologo_concluido")
+		GameState.set_value(&"dia", 2)
+		main_menu.close()
+		await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+		await _frames(2)
+		depuracao.pular_dia()
+		await _until(func() -> bool: return GameState.get_value(&"dia") == 3 and not SceneDirector.is_busy, 30.0)
+		await _frames(2)
+		var esc_p := root.find_children("*", "Escritorio", true, false).front() as Escritorio
+		_check(GameState.get_value(&"dia") == 3 and GameState.has_flag(&"anotou_dia_2") and GameState.get_value(&"correio_dia_2_tiradas") == 9
+			and esc_p and esc_p.find_child("Fotografias", true, false).visible and GameState.get_value(&"data") == esc_p.datas_dia[3],
+			"F8: pula do Dia 2 ao 3, com as fotografias tiradas e a data do dia")
+		depuracao.pular_dia()
+		await _until(func() -> bool: return GameState.get_value(&"dia") == 4 and not SceneDirector.is_busy, 30.0)
+		_check(GameState.has_flag(&"tocou_disco") and GameState.has_flag(&"fono_cilindro"), "F8: pulado o Dia 3, o fonógrafo já tocou")
+		SceneDirector.clear_level()
+
 	# Paginar sem abrir (abrir marcaria `leu_<id>`); no fim, porque é um quadro longo.
 	var sozinhas := PackedStringArray()
 	for arquivo in DirAccess.get_files_at("res://narrative/documents"):
@@ -885,6 +906,18 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 	var onde := esc.player.global_position.distance_to(lugar.assento.global_position) < 0.3 if lugar else esc.diario.aberto
 	_check(GameState.get_value(&"dia") == n and esc.player.seated and onde and esc.find_child("Dias", true, false).visible
 		and esc.lapso.sol.light_energy > 0.0, "de manhã, %s, a aurora na janela" % ("onde o sono o pegou" if lugar else "debruçado no diário aberto"))
+	if lugar:
+		# Playtest 5: acordado na poltrona, levantava dentro da colisão dela e travava.
+		await _until(func() -> bool: return esc._pode_ir and esc.player.input_enabled, 60.0)
+		var forma := esc.player.get_node(^"CollisionShape3D") as CollisionShape3D
+		var consulta := PhysicsShapeQueryParameters3D.new()
+		consulta.shape = forma.shape
+		consulta.collision_mask = 1
+		consulta.exclude = [esc.player.get_rid()]
+		consulta.transform = esc.player.global_transform * forma.transform
+		var preso := not esc.player.get_world_3d().direct_space_state.intersect_shape(consulta, 1).is_empty()
+		_check(not esc.player.seated and not preso and absf(esc.player.global_position.y - lugar.assento.global_position.y) < 0.1,
+			"acordado na noite %d, ele se levanta para fora da poltrona, livre" % n)
 	await _ir_para_casa(esc)
 
 

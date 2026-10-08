@@ -179,7 +179,7 @@ Noite sem sonho: fecha o caderno, levanta; tela preta, cartão *"Fim de maio."*,
 - **Envelope gordo de Townshend**, no chão junto à porta: dois selos, carimbo
   *MAY 22 1928*. Aberto, sai a carta; as fotografias saem **uma por vez**
   ("Tirar uma fotografia"), cada uma para o seu lugar na mesa — quem as arruma é o
-  jogador. (As que ficarem no envelope estão na mesa no dia seguinte.)
+  jogador. Só com as nove fora do envelope aparece "Escrever a Akeley" (playtest 5).
 - **A segunda carta** — 11 folhas de **letra cerrada ilegível**; o livro não a
   transcreve. As notas de Wilmarth (outra tinta) dizem o que havia: as transcrições
   do que se ouvia na mata, as formas rosadas, a narrativa cósmica, a lista de nomes
@@ -200,7 +200,7 @@ Noite sem sonho: fecha o caderno, levanta; tela preta, cartão *"Fim de maio."*,
 
 **O que fazer:** ler a carta; olhar as fotos; **"Deixar sem resposta"** os opositores
 (só depois de ler a 2ª carta) → rascunho e cartas somem, e o narrador: *"o meu
-debate público sobre o horror de Vermont terminou para sempre."*; responder (28 de maio):
+debate público sobre o horror de Vermont terminou para sempre."*; tiradas as fotos, responder (28 de maio):
 | Tom | Abertura |
 |---|---|
 | cético | "Uma fotografia verdadeira de uma marca na lama prova a marca, não o bicho." |

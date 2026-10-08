@@ -395,6 +395,73 @@ O que pediu, o porquê, e o que foi feito. Commits: `9410cbd` (1), `d79096b` (3,
     vidro); a disposição (item 7); a cidade à noite um pouco mais clara.
 14. ⏳ Por validar no playtest 5: tudo acima, e do Dia 5 ao fim da demo.
 
+## Fase 3f — Ajustes do playtest 5 (2026-10-08)
+O usuário jogou até a noite 3 (o sonho do disco): ao acordar, Wilmarth travou diante
+da poltrona e nada mais se fazia. Gostou da cena do mi-go (*"caramba! o mi-go lá"*) e
+do sonho do bosque. Pediu, antes de tudo, um jeito de pular dias em caso de bug e um
+arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera resposta.
+
+1. ✅ **Pular dia (depuração)**: **F8** dá o dia por feito (correio aberto com tudo
+   tirado, resposta escrita, dia anotado; no Dia 3 o fonógrafo montado e tocado) e
+   abre o escritório na manhã seguinte; no Prólogo, vai ao Dia 1; não passa do Dia 6.
+   **F9** recarrega o escritório no mesmo dia (destrava sem pular). Em
+   `autoload/depuracao.gd`, some no jogo exportado.
+2. ✅ **`COMANDOS.md` e `comandos.ps1`** (raiz): jogar, editor, teste, importar,
+   geradores, captura, ver/guardar/trocar saves, log, git; as teclas do jogo e as de
+   depuração.
+3. ✅ **Bug: travava diante da poltrona ao acordar** (noite 3; a 5 também). Causa:
+   ele sentava no centro da colisão da poltrona; ao levantar, a física o prendia
+   dentro dela. E acordava na altura do chão do sonho (o bosque), não da sala. Feito:
+   ao levantar, ele dá um passo à frente até um lugar livre (consulta de forma com a
+   cápsula dele: `_saida_do_assento`); acorda na altura do marcador.
+4. ✅ **Ele atravessava a poltrona para sentar** (vindo do fonógrafo, por trás dela).
+   Agora chega pela frente, contornando pelo canto mais perto (`_caminho_ao_assento`),
+   e só então desliza para o assento.
+5. ✅ **Dia 2: dava para escrever a carta com as fotos ainda no envelope.** "Escrever
+   a Akeley" só aparece depois de tiradas as nove (`correio_dia_2_tiradas`).
+6. ❓ **A calha: "a tela deve ficar solta ao colocarmos a carta no correio, talvez,
+   duas ações?"** Proposta: duas ações — "Abrir a porta" (cena curta) e o corredor é
+   dele; anda até a calha e "Pôr a carta na calha"; volta e fecha (ou ela fica aberta
+   até ele sair). Como já é a ida para casa.
+7. 🔧 **A xícara transparente, com o café** dentro (vidro? — a xícara de porcelana
+   não é transparente; um copo de vidro com café, ou a xícara sem tampa com o café à
+   vista). A confirmar no item.
+8. 🔧 **O diário**: o modelo mais agradável (capa de couro com cantos, lombada com
+   nervuras, fita marcadora, páginas com bordas); a abertura com sentido — a capa abre,
+   as folhas correm até a fita (a página do dia), e não uma página só caindo no meio;
+   fechar ao contrário.
+9. 🔧 **Ao clicar na porta, ele dá um girinho** em algumas situações (o `olhar_para`
+   do `conduzir` toma o caminho longo do ângulo ou parte de um desvio do mouse).
+10. ❓ **Voltar ao prédio de manhã**: começar o dia no corredor (o alto da escada) e
+    abrir a porta para entrar no escritório? Proposta: sim — o correio aparece no chão
+    quando a porta abre. Custa uma ação por dia.
+11. 🔧 **A escada não leva a lugar nenhum**: o vão da escada com patamar, a volta do
+    corrimão, o andar de baixo sumindo na penumbra (luz fraca lá embaixo).
+12. ❓ **Caligrafia copperplate em toda a letra de mão.** Fonte livre (OFL), p. ex.
+    *Pinyon Script*. Cuidado: copperplate é difícil de ler em carta longa — testar no
+    leitor; talvez a de Akeley (que o livro chama de "apertada, arcaica") ser outra mão.
+13. ❓ **Selos de cera**: em 1928, carta comum nos EUA era fechada pela goma do
+    envelope e franqueada com selo postal (2 centavos). Lacre já soava antiquado ou
+    cerimonial. Proposta: não usar lacre; manter goma + selo postal.
+14. 🔧 **O sonho da noite 2: as pegadas pouco visíveis**; mais sinistro (mais marcas,
+    frescas, úmidas, em volta do círculo e chegando perto dele; talvez se formando).
+15. ❓ **Pôr as coisas na mesa à mão, em vez de teletransportar** (abrir o pacote e
+    tirar as coisas). Ver a recomendação na conversa: o objeto viaja da mão até o lugar
+    dele na mesa (sem lugar livre), e o pacote do Dia 3 se esvazia peça por peça como
+    o envelope das fotos.
+16. 🔧 **O fonógrafo**: modelo muito melhor (um fonógrafo de cilindro comercial: caixa
+    de carvalho, mecanismo à vista, a corneta grande no braço) e um lugar digno (não no
+    armário do canto).
+17. 🔧 **Já montado**: o livro diz que Wilmarth pediu emprestada uma máquina comercial
+    à administração da universidade — chega pronta; só falta o cilindro. Sai o caixote
+    de peças (e com ele a porta entrando na caixa).
+18. 🔧 **O mi-go mais visível**: mais perto, maior na janela.
+19. ❓ **O sonho do disco: mais estranheza, um efeito de loucura.** Ideias: o escritório
+    aparecendo em pedaços no bosque; a voz vindo de trás dele e não do fonógrafo; os
+    vultos que viram a cabeça quando não olhados; as árvores respirando; a lanterna de
+    Akeley andando sozinha; visão dupla nas vozes zumbidas.
+20. ⏳ Por jogar: do Dia 3 de manhã (o save dele) ao fim da demo.
+
 ## Onde estamos (revisão de 2026-10-08, depois da 3e)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d e a
 **3e** (itens 1 e 3–13; o 2 não reproduzido). Teste de fumaça com 0 falhas. Nenhum
@@ -433,8 +500,9 @@ Fase 4 antes dela.
 1. ✅ **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
 2b. ✅ Playtest 4 (até o começo do Dia 5) → **Fase 3e** (acima).
-2c. **← AQUI.** O usuário joga o **playtest 5** (a checklist em "Onde estamos"); a
-   lista dele vira a **Fase 3f**.
+2c. ✅ O usuário jogou o **playtest 5** (até a noite 3); a lista virou a **Fase 3f**.
+2d. **← AQUI.** Fase 3f: feitos os itens 1–5; esperando as respostas dos ❓ (6, 10,
+   12, 13, 15, 19); os 🔧 podem começar (7, 8, 9, 11, 14, 16, 17, 18).
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

@@ -1629,11 +1629,12 @@ func _folha(parent: Node, nome: String, pos: Vector3, rot_y: float, doc: String,
 	return ler
 
 
-func _escrever(parent: Node, resposta: String, carta_lida: StringName) -> void:
+func _escrever(parent: Node, resposta: String, carta_lida: StringName) -> WriteReply:
 	var escrever := _area(parent, WriteReply.new(), "Escrever", Vector3(0.36, 0.2, 0.36), Vector3(0.33, 0.85, -2.22)) as WriteReply
 	escrever.prompt = "Escrever a Akeley"
 	escrever.reply = load("res://narrative/replies/%s.tres" % resposta)
 	escrever.condition = _cond_valor(carta_lida, ValueCondition.Op.MAIOR_OU_IGUAL, 1)
+	return escrever
 
 
 ## Luz de um dia: vista da janela, sol entrando e preenchimento.
@@ -2420,7 +2421,11 @@ func _dia_2(parent: Node, fotos: Array[Node3D]) -> void:
 	}, "Envelope gordo de Townshend",
 		"A mesma letra apertada. Dois selos — a carta pesa. Carimbo de Townshend, 22 de maio.")
 	c.retirar = fotos
-	_escrever(g, "resposta_dia_2", &"leu_carta_akeley_2")
+	# Só depois de tirar as fotografias do envelope (playtest 5: dava para responder
+	# com elas ainda dentro).
+	var escrever := _escrever(g, "resposta_dia_2", &"leu_carta_akeley_2")
+	escrever.condition = _composta(CompositeCondition.Mode.TODAS, [escrever.condition,
+		_cond_valor(&"correio_dia_2_tiradas", ValueCondition.Op.MAIOR_OU_IGUAL, fotos.size())])
 
 
 ## O debate nos jornais: o rascunho (Dias 1 e 2) e, no Dia 2, as cartas dos

@@ -480,13 +480,17 @@ func _on_lugar_sono(_by: Node, lugar: LugarSono) -> void:
 		await get_tree().create_timer(1.2).timeout
 		if not is_inside_tree():
 			return
+	# Pela frente da poltrona, contornando-a se ele vem por trás (playtest 5: ele a
+	# atravessava); dali, senta.
 	var assento := lugar.assento.global_position
 	assento.y = player.global_position.y
-	await player.conduzir([assento], lugar.olhar.global_position)
+	await player.conduzir(_caminho_ao_assento(lugar), lugar.olhar.global_position)
 	if not is_inside_tree():
 		return
 	player.seated = true
-	await player.olhar_para(lugar.olhar.global_position, 0.8).finished
+	var senta := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	senta.tween_property(player, ^"global_position", assento, 0.9)
+	await player.olhar_para(lugar.olhar.global_position, 0.9, assento).finished
 	if not is_inside_tree():
 		return
 	if lugar.fonografo and not lugar.fonografo.tocando():
@@ -503,7 +507,68 @@ func _on_lugar_sono(_by: Node, lugar: LugarSono) -> void:
 	await _sonhar(lugar.noite)
 	if not is_inside_tree():
 		return
+	await _levantar_do_assento(lugar)
+	if not is_inside_tree():
+		return
 	_hora_de_ir()
+
+
+## A frente do assento (o -Z do marcador) e o lado dele (+X), no chão.
+func _eixos_do_assento(lugar: LugarSono) -> Array[Vector3]:
+	var b := lugar.assento.global_basis
+	var frente := -b.z
+	frente.y = 0.0
+	var lado := b.x
+	lado.y = 0.0
+	return [frente.normalized(), lado.normalized()]
+
+
+## Os pontos por onde ele chega diante do assento: se vem por trás ou pelo lado
+## do móvel, contorna pelo canto da frente mais perto dele.
+func _caminho_ao_assento(lugar: LugarSono) -> Array:
+	var eixos := _eixos_do_assento(lugar)
+	var centro := lugar.assento.global_position
+	var de := player.global_position - centro
+	de.y = 0.0
+	var saida := _saida_do_assento(lugar)
+	if de.dot(eixos[0]) > 0.45:
+		return [saida]
+	var lado := signf(de.dot(eixos[1]))
+	if lado == 0.0:
+		lado = 1.0
+	var canto := centro + eixos[0] * 0.95 + eixos[1] * lado * 0.8
+	return [canto, saida]
+
+
+## Um lugar livre diante do assento, onde ele fica de pé ao levantar: sentado, o
+## corpo está dentro da colisão do móvel, e a física o prenderia ali (playtest 5:
+## travava na frente da poltrona ao acordar).
+func _saida_do_assento(lugar: LugarSono) -> Vector3:
+	var eixos := _eixos_do_assento(lugar)
+	# O marcador está no chão da sala (no pé do móvel).
+	var centro := lugar.assento.global_position
+	var forma := player.get_node(^"CollisionShape3D") as CollisionShape3D
+	var consulta := PhysicsShapeQueryParameters3D.new()
+	consulta.shape = forma.shape
+	consulta.collision_mask = 1
+	consulta.exclude = [player.get_rid()]
+	var espaco := get_world_3d().direct_space_state
+	for k: Vector2 in [Vector2(0.75, 0), Vector2(0.9, 0), Vector2(0.75, -0.45), Vector2(0.75, 0.45),
+			Vector2(1.1, 0), Vector2(1.0, -0.7), Vector2(1.0, 0.7), Vector2(1.3, 0)]:
+		var p := centro + eixos[0] * k.x + eixos[1] * k.y
+		consulta.transform = Transform3D(Basis.IDENTITY, p) * forma.transform
+		if espaco.intersect_shape(consulta, 1).is_empty():
+			return p
+	return centro + eixos[0] * 0.9
+
+
+## Levanta do assento (LugarSono) e dá o passo à frente, para fora do móvel.
+func _levantar_do_assento(lugar: LugarSono) -> void:
+	var saida := _saida_do_assento(lugar)
+	player.stand()
+	player.debrucado = 0.0
+	var olhar := saida + _eixos_do_assento(lugar)[0] * 2.0 + Vector3.UP * 1.5
+	await player.conduzir([saida], olhar, 0.7)
 
 
 ## Folhear o diário (Fase 3d): ele senta, o caderno abre no último par escrito;
@@ -733,9 +798,9 @@ func _acordar(noite: int) -> void:
 	var lugar := _lugar_sono(noite)
 	player.seated = true
 	if lugar:
-		var assento := lugar.assento.global_position
-		assento.y = player.global_position.y
-		player.global_position = assento
+		# A altura do marcador (o chão da sala), não a de onde o sonho o deixou:
+		# o chão do bosque não é o da sala.
+		player.global_position = lugar.assento.global_position
 		player.debrucado = 0.0
 		# A cabeça tombada para o peito.
 		player.olhar_para(lugar.olhar.global_position + Vector3.DOWN * 0.9, 0.01)
