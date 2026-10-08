@@ -153,7 +153,12 @@ func _physics_process(delta: float) -> void:
 	var k := 1.0 - exp(-acceleration * delta)
 	velocity.x = lerpf(velocity.x, wish.x, k)
 	velocity.z = lerpf(velocity.z, wish.z, k)
-	move_and_slide()
+	# Sentado (a cadeira, a poltrona), fica onde a cena o pôs: a física o
+	# empurraria para fora da colisão do móvel.
+	if seated:
+		velocity = Vector3.ZERO
+	else:
+		move_and_slide()
 
 	_update_head(delta, crouching)
 	_update_target()

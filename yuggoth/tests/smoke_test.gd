@@ -334,10 +334,11 @@ func _ready() -> void:
 	var anotar: Interactable = esc.diario.get_node("Anotar")
 	_check(anotar.can_interact(player) and anotar.is_visible_in_tree(), "o caderno na mesa: \"Anotar o dia\"")
 	await _anotar(esc)
-	await _until(func() -> bool: return esc.diario.aberto, 20.0)
+	await _until(func() -> bool: return esc.diario.aberto, 45.0)
 	_check(esc.diario.aberto and player.seated, "Wilmarth senta e o diário abre diante dele")
 	var entrada1: DocumentData = esc.diario_entradas[1]
 	_check(entrada1 in GameState.dossier, "a entrada do dia vai para o dossiê")
+	_check(esc.bebida.xicara.get_node("Nivel").visible, "antes de anotar o dia, o café na xícara")
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 2 and not SceneDirector.hold_black and not esc._saindo, 60.0)
 	_check(GameState.get_value(&"dia") == 2, "anotado o dia (sem sonho), ir para casa avança para o Dia 2")
 	_check(not esc.diario.aberto and not player.seated and esc.diario.transform.is_equal_approx(esc.diario._casa), "o caderno de volta ao lugar, fechado")
@@ -572,6 +573,8 @@ func _ready() -> void:
 	await _sonho_no_teste(esc, 4, func() -> void: esc.find_child("Noite4", true, false).get_node("Pedra/Examinar").interact(esc.player))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 5 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 5 and not tel.can_interact(player), "Dia 5: o telefone volta a ficar mudo")
+	_check(GameState.has_flag(&"frasco_na_mesa") and esc.bebida.copo.visible and esc.bebida.frasco.get_parent() != esc.bebida.gaveta,
+		"o uísque da noite do Dia 4: o frasco saiu da gaveta e ficou na mesa")
 
 	# --- Escritório: Dia 5, o telegrama "AKELY" (livro cap. IV) ---
 	var dia5: Node3D = esc.find_child("Dia5", true, false)
@@ -828,15 +831,25 @@ func _inalcancaveis(esc: Node3D, limites := Vector2(2.3, 2.8)) -> PackedStringAr
 func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 	_check(GameState.get_value(&"dia") == n and GameState.get_value(&"diario") == n, "Dia %d: postada a resposta, falta o diário" % n)
 	await _anotar(esc)
-	# Adormece à mesa: a sala vira o sonho em volta dele, sem tela preta.
+	# Noites 3 e 5: a entrada termina inteira, e o sono vem noutro lugar (LugarSono).
+	var lugar := esc._lugar_sono(n)
+	if lugar:
+		await _until(func() -> bool: return GameState.get_value(&"sono", 0) == n and esc.player.input_enabled, 60.0)
+		_check(not esc.diario.aberto and esc.diario._mancha.raio == 0.0 and lugar.can_interact(esc.player) and not esc.player.seated,
+			"a noite do Dia %d continua: a entrada inteira, e \"%s\"" % [n, lugar.prompt])
+		lugar.interact(esc.player)
+	# Adormece (à mesa ou no lugar): a sala vira o sonho em volta dele, sem tela preta.
 	var escuro := 0.0
 	var t := 0.0
 	while t < 90.0 and not (GameState.get_value(&"sonhando") == n and esc.player.input_enabled):
 		escuro = maxf(escuro, SceneDirector._fade.modulate.a)
 		await get_tree().process_frame
 		t += get_process_delta_time()
-	_check(escuro < 0.5 and not SceneDirector.hold_black and esc.player.seated, "a noite do Dia %d: adormece à mesa, sem tela preta" % n)
-	_check(esc.diario.aberto and esc.diario._mancha.raio > 0.0, "a última linha falhou: a tinta escorre no diário")
+	_check(escuro < 0.5 and not SceneDirector.hold_black and esc.player.seated, "a noite do Dia %d: adormece, sem tela preta" % n)
+	if lugar:
+		_check(esc.player.global_position.distance_to(lugar.assento.global_position) < 0.3, "adormece ali, sentado")
+	else:
+		_check(esc.diario.aberto and esc.diario._mancha.raio > 0.0, "a última linha falhou: a tinta escorre no diário")
 	var grupo: Node3D = esc.find_child("Noite%d" % n, true, false)
 	_check(GameState.get_value(&"sonhando") == n and is_equal_approx(GameState.get_number(&"sonho"), 1.0) and grupo.visible
 		and not esc.find_child("Dias", true, false).visible and esc.player.input_enabled, "a noite do Dia %d: o sonho" % n)
@@ -849,8 +862,9 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 		viewer.close()
 	await _until(func() -> bool: return GameState.get_value(&"sonhando") == 0 and not SceneDirector.hold_black, 60.0)
 	_check(GameState.get_value(&"sonhando") == 0 and is_zero_approx(GameState.get_number(&"sonho")), "acordar do sonho da noite %d" % n)
-	_check(GameState.get_value(&"dia") == n and esc.player.seated and esc.diario.aberto and esc.find_child("Dias", true, false).visible
-		and esc.lapso.sol.light_energy > 0.0, "de manhã, debruçado no diário aberto, a aurora na janela")
+	var onde := esc.player.global_position.distance_to(lugar.assento.global_position) < 0.3 if lugar else esc.diario.aberto
+	_check(GameState.get_value(&"dia") == n and esc.player.seated and onde and esc.find_child("Dias", true, false).visible
+		and esc.lapso.sol.light_energy > 0.0, "de manhã, %s, a aurora na janela" % ("onde o sono o pegou" if lugar else "debruçado no diário aberto"))
 
 
 ## Postada a resposta do dia: "Anotar o dia" no caderno, como o jogador.

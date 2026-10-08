@@ -18,6 +18,8 @@ const SONHO_SUBIDA := 2.5
 const SONHO_DESCIDA := 4.0
 ## Onde a folha escrita deita para ser selada: no mata-borrão, o envelope à frente.
 const SELAGEM_POS := Vector3(0.05, 0.784, -2.2)
+const BEBIDA_CAFE := 1
+const BEBIDA_UISQUE := 2
 
 @export var env_1930: Environment
 @export var env_dia: Environment
@@ -47,6 +49,8 @@ const SELAGEM_POS := Vector3(0.05, 0.784, -2.2)
 @export var sonhos: Dictionary[int, StringName] = {}
 @export var env_sonho: Environment
 @export var som_sonho: AudioStream
+## O que ele se serve antes de anotar o dia (dia → BEBIDA_CAFE ou BEBIDA_UISQUE).
+@export var bebidas: Dictionary[int, int] = {}
 ## Segundos até acordar sozinho, se o jogador não fizer nada.
 @export var duracao_sonho := 90.0
 @export_group("")
@@ -103,6 +107,7 @@ var _ambientes: Dictionary[Environment, float] = {}
 @onready var player: Player = $Player
 @onready var diario: Diario = %Diario
 @onready var calha: CalhaCorreio = %Calha
+@onready var bebida: Bebida = %Bebida
 
 
 func _ready() -> void:
@@ -113,6 +118,8 @@ func _ready() -> void:
 	porta.interacted.connect(_on_porta)
 	diario.get_node(^"Anotar").interacted.connect(_on_anotar)
 	diario.get_node(^"Ler").interacted.connect(_on_ler_diario)
+	for l: LugarSono in find_children("*", "LugarSono", true, false):
+		l.interacted.connect(_on_lugar_sono.bind(l))
 	Events.reply_written.connect(_on_reply_written)
 	Events.document_closed.connect(_on_document_closed)
 	# Depois do disco, o zumbido nunca mais vai embora (vale também em 1930).
@@ -306,6 +313,12 @@ func _on_porta(_by: Node) -> void:
 		if not _respondeu(dia()):
 			Events.notice_requested.emit("Ainda devo uma resposta ao Sr. Akeley.")
 			return
+		var lugar := _lugar_sono(dia())
+		if GameState.has_flag(StringName("anotou_dia_%d" % dia())):
+			# Anotado o dia, a noite continua noutro lugar (LugarSono).
+			if lugar and lugar.linha:
+				Narrator.say(lugar.linha)
+			return
 		# Postada (ou perdida num load, com a mão vazia): falta o diário.
 		GameState.set_value(&"diario", dia())
 		Events.notice_requested.emit("Antes de ir, anotar o dia no diário.")
@@ -360,19 +373,35 @@ func _para_o_interludio() -> void:
 ## caderno, levanta, e o dia acaba. Noite de sonho: a última linha falha, ele
 ## adormece à mesa e a sala vira o sonho, sem tela preta; acorda de manhã
 ## debruçado no diário. O jogador nunca sabe de antemão qual das duas será.
+## Antes de escrever, ele se serve (Fase 3d, `bebidas`: café ou uísque). E nem
+## toda noite de sonho é no diário: com um LugarSono para a noite, a entrada
+## termina inteira, ele se levanta, e o sono vem lá (ouvindo o disco, diante do
+## fogo; _on_lugar_sono).
 func _on_anotar(_by: Node) -> void:
 	if _saindo or _saltando or em_lapso or selando:
 		return
 	_saindo = true
 	var n := dia()
 	GameState.set_value(&"diario", 0)
+	GameState.set_flag(StringName("anotou_dia_%d" % n))
 	# Falas que sobraram do dia não atravessam a noite.
 	Narrator.cancel()
 	player.input_enabled = false
 	var entrada := _entrada(n)
 	if entrada:
 		GameState.add_document(entrada)
-	var sonha := sonhos.has(n)
+	var lugar := _lugar_sono(n)
+	var sonha := sonhos.has(n) and lugar == null
+	if bebidas.has(n):
+		await _sentar_a_mesa()
+		if not is_inside_tree():
+			return
+		if bebidas[n] == BEBIDA_UISQUE:
+			await bebida.uisque(player)
+		else:
+			await bebida.cafe(player)
+		if not is_inside_tree():
+			return
 	await diario.anotar(entrada, _entrada(n - 1), player, sonha)
 	if not is_inside_tree():
 		return
@@ -383,7 +412,61 @@ func _on_anotar(_by: Node) -> void:
 		if not is_inside_tree():
 			return
 		player.stand()
+		if lugar:
+			# A noite ainda não acabou: o que ele quer fazer antes de ir.
+			GameState.set_value(&"sono", n)
+			if lugar.linha:
+				Narrator.say(lugar.linha)
+			_saindo = false
+			player.input_enabled = not Events.is_modal_open
+			return
 		await get_tree().create_timer(0.8).timeout
+	if not is_inside_tree():
+		return
+	_fim_do_dia()
+
+
+## Senta na cadeira da escrivaninha (onde o diário abre) e olha o tampo.
+func _sentar_a_mesa() -> void:
+	var sentar := diario.cadeira(player)
+	var t := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(player, ^"global_position", sentar, 1.2)
+	player.seated = true
+	await player.olhar_para(diario.pagina() + Vector3(0.25, 0, 0), 1.4, sentar).finished
+
+
+func _lugar_sono(noite: int) -> LugarSono:
+	for l: LugarSono in get_tree().get_nodes_in_group(&"lugar_sono"):
+		if l.noite == noite and is_ancestor_of(l):
+			return l
+	return null
+
+
+## A noite de sonho longe do diário (LugarSono): ele vai até lá, senta, faz o
+## que o lugar pede (o disco toca, um gole), e o sono vem como à mesa.
+func _on_lugar_sono(_by: Node, lugar: LugarSono) -> void:
+	if _saindo or _saltando or em_lapso or selando or postando:
+		return
+	_saindo = true
+	player.input_enabled = false
+	Narrator.cancel()
+	GameState.set_value(&"sono", 0)
+	var assento := lugar.assento.global_position
+	assento.y = player.global_position.y
+	var t := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(player, ^"global_position", assento, 1.6)
+	player.seated = true
+	await player.olhar_para(lugar.olhar.global_position, 1.8, assento).finished
+	if not is_inside_tree():
+		return
+	if lugar.fonografo and not lugar.fonografo.tocando():
+		lugar.fonografo.tocar()
+	if lugar.copo:
+		await bebida.gole(player, lugar.copo)
+		if not is_inside_tree():
+			return
+		await player.olhar_para(lugar.olhar.global_position, 1.0).finished
+	await _sonhar(lugar.noite)
 	if not is_inside_tree():
 		return
 	_fim_do_dia()
@@ -422,6 +505,7 @@ func _fim_do_dia() -> void:
 	player.stand()
 	player.debrucado = 0.0
 	player.fov_forcado = 0.0
+	GameState.set_value(&"sono", 0)
 	GameState.add(&"dia", 1)
 	GameState.set_value(&"data", _data_inicio())
 	_vestir(false)
@@ -465,7 +549,7 @@ func _sonhar(noite: int) -> void:
 		return
 	SceneDirector.hold_black = true
 	Narrator.cancel()
-	await _acordar()
+	await _acordar(noite)
 
 
 ## A última linha falhou (Diario.anotar): o sono pesa à mesa. As pálpebras caem
@@ -504,7 +588,8 @@ func _adormecer(noite: int) -> void:
 	if not is_inside_tree():
 		return
 
-	# A troca, no quase escuro.
+	# A troca, no quase escuro. O disco que embalou o sono para (a noite do disco).
+	get_tree().call_group(&"fonografo", &"parar")
 	GameState.set_value(&"sonhando", noite)
 	env.ambient_light_energy = ambiente
 	_ambientes.erase(env)
@@ -531,18 +616,30 @@ func _adormecer(noite: int) -> void:
 
 
 ## De manhã, debruçado na mesa (no escuro do fim do sonho): a sala do dia, o
-## diário aberto com a linha borrada, a aurora pela janela. Os olhos abrem, ele
-## se ergue — e então o dia seguinte (_fim_do_dia).
-func _acordar() -> void:
+## diário aberto com a linha borrada, a aurora pela janela — ou largado onde o
+## sono o pegou (LugarSono). Os olhos abrem, ele se ergue — e então o dia
+## seguinte (_fim_do_dia).
+func _acordar(noite: int) -> void:
 	GameState.set_value(&"sonhando", 0)
 	GameState.set_value(&"sonho", 0.0)
 	world_env.environment = _ambiente_do_dia()
 	AudioDirector.play_ambience(_som_do_dia(), 2.0)
 	lapso.amanhecer()
-	player.global_position = diario.cadeira(player)
+	# O fogo da noite (se houve) se apagou enquanto ele dormia.
+	GameState.set_flag(StringName("lareira_dia_%d" % noite), false)
+	var lugar := _lugar_sono(noite)
 	player.seated = true
-	player.debrucado = 1.0
-	player.olhar_para(diario.pagina(), 0.01)
+	if lugar:
+		var assento := lugar.assento.global_position
+		assento.y = player.global_position.y
+		player.global_position = assento
+		player.debrucado = 0.0
+		# A cabeça tombada para o peito.
+		player.olhar_para(lugar.olhar.global_position + Vector3.DOWN * 0.9, 0.01)
+	else:
+		player.global_position = diario.cadeira(player)
+		player.debrucado = 1.0
+		player.olhar_para(diario.pagina(), 0.01)
 	# A cabeça desce sozinha (Player._update_head). Os olhos, fechados, abrem
 	# como fecharam ao adormecer, ao contrário: pesados, piscando, devagar.
 	var palpebras := Palpebras.new()
@@ -566,6 +663,8 @@ func _acordar() -> void:
 	var t := player.create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(player, ^"debrucado", 0.0, 2.5)
 	t.tween_property(player.head, ^"rotation:x", deg_to_rad(-12.0), 2.5)
+	if lugar:
+		player.olhar_para(lugar.olhar.global_position, 2.5)
 	await t.finished
 	if not is_inside_tree():
 		return

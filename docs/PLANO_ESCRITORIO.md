@@ -267,11 +267,20 @@ foi feito:
    existe com a porta aberta; a calha vai de piso a teto, frente de vidro com faixas
    de latão, plaqueta "LETTERS / U.S. MAIL"; a carta entra deitada pela borda curta e
    se vê descer atrás do vidro. Sons novos: `calha_correio`, `porta_trinco`.
-7. **Dormir escrevendo toda noite fica estranho** (4 noites de sonho seguidas).
+7. ✅ **Dormir escrevendo toda noite fica estranho** (4 noites de sonho seguidas).
    **Decidido: bebida + lugar varia.** Antes do diário, um gesto: café nos primeiros
    dias, uísque nos últimos (💭 Lei Seca: um frasco na gaveta, para os nervos); a
    xícara e o copo ficam na mesa (acumulam, Fase 5). E o sono vem em lugares
    diferentes: no diário, na poltrona diante da lareira, ouvindo o fonógrafo.
+   Feito: `Bebida` (café nos Dias 1–3, a garrafa serve pela boca; no Dia 4 a gaveta
+   de cima à direita abre e o frasco sai e fica na mesa, `frasco_na_mesa`) e
+   `LugarSono`: noite 2 no diário; **noite 3** a entrada termina ("Vou ouvi-lo mais
+   uma vez") e "Ouvir o disco outra vez" o senta na cadeira de leitura nova, virada
+   para o fonógrafo; noite 4 no diário (depois do uísque); **noite 5** "Sentar diante
+   do fogo" (com o fogo aceso) na poltrona, agora virada para a lareira, com o copo.
+   Acorda onde dormiu; o fogo, de manhã, apagado. Sentado, o Player não passa pela
+   física (a poltrona o empurraria). Sons novos: `servir`, `gaveta`. As entradas 3 e
+   5 do diário perderam a última linha caída (ver FIDELIDADE).
 8. **O escritório e a vista lá fora** parecem toscos perto das animações:
    **materiais e texturas, móveis e objetos, a vista da janela.** (A luz e a
    composição não incomodaram.) Uma passada de acabamento com capturas antes/depois.

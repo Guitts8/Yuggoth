@@ -21,8 +21,10 @@ carta na **calha de correio** de latão (frente de vidro, de andar em andar até
 caixa do saguão); ela escorrega pela fenda e se vê descer atrás do vidro; a porta
 fecha. As cartas no meio do dia (Dias 5 e 6) saltam no tempo até a volta do correio. Postada a resposta do dia, falta só **o diário** 💭 (Dias 1
 a 5): *"Faltava só anotar o dia no diário, como eu fazia ao fim de cada dia."* — o
-caderno vermelho à esquerda do mata-borrão, **"Anotar o dia"**. Wilmarth senta, o
-caderno vem para diante dele e abre (à esquerda, a entrada anterior), ele se debruça
+caderno vermelho à esquerda do mata-borrão, **"Anotar o dia"**. Wilmarth senta e
+**se serve** 💭 — café da garrafa térmica nos Dias 1 a 3; no Dia 4, o uísque do
+frasco escondido na gaveta (a Lei Seca), e dali em diante o frasco fica na mesa —,
+bebe um gole; o caderno vem para diante dele e abre (à esquerda, a entrada anterior), ele se debruça
 e a pena da mesa escreve a entrada do dia, ao som dela; a entrada vai para o
 dossiê. **Todo dia termina assim**, e o jogador nunca sabe se aquela noite terá
 sonho: sem sonho (Dia 1), ele fecha o caderno, levanta, e vem o cartão do dia
@@ -38,8 +40,13 @@ escrivaninha, **"Pôr na mesa"** → **"Abrir com a espátula"** (som de papel r
 → o conteúdo sai para a mesa; depois o envelope é examinável (carimbo, selos,
 letra). Pacotes que não passam na fresta ficam no chão junto à porta.
 
-**Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5, no diário: a última linha
-da entrada **falha** — a letra desce, torta e cada vez mais clara, a escrita fica
+**Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5. Nem sempre no diário: na
+noite do disco (3) a entrada termina inteira, *"Antes de ir, quis ouvir o disco mais
+uma vez."*, e ele adormece na **cadeira de leitura**, ouvindo-o ("Ouvir o disco outra
+vez"); na noite da chuva (5), com o fogo aceso, *"Não ia conseguir dormir tão cedo.
+Fiquei diante do fogo, com o copo."* — **na poltrona diante da lareira** ("Sentar
+diante do fogo"), um gole, e o sono; acorda ali, de manhã, o fogo apagado. Nas
+noites 2 e 4, no diário: a última linha da entrada **falha** — a letra desce, torta e cada vez mais clara, a escrita fica
 lenta e para no meio da palavra; a pena tomba na página e a tinta se espalha e
 escorre. As pálpebras pesam (fecham e abrem devagar), a lâmpada baixa, **o relógio
 parado volta a bater**; ele encosta na cadeira e, de olhos quase fechados, a sala

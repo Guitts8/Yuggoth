@@ -24,6 +24,12 @@ const LAMBRI := 0.9
 
 ## A folha da porta (feita em _estrutura; a calha a abre).
 var _folha_porta: Node3D
+## A gaveta da escrivaninha que guarda o frasco (feita em _escrivaninha; Bebida).
+var _gaveta_mesa: Node3D
+## Onde ele senta nas noites longe do diário (LugarSono): a cadeira de leitura e
+## a poltrona.
+var _assento_leitura: Marker3D
+var _assento_poltrona: Marker3D
 
 
 func _ready() -> void:
@@ -112,6 +118,10 @@ func _materiais() -> void:
 	_mat("madeira_escura", "madeira_escura", {world = 2.0})
 	_mat("madeira_clara", "madeira_clara", {world = 2.0})
 	_mat("porta", "porta", {})
+	_mat("esmalte_verde", "aco", {world = 6.0, cor = Color(0.24, 0.36, 0.27)})
+	_mat("porcelana", "papel", {world = 6.0, cor = Color(1.08, 1.06, 1.0)})
+	_mat("cafe", "papel", {world = 6.0, cor = Color(0.14, 0.08, 0.04)})
+	_mat("uisque", "papel", {world = 6.0, cor = Color(0.75, 0.42, 0.12)})
 	_mat("piso_corredor", "assoalho", {world = 0.8, cor = Color(0.62, 0.52, 0.44)})
 	_mat("parede_corredor", "reboco", {world = 1.0, cor = Color(0.8, 0.73, 0.6)})
 	_mat("vidro_fosco", "papel", {unlit = true, world = 3.0, cor = Color(0.75, 0.62, 0.42)})
@@ -373,7 +383,12 @@ func _mobilia() -> void:
 	_cadeira(mob)
 	_estante(mob)
 	_lareira(mob)
-	_poltrona(_group(mob, "Poltrona", Vector3(1.6, 0, 0.9), 90), "estofado")
+	# Virada para a lareira (a noite do Dia 5 é diante do fogo, LugarSono).
+	var poltrona := _group(mob, "Poltrona", POLTRONA_POS, POLTRONA_ROT)
+	_poltrona(poltrona, "estofado")
+	_assento_poltrona = Marker3D.new()
+	_assento_poltrona.name = "Assento"
+	_add(poltrona, _assento_poltrona)
 	_quad(mob, "Tapete", Vector2(2.4, 1.8), Vector3(0, 0.006, 0.3), Vector3(-90, 0, 0), "tapete")
 	_cabideiro(mob)
 
@@ -409,8 +424,18 @@ func _escrivaninha(parent: Node) -> void:
 		var lado := "O" if s < 0 else "L"
 		_box(g, "Gaveteiro" + lado, Vector3(0.42, 0.72, 0.74), Vector3(s * 0.57, 0.36, 0), "madeira_escura")
 		for k in 3:
+			if s > 0 and k == 0:
+				continue  # a gaveta de cima, à direita, abre (frente e puxador são dela)
 			_box(g, "Puxador%s%d" % [lado, k], Vector3(0.08, 0.02, 0.02), Vector3(s * 0.57, 0.6 - k * 0.22, 0.38), "latao")
 	_box(g, "Fundo", Vector3(0.72, 0.5, 0.03), Vector3(0, 0.47, -0.3), "madeira_escura")
+	# A gaveta de cima, à direita: guarda o frasco de uísque (Bebida, Fase 3d).
+	var gaveta := _group(g, "Gaveta", Vector3(0.57, 0.6, 0.0))
+	_gaveta_mesa = gaveta
+	_box(gaveta, "Frente", Vector3(0.38, 0.17, 0.02), Vector3(0, 0, 0.38), "madeira_escura")
+	_box(gaveta, "Puxador", Vector3(0.08, 0.02, 0.02), Vector3(0, 0, 0.4), "latao")
+	_box(gaveta, "Chao", Vector3(0.34, 0.01, 0.55), Vector3(0, -0.07, 0.09), "madeira_clara")
+	for lado in [-1, 1]:
+		_box(gaveta, "Lado%d" % (lado + 1), Vector3(0.01, 0.12, 0.55), Vector3(lado * 0.165, -0.02, 0.09), "madeira_clara")
 	_colisao(g, "Colisao", [[Vector3(1.6, 0.78, 0.8), Vector3(0, 0.39, 0)]])
 
 
@@ -635,6 +660,8 @@ func _miskatonic() -> void:
 	_box(espatula, "Cabo", Vector3(0.07, 0.01, 0.018), Vector3(0.07, 0.005, 0), "latao")
 	_abajur_peca(g)
 	_diario(g, pena)
+	_bebida(g)
+	_cadeira_leitura(g)
 
 	_arquivo(g)
 	_cesto(g)
@@ -747,6 +774,121 @@ func _corredor(g: Node3D) -> void:
 	calha.som_abrir = load(SFX_DIR + "porta_rangendo.wav")
 	calha.som_fechar = load(SFX_DIR + "porta_trinco.wav")
 	calha.som_calha = load(SFX_DIR + "calha_correio.wav")
+
+
+## O café e o uísque (Bebida, Fase 3d): a garrafa térmica e a xícara no pires,
+## à direita na mesa; o copo (só depois do primeiro uísque) e o frasco, que mora
+## na gaveta de cima à direita até o Dia 4. Antes de anotar o dia, `bebidas`.
+func _bebida(g: Node3D) -> void:
+	var b := Bebida.new()
+	b.name = "Bebida"
+	_add(g, b)
+	b.unique_name_in_owner = true
+	var garrafa := _group(b, "Garrafa", Vector3(0.75, MESA, -2.56))
+	_cyl(garrafa, "Corpo", 0.042, 0.045, 0.22, Vector3(0, 0.11, 0), "esmalte_verde", 10)
+	_cyl(garrafa, "Ombro", 0.03, 0.042, 0.03, Vector3(0, 0.235, 0), "aco", 10)
+	_cyl(garrafa, "Tampa", 0.044, 0.044, 0.065, Vector3(0, 0.282, 0), "aco", 10)
+	_marca(garrafa, "Boca", Vector3(0, 0.31, 0))
+	_cyl(b, "Pires", 0.062, 0.055, 0.008, Vector3(0.72, MESA + 0.004, -1.87), "porcelana", 12)
+	var xicara := _group(b, "Xicara", Vector3(0.72, MESA + 0.008, -1.87))
+	_cyl(xicara, "Copa", 0.043, 0.03, 0.055, Vector3(0, 0.0275, 0), "porcelana", 12)
+	var asa := _box(xicara, "Asa", Vector3(0.025, 0.03, 0.008), Vector3(0.05, 0.03, 0), "porcelana")
+	asa.rotation_degrees.z = 10
+	_nivel(xicara, 0.039, 0.042, 0.006, "cafe")
+	var copo := _group(b, "Copo", Vector3(0.6, MESA, -2.03))
+	_copo(copo)
+	# O frasco, deitado dentro da gaveta.
+	var frasco := _group(_gaveta_mesa, "Frasco", Vector3(0.0, -0.05, 0.16))
+	frasco.rotation_degrees.x = -90
+	_box(frasco, "Corpo", Vector3(0.09, 0.13, 0.024), Vector3(0, 0.065, 0), "aco")
+	_cyl(frasco, "Gargalo", 0.009, 0.009, 0.02, Vector3(0.02, 0.14, 0), "aco", 6)
+	_cyl(frasco, "Tampa", 0.012, 0.012, 0.014, Vector3(0.02, 0.155, 0), "latao", 6)
+	_marca(frasco, "Boca", Vector3(0.02, 0.16, 0))
+	b.garrafa = garrafa
+	b.xicara = xicara
+	b.copo = copo
+	b.frasco = frasco
+	b.gaveta = _gaveta_mesa
+	# No espaço da escrivaninha (o pai da gaveta): em pé, junto ao copo.
+	b.frasco_na_mesa = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(-25.0), 0)), Vector3(0.74, MESA, -0.1))
+	b.som_servir = load(SFX_DIR + "servir.wav")
+	b.som_gaveta = load(SFX_DIR + "gaveta.wav")
+	var bebidas: Dictionary[int, int] = {1: 1, 2: 1, 3: 1, 4: 2}
+	cena.set("bebidas", bebidas)
+
+
+## A noite do Dia 5: anotado o dia, com o fogo aceso, "Sentar diante do fogo" na
+## poltrona, com o copo de uísque no braço dela (LugarSono).
+func _sono_fogo(g: Node3D) -> void:
+	var fogo := _area(g, LugarSono.new(), "SentarFogo", Vector3(0.95, 1.05, 0.9), POLTRONA_POS + Vector3(0, 0.5, 0)) as LugarSono
+	fogo.rotation_degrees.y = POLTRONA_ROT
+	fogo.noite = 5
+	fogo.prompt = "Sentar diante do fogo"
+	fogo.condition = _composta(CompositeCondition.Mode.TODAS, [_cond_valor(&"sono", ValueCondition.Op.IGUAL, 5), _flag(&"lareira_dia_5")])
+	fogo.assento = _assento_poltrona
+	var olhar := Marker3D.new()
+	olhar.name = "OlharFogo"
+	olhar.position = Vector3(W - 0.25, 0.35, -0.6)
+	_add(g, olhar)
+	fogo.olhar = olhar
+	fogo.linha = load("res://narrative/narration/sono_fogo.tres")
+	# O copo servido, no braço da poltrona (ele o trouxe da mesa).
+	var braco := POLTRONA_POS + Vector3(0.38, 0.62, 0.05).rotated(Vector3.UP, deg_to_rad(POLTRONA_ROT))
+	var copo := _grupo_se(g, "CopoFogo", _flag(&"anotou_dia_5"))
+	copo.position = braco
+	_copo(copo)
+	var nivel := copo.get_node("Nivel") as Node3D
+	nivel.visible = true
+	nivel.scale.y = 0.45
+	fogo.copo = copo
+
+
+## Um copo baixo de vidro, de uísque, com o nível (escondido enquanto vazio).
+func _copo(copo: Node3D) -> void:
+	var vidro := _cyl(copo, "Vidro", 0.033, 0.03, 0.075, Vector3(0, 0.0375, 0), "porcelana", 10)
+	var mv := StandardMaterial3D.new()
+	mv.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mv.albedo_color = Color(0.75, 0.82, 0.8, 0.3)
+	mv.roughness = 0.1
+	vidro.material_override = mv
+	_cyl(copo, "FundoGrosso", 0.029, 0.029, 0.01, Vector3(0, 0.005, 0), "porcelana", 10).material_override = mv
+	_nivel(copo, 0.028, 0.06, 0.01, "uisque")
+
+
+## Um marcador vazio (a boca de uma garrafa: por onde se serve).
+func _marca(pai: Node3D, nome: String, pos: Vector3) -> Marker3D:
+	var m := Marker3D.new()
+	m.name = nome
+	m.position = pos
+	_add(pai, m)
+	return m
+
+
+## O líquido: um pivô no fundo que cresce para cima (Bebida escala o y).
+func _nivel(recipiente: Node3D, raio: float, altura: float, fundo: float, mat: String) -> void:
+	var nivel := _group(recipiente, "Nivel", Vector3(0, fundo, 0))
+	nivel.visible = false
+	_cyl(nivel, "Liquido", raio, raio * 0.92, altura, Vector3(0, altura / 2, 0), mat, 10)
+
+
+## A cadeira de leitura no canto sudoeste, virada para o armário onde fica o
+## fonógrafo: a noite do Dia 3 (LugarSono "Ouvir o disco outra vez") é aqui.
+func _cadeira_leitura(g: Node3D) -> void:
+	var c := _group(g, "CadeiraLeitura", LEITURA_POS, LEITURA_ROT)
+	_box(c, "Assento", Vector3(0.5, 0.06, 0.48), Vector3(0, 0.44, 0), "estofado")
+	_box(c, "Moldura", Vector3(0.52, 0.04, 0.5), Vector3(0, 0.4, 0), "madeira_escura")
+	for x in [-0.23, 0.23]:
+		for z in [-0.21, 0.21]:
+			_box(c, "Perna%d%d" % [signf(x), signf(z)], Vector3(0.045, 0.4, 0.045), Vector3(x, 0.2, z), "madeira_escura")
+		_box(c, "Braco%d" % signf(x), Vector3(0.05, 0.03, 0.46), Vector3(x, 0.66, 0.0), "madeira_escura")
+		_box(c, "Apoio%d" % signf(x), Vector3(0.035, 0.22, 0.035), Vector3(x, 0.54, -0.2), "madeira_escura")
+	_box(c, "Encosto", Vector3(0.5, 0.5, 0.05), Vector3(0, 0.74, 0.24), "estofado")
+	_box(c, "EncostoMoldura", Vector3(0.54, 0.04, 0.07), Vector3(0, 1.0, 0.24), "madeira_escura")
+	var assento := Marker3D.new()
+	assento.name = "Assento"
+	_add(c, assento)
+	_assento_leitura = assento
+	_colisao(c, "Colisao", [[Vector3(0.55, 0.9, 0.55), Vector3(0, 0.45, 0)]])
 
 
 ## O diário de Wilmarth (Diario): um caderno fechado à esquerda do mata-borrão.
@@ -979,6 +1121,12 @@ const PORTA_H := 2.1
 const CORREDOR := 1.4
 const CALHA_X := -0.92
 const CALHA_BOCA := 1.15
+## A poltrona (virada para a lareira) e a cadeira de leitura (virada para o
+## fonógrafo, no canto sudoeste): onde ele adormece nas noites 5 e 3.
+const POLTRONA_POS := Vector3(1.35, 0, 0.45)
+const POLTRONA_ROT := -50.0
+const LEITURA_POS := Vector3(-1.45, 0, 1.0)
+const LEITURA_ROT := 153.0
 
 
 ## Conteúdo que só existe num dia: um grupo com ConditionalNode (`dia == n`).
@@ -1168,7 +1316,7 @@ func _dia_6(parent: Node) -> void:
 			Vector3(0.2, MESA + 0.005, -2.0), 7, &"segunda", CHAO_B, Vector3(0.62, -2.2, 8), "SEP 3",
 			"A letra treme mais do que nunca. Carimbo de Brattleboro, 3 de setembro."],
 		["Terca", &"narrou_cartao_6_setembro", "carta_akeley_terca", "Ler a carta de terça-feira",
-			Vector3(-0.42, MESA + 0.007, -1.98), -9, &"terca", CHAO_C, Vector3(0.65, -1.93, -5), "SEP 4",
+			Vector3(-0.42, MESA + 0.007, -1.98), -9, &"terca", CHAO_C, Vector3(0.42, -2.0, -5), "SEP 4",
 			"O endereço é um rabisco que quase sai do envelope. Carimbo de Brattleboro, 4 de setembro."],
 		["Quarta", &"narrou_cartao_7_setembro", "carta_akeley_quarta", "Ler a carta de quarta-feira",
 			Vector3(0.02, MESA + 0.009, -1.9), 3, &"quarta", CHAO_A, Vector3(0.06, -2.48, 3), "SEP 5",
@@ -1199,6 +1347,7 @@ func _dia_5(parent: Node) -> void:
 	_chuva(g)
 	_abajur(g)
 	_lareira_noite(g, 5)
+	_sono_fogo(g)
 	var janela := _area(g, StateInteractable.new(), "OlharJanela", Vector3(1.6, 1.5, 0.2), Vector3(0, 1.65, -D)) as StateInteractable
 	janela.prompt = "Olhar"
 	janela.notice = "Só a chuva, escorrendo no vidro."
@@ -1784,6 +1933,22 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 			tremem.append(n)
 	f.tremer = tremem
 
+	# A noite do Dia 3: anotado o dia, ouvir o disco outra vez, da cadeira de
+	# leitura — e o sono vem com ele (LugarSono). A área é maior que a do
+	# fonógrafo (ganha a mira) e só existe nessa noite.
+	var ouvir := _area(g, LugarSono.new(), "OuvirDeNovo", Vector3(0.52, 0.48, 0.48), Vector3(0, 0.18, 0)) as LugarSono
+	ouvir.noite = 3
+	ouvir.prompt = "Ouvir o disco outra vez"
+	ouvir.condition = _cond_valor(&"sono", ValueCondition.Op.IGUAL, 3)
+	ouvir.assento = _assento_leitura
+	var olhar := Marker3D.new()
+	olhar.name = "OlharDisco"
+	olhar.position = Vector3(0.0, 0.3, -0.05)
+	_add(g, olhar)
+	ouvir.olhar = olhar
+	ouvir.linha = load("res://narrative/narration/sono_disco.tres")
+	ouvir.fonografo = f
+
 
 func _dia_1(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 1)
@@ -1825,7 +1990,7 @@ func _debate(parent: Node) -> void:
 	var partes: Array[Condition] = [_cond_valor(&"dia", ValueCondition.Op.MENOR_OU_IGUAL, 2), encerrado]
 	todas.conditions = partes
 	var g := _grupo_se(parent, "Debate", todas)
-	_folha(g, "Rascunho", Vector3(0.62, MESA + 0.002, -2.05), -20, "rascunho_editor", "Ler o rascunho", false)
+	_folha(g, "Rascunho", Vector3(0.52, MESA + 0.002, -2.12), -20, "rascunho_editor", "Ler o rascunho", false)
 
 	var op := _grupo_se(g, "Opositores", _cond_valor(&"dia", ValueCondition.Op.IGUAL, 2))
 	_folha(op, "CartaLeitor", Vector3(0.42, MESA + 0.002, -2.42), 14, "carta_opositor", "Ler a carta do leitor", false)

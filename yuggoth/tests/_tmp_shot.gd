@@ -15,6 +15,10 @@ func _ready() -> void:
 	add_child(root)
 	await _s(0.5)
 
+	if OS.get_environment("SHOT_SO") == "sono":
+		await _sono()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_SO") == "postar":
 		var e := await _escritorio(1)
 		e.player.global_position = Vector3(0.2, 0, -1.2)
@@ -72,7 +76,7 @@ func _ready() -> void:
 	esc = await _escritorio(2)
 	await SceneDirector.fade_out(0.0)
 	SceneDirector.hold_black = true
-	esc._acordar()
+	esc._acordar(2)
 	await _serie("acordar", [1.2, 2.6, 4.0, 5.6, 7.0, 9.5, 12.0])
 
 	await _boston()
@@ -95,6 +99,43 @@ func _boston() -> void:
 	b.player.head.rotation.x = deg_to_rad(8)
 	GameState.set_flag(&"bateu_boston")
 	await _serie("boston", [0.5, 4.5])
+
+
+func _sono() -> void:
+	# O café (Dia 1) e o uísque (Dia 4), antes do diário.
+	for n in [1, 4]:
+		GameState.reset()
+		var e := await _escritorio(n)
+		e.player.global_position = Vector3(0.3, 0, -1.2)
+		GameState.set_value(&"diario", n)
+		await _s(0.5)
+		e._on_anotar(null)
+		var tempos := [3.0, 3.6, 4.2, 4.8, 6.0, 7.0, 7.8] if n == 1 else [6.5, 7.2, 7.8, 8.4, 10.0, 11.0]
+		await _serie("beber_d%d" % n, tempos)
+	if OS.get_environment("SHOT_BEBER") == "1":
+		return
+	# As noites longe da mesa: o disco (3) e o fogo (5); e o acordar ali.
+	for n in [3, 5]:
+		GameState.reset()
+		for fl in [&"fono_corneta", &"fono_manivela", &"fono_agulha", &"fono_cilindro", &"tocou_disco", &"lareira_dia_5"]:
+			GameState.set_flag(fl)
+		var e := await _escritorio(n)
+		e.player.global_position = Vector3(0.3, 0, -1.2)
+		GameState.set_value(&"diario", n)
+		await _s(0.5)
+		e._on_anotar(null)
+		var t0 := Time.get_ticks_msec()
+		while GameState.get_value(&"sono", 0) != n and Time.get_ticks_msec() - t0 < 60000:
+			await get_tree().process_frame
+		await _s(1.0)
+		var lugar := e._lugar_sono(n)
+		e.player.look_at(lugar.global_position)
+		await _s(0.3)
+		_shot("%s_noite%d_area" % [tag, n])
+		e._on_lugar_sono(null, lugar)
+		await _serie("noite%d" % n, [1.0, 2.5, 4.5, 8.0, 14.0, 20.0])
+		GameState.set_flag(e.sonhos[n])
+		await _serie("acordar%d" % n, [6.0, 9.0, 12.0, 15.0, 18.0])
 
 
 func _escritorio(dia: int) -> Escritorio:

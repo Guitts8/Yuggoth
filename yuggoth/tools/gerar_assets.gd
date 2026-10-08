@@ -946,6 +946,9 @@ func _sons() -> void:
 	# A calha de correio no corredor (Fase 3d) e a porta do escritório fechando.
 	_wav(_calha(), "calha_correio", false)
 	_wav(_trinco(), "porta_trinco", false)
+	# O café e o uísque antes do diário (Fase 3d).
+	_wav(_servir(), "servir", false)
+	_wav(_gaveta(), "gaveta", false)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1450,6 +1453,40 @@ func _calha() -> PackedFloat32Array:
 	for i in b.size():
 		b[i] += desce[i] * 0.5
 	_lowpass(b, 5200.0)
+	return b
+
+
+## Líquido servido: o jorro (ruído filtrado que borbulha) enchendo devagar —
+## o tom sobe à medida que o recipiente enche.
+func _servir() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 63
+	var b := _buf(1.5)
+	var jorro := _buf(1.5)
+	for i in jorro.size():
+		var t := float(i) / jorro.size()
+		var env := minf(t * 12.0, 1.0) * minf((1.0 - t) * 8.0, 1.0)
+		jorro[i] = rng.randf_range(-1, 1) * env * (0.6 + 0.4 * absf(sin(t * 90.0)))
+	for k in 4:
+		var de := int(k * 0.35 * RATE)
+		_ressoar(jorro, b, de, mini(de + int(0.4 * RATE), b.size()), 420.0 + k * 160.0, 90.0, 1.4)
+	_lowpass(b, 3000.0)
+	return b
+
+
+## Uma gaveta de madeira correndo, e o baque no fim.
+func _gaveta() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 64
+	var b := _buf(0.7)
+	var fim := int(0.45 * RATE)
+	for i in fim:
+		var t := float(i) / fim
+		b[i] += rng.randf_range(-1, 1) * 0.25 * sin(PI * t) * (0.7 + 0.3 * sin(t * 60.0))
+	_lowpass(b, 700.0)
+	for j in int(0.2 * RATE):
+		b[fim + j] += (rng.randf_range(-1, 1) * 0.4 + sin(TAU * 110.0 * j / RATE) * 0.6) * exp(-j / 500.0)
+	_lowpass(b, 1500.0)
 	return b
 
 
