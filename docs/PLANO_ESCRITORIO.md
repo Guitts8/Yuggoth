@@ -228,15 +228,16 @@ linguagem da tinta, mas é mais leitura e não mostra o sono. **Escolhida: 2 + 3
 ### Pendências pequenas, anotadas no playtest 2
 - "Deixar sem resposta" (Dia 2) confundiu: o texto da ação pode virar algo como
   "Encerrar o debate nos jornais" (o usuário ainda não pediu a troca).
-- A cidade 3D, se aprovada, precisa das outras horas (dia, entardecer, chuva) e de
-  substituir o painel de vez; se não, sai.
+- ~~A cidade 3D, se aprovada, precisa das outras horas e de substituir o painel~~ —
+  resolvido na 3d (item 8): fica a 3D em todas as horas.
 
 ## Fase 3d — Ajustes do playtest 3 (2026-10-08)
 O usuário jogou o diário e a passagem para o sonho. Aprovou: a animação de
 selar ("ótima"), a do diário, a transição para o sonho (a letra que falha é de
 propósito). Mas: *"as animações estão tão boas e elegantes que o escritório e a
 parte externa estão parecendo feitas nas coxas"*. O que pediu, o porquê, e o que
-foi feito:
+foi feito. Commits: `30e90f6` (itens 1–5), `8385fa6` (6), `d2e98ce` (7), `6560d44` (8);
+`b0c89f1` é só a reimportação das texturas novas (quadro, diploma) como VRAM, igual às demais.
 
 1. ✅ **Selar** — um pouco mais rápido; a folha dobrada brigava com o envelope ao
    entrar (os modelos se cruzavam); a vista ficava para onde o mouse estava, e não
@@ -302,21 +303,41 @@ foi feito:
      uma paisagem a óleo sobre a lareira e dois diplomas na parede leste.
    Ainda por ver com o usuário: o que mais parece tosco depois desta passada.
 
-## Onde estamos (revisão de 2026-10-07)
-**Ok (feito e commitado):** fases 1, 2, 3, 3b e 3c inteiras, inclusive a passagem
-para o sonho (`55cf59e`). Teste de fumaça passando no último commit. Prólogo → fim
-da demo jogável de ponta a ponta, com arte e som provisórios.
+## Onde estamos (revisão de 2026-10-08)
+**Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho (`55cf59e`)
+e a **3d inteira** (playtest 3, `30e90f6`..`6560d44`, mais `b0c89f1`). Teste de fumaça
+com 0 falhas no `6560d44`. Prólogo → fim da demo jogável de ponta a ponta, com arte e
+som provisórios. Nada por commitar; nenhum push feito (nem pedido).
 
-**Esperando o usuário (decisões, não código):**
-- O playtest 3 (Prólogo ao fim da demo), com atenção ao diário: o ritmo da escrita
-  e do sono, se a letra se lê debruçado, se o acordar de manhã deixa claro que foi sonho.
+**Esperando o usuário — o playtest 4** (Prólogo ao fim do Dia 6; F acelera, C mostra o
+painel antigo). O que lhe foi pedido para olhar:
+1. Selar: o ritmo, a folha no envelope oco, a vista de frente, o envelope subindo sem
+   atravessar a mesa.
+2. A calha: porta → corredor → calha → porta fecha. Se o ritual cansa em 5–6 repetições.
+3. Diário: a vista escrevendo (debruçado, os olhos seguem a pena); "Ler o diário" e
+   folhear com A/D.
+4. Café (Dias 1–3) e uísque (Dia 4: a gaveta, o frasco fica na mesa).
+5. O sono: noite 3 "Ouvir o disco outra vez", noite 5 lareira + "Sentar diante do fogo";
+   os olhos abrindo como fecharam.
+6. Boston: o 7 abrindo com a porta.
+7. **O principal: o que ainda parece "feito nas coxas"** na sala e na janela, em cada
+   hora (dia, entardecer, noite, chuva) — decide se há uma segunda passada.
+
+**Decisões de texto pendentes (o usuário ainda não respondeu):**
 - Aprovar os **textos das 5 entradas do diário** (`diario_dia_1..5`, compostos com
-  frases do conto; ver FIDELIDADE).
-- **Painel × cidade 3D** (tecla C): se a 3D ficar, faltam as outras horas (dia,
-  entardecer, chuva) e tirar o painel; se não, o experimento sai.
+  frases do conto; ver FIDELIDADE) — as **3 e 5 mudaram** na 3d (terminam "Vou ouvi-lo
+  mais uma vez." e "Chove. Não vou para casa ainda."; a última linha não cai mais).
+- As falas novas `sono_disco` ("Antes de ir, quis ouvir o disco mais uma vez.") e
+  `sono_fogo` ("Não ia conseguir dormir tão cedo. Fiquei diante do fogo, com o copo.").
+- A calha, o café e o uísque são 💭 (invenção nossa), marcados na FIDELIDADE.
 - O **visual do sonho** (pendência antiga, de antes do v2): com a realidade mais rica,
   ver se o contraste já basta ou o que falta (cor, pós, movimento, geometria).
 - "Deixar sem resposta" (Dia 2): trocar o texto da ação ou não.
+
+**Como retomar numa sessão nova:** ler este arquivo (a 3d e esta seção), esperar a
+lista do playtest 4 e registrá-la aqui como **Fase 3e** (pedido, porquê, o que foi
+feito, commit), no mesmo formato da 3d. Não começar a Fase 4 nem uma segunda passada
+de acabamento sem essa lista.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
 (GDD §12): opções de acessibilidade (tremor, afim, FOV — ainda não há nenhuma em
@@ -327,10 +348,11 @@ da demo jogável de ponta a ponta, com arte e som provisórios.
 ## Próximos passos (em ordem)
 1. ✅ **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
-2b. O usuário olha a 3d: a calha, o café/uísque, as noites 3 e 5, e **o que ainda
-   parece tosco** depois da passada de acabamento (pode virar uma segunda passada).
-   Ainda abertos: aprovar as entradas do diário (as 3 e 5 mudaram), o visual do sonho
-   e "Deixar sem resposta".
+2b. **← AQUI.** O usuário joga o **playtest 4** (a checklist em "Onde estamos"): a
+   calha, o café/uísque, as noites 3 e 5, e **o que ainda parece tosco** depois da
+   passada de acabamento. A lista dele vira a **Fase 3e** (pode incluir uma segunda
+   passada de acabamento). Ainda abertos: aprovar as entradas do diário (as 3 e 5
+   mudaram) e as falas `sono_disco`/`sono_fogo`, o visual do sonho e "Deixar sem resposta".
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 
