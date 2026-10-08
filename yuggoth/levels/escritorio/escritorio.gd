@@ -111,6 +111,7 @@ func _ready() -> void:
 	SceneDirector.tempo = self
 	porta.interacted.connect(_on_porta)
 	diario.get_node(^"Anotar").interacted.connect(_on_anotar)
+	diario.get_node(^"Ler").interacted.connect(_on_ler_diario)
 	Events.reply_written.connect(_on_reply_written)
 	Events.document_closed.connect(_on_document_closed)
 	# Depois do disco, o zumbido nunca mais vai embora (vale também em 1930).
@@ -378,6 +379,22 @@ func _on_anotar(_by: Node) -> void:
 	_fim_do_dia()
 
 
+## Folhear o diário (Fase 3d): ele senta, o caderno abre no último par escrito;
+## fechado, volta ao lugar e ele se levanta.
+func _on_ler_diario(_by: Node) -> void:
+	if _saindo or _saltando or em_lapso or selando:
+		return
+	player.input_enabled = false
+	await diario.ler(player)
+	if not is_inside_tree():
+		return
+	await diario.fechar(player)
+	if not is_inside_tree():
+		return
+	player.stand()
+	player.input_enabled = not Events.is_modal_open
+
+
 func _entrada(n: int) -> DocumentData:
 	return diario_entradas[n] if n > 0 and n < diario_entradas.size() else null
 
@@ -515,18 +532,25 @@ func _acordar() -> void:
 	player.global_position = diario.cadeira(player)
 	player.seated = true
 	player.debrucado = 1.0
-	var p := diario.pagina()
-	player.rotation.y = atan2(-(p.x - player.global_position.x), -(p.z - player.global_position.z))
-	# A cabeça desce sozinha (Player._update_head); depois, os olhos no diário.
+	player.olhar_para(diario.pagina(), 0.01)
+	# A cabeça desce sozinha (Player._update_head). Os olhos, fechados, abrem
+	# como fecharam ao adormecer, ao contrário: pesados, piscando, devagar.
+	var palpebras := Palpebras.new()
+	palpebras.fechado = 1.0
+	add_child(palpebras)
 	await get_tree().create_timer(0.5).timeout
 	if not is_inside_tree():
 		return
-	var olho := player.camera.global_position
-	player.head.rotation.x = atan2(p.y - olho.y, Vector2(p.x - olho.x, p.z - olho.z).length())
-	await SceneDirector.release_black(3.0)
+	await SceneDirector.release_black(0.0)
+	await get_tree().create_timer(1.0).timeout
 	if not is_inside_tree():
 		return
-	await get_tree().create_timer(2.0).timeout
+	for k: Array in [[0.7, 2.0], [0.97, 1.3], [0.45, 2.0], [0.85, 1.4], [0.0, 2.6]]:
+		await palpebras.fechar(k[0], k[1])
+		if not is_inside_tree():
+			return
+	palpebras.queue_free()
+	await get_tree().create_timer(0.8).timeout
 	if not is_inside_tree():
 		return
 	var t := player.create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)

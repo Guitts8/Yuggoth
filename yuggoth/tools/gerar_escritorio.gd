@@ -667,6 +667,9 @@ func _diario(g: Node3D, pena: Node3D) -> void:
 	var anotar := _area(d, Interactable.new(), "Anotar", Vector3(Diario.LARGURA + 0.02, 0.06, Diario.FUNDO + 0.02), Vector3(Diario.LARGURA * 0.5, 0.03, 0)) as Interactable
 	anotar.prompt = "Anotar o dia"
 	anotar.condition = _cond_valor(&"diario", ValueCondition.Op.MAIOR_OU_IGUAL, 1)
+	# Fora da hora de anotar, o diário se lê e se folheia (o Diario alterna as duas).
+	var ler := _area(d, Interactable.new(), "Ler", Vector3(Diario.LARGURA + 0.02, 0.06, Diario.FUNDO + 0.02), Vector3(Diario.LARGURA * 0.5, 0.03, 0)) as Interactable
+	ler.prompt = "Ler o diário"
 
 
 ## Experimento (playtest 2): Arkham em 3D lá fora, no lugar do painel — telhados de

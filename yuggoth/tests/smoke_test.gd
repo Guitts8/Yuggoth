@@ -400,7 +400,7 @@ func _ready() -> void:
 	_check(GameState.get_value(&"crenca") == 2, "duas respostas crédulas: crença 2")
 	esc.porta.interact(player)
 	await _sonho_no_teste(esc, 2, func() -> void: esc.player.global_position = Vector3(-1.0, 0, 2.4))
-	await _until(func() -> bool: return GameState.get_value(&"dia") == 3 and not SceneDirector.hold_black and not esc._saindo, 20.0)
+	await _until(func() -> bool: return GameState.get_value(&"dia") == 3 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 3 and fotos.visible and not dia2.visible, "Dia 3: as fotografias ficam, a carta do Dia 2 não")
 
 	# --- Escritório: Dia 3, o disco (livro cap. III) ---
@@ -460,7 +460,7 @@ func _ready() -> void:
 	await _selar(esc, writer)
 	esc.porta.interact(player)
 	await _sonho_no_teste(esc, 3, func() -> void: esc.find_child("Noite3", true, false).get_node("Fonografo/Agulha").interact(esc.player))
-	await _until(func() -> bool: return GameState.get_value(&"dia") == 4 and not SceneDirector.hold_black and not esc._saindo, 20.0)
+	await _until(func() -> bool: return GameState.get_value(&"dia") == 4 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 4 and fono.is_visible_in_tree() and esc.find_child("Cilindro", true, false).visible, "Dia 4: a máquina fica montada, com o cilindro")
 
 	# --- Escritório: Dia 4, a pedra que não chega (livro cap. III) ---
@@ -567,7 +567,7 @@ func _ready() -> void:
 	await _selar(esc, writer)
 	esc.porta.interact(player)
 	await _sonho_no_teste(esc, 4, func() -> void: esc.find_child("Noite4", true, false).get_node("Pedra/Examinar").interact(esc.player))
-	await _until(func() -> bool: return GameState.get_value(&"dia") == 5 and not SceneDirector.hold_black and not esc._saindo, 30.0)
+	await _until(func() -> bool: return GameState.get_value(&"dia") == 5 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 5 and not tel.can_interact(player), "Dia 5: o telefone volta a ficar mudo")
 
 	# --- Escritório: Dia 5, o telegrama "AKELY" (livro cap. IV) ---
@@ -678,7 +678,7 @@ func _ready() -> void:
 	_check(GameState.get_value(&"resposta_dia_5") == 0 and GameState.get_number(&"crenca") == crenca_antes, "a resposta animadora (a do livro) não mexe na crença")
 	esc.porta.interact(player)
 	await _sonho_no_teste(esc, 5, func() -> void: esc.find_child("TelefoneSonho", true, false).interact(esc.player))
-	await _until(func() -> bool: return GameState.get_value(&"dia") == 6 and not SceneDirector.hold_black and not esc._saindo, 30.0)
+	await _until(func() -> bool: return GameState.get_value(&"dia") == 6 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 6 and not dia5.visible, "ir para casa leva a setembro")
 
 	# --- Escritório: Dia 6, as três últimas cartas e o fim da demo (livro cap. IV) ---

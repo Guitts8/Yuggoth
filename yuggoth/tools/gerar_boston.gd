@@ -157,18 +157,19 @@ func _porta_do_quarto() -> void:
 	_box(p, "BatenteN", Vector3(0.06, PORTA_H + 0.04, 0.06), Vector3(0.0, (PORTA_H + 0.04) / 2, -0.03), "madeira_clara")
 	_box(p, "BatenteS", Vector3(0.06, PORTA_H + 0.04, 0.06), Vector3(0.0, (PORTA_H + 0.04) / 2, larg + 0.03), "madeira_clara")
 	_box(p, "BatenteAlto", Vector3(0.06, 0.06, larg + 0.12), Vector3(0.0, PORTA_H + 0.03, larg / 2), "madeira_clara")
+	# A folha gira em torno da dobradiça (a origem do grupo): para dentro, +x.
+	var folha := _group(p, "Folha")
+	folha.unique_name_in_owner = true
+	# O número é da folha (abre junto com ela).
 	var numero := Label3D.new()
 	numero.name = "Numero"
 	numero.text = "7"
 	numero.font_size = 64
 	numero.pixel_size = 0.0012
 	numero.modulate = Color(0.75, 0.6, 0.3)
-	numero.position = Vector3(-0.045, 1.62, larg / 2)
+	numero.position = Vector3(-0.004, 1.62, larg / 2)
 	numero.rotation_degrees.y = -90
-	_add(p, numero)
-	# A folha gira em torno da dobradiça (a origem do grupo): para dentro, +x.
-	var folha := _group(p, "Folha")
-	folha.unique_name_in_owner = true
+	_add(folha, numero)
 	_box(folha, "Madeira", Vector3(0.045, PORTA_H, larg), Vector3(0.025, PORTA_H / 2, larg / 2), "madeira_escura")
 	_quad(folha, "Frente", Vector2(larg, PORTA_H), Vector3(-0.0005, PORTA_H / 2, larg / 2), Vector3(0, -90, 0), "porta")
 	_box(folha, "Macaneta", Vector3(0.06, 0.05, 0.05), Vector3(-0.03, 1.0, larg - 0.08), "latao")

@@ -6,6 +6,10 @@ signal footstep
 ## Saiu da cadeira (o jogador tentou andar sentado).
 signal stood_up
 
+## Debruçado de todo (`debrucado` = 1), quanto a cabeça desce e vai à frente.
+const DEBRUCAR_DESCE := 0.08
+const DEBRUCAR_AVANCA := 0.28
+
 @export_group("Movimento")
 @export var walk_speed := 1.9
 @export var crouch_speed := 0.9
@@ -92,6 +96,26 @@ func stand() -> void:
 		stood_up.emit()
 
 
+## Onde ficam os olhos com o corpo em `de` (global), sentado ou de pé e
+## debruçado o quanto `debrucado` diz, virado para `yaw`.
+func olhos_em(de: Vector3, yaw: float) -> Vector3:
+	var altura := (seated_eye_height - DEBRUCAR_DESCE * debrucado) if seated else eye_height
+	var frente := Vector3(-sin(yaw), 0.0, -cos(yaw)) * (DEBRUCAR_AVANCA * debrucado if seated else 0.0)
+	return de + Vector3(0.0, altura, 0.0) + frente
+
+
+## Vira o corpo e a cabeça, devagar, para `ponto` (global), como se visto de `de`
+## (onde o corpo vai estar quando o tween acabar; por padrão, onde está).
+func olhar_para(ponto: Vector3, segundos: float, de := global_position) -> Tween:
+	var yaw := atan2(-(ponto.x - de.x), -(ponto.z - de.z))
+	var olho := olhos_em(de, yaw)
+	var pitch := atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
+	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(self, ^"rotation:y", rotation.y + angle_difference(rotation.y, yaw), segundos)
+	t.tween_property(head, ^"rotation:x", clampf(pitch, deg_to_rad(-85.0), deg_to_rad(85.0)), segundos)
+	return t
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if not input_enabled:
 		return
@@ -146,9 +170,9 @@ func _look(delta: Vector2) -> void:
 func _update_head(delta: float, crouching: bool) -> void:
 	var target_height := crouch_eye_height if crouching else eye_height
 	if seated:
-		target_height = seated_eye_height - 0.2 * debrucado
+		target_height = seated_eye_height - DEBRUCAR_DESCE * debrucado
 	head.position.y = lerpf(head.position.y, target_height, 1.0 - exp(-10.0 * delta))
-	head.position.z = -0.3 * debrucado if seated else 0.0
+	head.position.z = -DEBRUCAR_AVANCA * debrucado if seated else 0.0
 	var zoom := input_enabled and Input.is_action_pressed(&"zoom_visao")
 	var fov := fov_forcado if fov_forcado > 0.0 else (zoom_fov if zoom else _fov_base)
 	camera.fov = lerpf(camera.fov, fov, 1.0 - exp(-8.0 * delta))

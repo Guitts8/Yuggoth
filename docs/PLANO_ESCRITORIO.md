@@ -231,6 +231,46 @@ linguagem da tinta, mas é mais leitura e não mostra o sono. **Escolhida: 2 + 3
 - A cidade 3D, se aprovada, precisa das outras horas (dia, entardecer, chuva) e de
   substituir o painel de vez; se não, sai.
 
+## Fase 3d — Ajustes do playtest 3 (2026-10-08)
+O usuário jogou o diário e a passagem para o sonho. Aprovou: a animação de
+selar ("ótima"), a do diário, a transição para o sonho (a letra que falha é de
+propósito). Mas: *"as animações estão tão boas e elegantes que o escritório e a
+parte externa estão parecendo feitas nas coxas"*. O que pediu, o porquê, e o que
+foi feito:
+
+1. ✅ **Selar** — um pouco mais rápido; a folha dobrada brigava com o envelope ao
+   entrar (os modelos se cruzavam); a vista ficava para onde o mouse estava, e não
+   de frente para a carta; e o envelope selado, subindo para a mão, atravessava a mesa.
+   Agora: 20% mais rápido (`Selagem.RITMO`); o envelope é oco enquanto a folha entra
+   (frente, costas com a boca recuada, bordas) e a aba aberta deita na mesa, sob a
+   folha; a vista é calculada **da cadeira** (`Player.olhar_para(ponto, s, de)`; antes
+   saía de onde ele estava de pé) e aperta na carta (FOV 50); ao subir para a mão, ele
+   ergue a cabeça e o envelope sobe do tampo antes de vir.
+2. ✅ **A vista no diário** — esquisita; e parada demais enquanto ele escreve (a
+   câmera deve acompanhar a escrita). Era o mesmo erro do selar (o ângulo vinha de
+   onde ele estava de pé), e os olhos baixos demais, a 17 cm da folha. Debruçado agora
+   desce 8 cm e avança 28 (`Player.DEBRUCAR_*`), FOV 38; escrevendo, os olhos seguem a
+   pena com atraso e a cabeça respira (`Diario._seguir_a_pena`).
+3. ✅ **O diário na mesa desde o começo**, e dá para **lê-lo e folheá-lo** ali. (Ele já
+   ficava na mesa todos os dias; só a área aparecia depois de postar.) "Ler o diário"
+   fora da hora de anotar: ele senta, o caderno abre no último par, [A] [D] (ou as
+   setas) viram a folha — uma folha 3D que gira na lombada, com o par antigo de um lado
+   e o novo do outro —, [E] fecha. A primeira página é a folha de rosto.
+4. ✅ **Ao acordar, o olho abre como fechou**, ao contrário (`Palpebras`, sem fade).
+5. ✅ **Boston**: o 7 da porta do quarto não acompanhava a porta (era da parede).
+6. **Quem posta a carta?** — postar antes do diário deixou um buraco: a carta sumia
+   da mão na porta e ele continuava na sala. **Decidido: a calha de correio** de
+   latão no corredor, junto à porta (os prédios dos anos 1920 tinham): ele abre a
+   porta, põe a carta na calha, ouve-a descer, volta à mesa e ao diário.
+7. **Dormir escrevendo toda noite fica estranho** (4 noites de sonho seguidas).
+   **Decidido: bebida + lugar varia.** Antes do diário, um gesto: café nos primeiros
+   dias, uísque nos últimos (💭 Lei Seca: um frasco na gaveta, para os nervos); a
+   xícara e o copo ficam na mesa (acumulam, Fase 5). E o sono vem em lugares
+   diferentes: no diário, na poltrona diante da lareira, ouvindo o fonógrafo.
+8. **O escritório e a vista lá fora** parecem toscos perto das animações:
+   **materiais e texturas, móveis e objetos, a vista da janela.** (A luz e a
+   composição não incomodaram.) Uma passada de acabamento com capturas antes/depois.
+
 ## Onde estamos (revisão de 2026-10-07)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b e 3c inteiras, inclusive a passagem
 para o sonho (`55cf59e`). Teste de fumaça passando no último commit. Prólogo → fim
