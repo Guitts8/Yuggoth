@@ -943,6 +943,9 @@ func _sons() -> void:
 	# Boston: bater à porta da pensão, a porta que abre uma fresta.
 	_wav(_batidas(), "batidas_porta", false)
 	_wav(_rangido(), "porta_rangendo", false)
+	# A calha de correio no corredor (Fase 3d) e a porta do escritório fechando.
+	_wav(_calha(), "calha_correio", false)
+	_wav(_trinco(), "porta_trinco", false)
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1426,6 +1429,41 @@ func _batidas() -> PackedFloat32Array:
 	_lowpass(b, 1800.0)
 	return b
 
+
+
+## A carta na calha de correio: a tampinha de latão da boca, e o papel que
+## escorrega tubo abaixo, cada vez mais longe e mais abafado.
+func _calha() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 61
+	var b := _buf(1.9)
+	var tinido := _buf(1.9)
+	for j in int(0.02 * RATE):
+		tinido[j] = rng.randf_range(-1, 1) * exp(-j / 60.0)
+	_ressoar(tinido, b, 0, int(0.5 * RATE), 2300.0, 40.0, 1.6)
+	_ressoar(tinido, b, 0, int(0.5 * RATE), 3650.0, 60.0, 0.9)
+	var desce := _buf(1.9)
+	_atrito(desce, int(0.12 * RATE), int(1.8 * RATE), func(t: float) -> float:
+		return 0.32 * exp(-t * 2.8) * (0.55 + 0.45 * absf(sin(t * 26.0))), rng)
+	# O tubo de metal dá corpo ao papel; e o longe abafa.
+	_ressoar(desce, b, 0, desce.size(), 900.0, 120.0, 2.2)
+	for i in b.size():
+		b[i] += desce[i] * 0.5
+	_lowpass(b, 5200.0)
+	return b
+
+
+## A porta fechando: o baque da folha no batente e o trinco.
+func _trinco() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 62
+	var b := _buf(0.6)
+	for i in int(0.4 * RATE):
+		b[i] += (rng.randf_range(-1, 1) * 0.5 + sin(TAU * 85.0 * i / RATE) * 0.9) * exp(-i / 700.0)
+	_lowpass(b, 900.0)
+	_clique(b, int(0.03 * RATE), 1800.0, 0.35, rng)
+	_clique(b, int(0.09 * RATE), 2400.0, 0.2, rng)
+	return b
 
 ## Uma porta velha abrindo devagar: um rangido que sobe e cai, com o trinco antes.
 func _rangido() -> PackedFloat32Array:

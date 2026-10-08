@@ -16,8 +16,10 @@ outra** quantas vezes quiser. Só selar decide. Selada, Wilmarth senta à mesa e
 devagar, a folha se dobra em três e entra no envelope (endereçado a Townshend; a
 partir de julho, à Posta-Restante de Brattleboro), a aba fecha, o selo é batido —
 e a carta vai **para a mão**. **A porta é o correio:**
-"Levar a carta ao correio". As cartas no meio do dia (Dias 5 e 6) saltam no tempo
-até a volta do correio. Postada a resposta do dia, falta só **o diário** 💭 (Dias 1
+"Pôr a carta no correio" — ele abre a porta e, do outro lado do corredor, põe a
+carta na **calha de correio** de latão (frente de vidro, de andar em andar até a
+caixa do saguão); ela escorrega pela fenda e se vê descer atrás do vidro; a porta
+fecha. As cartas no meio do dia (Dias 5 e 6) saltam no tempo até a volta do correio. Postada a resposta do dia, falta só **o diário** 💭 (Dias 1
 a 5): *"Faltava só anotar o dia no diário, como eu fazia ao fim de cada dia."* — o
 caderno vermelho à esquerda do mata-borrão, **"Anotar o dia"**. Wilmarth senta, o
 caderno vem para diante dele e abre (à esquerda, a entrada anterior), ele se debruça
@@ -25,7 +27,8 @@ e a pena da mesa escreve a entrada do dia, ao som dela; a entrada vai para o
 dossiê. **Todo dia termina assim**, e o jogador nunca sabe se aquela noite terá
 sonho: sem sonho (Dia 1), ele fecha o caderno, levanta, e vem o cartão do dia
 seguinte; com sonho, a última linha falha (ver *Os sonhos*). A porta, sem carta na
-mão, só lembra: *"Antes de ir, anotar o dia no diário."*
+mão, só lembra: *"Antes de ir, anotar o dia no diário."* Fora dessa hora, **"Ler o
+diário"**: o caderno abre no último par e se folheia, folha por folha.
 
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
@@ -146,7 +149,7 @@ escolher como começar:
 A carta se escreve sozinha (som de pena) e vai para o dossiê. Narrador: *"Selei o
 envelope. Vai amanhã cedo, com o primeiro correio."*
 
-**Fim do dia:** levar a carta à **porta** ("Levar a carta ao correio"). Antes da resposta: *"Ainda devo uma
+**Fim do dia:** levar a carta à **porta** ("Pôr a carta no correio", a calha no corredor). Antes da resposta: *"Ainda devo uma
 resposta ao Sr. Akeley."* Postada, **o diário**: *"9 de maio. Respondi a Akeley. Pelas
 regras comuns, eu deveria rir dessas extravagâncias; mas algo no tom da carta me faz
 levá-la a sério. Não pode ser como ele pensa. E, no entanto, merece investigação."*

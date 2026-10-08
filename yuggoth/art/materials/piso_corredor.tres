@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_htflh"]
+[ext_resource type="Texture2D" path="res://art/textures/assoalho.png" id="2_xxeyv"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_htflh")
+shader_parameter/albedo_tex = ExtResource("2_xxeyv")
+shader_parameter/albedo_color = Color(0.62, 0.52, 0.44, 1)
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = true
+shader_parameter/tiles_per_meter = 0.8
+shader_parameter/snap_scale = null
+shader_parameter/affine_near = null
+shader_parameter/affine_far = null
+shader_parameter/affine_max_error = null
+shader_parameter/alpha_cut = null
+shader_parameter/facetado = null

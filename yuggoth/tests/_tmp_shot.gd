@@ -15,6 +15,18 @@ func _ready() -> void:
 	add_child(root)
 	await _s(0.5)
 
+	if OS.get_environment("SHOT_SO") == "postar":
+		var e := await _escritorio(1)
+		e.player.global_position = Vector3(0.2, 0, -1.2)
+		e.player.look_at(Vector3(0.2, 0.0, -2.0))
+		var r: ReplyData = load("res://narrative/replies/resposta_dia_1.tres")
+		r.apply(r.options[0])
+		CartaSaida.criar(e.miskatonic, r)
+		await _s(0.5)
+		e._on_porta(null)
+		await _serie("postar", [3.6, 4.1, 4.5, 4.9])
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_SO") == "boston":
 		await _boston()
 		get_tree().quit()

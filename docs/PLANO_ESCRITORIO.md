@@ -258,10 +258,15 @@ foi feito:
    e o novo do outro —, [E] fecha. A primeira página é a folha de rosto.
 4. ✅ **Ao acordar, o olho abre como fechou**, ao contrário (`Palpebras`, sem fade).
 5. ✅ **Boston**: o 7 da porta do quarto não acompanhava a porta (era da parede).
-6. **Quem posta a carta?** — postar antes do diário deixou um buraco: a carta sumia
+6. ✅ **Quem posta a carta?** — postar antes do diário deixou um buraco: a carta sumia
    da mão na porta e ele continuava na sala. **Decidido: a calha de correio** de
    latão no corredor, junto à porta (os prédios dos anos 1920 tinham): ele abre a
    porta, põe a carta na calha, ouve-a descer, volta à mesa e ao diário.
+   Feito: `CalhaCorreio`; a parede sul ganhou o vão e a folha gira na dobradiça; o
+   corredor (piso, reboco, lambri, um globo no teto, a porta fosca de outra sala) só
+   existe com a porta aberta; a calha vai de piso a teto, frente de vidro com faixas
+   de latão, plaqueta "LETTERS / U.S. MAIL"; a carta entra deitada pela borda curta e
+   se vê descer atrás do vidro. Sons novos: `calha_correio`, `porta_trinco`.
 7. **Dormir escrevendo toda noite fica estranho** (4 noites de sonho seguidas).
    **Decidido: bebida + lugar varia.** Antes do diário, um gesto: café nos primeiros
    dias, uísque nos últimos (💭 Lei Seca: um frasco na gaveta, para os nervos); a

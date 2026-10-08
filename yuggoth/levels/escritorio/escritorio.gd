@@ -51,8 +51,6 @@ const SELAGEM_POS := Vector3(0.05, 0.784, -2.2)
 @export var duracao_sonho := 90.0
 @export_group("")
 @export var som_pena: AudioStream
-## A carta saindo pela porta, para o correio.
-@export var som_postar: AudioStream
 ## Dobrar a folha, o envelope; o selo batido (Selagem).
 @export var som_papel: AudioStream
 @export var som_selo: AudioStream
@@ -88,6 +86,8 @@ var _cartao_no_lapso := false
 var em_lapso := false
 ## Durante a Selagem (a carta sendo dobrada e selada na mesa).
 var selando := false
+## Pondo a carta na calha do corredor (CalhaCorreio).
+var postando := false
 var _energias: Dictionary[Light3D, float] = {}
 ## Environments (recursos compartilhados) escurecidos no meio do sono: voltam
 ## se a fase sair antes.
@@ -102,6 +102,7 @@ var _ambientes: Dictionary[Environment, float] = {}
 @onready var fonografo: Fonografo = %Fonografo
 @onready var player: Player = $Player
 @onready var diario: Diario = %Diario
+@onready var calha: CalhaCorreio = %Calha
 
 
 func _ready() -> void:
@@ -290,14 +291,15 @@ func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
 
 
 func _process(_delta: float) -> void:
-	porta.prompt = "Levar a carta ao correio" if CartaSaida.atual else "Ir para casa"
+	porta.prompt = "Pôr a carta no correio" if CartaSaida.atual else "Ir para casa"
 
 
-## A porta é o correio: com a carta na mão, posta. A resposta do dia deixa só o
-## diário por fazer (a do Dia 6 encerra a demo); as outras (Dias 5 e 6) saltam
-## no tempo até a volta do correio. Sem carta, o dia não acaba pela porta.
+## A porta é o correio: com a carta na mão, ele a abre e põe a carta na calha do
+## corredor (CalhaCorreio). A resposta do dia deixa só o diário por fazer (a do
+## Dia 6 encerra a demo); as outras (Dias 5 e 6) saltam no tempo até a volta do
+## correio. Sem carta, o dia não acaba pela porta.
 func _on_porta(_by: Node) -> void:
-	if _saindo or _saltando or em_lapso or selando:
+	if _saindo or _saltando or em_lapso or selando or postando:
 		return
 	var carta := CartaSaida.atual
 	if carta == null:
@@ -309,11 +311,19 @@ func _on_porta(_by: Node) -> void:
 		Events.notice_requested.emit("Antes de ir, anotar o dia no diário.")
 		return
 	var reply := carta.reply
+	# Ele abre a porta e põe a carta na calha de correio do corredor (Fase 3d).
+	postando = true
+	player.input_enabled = false
+	await calha.postar(carta, player)
+	if not is_inside_tree():
+		return
 	carta.postar()
-	AudioDirector.play_sfx(som_postar, -4.0)
+	postando = false
 	if reply.id == StringName("resposta_dia_%d" % dia_do_interludio):
 		_para_o_interludio()
-	elif reply.id == StringName("resposta_dia_%d" % dia()):
+		return
+	player.input_enabled = not Events.is_modal_open
+	if reply.id == StringName("resposta_dia_%d" % dia()):
 		GameState.set_value(&"diario", dia())
 		Narrator.say(linha_diario)
 	elif reply.cartao_depois:

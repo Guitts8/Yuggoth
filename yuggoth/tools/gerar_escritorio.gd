@@ -22,6 +22,9 @@ const JANELA_Y := Vector2(0.9, 2.4)
 ## Altura do lambri (até o peitoril da janela).
 const LAMBRI := 0.9
 
+## A folha da porta (feita em _estrutura; a calha a abre).
+var _folha_porta: Node3D
+
 
 func _ready() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(MAT_DIR))
@@ -50,7 +53,6 @@ func _ready() -> void:
 	cena.set("env_sonho", _env_sonho())
 	cena.set("som_sonho", load(SFX_DIR + "sonho.wav"))
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
-	cena.set("som_postar", load(SFX_DIR + "papel_pegar.wav"))
 	cena.set("som_papel", load(SFX_DIR + "papel_pegar.wav"))
 	cena.set("som_selo", load(SFX_DIR + "selo_batido.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))
@@ -110,6 +112,9 @@ func _materiais() -> void:
 	_mat("madeira_escura", "madeira_escura", {world = 2.0})
 	_mat("madeira_clara", "madeira_clara", {world = 2.0})
 	_mat("porta", "porta", {})
+	_mat("piso_corredor", "assoalho", {world = 0.8, cor = Color(0.62, 0.52, 0.44)})
+	_mat("parede_corredor", "reboco", {world = 1.0, cor = Color(0.8, 0.73, 0.6)})
+	_mat("vidro_fosco", "papel", {unlit = true, world = 3.0, cor = Color(0.75, 0.62, 0.42)})
 	_mat("tijolo", "tijolo", {world = 2.5})
 	_mat("lambri", "lambri", {world = 1.0 / LAMBRI})
 	_mat("aco", "aco", {world = 2.0})
@@ -266,7 +271,14 @@ func _estrutura() -> void:
 	_quad(e, "Teto", Vector2(2 * W + sobra, 2 * D + sobra), Vector3(0, H, 0), Vector3(90, 0, 0), "teto")
 	_quad(e, "ParedeOeste", Vector2(2 * D + sobra, H + sobra), Vector3(-W, H / 2, 0), Vector3(0, 90, 0), "parede")
 	_quad(e, "ParedeLeste", Vector2(2 * D + sobra, H + sobra), Vector3(W, H / 2, 0), Vector3(0, -90, 0), "parede")
-	_quad(e, "ParedeSul", Vector2(2 * W + sobra, H + sobra), Vector3(0, H / 2, D), Vector3(0, 180, 0), "parede")
+	# O sul em pedaços, em volta do vão da porta (ela abre para a calha, Fase 3d).
+	var vao_o := PORTA_X - PORTA_L / 2
+	var vao_l := PORTA_X + PORTA_L / 2
+	var oeste := vao_o + W + sobra / 2
+	var leste := W + sobra / 2 - vao_l
+	_quad(e, "ParedeSulO", Vector2(oeste, H + sobra), Vector3(vao_o - oeste / 2, H / 2, D), Vector3(0, 180, 0), "parede")
+	_quad(e, "ParedeSulL", Vector2(leste, H + sobra), Vector3(vao_l + leste / 2, H / 2, D), Vector3(0, 180, 0), "parede")
+	_quad(e, "ParedeSulAlto", Vector2(PORTA_L, H + sobra / 2 - PORTA_H), Vector3(PORTA_X, (H + sobra / 2 + PORTA_H) / 2, D), Vector3(0, 180, 0), "parede")
 	# Norte em pedaços, com espessura, em volta da janela.
 	var t := 0.2
 	var lado := W - JANELA_X
@@ -296,7 +308,10 @@ func _estrutura() -> void:
 	var rp := 0.045
 	_box(e, "RodapeOeste", Vector3(rp, r, 2 * D), Vector3(-W + rp / 2, r / 2, 0), "madeira_escura")
 	_box(e, "RodapeLeste", Vector3(rp, r, 2 * D), Vector3(W - rp / 2, r / 2, 0), "madeira_escura")
-	_box(e, "RodapeSul", Vector3(2 * W, r, rp), Vector3(0, r / 2, D - rp / 2), "madeira_escura")
+	var ro := PORTA_X - PORTA_L / 2 - 0.05 + W
+	var rl := W - (PORTA_X + PORTA_L / 2 + 0.05)
+	_box(e, "RodapeSulO", Vector3(ro, r, rp), Vector3(-W + ro / 2, r / 2, D - rp / 2), "madeira_escura")
+	_box(e, "RodapeSulL", Vector3(rl, r, rp), Vector3(W - rl / 2, r / 2, D - rp / 2), "madeira_escura")
 	_box(e, "RodapeNorte", Vector3(2 * W, r, rp), Vector3(0, r / 2, -D + rp / 2), "madeira_escura")
 
 	# Janela: caixilho e travessas em cruz.
@@ -310,10 +325,15 @@ func _estrutura() -> void:
 	_box(j, "TravessaH", Vector3(2 * JANELA_X, 0.04, 0.04), Vector3(0, 1.7, -0.1), "madeira_clara")
 
 	# Porta (sul, lado oeste) e relógio (sul, lado leste).
-	var p := _group(e, "Porta", Vector3(-1.0, 0, D))
-	_box(p, "Folha", Vector3(0.92, 2.1, 0.05), Vector3(0, 1.05, -0.03), "madeira_escura")
-	_quad(p, "Frente", Vector2(0.92, 2.1), Vector3(0, 1.05, -0.06), Vector3(0, 180, 0), "porta")
-	_box(p, "Macaneta", Vector3(0.05, 0.05, 0.06), Vector3(0.36, 1.0, -0.1), "latao")
+	var p := _group(e, "Porta", Vector3(PORTA_X, 0, D))
+	# A folha gira na dobradiça (oeste) e abre para dentro da sala (CalhaCorreio).
+	var folha := _group(p, "Folha", Vector3(-PORTA_L / 2, 0, 0))
+	_folha_porta = folha
+	_box(folha, "Madeira", Vector3(PORTA_L, PORTA_H, 0.05), Vector3(PORTA_L / 2, PORTA_H / 2, -0.03), "madeira_escura")
+	_quad(folha, "Frente", Vector2(PORTA_L, PORTA_H), Vector3(PORTA_L / 2, PORTA_H / 2, -0.06), Vector3(0, 180, 0), "porta")
+	_quad(folha, "Costas", Vector2(PORTA_L, PORTA_H), Vector3(PORTA_L / 2, PORTA_H / 2, 0.0), Vector3.ZERO, "porta")
+	_box(folha, "Macaneta", Vector3(0.05, 0.05, 0.06), Vector3(PORTA_L / 2 + 0.36, 1.0, -0.1), "latao")
+	_box(folha, "MacanetaFora", Vector3(0.05, 0.05, 0.06), Vector3(PORTA_L / 2 + 0.36, 1.0, 0.04), "latao")
 	_box(p, "BatenteO", Vector3(0.08, 2.2, 0.06), Vector3(-0.5, 1.1, -0.03), "madeira_clara")
 	_box(p, "BatenteL", Vector3(0.08, 2.2, 0.06), Vector3(0.5, 1.1, -0.03), "madeira_clara")
 	_box(p, "BatenteAlto", Vector3(1.08, 0.08, 0.06), Vector3(0, 2.18, -0.03), "madeira_clara")
@@ -630,6 +650,7 @@ func _miskatonic() -> void:
 	var corredor := _omni(g, "LuzCorredor", Vector3(-0.95, 0.12, D - 0.3), Color(1.0, 0.8, 0.55), 0.5, 2.2)
 	corredor.omni_attenuation = 1.6
 
+	_corredor(g)
 	_lapso(g)
 	_cidade_3d(g)
 
@@ -648,6 +669,84 @@ func _miskatonic() -> void:
 	_box(a, "Movel", Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0), "madeira_escura")
 	_box(a, "Juncao", Vector3(0.01, 0.8, 0.01), Vector3(0, 0.45, -0.255), "ferro")
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
+
+
+## O corredor da Miskatonic atrás da porta e, na parede da frente, a calha de
+## correio de latão com frente de vidro (Fase 3d; CalhaCorreio): é por ela que a
+## carta sai. O corredor só aparece com a porta aberta.
+func _corredor(g: Node3D) -> void:
+	var c := _group(g, "Corredor")
+	c.unique_name_in_owner = true
+	c.visible = false
+	var fundo := D + CORREDOR
+	var meio := D + CORREDOR / 2
+	var x0 := -4.0
+	var x1 := 2.0
+	var largura := x1 - x0
+	var cx := (x0 + x1) / 2
+	_quad(c, "Piso", Vector2(largura, CORREDOR), Vector3(cx, 0, meio), Vector3(-90, 0, 0), "piso_corredor")
+	_quad(c, "Teto", Vector2(largura, CORREDOR), Vector3(cx, H, meio), Vector3(90, 0, 0), "teto")
+	_quad(c, "ParedeFrente", Vector2(largura, H), Vector3(cx, H / 2, fundo), Vector3(0, 180, 0), "parede_corredor")
+	_quad(c, "PontaO", Vector2(CORREDOR, H), Vector3(x0, H / 2, meio), Vector3(0, 90, 0), "parede_corredor")
+	_quad(c, "PontaL", Vector2(CORREDOR, H), Vector3(x1, H / 2, meio), Vector3(0, -90, 0), "parede_corredor")
+	_box(c, "Lambri", Vector3(largura, 1.0, 0.02), Vector3(cx, 0.5, fundo - 0.01), "lambri")
+	_box(c, "LambriMoldura", Vector3(largura, 0.04, 0.04), Vector3(cx, 1.02, fundo - 0.02), "madeira_escura")
+	_box(c, "Rodape", Vector3(largura, 0.12, 0.045), Vector3(cx, 0.06, fundo - 0.0225), "madeira_escura")
+	# A porta de outra sala, mais adiante, com o vidro fosco aceso.
+	var vizinha := _group(c, "PortaVizinha", Vector3(-2.9, 0, fundo), 180)
+	_box(vizinha, "Folha", Vector3(0.9, 2.1, 0.05), Vector3(0, 1.05, 0.0), "madeira_escura")
+	_box(vizinha, "Vidro", Vector3(0.6, 0.55, 0.052), Vector3(0, 1.6, 0.0), "vidro_fosco")
+	_box(vizinha, "Batente", Vector3(1.04, 2.18, 0.04), Vector3(0, 1.09, 0.01), "madeira_clara")
+	_box(vizinha, "Macaneta", Vector3(0.05, 0.05, 0.06), Vector3(0.36, 1.0, -0.05), "latao")
+	# A luz do teto: um globo de vidro.
+	var globo := Vector3(PORTA_X, H - 0.32, meio)
+	_cyl(c, "Haste", 0.008, 0.008, 0.24, globo + Vector3(0, 0.2, 0), "latao", 6)
+	_cyl(c, "Globo", 0.1, 0.07, 0.17, globo, "vidro_aceso", 8)
+	var luz := _omni(c, "Luz", globo + Vector3(0, -0.15, 0), Color(1.0, 0.8, 0.55), 1.4, 4.5)
+	luz.omni_attenuation = 1.3
+
+	# A calha: o fundo e as laterais de latão, a frente de vidro com faixas, de
+	# piso a teto (vem do andar de cima e desce ao saguão); a boca com a plaqueta.
+	var cal := _group(c, "CalhaTubo", Vector3(CALHA_X, 0, fundo - 0.002))
+	_box(cal, "Fundo", Vector3(0.18, H, 0.01), Vector3(0, H / 2, -0.005), "latao")
+	for s in [-1, 1]:
+		_box(cal, "Lado%d" % (s + 1), Vector3(0.014, H, 0.08), Vector3(s * 0.083, H / 2, -0.04), "latao")
+	var vidro := _quad(cal, "Vidro", Vector2(0.152, H), Vector3(0, H / 2, -0.079), Vector3(0, 180, 0), "papel")
+	var mv := StandardMaterial3D.new()
+	mv.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mv.albedo_color = Color(0.55, 0.62, 0.6, 0.2)
+	mv.roughness = 0.15
+	vidro.material_override = mv
+	for y in [0.35, 0.95, 1.55, 2.15, 2.75]:
+		_box(cal, "Faixa%d" % int(y * 100), Vector3(0.18, 0.025, 0.086), Vector3(0, y, -0.043), "latao")
+	_box(cal, "Placa", Vector3(0.21, 0.17, 0.014), Vector3(0, CALHA_BOCA, -0.09), "latao")
+	_quad(cal, "Fenda", Vector2(0.135, 0.014), Vector3(0, CALHA_BOCA, -0.0975), Vector3(0, 180, 0), "esmalte_preto")
+	for t: Array in [["LETTERS", 0.05], ["U.S. MAIL", -0.05]]:
+		var l := Label3D.new()
+		l.name = "Plaqueta" + t[0].replace(".", "").replace(" ", "")
+		l.text = t[0]
+		l.font_size = 48
+		l.pixel_size = 0.0006
+		l.modulate = Color(0.25, 0.17, 0.08)
+		l.outline_size = 0
+		l.position = Vector3(0, CALHA_BOCA + t[1], -0.0975)
+		l.rotation_degrees.y = 180
+		_add(cal, l)
+
+	# Quem anima: fora do grupo escondido (o envelope que desce é filho dela).
+	var calha := CalhaCorreio.new()
+	calha.name = "Calha"
+	calha.position = Vector3(CALHA_X, CALHA_BOCA, fundo - 0.1)
+	calha.rotation_degrees.y = 180
+	_add(g, calha)
+	calha.unique_name_in_owner = true
+	calha.folha = _folha_porta
+	calha.corredor = c
+	calha.diante = Vector3(PORTA_X + 0.1, 0, D - 0.62)
+	calha.queda = Vector2(-0.02, -CALHA_BOCA + 0.08)
+	calha.som_abrir = load(SFX_DIR + "porta_rangendo.wav")
+	calha.som_fechar = load(SFX_DIR + "porta_trinco.wav")
+	calha.som_calha = load(SFX_DIR + "calha_correio.wav")
 
 
 ## O diário de Wilmarth (Diario): um caderno fechado à esquerda do mata-borrão.
@@ -872,6 +971,14 @@ func _cortinas(parent: Node) -> void:
 # --- Os dias --------------------------------------------------------------------
 
 const MESA := 0.78  # altura do tampo da escrivaninha
+## A porta do escritório (sul): o meio do vão, a largura e a altura da folha.
+const PORTA_X := -1.0
+const PORTA_L := 0.92
+const PORTA_H := 2.1
+## O corredor atrás dela (largura) e a calha de correio na parede da frente.
+const CORREDOR := 1.4
+const CALHA_X := -0.92
+const CALHA_BOCA := 1.15
 
 
 ## Conteúdo que só existe num dia: um grupo com ConditionalNode (`dia == n`).
