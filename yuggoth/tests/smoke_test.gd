@@ -543,12 +543,18 @@ func _ready() -> void:
 	var falas_boston: Array[String] = []
 	var ouvir_boston := func(texto: String, _s: float) -> void: falas_boston.append(texto)
 	Events.subtitle_requested.connect(ouvir_boston)
-	for i in 4:
-		rapaz.interact(player)
-		await _frames(1)
-		while rapaz.em_conversa():
-			sonho_max = maxf(sonho_max, GameState.get_number(&"sonho"))
-			await get_tree().process_frame
+	# Em pessoa, as perguntas aparecem embaixo para escolher (Fase 3e): sempre a
+	# primeira (a ordem do livro), até não sobrar nenhuma.
+	var max_opcoes := 0
+	rapaz.interact(player)
+	await _frames(1)
+	while rapaz.em_conversa():
+		sonho_max = maxf(sonho_max, GameState.get_number(&"sonho"))
+		if OpcoesConversa.atual and OpcoesConversa.atual.is_inside_tree():
+			max_opcoes = maxi(max_opcoes, OpcoesConversa.atual._frases.size())
+			OpcoesConversa.atual.confirmar(0)
+		await get_tree().process_frame
+	_check(max_opcoes == 3, "depois do homem de Keene, duas perguntas e a despedida, à escolha")
 	Events.subtitle_requested.disconnect(ouvir_boston)
 	_check(falas_boston.any(func(f: String) -> bool: return f.contains("não tenho certeza nem disso")), "nem tem certeza de que o reconheceria")
 	await _check_alcance(boston, "Boston, pela fresta", Vector2(0.6, 2.8))

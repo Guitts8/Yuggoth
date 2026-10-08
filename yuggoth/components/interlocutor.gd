@@ -16,6 +16,16 @@ const TONS := {"Telefonista": 1.35, "Wilmarth": 0.82}
 ## Um murmúrio de voz sob cada legenda (em loop, com o tom de quem fala).
 @export var voz: AudioStream
 @export var voz_db := -14.0
+@export_group("Opções")
+## Em pessoa (Fase 3e: "opções de diálogo embaixo, como Skyrim"): usar abre as
+## conversas disponíveis para escolher (o `prompt` de cada uma) e a despedida;
+## depois de cada uma, as que restam. Sem isto, vai a primeira disponível (o telefone).
+@export var com_opcoes := false
+@export var despedida := "Despedir-se"
+@export var prompt_opcoes := "Falar"
+## Dita uma vez ao fim de uma conversa em que `fim_depois_de` já foi feita.
+@export var narracao_fim: NarrationLine
+@export var fim_depois_de: Ligacao
 
 var _em_conversa := false
 var _voz: AudioStreamPlayer
@@ -55,13 +65,51 @@ func _process(_delta: float) -> void:
 func _atualizar_prompt() -> void:
 	var l := atual()
 	if l:
-		prompt = l.prompt
+		# Com opções, a primeira conversa ainda não feita dá o aviso (a de abrir).
+		prompt = prompt_opcoes if com_opcoes and _feitas() > 0 else l.prompt
+
+
+func _feitas() -> int:
+	return conversas.filter(func(l: Ligacao) -> bool: return l and GameState.has_flag(l.get_done_flag())).size()
 
 
 func _on_interact(_by: Node) -> void:
 	var l := atual()
-	if l:
+	if l == null:
+		return
+	if com_opcoes:
+		_conversar()
+	else:
 		_falar(l)
+
+
+## A conversa com opções: escolhe, ouve, volta às opções que restam, até a
+## despedida (ou não sobrar nenhuma).
+func _conversar() -> void:
+	_em_conversa = true
+	while true:
+		var disponiveis: Array[Ligacao] = []
+		for l in conversas:
+			if l and l.disponivel():
+				disponiveis.append(l)
+		if disponiveis.is_empty():
+			break
+		var frases := PackedStringArray()
+		for l in disponiveis:
+			frases.append(l.prompt)
+		frases.append(despedida)
+		var i := await OpcoesConversa.escolher(self, frases)
+		if not is_inside_tree():
+			return
+		if i < 0 or i >= disponiveis.size():
+			break
+		await _dizer(disponiveis[i])
+		if not is_inside_tree():
+			return
+	_em_conversa = false
+	if narracao_fim and (fim_depois_de == null or GameState.has_flag(fim_depois_de.get_done_flag())) \
+			and not GameState.has_flag(narracao_fim.get_said_flag()):
+		Narrator.say(narracao_fim)
 
 
 ## Antes da primeira fala (o Telefone tira o fone do gancho). Pode esperar.
@@ -76,6 +124,17 @@ func _terminar(_l: Ligacao) -> void:
 
 func _falar(l: Ligacao) -> void:
 	_em_conversa = true
+	await _dizer(l)
+	if not is_inside_tree():
+		return
+	_em_conversa = false
+	if not l.fase_depois.is_empty():
+		SceneDirector.change_level(l.fase_depois, l.entrada_depois)
+
+
+## Uma conversa, do começo ao fim (as falas e o que vem depois dela, menos a
+## troca de fase).
+func _dizer(l: Ligacao) -> void:
 	await _comecar(l)
 	if not is_inside_tree():
 		return
@@ -102,11 +161,6 @@ func _falar(l: Ligacao) -> void:
 			Narrator.say(l.narracao_depois)
 		else:
 			await Narrator.say(l.narracao_depois)
-			if not is_inside_tree():
-				return
-	_em_conversa = false
-	if not l.fase_depois.is_empty():
-		SceneDirector.change_level(l.fase_depois, l.entrada_depois)
 
 
 func _amolecer(ate: float, segundos: float) -> void:

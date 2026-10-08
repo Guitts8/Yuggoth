@@ -31,7 +31,6 @@ func _ready() -> void:
 	_mat("camisa", "lencol", {world = 3.0, cor = Color(1.08, 1.06, 1.0)})
 	_mat("colete", "la_escura", {world = 3.0, cor = Color(1.3, 1.25, 1.5)})
 	_mat("parede_pensao", "papel_parede", {world = 1.6, cor = Color(1.05, 0.92, 0.78)})
-	_mat("vista_boston", "vista_boston", {unlit = true})
 
 	cena = Node3D.new()
 	cena.name = "Boston"
@@ -100,10 +99,26 @@ func _corredor() -> void:
 	for lado in [-1, 1]:
 		_box(c, "Rodape%d" % lado, Vector3(0.03, 0.1, comp), Vector3(lado * (W - 0.015), 0.05, meio_z), "madeira_escura")
 
-	# A janelinha do fim do corredor, para os telhados de Boston.
-	_quad(c, "ParedeNorte", Vector2(2 * W + s, H + s), Vector3(0, H / 2, -D_N), Vector3.ZERO, "parede_pensao")
+	# A janelinha do fim do corredor, para os telhados de Boston — em 3D (Fase
+	# 3e): a parede norte em pedaços em volta do vão, e a cidade lá fora.
+	var vao := Vector2(0.31, 0.41)  # meia largura, meia altura
+	var centro := 1.55
+	var resto := W + s / 2 - vao.x
+	for sx in [-1, 1]:
+		_quad(c, "ParedeNorte%d" % (sx + 1), Vector2(resto, H + s), Vector3(sx * (vao.x + resto / 2), H / 2, -D_N), Vector3.ZERO, "parede_pensao")
+	_quad(c, "ParedeNorteBaixo", Vector2(2 * vao.x, centro - vao.y), Vector3(0, (centro - vao.y) / 2, -D_N), Vector3.ZERO, "parede_pensao")
+	_quad(c, "ParedeNorteAlto", Vector2(2 * vao.x, H + s / 2 - centro - vao.y), Vector3(0, (H + s / 2 + centro + vao.y) / 2, -D_N), Vector3.ZERO, "parede_pensao")
+	# O vão tem a espessura da parede.
+	for sx in [-1, 1]:
+		_box(c, "Vao%d" % (sx + 1), Vector3(0.02, 2 * vao.y, 0.2), Vector3(sx * (vao.x + 0.01), centro, -D_N - 0.1), "parede_pensao")
+	for sy in [-1, 1]:
+		_box(c, "VaoH%d" % (sy + 1), Vector3(2 * vao.x, 0.02, 0.2), Vector3(0, centro + sy * (vao.y + 0.01), -D_N - 0.1), "parede_pensao")
+	var cidade: Node3D = preload("res://tools/vistas.gd").new().boston()
+	cidade.position = Vector3(0, 0, -D_N - 0.2)
+	_add(c, cidade)
+	for filho in cidade.get_children():
+		filho.owner = cena
 	var j := _group(c, "Janela", Vector3(0, 0, -D_N + 0.02))
-	_quad(j, "Vista", Vector2(0.62, 0.82), Vector3(0, 1.55, 0.001), Vector3.ZERO, "vista_boston")
 	_box(j, "Moldura", Vector3(0.72, 0.05, 0.06), Vector3(0, 1.12, 0.02), "madeira_clara")
 	_box(j, "Verga", Vector3(0.72, 0.05, 0.06), Vector3(0, 1.98, 0.02), "madeira_clara")
 	_box(j, "Travessa", Vector3(0.62, 0.03, 0.03), Vector3(0, 1.55, 0.02), "madeira_clara")
@@ -133,7 +148,8 @@ func _corredor() -> void:
 	var sair := _area(c, Interactable.new(), "Saida", Vector3(2 * W, 1.6, 0.4), Vector3(0, 0.8, D_S - 0.3)) as Interactable
 	sair.unique_name_in_owner = true
 	sair.prompt = "Voltar a Arkham"
-	sair.condition = _flag(&"ligou_boston_reconhecer")
+	# Depois do essencial (o homem de Keene), pode-se ir (Fase 3e: a conversa tem opções).
+	sair.condition = _flag(&"ligou_boston_homem")
 
 	_colisao(c, "Colisao", [
 		[Vector3(2 * W, 0.2, comp), Vector3(0, -0.1, meio_z)],
@@ -245,3 +261,8 @@ func _funcionario() -> void:
 	fala.conversas = conversas
 	fala.voz = load(SFX_DIR + "voz_sala.wav")
 	fala.voz_db = -12.0
+	# Em pessoa: as perguntas aparecem embaixo, para escolher (Fase 3e).
+	fala.com_opcoes = true
+	fala.despedida = "Agradecer e ir embora"
+	fala.narracao_fim = load("res://narrative/narration/boston_nada.tres")
+	fala.fim_depois_de = conversas[1]
