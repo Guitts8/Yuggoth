@@ -24,13 +24,13 @@ const LAMBRI := 0.9
 
 ## Arkham em 3D pela janela (Fase 3d): as malhas montadas uma vez, uma vista por hora.
 var _cidade = preload("res://tools/cidade_arkham.gd").new()
+## As outras vistas em 3D (os sonhos) e o bosque do disco (Fase 3e).
+var _vistas = preload("res://tools/vistas.gd").new()
 ## A folha da porta (feita em _estrutura; a calha a abre).
 var _folha_porta: Node3D
 ## A gaveta da escrivaninha que guarda o frasco (feita em _escrivaninha; Bebida).
 var _gaveta_mesa: Node3D
-## Onde ele senta nas noites longe do diário (LugarSono): a cadeira de leitura e
-## a poltrona.
-var _assento_leitura: Marker3D
+## Onde ele senta nas noites longe do diário (LugarSono): a poltrona.
 var _assento_poltrona: Marker3D
 
 
@@ -59,6 +59,11 @@ func _ready() -> void:
 	cena.set("linhas_volta", volta)
 	# Os sonhos (Escritorio._sonhar; o conteúdo vem de _sonhos).
 	cena.set("env_sonho", _env_sonho())
+	# A noite 3 sai da sala: o bosque onde o disco foi gravado.
+	var fora: Array[int] = [3]
+	cena.set("sonhos_fora", fora)
+	var ambientes_sonho: Dictionary[int, Environment] = {3: _env_bosque()}
+	cena.set("ambientes_sonho", ambientes_sonho)
 	cena.set("som_sonho", load(SFX_DIR + "sonho.wav"))
 	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
 	cena.set("som_papel", load(SFX_DIR + "papel_pegar.wav"))
@@ -171,6 +176,8 @@ func _materiais() -> void:
 	_mat("vista_plataforma", "vista_plataforma", {unlit = true})
 	_mat("homem_magro", "homem_magro", {unlit = true})
 	_mat("pedra_negra", "pedra_negra", {world = 4.0})
+	# O bosque do disco (noite 3): a cor vem do vértice, a textura só dá o grão.
+	_mat("bosque", "grao", {world = 1.0})
 
 
 func _env_1930() -> Environment:
@@ -185,6 +192,17 @@ func _env_1930() -> Environment:
 	e.fog_density = 1.0
 	e.fog_depth_begin = 2.0
 	e.fog_depth_end = 10.0
+	return e
+
+
+## O bosque do disco (noite 3): a névoa do pântano, mais longe que a da sala
+## (é um lugar aberto), verde-escura.
+func _env_bosque() -> Environment:
+	var e := _env_sonho()
+	e.ambient_light_color = Color(0.05, 0.065, 0.06)
+	e.fog_light_color = Color(0.035, 0.05, 0.045)
+	e.fog_depth_begin = 3.0
+	e.fog_depth_end = 13.0
 	return e
 
 
@@ -418,12 +436,13 @@ func _mobilia() -> void:
 	_cadeira(mob)
 	_estante(mob)
 	_lareira(mob)
-	# Virada para a lareira (a noite do Dia 5 é diante do fogo, LugarSono).
+	# Ao lado da lareira, virada para ela (as noites do disco e do fogo, LugarSono).
 	var poltrona := _group(mob, "Poltrona", POLTRONA_POS, POLTRONA_ROT)
 	_poltrona(poltrona, "estofado")
 	_assento_poltrona = Marker3D.new()
 	_assento_poltrona.name = "Assento"
 	_add(poltrona, _assento_poltrona)
+	_mesinha(mob)
 	_quad(mob, "Tapete", Vector2(2.4, 1.8), Vector3(0, 0.006, 0.3), Vector3(-90, 0, 0), "tapete")
 	_cabideiro(mob)
 
@@ -741,7 +760,6 @@ func _miskatonic() -> void:
 	_abajur_peca(g)
 	_diario(g, pena)
 	_bebida(g)
-	_cadeira_leitura(g)
 
 	_arquivo(g)
 	_cesto(g)
@@ -1008,7 +1026,7 @@ func _bebida(g: Node3D) -> void:
 
 
 ## A noite do Dia 5: anotado o dia, com o fogo aceso, "Sentar diante do fogo" na
-## poltrona, com o copo de uísque no braço dela (LugarSono).
+## poltrona, com o copo de uísque servido na mesinha ao lado (LugarSono).
 func _sono_fogo(g: Node3D) -> void:
 	var fogo := _area(g, LugarSono.new(), "SentarFogo", Vector3(0.95, 1.05, 0.9), POLTRONA_POS + Vector3(0, 0.5, 0)) as LugarSono
 	fogo.rotation_degrees.y = POLTRONA_ROT
@@ -1022,10 +1040,9 @@ func _sono_fogo(g: Node3D) -> void:
 	_add(g, olhar)
 	fogo.olhar = olhar
 	fogo.linha = load("res://narrative/narration/sono_fogo.tres")
-	# O copo servido, no braço da poltrona (ele o trouxe da mesa).
-	var braco := POLTRONA_POS + Vector3(0.38, 0.62, 0.05).rotated(Vector3.UP, deg_to_rad(POLTRONA_ROT))
+	# O copo servido, na mesinha ao lado da poltrona (ele o trouxe da mesa).
 	var copo := _grupo_se(g, "CopoFogo", _flag(&"anotou_dia_5"))
-	copo.position = braco
+	copo.position = _mesinha_pos() + Vector3(-0.07, MESINHA_ALTURA, -0.09)
 	_copo(copo)
 	var nivel := copo.get_node("Nivel") as Node3D
 	nivel.visible = true
@@ -1061,24 +1078,30 @@ func _nivel(recipiente: Node3D, raio: float, altura: float, fundo: float, mat: S
 	_cyl(nivel, "Liquido", raio, raio * 0.92, altura, Vector3(0, altura / 2, 0), mat, 10)
 
 
-## A cadeira de leitura no canto sudoeste, virada para o armário onde fica o
-## fonógrafo: a noite do Dia 3 (LugarSono "Ouvir o disco outra vez") é aqui.
-func _cadeira_leitura(g: Node3D) -> void:
-	var c := _group(g, "CadeiraLeitura", LEITURA_POS, LEITURA_ROT)
-	_box(c, "Assento", Vector3(0.5, 0.06, 0.48), Vector3(0, 0.44, 0), "estofado")
-	_box(c, "Moldura", Vector3(0.52, 0.04, 0.5), Vector3(0, 0.4, 0), "madeira_escura")
-	for x in [-0.23, 0.23]:
-		for z in [-0.21, 0.21]:
-			_box(c, "Perna%d%d" % [signf(x), signf(z)], Vector3(0.045, 0.4, 0.045), Vector3(x, 0.2, z), "madeira_escura")
-		_box(c, "Braco%d" % signf(x), Vector3(0.05, 0.03, 0.46), Vector3(x, 0.66, 0.0), "madeira_escura")
-		_box(c, "Apoio%d" % signf(x), Vector3(0.035, 0.22, 0.035), Vector3(x, 0.54, -0.2), "madeira_escura")
-	_box(c, "Encosto", Vector3(0.5, 0.5, 0.05), Vector3(0, 0.74, 0.24), "estofado")
-	_box(c, "EncostoMoldura", Vector3(0.54, 0.04, 0.07), Vector3(0, 1.0, 0.24), "madeira_escura")
-	var assento := Marker3D.new()
-	assento.name = "Assento"
-	_add(c, assento)
-	_assento_leitura = assento
-	_colisao(c, "Colisao", [[Vector3(0.55, 0.9, 0.55), Vector3(0, 0.45, 0)]])
+## A mesinha de apoio ao lado da poltrona (Fase 3e: "uma mesa de apoio para
+## bebidas"): tampo redondo sobre um pé torneado de três garras; em cima, o
+## cinzeiro de latão e um livro deixado aberto de borco.
+static func _mesinha_pos() -> Vector3:
+	return POLTRONA_POS + Vector3(0.62, 0, 0.1).rotated(Vector3.UP, deg_to_rad(POLTRONA_ROT))
+
+
+func _mesinha(parent: Node) -> void:
+	var g := _group(parent, "Mesinha", _mesinha_pos(), 15)
+	var alt := MESINHA_ALTURA
+	_cyl(g, "Tampo", 0.2, 0.2, 0.025, Vector3(0, alt - 0.0125, 0), "madeira_escura", 12)
+	_cyl(g, "Saia", 0.18, 0.18, 0.04, Vector3(0, alt - 0.045, 0), "madeira_escura", 12)
+	_cyl(g, "Pe", 0.025, 0.035, alt - 0.17, Vector3(0, 0.12 + (alt - 0.17) / 2, 0), "madeira_escura", 8)
+	_cyl(g, "Anel", 0.045, 0.045, 0.04, Vector3(0, 0.36, 0), "madeira_escura", 8)
+	_cyl(g, "Base", 0.05, 0.06, 0.06, Vector3(0, 0.12, 0), "madeira_escura", 8)
+	for k in 3:
+		var garra := _box(g, "Garra%d" % k, Vector3(0.04, 0.03, 0.2), Vector3(0, 0, 0), "madeira_escura")
+		var a := TAU * k / 3.0
+		garra.position = Vector3(sin(a), 0, cos(a)) * 0.1 + Vector3(0, 0.06, 0)
+		garra.rotation = Vector3(deg_to_rad(18.0), a, 0)
+	_cyl(g, "Cinzeiro", 0.05, 0.045, 0.015, Vector3(-0.08, alt + 0.0075, 0.07), "latao", 10)
+	var livro := _box(g, "Livro", Vector3(0.13, 0.02, 0.19), Vector3(0.06, alt + 0.01, -0.04), "capa_livro")
+	livro.rotation_degrees.y = 25
+	_colisao(g, "Colisao", [[Vector3(0.36, alt, 0.36), Vector3(0, alt / 2, 0)]])
 
 
 ## O diário de Wilmarth (Diario): um caderno fechado à esquerda do mata-borrão.
@@ -1122,6 +1145,14 @@ func _vista(parent: Node, hora: String, painel: String, nome := "Vista", z := -D
 	sem_painel.condition = _flag(&"painel", true)
 	_add(cidade, sem_painel)
 	return v
+
+
+## Uma vista em 3D (tools/vistas.gd) atrás da janela, nas coordenadas da sala.
+func _vista_3d(parent: Node, vista: Node3D) -> Node3D:
+	_add(parent, vista)
+	for filho in vista.get_children():
+		filho.owner = cena
+	return vista
 
 
 ## O tempo passando na sala (Lapso): a folhinha no peitoril da janela, de frente
@@ -1264,12 +1295,11 @@ const PAREDE_SUL := 0.14
 ## Onde o corredor acaba, a leste, e a escada começa a descer.
 const ESCADA_X := 2.0
 const DEGRAU := Vector2(0.28, 0.18)
-## A poltrona (virada para a lareira) e a cadeira de leitura (virada para o
-## fonógrafo, no canto sudoeste): onde ele adormece nas noites 5 e 3.
-const POLTRONA_POS := Vector3(1.35, 0, 0.45)
-const POLTRONA_ROT := -50.0
-const LEITURA_POS := Vector3(-1.45, 0, 1.0)
-const LEITURA_ROT := 153.0
+## A poltrona, ao lado da lareira e virada para ela (Fase 3e: estava no meio da
+## sala), com a mesinha de apoio à direita: onde ele adormece nas noites 3 e 5.
+const POLTRONA_POS := Vector3(1.75, 0, 0.45)
+const POLTRONA_ROT := -28.0
+const MESINHA_ALTURA := 0.6
 
 
 ## Conteúdo que só existe num dia: um grupo com ConditionalNode (`dia == n`).
@@ -1563,17 +1593,27 @@ func _dia_5(parent: Node) -> void:
 		"A letra continua trêmula, mas o envelope veio fechado com cuidado. Carimbo de Brattleboro, 27 de agosto.")
 	_escrever(c28, "resposta_dia_5", &"leu_carta_akeley_28_agosto")
 
-	# Depois do bilhete, quem olhar para a janela vê algo passar lá fora. Uma vez.
+	# Depois do bilhete, quem olhar para a janela vê algo passar lá fora, na
+	# chuva, a poucos metros do vidro: uma delas, em 3D (Fase 3e). Uma vez.
 	var sombra := Aparicao.new()
 	sombra.name = "Sombra"
-	sombra.position = Vector3(-1.7, 1.6, -D - 0.35)
-	sombra.deslocamento = Vector3(3.4, 0.15, 0)
-	sombra.duracao = 1.6
+	sombra.position = Vector3(-3.6, 1.9, -D - 2.6)
+	sombra.deslocamento = Vector3(7.2, 0.5, -0.8)
+	sombra.duracao = 1.8
+	sombra.distancia = 9.0
 	sombra.condition = _flag(&"leu_bilhete_akeley_agosto")
 	sombra.flag = &"viu_sombra_janela"
 	sombra.exposure = 0.03
 	_add(g, sombra)
-	_quad(sombra, "Vulto", Vector2(0.9, 1.3), Vector3.ZERO, Vector3.ZERO, "sombra")
+	var vulto := Migo.new()
+	vulto.name = "Vulto"
+	vulto.rotation_degrees = Vector3(0, -95, 8)
+	vulto.batida = 0.32
+	_add(sombra, vulto)
+	# Um clarão frio e curto que viaja com ela (a luz da rua na chuva): sem ele,
+	# o corpo some no escuro. Não alcança a sala.
+	var clarao := _omni(sombra, "Clarao", Vector3(0.3, 0.9, 1.2), Color(0.7, 0.75, 0.9), 0.9, 2.2)
+	clarao.omni_attenuation = 1.5
 
 
 ## Dia 4 (cap. III): a pedra que não chega. O telegrama de quarta-feira, a carta
@@ -1845,7 +1885,7 @@ func _sonhos(parent: Node) -> void:
 ## círculo de pedras. Acorda ao seguir as marcas de volta até a porta, onde
 ## começam ("Chamei-a de pegada...").
 func _sonho_garras(g: Node3D) -> void:
-	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.15), Vector3.ZERO, "vista_circulo")
+	_vista_3d(g, _vistas.circulo())
 	_omni(g, "Lua", Vector3(0.2, 2.2, -2.4), Color(0.5, 0.6, 0.9), 1.4, 7.0)
 	# A luz fria que deita no chão e mostra o caminho das marcas (acima do tapete).
 	var caminho := SpotLight3D.new()
@@ -1874,44 +1914,87 @@ func _sonho_garras(g: Node3D) -> void:
 	_area(g, gatilho, "NaPorta", Vector3(1.4, 2.0, 0.9), Vector3(-1.0, 1.0, 2.4))
 
 
-## Noite do Dia 3 (o disco): tudo escuro; só o fonógrafo, na mesa, sob uma luz,
-## tocando sozinho. Acorda ao levantar a agulha.
+## Noite do Dia 3 (Fase 3e: "que ele revivesse o que acontece dentro do disco,
+## em sonho, de relance"): a sala some, e ele está onde o disco foi gravado — a 1
+## da manhã de 1º de maio de 1915, junto à boca fechada de uma caverna, onde a
+## encosta oeste da Dark Mountain sobe do pântano de Lee (cap. III). O
+## fonógrafo de Akeley no toco, a lanterna dele no chão, e o disco tocando de onde
+## parou na sala, com as legendas; vultos parados na névoa, junto da caverna, e
+## uma das criaturas passando entre as árvores, para quem olhar. Acorda ao
+## levantar a agulha (ou quando o disco acaba).
 func _sonho_disco(g: Node3D) -> void:
-	# De lado para quem chega: a corneta se vê de perfil, virada para a sala.
-	var f := _group(g, "Fonografo", Vector3(0.05, MESA, -2.36), 120)
+	var clareira := POLTRONA_POS + Vector3(-0.1, 0, -1.9)
+	var boca := POLTRONA_POS + Vector3(0.9, 0, -7.2)
+	var mat := load(MAT_DIR + "bosque.tres") as Material
+	var bosque: Node3D = _vistas.bosque(mat, clareira, boca)
+	_add(g, bosque)
+	for filho in bosque.get_children():
+		filho.owner = cena
+	# O chão, os troncos, a encosta; e um anel em volta (a névoa esconde o fim).
+	var formas := [[Vector3(30, 0.2, 30), Vector3(clareira.x, -0.1, clareira.z)]]
+	for p: Vector3 in bosque.get_meta(&"troncos"):
+		formas.append([Vector3(0.3, 3.0, 0.3), p + Vector3(0, 1.5, 0)])
+	formas.append([Vector3(12, 6, 1.0), boca + Vector3(0, 3, -0.6)])
+	for k in 12:
+		var a := TAU * k / 12.0
+		var p := clareira + Vector3(cos(a), 0, sin(a)) * 8.5
+		var parede := [Vector3(4.6, 4, 0.3), p + Vector3(0, 2, 0)]
+		formas.append(parede)
+	var colisao := _colisao(g, "Colisao", formas)
+	# Os pedaços do anel giram para fora do centro.
+	for k in 12:
+		var forma := colisao.get_child(colisao.get_child_count() - 12 + k) as Node3D
+		forma.rotation.y = -TAU * k / 12.0 + PI / 2
+
+	# O toco com o fonógrafo de Akeley (o ditafone que gravou), virado para ele.
+	var toco_pos := clareira + Vector3(0.5, 0, -0.6)
+	_cyl(g, "Toco", 0.28, 0.33, 0.55, toco_pos + Vector3(0, 0.275, 0), "madeira_escura", 9)
+	var f := _group(g, "Fonografo", toco_pos + Vector3(0, 0.55, 0), 200)
 	_box(f, "Caixa", Vector3(0.34, 0.14, 0.24), Vector3(0, 0.07, 0), "madeira_clara")
 	var cera := _cyl(f, "Cera", 0.032, 0.032, 0.11, Vector3(0, 0.19, 0.02), "cinzas", 10)
 	cera.rotation_degrees.z = 90
 	var cone := _cyl(f, "Corneta", 0.2, 0.015, 0.5, Vector3(0.0, 0.42, -0.18), "latao", 10)
 	cone.rotation_degrees = Vector3(-60, 0, 0)
-	var luz := SpotLight3D.new()
-	luz.name = "Luz"
-	luz.transform = Transform3D(Basis.looking_at(Vector3.DOWN, Vector3.FORWARD), Vector3(0, 1.6, 0))
-	luz.light_color = Color(0.9, 0.85, 0.6)
-	luz.light_energy = 4.5
-	luz.spot_angle = 26.0
-	luz.spot_range = 3.0
-	luz.shadow_enabled = true
-	_add(f, luz)
-	var disco := AudioStreamPlayer3D.new()
-	disco.name = "Disco"
-	disco.stream = load(SFX_DIR + "disco_longo.wav")
-	disco.autoplay = true
-	disco.bus = &"Voice"
-	disco.unit_size = 3.0
-	_add(f, disco)
-	var agulha := _area(f, StateInteractable.new(), "Agulha", Vector3(0.45, 0.5, 0.4), Vector3(0, 0.2, 0)) as StateInteractable
-	agulha.prompt = "Levantar a agulha"
-	agulha.changes = {&"acordou_noite_3": 1.0}
-	agulha.additive = false
+	var fono := _area(f, Fonografo.new(), "Disco", Vector3(0.5, 0.6, 0.5), Vector3(0, 0.2, 0)) as Fonografo
+	fono.gravacao = load("res://narrative/gravacoes/disco_1915.tres")
+	fono.gravacao_longa = load("res://narrative/gravacoes/disco_1915_longo.tres")
+	fono.exposicao_repeticao = 0.0
+	fono.flag_ao_parar = &"acordou_noite_3"
+
+	# A lanterna de Akeley no chão, junto do toco: a única luz quente.
+	var lanterna := _group(g, "Lanterna", toco_pos + Vector3(-0.45, 0, 0.25))
+	_cyl(lanterna, "Base", 0.06, 0.065, 0.04, Vector3(0, 0.02, 0), "ferro", 8)
+	_cyl(lanterna, "Vidro", 0.045, 0.045, 0.12, Vector3(0, 0.1, 0), "vidro_aceso", 8)
+	_cyl(lanterna, "Tampa", 0.03, 0.06, 0.04, Vector3(0, 0.18, 0), "ferro", 8)
+	var chama := _omni(lanterna, "Luz", Vector3(0, 0.25, 0), Color(1.0, 0.7, 0.4), 1.6, 6.0)
+	chama.shadow_enabled = true
+	chama.omni_attenuation = 1.3
+	# A lua, fria e alta, por entre as copas.
+	_omni(g, "Lua", clareira + Vector3(-2.0, 7.0, -3.0), Color(0.45, 0.52, 0.75), 0.9, 14.0)
+
+	# De relance: uma delas, atravessando entre as árvores, perto da caverna.
+	var passa := Aparicao.new()
+	passa.name = "Criatura"
+	passa.position = boca + Vector3(-4.5, 2.2, 2.2)
+	passa.deslocamento = Vector3(9.0, 0.8, -0.5)
+	passa.duracao = 2.6
+	passa.atraso = 1.2
+	passa.angulo = 28.0
+	passa.distancia = 12.0
+	passa.flag = &"viu_criatura_disco"
+	passa.exposure = 0.03
+	_add(g, passa)
+	var migo := Migo.new()
+	migo.name = "Migo"
+	migo.rotation_degrees.y = -90
+	_add(passa, migo)
 
 
 ## Noite do Dia 4 (a pedra que não chega): a pedra negra está na mesa; pela
 ## janela, a plataforma de Keene à noite e um homem magro de costas, e a voz
 ## zumbida. Acorda depois de examinar a pedra (o sono pesa).
 func _sonho_pedra(g: Node3D) -> void:
-	_quad(g, "Vista", Vector2(5.0, 3.0), Vector3(0, 1.6, -D - 1.15), Vector3.ZERO, "vista_plataforma")
-	_quad(g, "Homem", Vector2(0.26, 0.65), Vector3(0.45, 1.2, -D - 0.85), Vector3.ZERO, "homem_magro")
+	_vista_3d(g, _vistas.plataforma())
 	_omni(g, "Janela", Vector3(0.3, 1.8, -2.6), Color(0.85, 0.75, 0.55), 0.6, 4.0)
 	var pedra := _group(g, "Pedra", Vector3(-0.05, MESA, -2.3), 8)
 	_box(pedra, "Bloco", Vector3(0.3, 0.55, 0.14), Vector3(0, 0.275, 0), "pedra_negra")
@@ -1938,6 +2021,7 @@ func _sonho_pedra(g: Node3D) -> void:
 ## Noite do Dia 5 (o telegrama AKELY): chove dentro da sala; o telefone toca.
 ## Atendido, só um zumbido na linha, soletrando. Acorda ao desligar.
 func _sonho_telefone(g: Node3D) -> void:
+	_vista(g, "chuva", "vista_noite")
 	_omni(g, "Penumbra", Vector3(0.5, 2.4, -1.0), Color(0.45, 0.5, 0.65), 0.7, 7.0)
 	var chuva := _chuva_dentro(g)
 	chuva.name = "ChuvaDentro"
@@ -1985,24 +2069,28 @@ func _chuva_dentro(parent: Node) -> GPUParticles3D:
 	return p
 
 
-## Uma das criaturas cruzando o céu da cidade, à noite: uma silhueta 2D sobre o
-## painel da janela, passando na frente do mostrador aceso da torre, uma vez, sem
-## som — só para quem estiver olhando (Aparicao). Nada confirma o que foi visto.
+## Uma das criaturas cruzando o céu da cidade, à noite: em 3D (Fase 3e), uma
+## silhueta escura de asas batendo, por cima dos olmos do campus, uma vez, sem som
+## — só para quem estiver olhando (Aparicao). Nada confirma o que foi visto.
 func _criatura_no_ceu(parent: Node, cond: Condition, flag: StringName) -> void:
-	var migo := Aparicao.new()
-	migo.name = "Criatura"
-	migo.position = Vector3(-1.5, 1.72, -D - 1.12)
-	migo.deslocamento = Vector3(3.8, 0.32, 0)
-	migo.duracao = 2.4
-	migo.atraso = 0.6
-	migo.angulo = 20.0
-	migo.batida = 0.35
-	migo.batidas = 4.0
-	migo.condition = cond
-	migo.flag = flag
-	migo.exposure = 0.03
-	_add(parent, migo)
-	_quad(migo, "Silhueta", Vector2(0.48, 0.29), Vector3.ZERO, Vector3.ZERO, "migo")
+	var passa := Aparicao.new()
+	passa.name = "Criatura"
+	passa.position = Vector3(-9.0, 4.0, -18.0)
+	passa.deslocamento = Vector3(18.0, 2.5, -4.0)
+	passa.duracao = 3.0
+	passa.atraso = 0.6
+	passa.angulo = 20.0
+	passa.distancia = 30.0
+	passa.condition = cond
+	passa.flag = flag
+	passa.exposure = 0.03
+	_add(parent, passa)
+	var migo := Migo.new()
+	migo.name = "Silhueta"
+	migo.silhueta = true
+	migo.batida = 0.4
+	migo.rotation_degrees = Vector3(0, -100, -6)
+	_add(passa, migo)
 
 
 ## Lugar da lâmpada de banqueiro na mesa.
@@ -2076,19 +2164,18 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 			tremem.append(n)
 	f.tremer = tremem
 
-	# A noite do Dia 3: anotado o dia, ouvir o disco outra vez, da cadeira de
-	# leitura — e o sono vem com ele (LugarSono). A área é maior que a do
-	# fonógrafo (ganha a mira) e só existe nessa noite.
+	# A noite do Dia 3: anotado o dia, ouvir o disco outra vez — ele baixa a
+	# agulha e vai ouvi-lo da poltrona, olhando a lareira fria; o sono vem com o
+	# disco (LugarSono). A área é maior que a do fonógrafo (ganha a mira) e só
+	# existe nessa noite.
 	var ouvir := _area(g, LugarSono.new(), "OuvirDeNovo", Vector3(0.52, 0.48, 0.48), Vector3(0, 0.18, 0)) as LugarSono
 	ouvir.noite = 3
 	ouvir.prompt = "Ouvir o disco outra vez"
 	ouvir.condition = _cond_valor(&"sono", ValueCondition.Op.IGUAL, 3)
-	ouvir.assento = _assento_leitura
-	var olhar := Marker3D.new()
-	olhar.name = "OlharDisco"
-	olhar.position = Vector3(0.0, 0.3, -0.05)
-	_add(g, olhar)
-	ouvir.olhar = olhar
+	ouvir.assento = _assento_poltrona
+	ouvir.diante = _marca(parent as Node3D, "DianteDisco", g.position + Vector3(0.6, -0.9, -0.34))
+	ouvir.olhar = _marca(parent as Node3D, "OlharLareiraFria", Vector3(W - 0.25, 0.35, -0.6))
+	ouvir.escutar = 14.0
 	ouvir.linha = load("res://narrative/narration/sono_disco.tres")
 	ouvir.fonografo = f
 

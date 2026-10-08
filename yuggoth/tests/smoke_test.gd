@@ -464,7 +464,14 @@ func _ready() -> void:
 	writer._finish_writing()
 	await _selar(esc, writer)
 	await _porta(esc)
-	await _sonho_no_teste(esc, 3, func() -> void: esc.find_child("Noite3", true, false).get_node("Fonografo/Agulha").interact(esc.player))
+	await _sonho_no_teste(esc, 3, func() -> void:
+		# O disco de Akeley, no bosque: tocando de onde parou; levantar a agulha acorda.
+		var disco: Fonografo = esc.find_child("Noite3", true, false).get_node("Fonografo/Disco")
+		_check(esc.find_child("Bosque", true, false).is_visible_in_tree() and not (esc.get_node("Estrutura") as Node3D).visible,
+			"a noite do disco: a sala some, e ele está no bosque onde o disco foi gravado")
+		if not disco.tocando():
+			disco.tocar()
+		disco.interact(esc.player))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 4 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 4 and fono.is_visible_in_tree() and esc.find_child("Cilindro", true, false).visible, "Dia 4: a máquina fica montada, com o cilindro")
 
@@ -848,9 +855,12 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 		escuro = maxf(escuro, SceneDirector._fade.modulate.a)
 		await get_tree().process_frame
 		t += get_process_delta_time()
-	_check(escuro < 0.5 and not SceneDirector.hold_black and esc.player.seated, "a noite do Dia %d: adormece, sem tela preta" % n)
+	# Fora da sala (a noite do disco), ele sonha de pé.
+	var fora := n in esc.sonhos_fora
+	_check(escuro < 0.5 and not SceneDirector.hold_black and esc.player.seated != fora, "a noite do Dia %d: adormece, sem tela preta" % n)
 	if lugar:
-		_check(esc.player.global_position.distance_to(lugar.assento.global_position) < 0.3, "adormece ali, sentado")
+		_check(Vector2(esc.player.global_position.x, esc.player.global_position.z).distance_to(
+			Vector2(lugar.assento.global_position.x, lugar.assento.global_position.z)) < 0.3, "adormece ali")
 	else:
 		_check(esc.diario.aberto and esc.diario._mancha.raio > 0.0, "a última linha falhou: a tinta escorre no diário")
 	var grupo: Node3D = esc.find_child("Noite%d" % n, true, false)

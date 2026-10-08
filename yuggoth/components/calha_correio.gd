@@ -35,9 +35,6 @@ extends Node3D
 ## A descida que se vê pelo vidro: de onde a carta cai até onde some (y local).
 @export var queda := Vector2(0.0, -1.0)
 
-## Andando conduzido, em metros por segundo (devagar, como ele anda).
-const PASSO := 1.1
-
 var porta_aberta := false
 
 
@@ -47,7 +44,7 @@ func postar(carta: Node3D, player: Player) -> void:
 	if not is_inside_tree():
 		return
 	# Pela soleira até a calha, olhando a boca dela.
-	await andar(player, [soleira, na_calha], global_position + Vector3.DOWN * 0.1)
+	await player.conduzir([soleira, na_calha], global_position + Vector3.DOWN * 0.1)
 	if not is_inside_tree():
 		return
 
@@ -81,7 +78,7 @@ func postar(carta: Node3D, player: Player) -> void:
 		return
 
 	# De volta à sala, e fecha a porta.
-	await andar(player, [soleira, diante], _macaneta())
+	await player.conduzir([soleira, diante], _macaneta())
 	if not is_inside_tree():
 		return
 	await fechar(player)
@@ -96,7 +93,7 @@ func postar(carta: Node3D, player: Player) -> void:
 func abrir(player: Player) -> void:
 	var estava := player.conduzido
 	player.conduzido = true
-	await andar(player, [diante], _macaneta())
+	await player.conduzir([diante], _macaneta())
 	if not is_inside_tree():
 		return
 	if corredor:
@@ -132,24 +129,6 @@ func fechar_ja() -> void:
 	porta_aberta = false
 	if corredor:
 		corredor.visible = false
-
-
-## Leva o corpo pelos pontos (global, no chão), no passo dele, olhando `olhar`.
-func andar(player: Player, pontos: Array, olhar: Vector3) -> void:
-	var de := player.global_position
-	var total := 0.0
-	var t := player.create_tween().set_trans(Tween.TRANS_SINE)
-	for i in pontos.size():
-		var p: Vector3 = pontos[i]
-		p.y = de.y
-		var d := maxf(0.15, (p - (de if i == 0 else Vector3(pontos[i - 1].x, de.y, pontos[i - 1].z))).length())
-		var s := d / PASSO
-		total += s
-		t.tween_property(player, ^"global_position", p, s).set_ease(
-			Tween.EASE_IN if i == 0 and pontos.size() > 1 else (Tween.EASE_OUT if i == pontos.size() - 1 and pontos.size() > 1 else Tween.EASE_IN_OUT))
-	var fim: Vector3 = pontos[-1]
-	player.olhar_para(olhar, maxf(total, 0.5), Vector3(fim.x, de.y, fim.z))
-	await t.finished
 
 
 func _macaneta() -> Vector3:

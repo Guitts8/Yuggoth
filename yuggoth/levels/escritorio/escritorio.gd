@@ -49,6 +49,11 @@ const BEBIDA_UISQUE := 2
 @export var sonhos: Dictionary[int, StringName] = {}
 @export var env_sonho: Environment
 @export var som_sonho: AudioStream
+## Sonhos que saem da sala (Fase 3e: a noite 3 revive o disco no bosque da Dark
+## Mountain): a sala inteira some enquanto duram, e ele sonha de pé.
+@export var sonhos_fora: Array[int] = []
+## Environment próprio de uma noite (faltando, `env_sonho`).
+@export var ambientes_sonho: Dictionary[int, Environment] = {}
 ## O que ele se serve antes de anotar o dia (dia → BEBIDA_CAFE ou BEBIDA_UISQUE).
 @export var bebidas: Dictionary[int, int] = {}
 ## Segundos até acordar sozinho, se o jogador não fizer nada.
@@ -96,6 +101,8 @@ var _energias: Dictionary[Light3D, float] = {}
 ## Environments (recursos compartilhados) escurecidos no meio do sono: voltam
 ## se a fase sair antes.
 var _ambientes: Dictionary[Environment, float] = {}
+## A sala escondida durante um sonho fora dela: cada nó e como estava.
+var _sala_escondida: Dictionary[Node3D, Array] = {}
 
 @onready var gabinete: Node3D = $Gabinete1930
 @onready var miskatonic: Node3D = $Miskatonic
@@ -463,12 +470,23 @@ func _on_lugar_sono(_by: Node, lugar: LugarSono) -> void:
 	player.input_enabled = false
 	Narrator.cancel()
 	GameState.set_value(&"sono", 0)
+	# O disco começa antes do sono: ele vai ao fonógrafo e baixa a agulha.
+	if lugar.fonografo and lugar.diante:
+		await player.conduzir([lugar.diante.global_position], lugar.fonografo.global_position + Vector3.UP * 0.15)
+		if not is_inside_tree():
+			return
+		if not lugar.fonografo.tocando():
+			lugar.fonografo.tocar()
+		await get_tree().create_timer(1.2).timeout
+		if not is_inside_tree():
+			return
 	var assento := lugar.assento.global_position
 	assento.y = player.global_position.y
-	var t := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(player, ^"global_position", assento, 1.6)
+	await player.conduzir([assento], lugar.olhar.global_position)
+	if not is_inside_tree():
+		return
 	player.seated = true
-	await player.olhar_para(lugar.olhar.global_position, 1.8, assento).finished
+	await player.olhar_para(lugar.olhar.global_position, 0.8).finished
 	if not is_inside_tree():
 		return
 	if lugar.fonografo and not lugar.fonografo.tocando():
@@ -478,6 +496,10 @@ func _on_lugar_sono(_by: Node, lugar: LugarSono) -> void:
 		if not is_inside_tree():
 			return
 		await player.olhar_para(lugar.olhar.global_position, 1.0).finished
+	if lugar.escutar > 0.0:
+		await get_tree().create_timer(lugar.escutar).timeout
+		if not is_inside_tree():
+			return
 	await _sonhar(lugar.noite)
 	if not is_inside_tree():
 		return
@@ -636,31 +658,62 @@ func _adormecer(noite: int) -> void:
 	if not is_inside_tree():
 		return
 
-	# A troca, no quase escuro. O disco que embalou o sono para (a noite do disco).
+	# A troca, no quase escuro. O disco que embalou o sono para (a noite do
+	# disco) — e continua no sonho, de onde parou.
+	var disco := -1.0
+	for f: Fonografo in get_tree().get_nodes_in_group(&"fonografo"):
+		disco = maxf(disco, f.posicao())
 	get_tree().call_group(&"fonografo", &"parar")
 	GameState.set_value(&"sonhando", noite)
+	if noite in sonhos_fora:
+		_esconder_sala(true)
+		player.stand()
+		player.seated = false
+	if disco >= 0.0:
+		for f: Fonografo in get_tree().get_nodes_in_group(&"fonografo"):
+			if f.is_visible_in_tree():
+				f.tocar(disco)
 	env.ambient_light_energy = ambiente
 	_ambientes.erase(env)
 	for l in luzes:
 		l.light_energy = luzes[l]
-	world_env.environment = env_sonho
+	var env_noite_sonho: Environment = ambientes_sonho.get(noite, env_sonho)
+	world_env.environment = env_noite_sonho
 	AudioDirector.play_ambience(som_sonho, 2.5)
 	var acender := _luzes_acesas()
-	var sonho_ambiente := env_sonho.ambient_light_energy
-	_ambientes[env_sonho] = sonho_ambiente
-	env_sonho.ambient_light_energy = 0.0
+	var sonho_ambiente := env_noite_sonho.ambient_light_energy
+	_ambientes[env_noite_sonho] = sonho_ambiente
+	env_noite_sonho.ambient_light_energy = 0.0
 	t = create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
 	for l in acender:
 		l.light_energy = 0.0
 		t.tween_property(l, ^"light_energy", acender[l], 3.5)
-	t.tween_property(env_sonho, ^"ambient_light_energy", sonho_ambiente, 3.5)
+	t.tween_property(env_noite_sonho, ^"ambient_light_energy", sonho_ambiente, 3.5)
 	await palpebras.fechar(0.0, 3.5)
 	if not is_inside_tree():
 		return
 	if t.is_running():
 		await t.finished
-	_ambientes.erase(env_sonho)
+	_ambientes.erase(env_noite_sonho)
 	palpebras.queue_free()
+
+
+## Some com a sala (estrutura, móveis e tudo da Miskatonic menos os sonhos) para
+## um sonho fora dela; e a devolve como estava.
+func _esconder_sala(esconder: bool) -> void:
+	if not esconder:
+		for n in _sala_escondida:
+			n.visible = _sala_escondida[n][0]
+			n.process_mode = _sala_escondida[n][1]
+		_sala_escondida.clear()
+		return
+	var nos: Array[Node3D] = [$Estrutura as Node3D, $Mobilia as Node3D]
+	for n in miskatonic.get_children():
+		if n is Node3D and n.name != &"Sonhos":
+			nos.append(n)
+	for n in nos:
+		_sala_escondida[n] = [n.visible, n.process_mode]
+		_ativar(n, false)
 
 
 ## De manhã, debruçado na mesa (no escuro do fim do sonho): a sala do dia, o
@@ -668,6 +721,8 @@ func _adormecer(noite: int) -> void:
 ## sono o pegou (LugarSono). Os olhos abrem, ele se ergue — e então o dia
 ## seguinte (_fim_do_dia).
 func _acordar(noite: int) -> void:
+	get_tree().call_group(&"fonografo", &"parar")
+	_esconder_sala(false)
 	GameState.set_value(&"sonhando", 0)
 	GameState.set_value(&"sonho", 0.0)
 	world_env.environment = _ambiente_do_dia()

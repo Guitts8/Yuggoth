@@ -38,6 +38,7 @@ func _texturas() -> void:
 	_save(_papel(), "papel")
 	_save(_latao(), "latao")
 	_save(_cinzas(), "cinzas")
+	_save(_grao(), "grao")
 	_save(_papel_pardo(), "papel_pardo")
 	_save(_barbante(), "barbante")
 	_save(_mostrador(), "mostrador")
@@ -443,6 +444,19 @@ func _cinzas() -> Image:
 		for x in 64:
 			var v := 0.12 + n.get_noise_2d(x, y) * 0.08
 			img.set_pixel(x, y, Color(v, v * 0.95, v * 0.9))
+	return img
+
+
+## Grão neutro, quase branco (Fase 3e): para malhas que levam a cor no vértice
+## (o bosque do disco, o mi-go) — a textura só dá o ruído, sem riscos.
+func _grao() -> Image:
+	var img := _img()
+	var n := _noise(31, 0.21)
+	var fino := _noise(32, 0.9)
+	for y in 64:
+		for x in 64:
+			var v := 0.86 + n.get_noise_2d(x, y) * 0.1 + fino.get_noise_2d(x, y) * 0.06
+			img.set_pixel(x, y, Color(v, v, v))
 	return img
 
 

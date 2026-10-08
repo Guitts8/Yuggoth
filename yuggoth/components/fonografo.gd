@@ -27,6 +27,9 @@ const PECAS := {&"fono_corneta": "a corneta", &"fono_manivela": "a manivela", &"
 @export var tremer: Array[Node3D] = []
 ## O cilindro está à mão (o pacote do expresso foi aberto). Vazio = sempre.
 @export var cilindro_chegou: Condition
+## Marcada quando a agulha levanta ou o disco acaba (o do sonho da noite 3: é
+## assim que ele acorda).
+@export var flag_ao_parar: StringName
 
 var _som: AudioStreamPlayer3D
 var _atual: Gravacao
@@ -68,6 +71,11 @@ func _ao_telefone() -> bool:
 func parar() -> void:
 	if tocando():
 		_parar()
+
+
+## Onde a agulha está (segundos), tocando; senão, -1.
+func posicao() -> float:
+	return _som.get_playback_position() if tocando() else -1.0
 
 
 func _tem_cilindro() -> bool:
@@ -112,7 +120,9 @@ func _on_interact(_by: Node) -> void:
 	tocar()
 
 
-func tocar() -> void:
+## Baixa a agulha (em `desde` segundos do disco: o sonho continua de onde a sala
+## parou).
+func tocar(desde := 0.0) -> void:
 	var primeira := not GameState.has_flag(&"tocou_disco")
 	_atual = gravacao if primeira or gravacao_longa == null else gravacao_longa
 	GameState.add(&"vezes_disco", 1)
@@ -124,7 +134,7 @@ func tocar() -> void:
 		_repouso[n] = n.rotation
 	_trecho = -1
 	_som.stream = _atual.audio
-	_som.play()
+	_som.play(clampf(desde, 0.0, maxf(_atual.duracao - 1.0, 0.0)))
 	_atualizar_prompt()
 
 
@@ -169,4 +179,6 @@ func _parar() -> void:
 		AudioDirector.set_hum(zumbido, 6.0)
 	if narracao_depois and not GameState.has_flag(narracao_depois.get_said_flag()):
 		Narrator.say(narracao_depois)
+	if flag_ao_parar:
+		GameState.set_flag(flag_ao_parar)
 	_atualizar_prompt()

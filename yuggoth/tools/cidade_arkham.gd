@@ -131,9 +131,14 @@ func vista(hora: String) -> Node3D:
 
 
 func _mats(hora: String) -> Dictionary:
-	if _materiais.has(hora):
-		return _materiais[hora]
-	var h: Dictionary = HORAS[hora]
+	if not _materiais.has(hora):
+		_materiais[hora] = materiais_para(HORAS[hora])
+	return _materiais[hora]
+
+
+## Os materiais (sólido, janelas e céu) para uma luz `h` no formato de HORAS
+## (as vistas dos sonhos e de Boston têm as luzes delas, tools/vistas.gd).
+func materiais_para(h: Dictionary) -> Dictionary:
 	var cidade := load("res://shaders/cidade.gdshader") as Shader
 	var solido := ShaderMaterial.new()
 	solido.shader = cidade
@@ -158,8 +163,7 @@ func _mats(hora: String) -> Dictionary:
 	for k in ["topo", "horizonte", "nuvens", "nuvem_cor", "estrelas"]:
 		ceu.set_shader_parameter(StringName(k), h[k])
 	ceu.set_shader_parameter(&"ruido", _ruido)
-	_materiais[hora] = {solido = solido, janelas = janelas, ceu = ceu}
-	return _materiais[hora]
+	return {solido = solido, janelas = janelas, ceu = ceu}
 
 
 # --- As peças ----------------------------------------------------------------------

@@ -133,6 +133,30 @@ func olhar_para(ponto: Vector3, segundos: float, de := global_position) -> Tween
 	return t
 
 
+## Uma cena o leva a pé pelos `pontos` (global, no chão), no passo dele, olhando
+## `olhar`; sem a física (passa pela porta aberta e pelos móveis).
+func conduzir(pontos: Array, olhar: Vector3, passo := 1.1) -> void:
+	var estava := conduzido
+	conduzido = true
+	var de := global_position
+	var total := 0.0
+	var anterior := de
+	var t := create_tween().set_trans(Tween.TRANS_SINE)
+	for i in pontos.size():
+		var p: Vector3 = pontos[i]
+		p.y = de.y
+		var s := maxf(0.15, p.distance_to(anterior)) / passo
+		total += s
+		var facil := Tween.EASE_IN_OUT
+		if pontos.size() > 1:
+			facil = Tween.EASE_IN if i == 0 else (Tween.EASE_OUT if i == pontos.size() - 1 else Tween.EASE_IN_OUT)
+		t.tween_property(self, ^"global_position", p, s).set_ease(facil)
+		anterior = p
+	olhar_para(olhar, maxf(total, 0.5), anterior)
+	await t.finished
+	conduzido = estava
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and pode_olhar():
 		_look(event.relative * mouse_sensitivity)

@@ -13,8 +13,13 @@ extends Interactable
 @export var olhar: Marker3D
 ## Dita ao fechar o diário, nesta noite: o que ele ainda quer fazer.
 @export var linha: NarrationLine
-## Tocar este fonógrafo ao sentar (a noite do disco).
+## Tocar este fonógrafo antes de sentar (a noite do disco): ele vai até `diante`,
+## dá corda e baixa a agulha, e só então senta (playtest 4: "deixe que o disco
+## comece antes que ele durma").
 @export var fonografo: Fonografo
+@export var diante: Marker3D
+## Sentado, quanto tempo ele fica (ouvindo, olhando o fogo) antes de o sono vir.
+@export var escutar := 0.0
 ## Beber deste copo ao sentar (Bebida.gole).
 @export var copo: Node3D
 
