@@ -54,8 +54,9 @@ var _anotar: Interactable
 var _ler: Interactable
 ## Do primeiro passo de anotar/ler até voltar ao lugar: as áreas somem.
 var _ocupado := false
-## Folheando: as páginas (rosto + entradas) e a da esquerda no par aberto.
-var _paginas: PackedStringArray = []
+## Folheando: as páginas (rosto + entradas, cada uma em quantas folhas der),
+## como [texto, rolagem em px], e a da esquerda no par aberto.
+var _paginas: Array = []
 var _par := 0
 var _virando := false
 var _pode_virar := false
@@ -73,6 +74,10 @@ var _fechado: Node3D
 var _capa: Node3D
 var _aberto: Node3D
 var _vp: SubViewport
+## Cada página é uma janela (recorta) com o rótulo dentro; o rótulo sobe para
+## mostrar a folha seguinte do mesmo texto (playtest 4: a letra saía do caderno).
+var _jan_esq: Control
+var _jan_dir: Control
 var _esquerda: RichTextLabel
 var _direita: RichTextLabel
 var _mancha: Mancha
@@ -134,8 +139,13 @@ func _seguir_a_pena(delta: float) -> void:
 ## Com `falhar`, a última linha cai e a tinta escorre: termina aberto, a pena
 ## tombada na página.
 func anotar(entrada: DocumentData, anterior: DocumentData, player: Player, falhar: bool) -> void:
+	# À esquerda, a última folha da entrada anterior.
 	_esquerda.text = anterior.resolve_pages()[0] if anterior else ROSTO
+	var folhas := _folhas(_esquerda)
+	_esquerda.visible_characters = -1
+	_esquerda.position.y = -folhas[folhas.size() - 1]
 	_direita.text = entrada.resolve_pages()[0] if entrada else ""
+	_direita.position.y = 0.0
 	_direita.visible_characters = 0
 	_mancha.raio = 0.0
 	_mancha.escorrido = 0.0
@@ -193,13 +203,17 @@ func _abrir(player: Player) -> void:
 ## Folhear o diário: abre no último par escrito e espera o jogador fechar
 ## ([E]/[Esc]); quem fecha o caderno depois é quem chamou (`fechar()`).
 func ler(player: Player) -> void:
-	_paginas = PackedStringArray([ROSTO])
+	_paginas = [[ROSTO, 0.0]]
 	var entradas := GameState.dossier.filter(func(d: DocumentData) -> bool:
 		return String(d.id).begins_with("diario_dia_"))
 	entradas.sort_custom(func(a: DocumentData, b: DocumentData) -> bool:
 		return String(a.id).naturalnocasecmp_to(String(b.id)) < 0)
 	for d: DocumentData in entradas:
-		_paginas.append(d.resolve_pages()[0])
+		var texto: String = d.resolve_pages()[0]
+		_esquerda.text = texto
+		var folhas := _folhas(_esquerda)
+		for k in folhas.size():
+			_paginas.append([texto, folhas[k], _fim_da_folha(_esquerda, k)])
 	_par = maxi(0, _paginas.size() - 2)
 	_mostrar_par()
 	_direita.visible_characters = -1
@@ -250,8 +264,24 @@ func _virar(direcao: int) -> void:
 	var novo := _par + direcao
 	if _virando or novo < 0 or novo > maxi(0, _paginas.size() - 2):
 		return
+	await _animar_virada(direcao, func() -> void:
+		_par = novo
+		_mostrar_par())
+
+
+## A folha virando (as duas direções), com `trocar` mudando o conteúdo no meio:
+## ao ler (o par seguinte) e ao escrever (a folha cheia passa para a esquerda).
+func _animar_virada(direcao: int, trocar: Callable) -> void:
 	_virando = true
-	_mat_foto.set_shader_parameter(&"albedo_tex", ImageTexture.create_from_image(_vp.get_texture().get_image()))
+	var foto: Image = null if DisplayServer.get_name() == "headless" else _vp.get_texture().get_image()
+	if foto == null:
+		# Sem renderização (os testes, headless): não há foto da folha, nem quadro
+		# desenhado para esperar — troca e pronto.
+		trocar.call()
+		await get_tree().process_frame
+		_virando = false
+		return
+	_mat_foto.set_shader_parameter(&"albedo_tex", ImageTexture.create_from_image(foto))
 	if direcao > 0:
 		_pag_esq.material_override = _mat_foto
 		_frente.material_override = _mat_foto
@@ -262,8 +292,7 @@ func _virar(direcao: int) -> void:
 		_verso.material_override = _mat_foto
 		_frente.material_override = _mat_vivo
 		_virada.rotation.z = PI
-	_par = novo
-	_mostrar_par()
+	trocar.call()
 	await RenderingServer.frame_post_draw
 	if not is_inside_tree():
 		return
@@ -282,9 +311,45 @@ func _virar(direcao: int) -> void:
 
 
 func _mostrar_par() -> void:
-	_esquerda.text = _paginas[_par] if _par < _paginas.size() else ""
-	_direita.text = _paginas[_par + 1] if _par + 1 < _paginas.size() else ""
+	_mostrar(_esquerda, _paginas[_par] if _par < _paginas.size() else ["", 0.0])
+	_mostrar(_direita, _paginas[_par + 1] if _par + 1 < _paginas.size() else ["", 0.0])
 	_acertar_pautas.call_deferred()
+
+
+## Uma página: [texto, rolagem, até que letra] (a folha do texto que cabe nela).
+func _mostrar(r: RichTextLabel, pagina: Array) -> void:
+	r.text = pagina[0]
+	r.visible_characters = pagina[2] if pagina.size() > 2 else -1
+	r.position.y = -float(pagina[1])
+
+
+## Quantas linhas cabem numa folha (a última com folga para a letra que cai).
+func _linhas_por_folha(r: RichTextLabel) -> int:
+	if r.get_line_count() < 2:
+		return 999
+	var passo := r.get_line_offset(1) - r.get_line_offset(0)
+	var fonte := r.get_theme_font(&"normal_font")
+	var alto := _jan_dir.size.y - 14.0
+	return maxi(1, int((alto - fonte.get_height(FONTE)) / passo) + 1)
+
+
+## As folhas do texto que está em `r`: a rolagem (px) de cada uma.
+func _folhas(r: RichTextLabel) -> PackedFloat32Array:
+	var f := PackedFloat32Array([0.0])
+	var linhas := r.get_line_count()
+	var por := _linhas_por_folha(r)
+	var k := por
+	while k < linhas:
+		f.append(r.get_line_offset(k) - r.get_line_offset(0))
+		k += por
+	return f
+
+
+## Até que letra vai a folha `k` do texto em `r` (-1: até o fim): a linha
+## seguinte, já da outra folha, não aparece cortada no pé desta.
+func _fim_da_folha(r: RichTextLabel, k: int) -> int:
+	var primeira := (k + 1) * _linhas_por_folha(r)
+	return r.get_line_range(primeira).x if primeira < r.get_line_count() else -1
 
 
 ## A dica embaixo da tela, em resolução nativa (na raiz, fora do mundo).
@@ -378,13 +443,28 @@ func _escrever(falhar: bool) -> void:
 	if falhar:
 		_queda_desde = texto.strip_edges(false, true).rfind("\n") + 1
 	var normal := total if _queda_desde < 0 else _queda_desde
+	# As folhas que a entrada ocupa: cheia uma, ele vira a página e continua na
+	# seguinte (playtest 4: "ao finalizar a folha, ele deve passar para a próxima").
+	var folhas := _folhas(_direita)
+	var por := _linhas_por_folha(_direita)
 	_escrevendo = true
 	_ligar_pena()
-	var t := create_tween()
-	t.tween_property(_direita, ^"visible_characters", normal, normal / LETRAS_POR_SEGUNDO)
-	await t.finished
-	if not is_inside_tree():
-		return
+	var feito := 0
+	var t: Tween
+	for k in folhas.size():
+		var fim := total if k == folhas.size() - 1 else _direita.get_line_range((k + 1) * por).x
+		var alvo := mini(fim, normal)
+		if alvo > feito:
+			t = create_tween()
+			t.tween_property(_direita, ^"visible_characters", alvo, (alvo - feito) / LETRAS_POR_SEGUNDO)
+			await t.finished
+			if not is_inside_tree():
+				return
+			feito = alvo
+		if k < folhas.size() - 1:
+			await _virar_escrevendo(folhas[k], folhas[k + 1], fim)
+			if not is_inside_tree():
+				return
 	if falhar:
 		# A última linha, cada vez mais devagar, até a mão parar.
 		var resto := total - normal
@@ -414,19 +494,41 @@ func _escrever(falhar: bool) -> void:
 	await get_tree().create_timer(1.5).timeout
 
 
+## A folha da direita encheu: a pena se ergue, a folha vira (a cheia vai para a
+## esquerda) e a escrita continua no alto da nova página.
+func _virar_escrevendo(rolagem_cheia: float, rolagem_nova: float, fim_cheia: int) -> void:
+	_escrevendo = false
+	_parar_pena()
+	if pena:
+		var de := pena.global_transform
+		var t := _tween()
+		t.tween_property(pena, ^"global_transform", de.translated(Vector3.UP * 0.05), 0.3)
+		await t.finished
+	await _animar_virada(1, func() -> void:
+		_esquerda.text = _direita.text
+		_esquerda.visible_characters = fim_cheia
+		_esquerda.position.y = -rolagem_cheia
+		_direita.position.y = -rolagem_nova)
+	if not is_inside_tree():
+		return
+	_escrevendo = true
+	_ligar_pena()
+
+
 ## Onde está a ponta da pena (pixels da textura): logo depois da última letra visível.
 func _ponta_px() -> Vector2:
 	var c := _direita.visible_characters
 	var fonte := _direita.get_theme_font(&"normal_font")
 	var subida := fonte.get_ascent(FONTE) * 0.8
+	var origem := _jan_dir.position + _direita.position
 	if c <= 0:
-		return _direita.position + Vector2(0, subida)
+		return origem + Vector2(0, subida)
 	var texto := _direita.get_parsed_text()
 	var linha := _direita.get_character_line(c - 1)
 	var faixa := _direita.get_line_range(linha)
 	var trecho := texto.substr(faixa.x, c - faixa.x).replace("\n", "")
 	var largura := fonte.get_string_size(trecho, HORIZONTAL_ALIGNMENT_LEFT, -1, FONTE).x
-	var p := _direita.position + Vector2(largura, _direita.get_line_offset(linha) + subida)
+	var p := origem + Vector2(largura, _direita.get_line_offset(linha) + subida)
 	if _queda_desde >= 0 and c > _queda_desde:
 		p += QuedaTextEffect.deslocamento(c - 1 - _queda_desde)
 	return p
@@ -526,8 +628,10 @@ func _montar() -> void:
 	_pautas.size = Vector2(TEXTURA)
 	_vp.add_child(_pautas)
 	var meia := TEXTURA.x * 0.5
-	_esquerda = _rotulo(Rect2(MARGEM.x, MARGEM.y, meia - MARGEM.x * 2.0, TEXTURA.y - MARGEM.y * 2.0))
-	_direita = _rotulo(Rect2(meia + MARGEM.x, MARGEM.y, meia - MARGEM.x * 2.0, TEXTURA.y - MARGEM.y * 2.0))
+	_jan_esq = _janela(Rect2(MARGEM.x, MARGEM.y, meia - MARGEM.x * 2.0, TEXTURA.y - MARGEM.y * 2.0))
+	_jan_dir = _janela(Rect2(meia + MARGEM.x, MARGEM.y, meia - MARGEM.x * 2.0, TEXTURA.y - MARGEM.y * 2.0))
+	_esquerda = _rotulo(_jan_esq)
+	_direita = _rotulo(_jan_dir)
 	_mancha = Mancha.new()
 	_mancha.size = Vector2(TEXTURA)
 	_mancha.cor = TINTA
@@ -598,11 +702,25 @@ func _acertar_pautas() -> void:
 		return
 	var fonte := r.get_theme_font(&"normal_font")
 	_pautas.passo = r.get_line_offset(1) - r.get_line_offset(0)
-	_pautas.topo = r.position.y + r.get_line_offset(0) + fonte.get_ascent(FONTE) + 3.0
+	# As folhas rolam de linha inteira em linha inteira: as pautas não mudam.
+	_pautas.topo = _jan_dir.position.y + r.get_line_offset(0) + fonte.get_ascent(FONTE) + 3.0
 	_pautas.queue_redraw()
 
 
-func _rotulo(onde: Rect2) -> RichTextLabel:
+## A janela de uma página: recorta o que passa da folha.
+func _janela(onde: Rect2) -> Control:
+	var c := Control.new()
+	c.position = onde.position
+	c.size = onde.size
+	c.clip_contents = true
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_vp.add_child(c)
+	return c
+
+
+## O rótulo de uma página: da largura dela e bem mais alto (o texto todo, que
+## sobe uma folha por vez).
+func _rotulo(janela: Control) -> RichTextLabel:
 	var r := RichTextLabel.new()
 	r.bbcode_enabled = true
 	r.scroll_active = false
@@ -610,15 +728,15 @@ func _rotulo(onde: Rect2) -> RichTextLabel:
 	r.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	r.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	r.position = onde.position
-	r.size = onde.size
+	r.position = Vector2.ZERO
+	r.size = Vector2(janela.size.x, janela.size.y * 6.0)
 	r.add_theme_color_override(&"default_color", TINTA)
 	r.add_theme_constant_override(&"line_separation", ENTRELINHA)
 	DocumentData.apply_fonts(r, DocumentData.Style.MANUSCRITO, FONTE)
 	r.install_effect(TremorTextEffect.new())
 	r.install_effect(QuedaTextEffect.new())
 	r.install_effect(IllegibleTextEffect.new())
-	_vp.add_child(r)
+	janela.add_child(r)
 	return r
 
 

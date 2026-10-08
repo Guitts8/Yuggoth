@@ -869,6 +869,7 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 			Vector2(lugar.assento.global_position.x, lugar.assento.global_position.z)) < 0.3, "adormece ali")
 	else:
 		_check(esc.diario.aberto and esc.diario._mancha.raio > 0.0, "a última linha falhou: a tinta escorre no diário")
+		_check(esc.diario._ponta_px().y < Diario.TEXTURA.y - 8.0, "a letra fica no caderno: cheia a folha, ele vira a página")
 	var grupo: Node3D = esc.find_child("Noite%d" % n, true, false)
 	_check(GameState.get_value(&"sonhando") == n and is_equal_approx(GameState.get_number(&"sonho"), 1.0) and grupo.visible
 		and not esc.find_child("Dias", true, false).visible and esc.player.input_enabled, "a noite do Dia %d: o sonho" % n)
