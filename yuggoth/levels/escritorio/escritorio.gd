@@ -108,6 +108,11 @@ var _ambientes: Dictionary[Environment, float] = {}
 @onready var diario: Diario = %Diario
 @onready var calha: CalhaCorreio = %Calha
 @onready var bebida: Bebida = %Bebida
+## O alto da escada, no fim do corredor: chegar lá, na hora de ir, vira o dia.
+@onready var escada: Area3D = %Escada
+
+## O dia acabou e falta ir para casa (Fase 3e): a porta abre para o corredor.
+var _pode_ir := false
 
 
 func _ready() -> void:
@@ -116,6 +121,7 @@ func _ready() -> void:
 	player.lamp.available = false
 	SceneDirector.tempo = self
 	porta.interacted.connect(_on_porta)
+	escada.body_entered.connect(_on_escada)
 	diario.get_node(^"Anotar").interacted.connect(_on_anotar)
 	diario.get_node(^"Ler").interacted.connect(_on_ler_diario)
 	for l: LugarSono in find_children("*", "LugarSono", true, false):
@@ -299,14 +305,20 @@ func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
 
 func _process(_delta: float) -> void:
 	porta.prompt = "Pôr a carta no correio" if CartaSaida.atual else "Ir para casa"
+	# Aberta, a porta não se usa: o corredor está ali.
+	porta.enabled = not calha.porta_aberta
 
 
-## A porta é o correio: com a carta na mão, ele a abre e põe a carta na calha do
-## corredor (CalhaCorreio). A resposta do dia deixa só o diário por fazer (a do
-## Dia 6 encerra a demo); as outras (Dias 5 e 6) saltam no tempo até a volta do
-## correio. Sem carta, o dia não acaba pela porta.
+## A porta é o correio: com a carta na mão, ele a abre, vai à calha do corredor
+## e põe a carta nela (CalhaCorreio). A resposta do dia deixa só o diário por
+## fazer (a do Dia 6 encerra a demo); as outras (Dias 5 e 6) saltam no tempo até
+## a volta do correio. Sem carta, o dia só acaba pela porta depois do diário (e
+## do sonho, se houver): ela abre, e ele vai para casa pelo corredor.
 func _on_porta(_by: Node) -> void:
 	if _saindo or _saltando or em_lapso or selando or postando:
+		return
+	if _pode_ir:
+		_sair_pela_porta()
 		return
 	var carta := CartaSaida.atual
 	if carta == null:
@@ -423,7 +435,7 @@ func _on_anotar(_by: Node) -> void:
 		await get_tree().create_timer(0.8).timeout
 	if not is_inside_tree():
 		return
-	_fim_do_dia()
+	_hora_de_ir()
 
 
 ## Senta na cadeira da escrivaninha (onde o diário abre) e olha o tampo.
@@ -469,7 +481,7 @@ func _on_lugar_sono(_by: Node, lugar: LugarSono) -> void:
 	await _sonhar(lugar.noite)
 	if not is_inside_tree():
 		return
-	_fim_do_dia()
+	_hora_de_ir()
 
 
 ## Folhear o diário (Fase 3d): ele senta, o caderno abre no último par escrito;
@@ -492,16 +504,52 @@ func _entrada(n: int) -> DocumentData:
 	return diario_entradas[n] if n > 0 and n < diario_entradas.size() else null
 
 
+## O dia acabou (anotado sem sonho; ou de manhã, acordado do sonho): falta ir
+## para casa (Fase 3e). A porta, sem carta, abre para o corredor; descer a escada
+## do fim dele vira o dia (_on_escada).
+func _hora_de_ir() -> void:
+	player.stand()
+	player.debrucado = 0.0
+	player.fov_forcado = 0.0
+	_pode_ir = true
+	_saindo = false
+	player.input_enabled = not Events.is_modal_open
+	Events.notice_requested.emit("Hora de ir para casa.")
+
+
+## Ele abre a porta (a cena o leva até ela); depois, o corredor é dele.
+func _sair_pela_porta() -> void:
+	if calha.porta_aberta:
+		return
+	_saindo = true
+	player.input_enabled = false
+	await calha.abrir(player)
+	if not is_inside_tree():
+		return
+	_saindo = false
+	player.input_enabled = not Events.is_modal_open
+
+
+func _on_escada(body: Node3D) -> void:
+	if body == player and _pode_ir and calha.porta_aberta and not _saindo:
+		_pode_ir = false
+		_fim_do_dia()
+
+
 func _fim_do_dia() -> void:
 	_saindo = true
+	_pode_ir = false
 	await SceneDirector.fade_out(1.2)
 	if not is_inside_tree():
 		return
 	SceneDirector.hold_black = true
 	Narrator.cancel()
-	# A sala de amanhã: o caderno no lugar, a manhã desfeita, Wilmarth de pé.
+	# A sala de amanhã: o caderno no lugar, a manhã desfeita, a porta fechada,
+	# Wilmarth de pé.
 	lapso.desfazer_manha()
 	diario.repor()
+	calha.fechar_ja()
+	player.conduzido = false
 	player.stand()
 	player.debrucado = 0.0
 	player.fov_forcado = 0.0
@@ -527,7 +575,7 @@ func _fim_do_dia() -> void:
 ## (`sonhando` = noite: o conteúdo dos dias some, o grupo `Sonhos/NoiteN`
 ## aparece; a estética crua no máximo). Ele anda por ela até a flag de
 ## `sonhos[noite]` (acordar), ou o tempo acabar; então o sono pesa, escurece,
-## e ele acorda de manhã, debruçado no diário.
+## e ele acorda de manhã, debruçado no diário (e depois vai para casa).
 func _sonhar(noite: int) -> void:
 	var acordar: StringName = sonhos[noite]
 	await _adormecer(noite)

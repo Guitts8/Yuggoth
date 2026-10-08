@@ -339,6 +339,7 @@ func _ready() -> void:
 	var entrada1: DocumentData = esc.diario_entradas[1]
 	_check(entrada1 in GameState.dossier, "a entrada do dia vai para o dossiê")
 	_check(esc.bebida.xicara.get_node("Nivel").visible, "antes de anotar o dia, o café na xícara")
+	await _ir_para_casa(esc)
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 2 and not SceneDirector.hold_black and not esc._saindo, 60.0)
 	_check(GameState.get_value(&"dia") == 2, "anotado o dia (sem sonho), ir para casa avança para o Dia 2")
 	_check(not esc.diario.aberto and not player.seated and esc.diario.transform.is_equal_approx(esc.diario._casa), "o caderno de volta ao lugar, fechado")
@@ -573,8 +574,8 @@ func _ready() -> void:
 	await _sonho_no_teste(esc, 4, func() -> void: esc.find_child("Noite4", true, false).get_node("Pedra/Examinar").interact(esc.player))
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 5 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 5 and not tel.can_interact(player), "Dia 5: o telefone volta a ficar mudo")
-	_check(GameState.has_flag(&"frasco_na_mesa") and esc.bebida.copo.visible and esc.bebida.frasco.get_parent() != esc.bebida.gaveta,
-		"o uísque da noite do Dia 4: o frasco saiu da gaveta e ficou na mesa")
+	_check(GameState.has_flag(&"serviu_uisque") and esc.bebida.copo.visible and esc.bebida.frasco.get_parent() == esc.bebida.gaveta,
+		"o uísque da noite do Dia 4: o copo fica na mesa; o frasco, escondido na gaveta")
 
 	# --- Escritório: Dia 5, o telegrama "AKELY" (livro cap. IV) ---
 	var dia5: Node3D = esc.find_child("Dia5", true, false)
@@ -867,6 +868,33 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 	var onde := esc.player.global_position.distance_to(lugar.assento.global_position) < 0.3 if lugar else esc.diario.aberto
 	_check(GameState.get_value(&"dia") == n and esc.player.seated and onde and esc.find_child("Dias", true, false).visible
 		and esc.lapso.sol.light_energy > 0.0, "de manhã, %s, a aurora na janela" % ("onde o sono o pegou" if lugar else "debruçado no diário aberto"))
+	await _ir_para_casa(esc)
+
+
+## O dia acabou: a porta abre para o corredor e ele desce a escada, como o
+## jogador (Fase 3e).
+func _ir_para_casa(esc: Escritorio) -> void:
+	var n: int = GameState.get_value(&"dia")
+	await _until(func() -> bool: return esc._pode_ir and esc.player.input_enabled, 60.0)
+	_check(esc._pode_ir and esc.porta.prompt == "Ir para casa" and GameState.get_value(&"dia") == n, "Dia %d acabado: hora de ir para casa" % n)
+	esc.porta.interact(esc.player)
+	await _until(func() -> bool: return esc.calha.porta_aberta and esc.player.input_enabled, 20.0)
+	await _frames(2)
+	_check(esc.calha.corredor.visible and not esc.porta.can_interact(esc.player) and not esc.player.seated, "a porta aberta: o corredor")
+	# Pelo corredor até a escada, andando como o jogador (com a física: o vão
+	# está livre): primeiro pela soleira, depois corredor afora.
+	var alvo := esc.escada.global_position
+	var t := 0.0
+	while t < 20.0 and GameState.get_value(&"dia") == n and not esc._saindo:
+		var p := esc.player.global_position
+		var rumo := Vector3(alvo.x, p.y, alvo.z) if p.z > 3.4 else Vector3(esc.calha.soleira.x, p.y, 3.8)
+		if p.distance_to(rumo) > 0.05:
+			esc.player.look_at(rumo)
+		Input.action_press(&"mover_frente")
+		await get_tree().physics_frame
+		t += get_physics_process_delta_time()
+	Input.action_release(&"mover_frente")
+	_check(esc._saindo or GameState.get_value(&"dia") == n + 1, "pelo corredor até a escada: o dia acaba")
 
 
 ## Postada a resposta do dia: "Anotar o dia" no caderno, como o jogador.

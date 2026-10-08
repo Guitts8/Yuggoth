@@ -1,14 +1,19 @@
 class_name CalhaCorreio
 extends Node3D
 ## A calha de correio de latão no corredor, diante da porta do escritório
-## (docs/PLANO_ESCRITORIO.md, Fase 3d): é por ela que a carta de Wilmarth sai.
-## Como nos prédios dos anos 1920, a calha desce pela parede de andar em andar,
-## com a frente de vidro, até a caixa do correio no saguão; o carteiro a esvazia
-## de manhã ("vai amanhã cedo, com o primeiro correio").
+## (docs/PLANO_ESCRITORIO.md, Fases 3d e 3e): é por ela que a carta de Wilmarth
+## sai. Como nos prédios dos anos 1920, a calha desce pela parede de andar em
+## andar, com a frente de vidro, até a caixa do correio no saguão; o carteiro a
+## esvazia de manhã ("vai amanhã cedo, com o primeiro correio").
 ##
-## `await postar(carta, player)`: ele vai até a porta, abre, põe a carta na boca
-## da calha (a carta escorrega e se vê descer atrás do vidro), fecha a porta e
-## volta a olhar a sala. Quem chama solta a carta (`CartaSaida.postar`) depois.
+## `await postar(carta, player)`: ele vai até a porta (ao lado da maçaneta, fora
+## do arco da folha), abre, atravessa a soleira até a calha, põe a carta na boca
+## (ela escorrega e se vê descer atrás do vidro), volta e fecha a porta. Quem
+## chama solta a carta (`CartaSaida.postar`) depois. Durante tudo, a cena o
+## conduz (`Player.conduzido`), e a cabeça continua dele.
+##
+## `abrir(player)` e `fechar(player)` servem também para sair do escritório no
+## fim do dia (Escritorio, "Ir para casa").
 ##
 ## A origem do nó é a boca da calha, virada para a porta (-Z local aponta para
 ## dentro da calha). O gerador põe a calha, o corredor e a folha da porta.
@@ -18,49 +23,42 @@ extends Node3D
 @export var aberta := 78.0
 ## O corredor atrás da porta: só aparece enquanto ela está aberta.
 @export var corredor: Node3D
-## Onde Wilmarth para, diante da porta (global, no chão).
+## Onde Wilmarth para para abrir a porta (global, no chão): ao lado da
+## maçaneta, fora do arco da folha (playtest 4: a porta o atravessava).
 @export var diante := Vector3.ZERO
+## A soleira da porta (global, no chão) e o lugar diante da calha, no corredor.
+@export var soleira := Vector3.ZERO
+@export var na_calha := Vector3.ZERO
 @export var som_abrir: AudioStream
 @export var som_fechar: AudioStream
 @export var som_calha: AudioStream
 ## A descida que se vê pelo vidro: de onde a carta cai até onde some (y local).
 @export var queda := Vector2(0.0, -1.0)
 
-## A vista, apertada na calha enquanto a porta está aberta.
-const FOV := 55.0
+## Andando conduzido, em metros por segundo (devagar, como ele anda).
+const PASSO := 1.1
+
+var porta_aberta := false
 
 
 func postar(carta: Node3D, player: Player) -> void:
-	# Até a porta, de frente para ela.
-	var macaneta := folha.global_transform * Vector3(0.82, 1.0, 0.0) if folha else global_position
-	var t := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(player, ^"global_position", Vector3(diante.x, player.global_position.y, diante.z), 1.1)
-	await player.olhar_para(macaneta, 1.1, Vector3(diante.x, player.global_position.y, diante.z)).finished
+	player.conduzido = true
+	await abrir(player)
+	if not is_inside_tree():
+		return
+	# Pela soleira até a calha, olhando a boca dela.
+	await andar(player, [soleira, na_calha], global_position + Vector3.DOWN * 0.1)
 	if not is_inside_tree():
 		return
 
-	# A porta abre para dentro; ele olha a calha do outro lado do corredor.
-	if corredor:
-		corredor.visible = true
-	player.fov_forcado = FOV
-	_tocar(som_abrir)
-	t = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(folha, ^"rotation_degrees:y", aberta, 1.3)
-	await _pausa(0.5)
-	await player.olhar_para(global_position + Vector3.DOWN * 0.08, 1.0).finished
-	if t.is_running():
-		await t.finished
-	if not is_inside_tree():
-		return
-
-	# A carta vai da mão à boca da calha, em pé, e escorrega para dentro.
+	# A carta vai da mão à boca da calha, deitada, e escorrega para dentro.
 	carta.set_process(false)
 	var de := carta.global_transform
 	# Deitada, a borda curta na fenda (o X do envelope aponta para dentro, -Z).
 	var deitada := Basis(Vector3(0, 0, -1), Vector3.UP, Vector3(1, 0, 0))
 	var na_boca := global_transform * Transform3D(deitada, Vector3(0, 0.0, Envelope.LARGURA * 0.5 + 0.03))
-	t = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_method(func(k: float) -> void: carta.global_transform = de.interpolate_with(na_boca, k), 0.0, 1.0, 0.9)
+	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_method(func(k: float) -> void: carta.global_transform = de.interpolate_with(na_boca, k), 0.0, 1.0, 0.8)
 	await t.finished
 	if not is_inside_tree():
 		return
@@ -71,28 +69,91 @@ func postar(carta: Node3D, player: Player) -> void:
 	carta.visible = false
 	_tocar(som_calha)
 
-	# Atrás do vidro, a carta desce e some andar abaixo.
+	# Atrás do vidro, a carta desce e some andar abaixo; ele a acompanha.
 	var desce := _envelope_caindo()
+	player.olhar_para(global_position + Vector3.DOWN * 0.8, 1.0)
 	t = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	t.tween_property(desce, ^"position:y", queda.y, 0.75)
 	await t.finished
 	desce.queue_free()
-	await _pausa(0.7)
+	await _pausa(0.6)
 	if not is_inside_tree():
 		return
 
-	# Fecha a porta e volta a olhar a sala.
-	await player.olhar_para(macaneta, 0.8).finished
-	t = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	# De volta à sala, e fecha a porta.
+	await andar(player, [soleira, diante], _macaneta())
+	if not is_inside_tree():
+		return
+	await fechar(player)
+	player.conduzido = false
+	if not is_inside_tree():
+		return
+	await player.olhar_para(diante + Vector3(0.4, 1.0, -3.0), 1.0).finished
+
+
+## Vai até a porta, de frente para a maçaneta, e a abre para dentro; o corredor
+## aparece.
+func abrir(player: Player) -> void:
+	var estava := player.conduzido
+	player.conduzido = true
+	await andar(player, [diante], _macaneta())
+	if not is_inside_tree():
+		return
+	if corredor:
+		corredor.visible = true
+	_tocar(som_abrir)
+	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(folha, ^"rotation_degrees:y", aberta, 1.3)
+	# Enquanto ela abre, os olhos vão para o corredor.
+	player.olhar_para(soleira + Vector3(0, 1.4, 1.0), 1.3)
+	await t.finished
+	porta_aberta = true
+	player.conduzido = estava
+
+
+## Fecha a porta (ele está diante dela, do lado da sala); o corredor some.
+func fechar(player: Player) -> void:
+	await player.olhar_para(_macaneta(), 0.6).finished
+	if not is_inside_tree():
+		return
+	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(folha, ^"rotation_degrees:y", 0.0, 1.0)
 	await t.finished
 	_tocar(som_fechar)
+	porta_aberta = false
 	if corredor:
 		corredor.visible = false
-	player.fov_forcado = 0.0
-	if not is_inside_tree():
-		return
-	await player.olhar_para(diante + Vector3(0.6, 1.0, -3.0), 1.2).finished
+
+
+## Fechada de uma vez (no escuro da virada do dia).
+func fechar_ja() -> void:
+	if folha:
+		folha.rotation_degrees.y = 0.0
+	porta_aberta = false
+	if corredor:
+		corredor.visible = false
+
+
+## Leva o corpo pelos pontos (global, no chão), no passo dele, olhando `olhar`.
+func andar(player: Player, pontos: Array, olhar: Vector3) -> void:
+	var de := player.global_position
+	var total := 0.0
+	var t := player.create_tween().set_trans(Tween.TRANS_SINE)
+	for i in pontos.size():
+		var p: Vector3 = pontos[i]
+		p.y = de.y
+		var d := maxf(0.15, (p - (de if i == 0 else Vector3(pontos[i - 1].x, de.y, pontos[i - 1].z))).length())
+		var s := d / PASSO
+		total += s
+		t.tween_property(player, ^"global_position", p, s).set_ease(
+			Tween.EASE_IN if i == 0 and pontos.size() > 1 else (Tween.EASE_OUT if i == pontos.size() - 1 and pontos.size() > 1 else Tween.EASE_IN_OUT))
+	var fim: Vector3 = pontos[-1]
+	player.olhar_para(olhar, maxf(total, 0.5), Vector3(fim.x, de.y, fim.z))
+	await t.finished
+
+
+func _macaneta() -> Vector3:
+	return folha.global_transform * Vector3(0.82, 1.0, 0.0) if folha else global_position
 
 
 ## Um envelope de pé dentro da calha, atrás do vidro, na altura da boca.

@@ -344,6 +344,8 @@ func _estrutura() -> void:
 	_quad(folha, "Costas", Vector2(PORTA_L, PORTA_H), Vector3(PORTA_L / 2, PORTA_H / 2, 0.0), Vector3.ZERO, "porta")
 	_box(folha, "Macaneta", Vector3(0.05, 0.05, 0.06), Vector3(PORTA_L / 2 + 0.36, 1.0, -0.1), "latao")
 	_box(folha, "MacanetaFora", Vector3(0.05, 0.05, 0.06), Vector3(PORTA_L / 2 + 0.36, 1.0, 0.04), "latao")
+	# A folha fecha o vão (a parede tem o vão aberto, Fase 3e) e gira com ela.
+	_colisao(folha, "Colisao", [[Vector3(PORTA_L, PORTA_H, 0.05), Vector3(PORTA_L / 2, PORTA_H / 2, -0.03)]])
 	_box(p, "BatenteO", Vector3(0.08, 2.2, 0.06), Vector3(-0.5, 1.1, -0.03), "madeira_clara")
 	_box(p, "BatenteL", Vector3(0.08, 2.2, 0.06), Vector3(0.5, 1.1, -0.03), "madeira_clara")
 	_box(p, "BatenteAlto", Vector3(1.08, 0.08, 0.06), Vector3(0, 2.18, -0.03), "madeira_clara")
@@ -373,12 +375,17 @@ func _estrutura() -> void:
 	tique.unit_size = 2.0
 	_add(rel, tique)
 
+	# O sul com o vão da porta (no fim do dia ele sai por ela, pelo corredor).
+	var vo := PORTA_X - PORTA_L / 2 + W + 0.2
+	var vl := W + 0.2 - (PORTA_X + PORTA_L / 2)
 	_colisao(e, "Colisao", [
 		[Vector3(2 * W, 0.2, 2 * D), Vector3(0, -0.1, 0)],
 		[Vector3(2 * W, 0.2, 2 * D), Vector3(0, H + 0.1, 0)],
 		[Vector3(0.2, H, 2 * D), Vector3(-W - 0.1, H / 2, 0)],
 		[Vector3(0.2, H, 2 * D), Vector3(W + 0.1, H / 2, 0)],
-		[Vector3(2 * W, H, 0.2), Vector3(0, H / 2, D + 0.1)],
+		[Vector3(vo, H, PAREDE_SUL), Vector3(-W - 0.2 + vo / 2, H / 2, D + PAREDE_SUL / 2)],
+		[Vector3(vl, H, PAREDE_SUL), Vector3(W + 0.2 - vl / 2, H / 2, D + PAREDE_SUL / 2)],
+		[Vector3(PORTA_L, H - PORTA_H, PAREDE_SUL), Vector3(PORTA_X, (H + PORTA_H) / 2, D + PAREDE_SUL / 2)],
 		[Vector3(2 * W, H, 0.2), Vector3(0, H / 2, -D - 0.1)],
 	])
 
@@ -787,29 +794,79 @@ func _quadros(g: Node3D) -> void:
 
 ## O corredor da Miskatonic atrás da porta e, na parede da frente, a calha de
 ## correio de latão com frente de vidro (Fase 3d; CalhaCorreio): é por ela que a
-## carta sai. O corredor só aparece com a porta aberta.
+## carta sai. No fim do corredor, a leste, a escada desce para a rua: é por ela
+## que ele vai para casa (Fase 3e). O corredor só aparece com a porta aberta; as
+## colisões ficam sempre (atrás da porta fechada, ninguém chega a elas).
 func _corredor(g: Node3D) -> void:
 	var c := _group(g, "Corredor")
 	c.unique_name_in_owner = true
 	c.visible = false
 	var fundo := D + CORREDOR
 	var meio := D + CORREDOR / 2
+	var perto := D + PAREDE_SUL
 	var x0 := -4.0
-	var x1 := 2.0
+	var x1 := ESCADA_X
 	var largura := x1 - x0
 	var cx := (x0 + x1) / 2
 	_quad(c, "Piso", Vector2(largura, CORREDOR), Vector3(cx, 0, meio), Vector3(-90, 0, 0), "piso_corredor")
 	_quad(c, "Teto", Vector2(largura, CORREDOR), Vector3(cx, H, meio), Vector3(90, 0, 0), "teto")
 	_quad(c, "ParedeFrente", Vector2(largura, H), Vector3(cx, H / 2, fundo), Vector3(0, 180, 0), "parede_corredor")
 	_quad(c, "PontaO", Vector2(CORREDOR, H), Vector3(x0, H / 2, meio), Vector3(0, 90, 0), "parede_corredor")
-	_quad(c, "PontaL", Vector2(CORREDOR, H), Vector3(x1, H / 2, meio), Vector3(0, -90, 0), "parede_corredor")
 	_box(c, "Lambri", Vector3(largura, 1.0, 0.02), Vector3(cx, 0.5, fundo - 0.01), "lambri")
 	_box(c, "LambriMoldura", Vector3(largura, 0.04, 0.04), Vector3(cx, 1.02, fundo - 0.02), "madeira_escura")
 	_box(c, "Rodape", Vector3(largura, 0.12, 0.045), Vector3(cx, 0.06, fundo - 0.0225), "madeira_escura")
+
+	# O lado do corredor da parede da sala, em volta do vão (de dentro do corredor,
+	# a face da sala some — via-se a sala através dela), com lambri e rodapé, e os
+	# montantes do vão, na espessura da parede.
+	var vao_o := PORTA_X - PORTA_L / 2
+	var vao_l := PORTA_X + PORTA_L / 2
+	for t: Array in [["O", x0, vao_o], ["L", vao_l, x1]]:
+		var a: float = t[1]
+		var b: float = t[2]
+		_quad(c, "ParedeSala" + t[0], Vector2(b - a, H), Vector3((a + b) / 2, H / 2, perto), Vector3.ZERO, "parede_corredor")
+		_box(c, "LambriSala" + t[0], Vector3(b - a, 1.0, 0.02), Vector3((a + b) / 2, 0.5, perto + 0.01), "lambri")
+		_box(c, "MolduraSala" + t[0], Vector3(b - a, 0.04, 0.04), Vector3((a + b) / 2, 1.02, perto + 0.02), "madeira_escura")
+		_box(c, "RodapeSala" + t[0], Vector3(b - a, 0.12, 0.045), Vector3((a + b) / 2, 0.06, perto + 0.0225), "madeira_escura")
+	_quad(c, "ParedeSalaAlto", Vector2(PORTA_L, H - PORTA_H), Vector3(PORTA_X, (H + PORTA_H) / 2, perto), Vector3.ZERO, "parede_corredor")
+	for s in [-1, 1]:
+		_box(c, "Montante%d" % (s + 1), Vector3(0.03, PORTA_H, PAREDE_SUL), Vector3(PORTA_X + s * (PORTA_L / 2 + 0.015), PORTA_H / 2, D + PAREDE_SUL / 2), "madeira_clara")
+	_box(c, "VaoAlto", Vector3(PORTA_L + 0.06, 0.03, PAREDE_SUL), Vector3(PORTA_X, PORTA_H + 0.015, D + PAREDE_SUL / 2), "madeira_clara")
+	# O alizar do lado do corredor.
+	for s in [-1, 1]:
+		_box(c, "Alizar%d" % (s + 1), Vector3(0.1, PORTA_H + 0.12, 0.025), Vector3(PORTA_X + s * (PORTA_L / 2 + 0.07), (PORTA_H + 0.12) / 2, perto + 0.0125), "madeira_escura")
+	_box(c, "AlizarVerga", Vector3(PORTA_L + 0.3, 0.14, 0.03), Vector3(PORTA_X, PORTA_H + 0.12, perto + 0.015), "madeira_escura")
+
+	_escada(c, x1, perto, fundo)
+
+	_colisao(c, "Colisao", [
+		[Vector3(largura + 0.4, 0.2, CORREDOR), Vector3(cx, -0.1, meio)],
+		[Vector3(largura + 0.4, H, 0.2), Vector3(cx, H / 2, fundo + 0.1)],
+		[Vector3(0.2, H, CORREDOR), Vector3(x0 - 0.1, H / 2, meio)],
+		[Vector3(vao_o - x0, H, PAREDE_SUL), Vector3((x0 + vao_o) / 2, H / 2, D + PAREDE_SUL / 2)],
+		[Vector3(x1 - vao_l, H, PAREDE_SUL), Vector3((vao_l + x1) / 2, H / 2, D + PAREDE_SUL / 2)],
+		# O alto da escada: quem chega aqui já foi para casa (%Escada).
+		[Vector3(0.2, H, CORREDOR), Vector3(x1 + 0.35, H / 2, meio)],
+	])
+	var escada := Area3D.new()
+	escada.name = "Escada"
+	escada.collision_layer = 0
+	escada.collision_mask = 1
+	escada.monitorable = false
+	escada.position = Vector3(x1 - 0.2, 1.0, meio)
+	_add(g, escada)
+	escada.unique_name_in_owner = true
+	var forma := CollisionShape3D.new()
+	forma.name = "Forma"
+	var caixa := BoxShape3D.new()
+	caixa.size = Vector3(0.5, 2.0, CORREDOR)
+	forma.shape = caixa
+	_add(escada, forma)
 	# A porta de outra sala, mais adiante, com o vidro fosco aceso.
 	var vizinha := _group(c, "PortaVizinha", Vector3(-2.9, 0, fundo), 180)
 	_box(vizinha, "Folha", Vector3(0.9, 2.1, 0.05), Vector3(0, 1.05, 0.0), "madeira_escura")
-	_box(vizinha, "Vidro", Vector3(0.6, 0.55, 0.052), Vector3(0, 1.6, 0.0), "vidro_fosco")
+	# O vidro sai da madeira (rente a ela, sumia na distância).
+	_box(vizinha, "Vidro", Vector3(0.6, 0.55, 0.07), Vector3(0, 1.6, 0.0), "vidro_fosco")
 	_box(vizinha, "Batente", Vector3(1.04, 2.18, 0.04), Vector3(0, 1.09, 0.01), "madeira_clara")
 	_box(vizinha, "Macaneta", Vector3(0.05, 0.05, 0.06), Vector3(0.36, 1.0, -0.05), "latao")
 	# A luz do teto: um globo de vidro.
@@ -856,11 +913,56 @@ func _corredor(g: Node3D) -> void:
 	calha.unique_name_in_owner = true
 	calha.folha = _folha_porta
 	calha.corredor = c
-	calha.diante = Vector3(PORTA_X + 0.1, 0, D - 0.62)
+	# Para abrir a porta, ao lado da maçaneta, fora do arco da folha.
+	calha.diante = Vector3(PORTA_X + 0.65, 0, D - 0.55)
+	calha.soleira = Vector3(PORTA_X + 0.05, 0, D + PAREDE_SUL / 2)
+	calha.na_calha = Vector3(CALHA_X, 0, fundo - 0.55)
 	calha.queda = Vector2(-0.02, -CALHA_BOCA + 0.08)
 	calha.som_abrir = load(SFX_DIR + "porta_rangendo.wav")
 	calha.som_fechar = load(SFX_DIR + "porta_trinco.wav")
 	calha.som_calha = load(SFX_DIR + "calha_correio.wav")
+
+
+## A escada no fim do corredor (Fase 3e): os degraus descem para leste, entre
+## as paredes, para o andar de baixo, mal iluminado de lá; o corrimão de
+## madeira com o pilar no alto e os balaústres.
+func _escada(c: Node3D, x: float, perto: float, fundo: float) -> void:
+	var e := _group(c, "Escada")
+	var n := 9
+	var largura := fundo - perto
+	var meio := (perto + fundo) / 2
+	var comprido := n * DEGRAU.x + 0.3
+	var desce := n * DEGRAU.y
+	for k in n:
+		var topo := -(k + 1) * DEGRAU.y
+		_box(e, "Degrau%d" % k, Vector3(DEGRAU.x, DEGRAU.y, largura), Vector3(x + (k + 0.5) * DEGRAU.x, topo - DEGRAU.y / 2, meio), "madeira_escura")
+		# O nariz do degrau, um pouco à frente.
+		_box(e, "Nariz%d" % k, Vector3(0.03, 0.025, largura), Vector3(x + k * DEGRAU.x + 0.005, topo - 0.0125, meio), "madeira_clara")
+	var fim := x + comprido
+	var baixo := -desce - 0.3
+	var alto := H - baixo
+	_quad(e, "ParedePerto", Vector2(comprido, alto), Vector3(x + comprido / 2, (H + baixo) / 2, perto), Vector3.ZERO, "parede_corredor")
+	_quad(e, "ParedeFundo", Vector2(comprido, alto), Vector3(x + comprido / 2, (H + baixo) / 2, fundo), Vector3(0, 180, 0), "parede_corredor")
+	_quad(e, "ParedeFim", Vector2(largura, alto), Vector3(fim, (H + baixo) / 2, meio), Vector3(0, -90, 0), "parede_corredor")
+	_quad(e, "Teto", Vector2(comprido, largura), Vector3(x + comprido / 2, H, meio), Vector3(90, 0, 0), "teto")
+	_quad(e, "PisoBaixo", Vector2(0.6, largura), Vector3(fim - 0.3, -desce, meio), Vector3(-90, 0, 0), "piso_corredor")
+	# O corrimão, do lado da parede da frente: o pilar no alto, a barra inclinada
+	# e os balaústres.
+	var z := fundo - 0.07
+	var a := atan2(desce, n * DEGRAU.x)
+	var pilar := _box(e, "Pilar", Vector3(0.08, 1.05, 0.08), Vector3(x + 0.04, 0.525, z), "madeira_escura")
+	_cyl(e, "Pomo", 0.05, 0.045, 0.07, pilar.position + Vector3(0, 0.56, 0), "madeira_escura", 8)
+	var comp := Vector2(n * DEGRAU.x, desce).length()
+	var barra := _box(e, "Corrimao", Vector3(comp, 0.05, 0.06), Vector3(x + 0.04 + n * DEGRAU.x / 2, 0.95 - desce / 2, z), "madeira_escura")
+	barra.rotation.z = -a
+	for k in n:
+		var bx := x + (k + 0.5) * DEGRAU.x
+		var chao := -(k + 1) * DEGRAU.y
+		var topo := 0.95 - (bx - x - 0.04) * tan(a)
+		_box(e, "Balaustre%d" % k, Vector3(0.025, topo - chao, 0.025), Vector3(bx, (topo + chao) / 2, z), "madeira_escura")
+	# A luz de baixo, fraca: a escada desce para o escuro.
+	var luz := _omni(e, "LuzBaixo", Vector3(fim - 0.5, -desce + 0.6, meio), Color(1.0, 0.78, 0.5), 0.6, 3.0)
+	luz.omni_attenuation = 1.5
 
 
 ## O café e o uísque (Bebida, Fase 3d): a garrafa térmica e a xícara no pires,
@@ -896,8 +998,9 @@ func _bebida(g: Node3D) -> void:
 	b.copo = copo
 	b.frasco = frasco
 	b.gaveta = _gaveta_mesa
-	# No espaço da escrivaninha (o pai da gaveta): em pé, junto ao copo.
-	b.frasco_na_mesa = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(-25.0), 0)), Vector3(0.74, MESA, -0.1))
+	# No espaço da escrivaninha (o pai da gaveta): em pé, junto ao copo, só
+	# enquanto serve (depois volta para a gaveta).
+	b.frasco_servindo = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(-25.0), 0)), Vector3(0.74, MESA, -0.1))
 	b.som_servir = load(SFX_DIR + "servir.wav")
 	b.som_gaveta = load(SFX_DIR + "gaveta.wav")
 	var bebidas: Dictionary[int, int] = {1: 1, 2: 1, 3: 1, 4: 2}
@@ -1156,6 +1259,11 @@ const PORTA_H := 2.1
 const CORREDOR := 1.4
 const CALHA_X := -0.92
 const CALHA_BOCA := 1.15
+## A espessura da parede sul (entre a sala e o corredor).
+const PAREDE_SUL := 0.14
+## Onde o corredor acaba, a leste, e a escada começa a descer.
+const ESCADA_X := 2.0
+const DEGRAU := Vector2(0.28, 0.18)
 ## A poltrona (virada para a lareira) e a cadeira de leitura (virada para o
 ## fonógrafo, no canto sudoeste): onde ele adormece nas noites 5 e 3.
 const POLTRONA_POS := Vector3(1.35, 0, 0.45)

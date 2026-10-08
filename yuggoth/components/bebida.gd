@@ -3,7 +3,9 @@ extends Node3D
 ## O café e o uísque de Wilmarth (docs/PLANO_ESCRITORIO.md, Fase 3d) 💭: antes de
 ## anotar o dia, sentado à mesa, ele se serve — café da garrafa térmica nos
 ## primeiros dias (para render mais), uísque do frasco escondido na gaveta nos
-## últimos (é 1928, a Lei Seca: para os nervos). A xícara e o copo ficam na mesa.
+## últimos (é 1928, a Lei Seca: para os nervos). O frasco volta para a gaveta
+## assim que serve (playtest 4: "o uísque é escondido"); a xícara e o copo ficam
+## na mesa.
 ##
 ## `await cafe(player)` / `await uisque(player)`: serve e bebe um gole; `await
 ## gole(player, recipiente)` só bebe (o copo já servido, junto à lareira). Quem
@@ -12,27 +14,25 @@ extends Node3D
 
 @export var garrafa: Node3D
 @export var xicara: Node3D
-## O frasco começa dentro da gaveta (filho dela); servido o uísque, vai para a
-## mesa (`frasco_na_mesa`, no espaço do pai da gaveta) e não volta mais.
+## O frasco mora dentro da gaveta (filho dela); sai só para servir, em pé sobre
+## a mesa em `frasco_servindo` (no espaço do pai da gaveta), e volta.
 @export var frasco: Node3D
 @export var copo: Node3D
 @export var gaveta: Node3D
-@export var frasco_na_mesa := Transform3D.IDENTITY
+@export var frasco_servindo := Transform3D.IDENTITY
 @export var som_servir: AudioStream
 @export var som_gaveta: AudioStream
 
 
 func _ready() -> void:
-	# Depois que a gaveta e o frasco estiverem prontos (reparent no _ready falha).
-	_repor.call_deferred()
+	_repor()
 
 
+## O copo fica na mesa depois do primeiro uísque (`frasco_na_mesa` é o nome
+## antigo da flag, de saves da 3d).
 func _repor() -> void:
-	if GameState.has_flag(&"frasco_na_mesa"):
-		_frasco_para_a_mesa()
-		frasco.transform = frasco_na_mesa
 	if copo:
-		copo.visible = GameState.has_flag(&"frasco_na_mesa")
+		copo.visible = GameState.has_flag(&"serviu_uisque") or GameState.has_flag(&"frasco_na_mesa")
 
 
 ## Café da garrafa térmica na xícara, e um gole.
@@ -41,31 +41,42 @@ func cafe(player: Player) -> void:
 	await gole(player, xicara)
 
 
-## A gaveta abre, o frasco sai para a mesa, o uísque no copo; um gole.
+## A gaveta abre, o frasco sai, o uísque no copo, e o frasco volta escondido
+## para a gaveta, que fecha; um gole.
 func uisque(player: Player) -> void:
 	copo.visible = true
-	if not GameState.has_flag(&"frasco_na_mesa"):
-		var fechada := gaveta.position
-		await player.olhar_para(gaveta.global_position + Vector3.UP * 0.25, 0.9).finished
-		_tocar(som_gaveta)
-		var t := _tween()
-		t.tween_property(gaveta, ^"position", fechada + Vector3(0, 0, 0.24), 0.7)
-		await t.finished
-		_frasco_para_a_mesa()
-		var de := frasco.transform
-		t = _tween()
-		t.tween_method(func(k: float) -> void:
-			var x := de.interpolate_with(frasco_na_mesa, k)
-			x.origin.y += sin(k * PI) * 0.2
-			frasco.transform = x, 0.0, 1.0, 1.1)
-		await t.finished
-		_tocar(som_gaveta)
-		t = _tween()
-		t.tween_property(gaveta, ^"position", fechada, 0.6)
-		await t.finished
-		GameState.set_flag(&"frasco_na_mesa")
+	var fechada := gaveta.position
+	await player.olhar_para(gaveta.global_position + Vector3.UP * 0.25, 0.9).finished
+	_tocar(som_gaveta)
+	var t := _tween()
+	t.tween_property(gaveta, ^"position", fechada + Vector3(0, 0, 0.24), 0.7)
+	await t.finished
+	# Da gaveta (aberta) para a mesa, num arco; e de volta pelo mesmo caminho.
+	var na_gaveta := frasco.transform
+	frasco.reparent(gaveta.get_parent(), true)
+	var de := frasco.transform
+	await _arco(de, frasco_servindo, 1.1)
 	await _servir(player, frasco, copo, 0.45)
+	await player.olhar_para(gaveta.global_position + Vector3.UP * 0.25, 0.7).finished
+	await _arco(frasco_servindo, de, 0.9)
+	frasco.reparent(gaveta, true)
+	frasco.transform = na_gaveta
+	_tocar(som_gaveta)
+	t = _tween()
+	t.tween_property(gaveta, ^"position", fechada, 0.6)
+	await t.finished
+	GameState.set_flag(&"serviu_uisque")
 	await gole(player, copo)
+
+
+## O frasco de `de` a `ate` (no espaço do pai da gaveta), subindo no meio.
+func _arco(de: Transform3D, ate: Transform3D, segundos: float) -> void:
+	var t := _tween()
+	t.tween_method(func(k: float) -> void:
+		var x := de.interpolate_with(ate, k)
+		x.origin.y += sin(k * PI) * 0.2
+		frasco.transform = x, 0.0, 1.0, segundos)
+	await t.finished
 
 
 ## O recipiente vem à boca (embaixo do centro da vista), inclina, e volta.
@@ -119,11 +130,6 @@ func _servir(player: Player, de: Node3D, para: Node3D, cheio: float) -> void:
 	t.tween_property(de, ^"global_transform", sobre, 0.4)
 	t.tween_property(de, ^"global_transform", casa, 0.7)
 	await t.finished
-
-
-func _frasco_para_a_mesa() -> void:
-	if frasco.get_parent() == gaveta:
-		frasco.reparent(gaveta.get_parent(), true)
 
 
 func _tween() -> Tween:
