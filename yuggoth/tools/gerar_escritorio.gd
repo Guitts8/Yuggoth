@@ -150,6 +150,10 @@ func _materiais() -> void:
 	_mat("papel", "papel", {world = 4.0})
 	_mat("latao", "latao", {world = 3.0})
 	_mat("cinzas", "cinzas", {world = 2.0})
+	# A lareira (Fase 3e): azulejos verdes vidrados, o piso de pedra, a fuligem.
+	_mat("azulejo", "aco", {world = 8.0, cor = Color(0.26, 0.4, 0.32)})
+	_mat("pedra_lareira", "reboco", {world = 2.0, cor = Color(0.5, 0.48, 0.45)})
+	_mat("fuligem", "cinzas", {world = 3.0, cor = Color(0.45, 0.42, 0.4)})
 	_mat("papel_pardo", "papel_pardo", {world = 3.0})
 	_mat("barbante", "barbante", {world = 40.0})
 	_mat("mostrador", "mostrador", {})
@@ -342,15 +346,7 @@ func _estrutura() -> void:
 	_box(e, "RodapeSulL", Vector3(rl, r, rp), Vector3(W - rl / 2, r / 2, D - rp / 2), "madeira_escura")
 	_box(e, "RodapeNorte", Vector3(2 * W, r, rp), Vector3(0, r / 2, -D + rp / 2), "madeira_escura")
 
-	# Janela: caixilho e travessas em cruz.
-	var j := _group(e, "Janela", Vector3(0, 0, -D))
-	_box(j, "Peitoril", Vector3(2 * JANELA_X + 0.2, 0.06, 0.26), Vector3(0, JANELA_Y.x, 0.02), "madeira_clara")
-	_box(j, "Verga", Vector3(2 * JANELA_X + 0.1, 0.1, 0.14), Vector3(0, JANELA_Y.y + 0.05, -0.05), "madeira_clara")
-	for s in [-1, 1]:
-		_box(j, "Batente%s" % ("O" if s < 0 else "L"), Vector3(0.08, JANELA_Y.y - JANELA_Y.x, 0.14),
-			Vector3(s * (JANELA_X + 0.02), (JANELA_Y.x + JANELA_Y.y) / 2, -0.05), "madeira_clara")
-	_box(j, "TravessaV", Vector3(0.04, JANELA_Y.y - JANELA_Y.x, 0.04), Vector3(0, (JANELA_Y.x + JANELA_Y.y) / 2, -0.1), "madeira_clara")
-	_box(j, "TravessaH", Vector3(2 * JANELA_X, 0.04, 0.04), Vector3(0, 1.7, -0.1), "madeira_clara")
+	_janela(e)
 
 	# Porta (sul, lado oeste) e relógio (sul, lado leste).
 	var p := _group(e, "Porta", Vector3(PORTA_X, 0, D))
@@ -406,6 +402,71 @@ func _estrutura() -> void:
 		[Vector3(PORTA_L, H - PORTA_H, PAREDE_SUL), Vector3(PORTA_X, (H + PORTA_H) / 2, D + PAREDE_SUL / 2)],
 		[Vector3(2 * W, H, 0.2), Vector3(0, H / 2, -D - 0.1)],
 	])
+
+
+## A janela norte (Fase 3e: "a estrutura da janela"): duas janelas de guilhotina
+## lado a lado, como nos prédios da Nova Inglaterra dos anos 1920, separadas por
+## um montante. Cada uma com a folha de baixo na frente e a de cima atrás, em
+## quatro vidros cada (pinázios), o trilho do meio com a tranca de latão e os
+## puxadores; o vão forrado de madeira na espessura da parede; do lado da sala, o
+## alizar com a cimalha em cima, e o peitoril com o avental embaixo. Um vidro
+## quase invisível em cada folha.
+func _janela(e: Node3D) -> void:
+	var j := _group(e, "Janela", Vector3(0, 0, -D))
+	var baixo := JANELA_Y.x
+	var alto := JANELA_Y.y
+	var meio := (baixo + alto) / 2
+	var vao := alto - baixo
+	var t := 0.2  # espessura da parede
+	# O forro do vão: os lados e o alto, na espessura da parede.
+	for s in [-1, 1]:
+		_box(j, "Forro%s" % ("O" if s < 0 else "L"), Vector3(0.03, vao, t), Vector3(s * (JANELA_X - 0.015), meio, -t / 2), "madeira_clara")
+	_box(j, "ForroAlto", Vector3(2 * JANELA_X, 0.03, t), Vector3(0, alto - 0.015, -t / 2), "madeira_clara")
+	# O peitoril (de dentro, avançando na sala) e o avental embaixo dele.
+	_box(j, "Peitoril", Vector3(2 * JANELA_X + 0.22, 0.04, 0.24), Vector3(0, baixo, 0.0), "madeira_clara")
+	_box(j, "PeitorilFora", Vector3(2 * JANELA_X, 0.03, t), Vector3(0, baixo - 0.01, -t / 2 - 0.02), "madeira_clara")
+	_box(j, "Avental", Vector3(2 * JANELA_X + 0.1, 0.1, 0.02), Vector3(0, baixo - 0.07, 0.01), "madeira_clara")
+	# O alizar: os montantes, a verga e a cimalha.
+	for s in [-1, 1]:
+		_box(j, "Alizar%s" % ("O" if s < 0 else "L"), Vector3(0.1, vao + 0.02, 0.025), Vector3(s * (JANELA_X + 0.05), meio + 0.01, 0.0125), "madeira_clara")
+	_box(j, "AlizarVerga", Vector3(2 * JANELA_X + 0.22, 0.14, 0.03), Vector3(0, alto + 0.07, 0.015), "madeira_clara")
+	_box(j, "AlizarCimalha", Vector3(2 * JANELA_X + 0.3, 0.035, 0.07), Vector3(0, alto + 0.155, 0.03), "madeira_clara")
+	# O montante entre as duas janelas.
+	_box(j, "Montante", Vector3(0.1, vao, t - 0.02), Vector3(0, meio, -t / 2), "madeira_clara")
+	# As duas janelas de guilhotina.
+	var vidro := StandardMaterial3D.new()
+	vidro.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	vidro.albedo_color = Color(0.7, 0.78, 0.82, 0.07)
+	vidro.roughness = 0.05
+	vidro.metallic_specular = 0.9
+	var larg := JANELA_X - 0.05 - 0.015  # cada janela, do montante ao forro
+	for s in [-1, 1]:
+		var cx: float = s * (0.05 + larg / 2)
+		# A de baixo na frente (mais perto da sala), a de cima atrás.
+		for f: Array in [["Baixo", baixo, meio + 0.02, -0.07], ["Cima", meio - 0.02, alto, -0.12]]:
+			var y0: float = f[1]
+			var y1: float = f[2]
+			var z: float = f[3]
+			var folha := _group(j, "Folha%s%s" % [f[0], "O" if s < 0 else "L"], Vector3(cx, (y0 + y1) / 2, z))
+			var h := y1 - y0
+			var tr := 0.045
+			# Montantes e travessas da folha (a de baixo mais larga embaixo).
+			for k in [-1, 1]:
+				_box(folha, "Montante%d" % (k + 1), Vector3(tr, h, 0.035), Vector3(k * (larg / 2 - tr / 2), 0, 0), "madeira_clara")
+			var pe := 0.07 if f[0] == "Baixo" else tr
+			_box(folha, "TravessaPe", Vector3(larg, pe, 0.035), Vector3(0, -h / 2 + pe / 2, 0), "madeira_clara")
+			_box(folha, "TravessaTopo", Vector3(larg, tr, 0.035), Vector3(0, h / 2 - tr / 2, 0), "madeira_clara")
+			# Os pinázios: uma cruz, quatro vidros.
+			_box(folha, "PinazioV", Vector3(0.018, h - tr, 0.025), Vector3(0, 0, 0), "madeira_clara")
+			_box(folha, "PinazioH", Vector3(larg - tr, 0.018, 0.025), Vector3(0, (pe - tr) / 2, 0), "madeira_clara")
+			var v := _quad(folha, "Vidro", Vector2(larg - tr, h - tr), Vector3(0, 0, -0.004), Vector3.ZERO, "papel")
+			v.material_override = vidro
+			v.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			if f[0] == "Baixo":
+				# A tranca no trilho do meio e os dois puxadores embaixo.
+				_box(folha, "Tranca", Vector3(0.07, 0.018, 0.03), Vector3(0, h / 2 + 0.005, -0.02), "latao")
+				for k in [-1, 1]:
+					_box(folha, "Puxador%d" % (k + 1), Vector3(0.03, 0.025, 0.02), Vector3(k * larg * 0.3, -h / 2 + 0.05, 0.025), "latao")
 
 
 # --- Mobília comum ---------------------------------------------------------------
@@ -557,8 +618,23 @@ func _fileira(pecas: Array, rng: RandomNumberGenerator, y: float, fundo: float, 
 		var alt := minf(rng.randf_range(0.19, 0.33), alt_max)
 		if z + esp > z1:
 			break
-		pecas.append([Vector3(prof, alt, esp), Vector3(fundo + prof / 2, y + alt / 2, z + esp / 2), Vector3.ZERO, cor])
-		z += esp
+		# Livros de série, às vezes: a mesma cor e altura, lado a lado.
+		var serie := rng.randi_range(2, 5) if rng.randf() < 0.18 else 1
+		for s in serie:
+			if z + esp > z1:
+				break
+			var frente := fundo + prof
+			pecas.append([Vector3(prof, alt, esp), Vector3(fundo + prof / 2, y + alt / 2, z + esp / 2), Vector3.ZERO, cor])
+			# Na lombada, os frisos dourados perto do pé e da cabeça (Fase 3e).
+			if rng.randf() < 0.7:
+				var ouro := Color(0.78, 0.62, 0.3) * rng.randf_range(0.8, 1.1)
+				ouro.a = 1.0
+				for faixa in [0.035, alt - 0.045]:
+					pecas.append([Vector3(0.004, 0.008, esp - 0.004), Vector3(frente + 0.001, y + faixa, z + esp / 2), Vector3.ZERO, ouro])
+			# E a etiqueta clara do título, nos mais altos.
+			if alt > 0.24 and rng.randf() < 0.4:
+				pecas.append([Vector3(0.004, 0.03, esp - 0.008), Vector3(frente + 0.001, y + alt * 0.7, z + esp / 2), Vector3.ZERO, Color(0.82, 0.76, 0.6)])
+			z += esp
 	# O último, inclinado sobre os outros, se sobrou espaço.
 	var resto := z1 - z
 	if resto > 0.06:
@@ -570,16 +646,32 @@ func _fileira(pecas: Array, rng: RandomNumberGenerator, y: float, fundo: float, 
 			z + (alt * sin(a) + 0.035 * cos(a)) / 2), Vector3(-ang, 0, 0), cor])
 
 
+## A estante da parede oeste, metade norte, cheia (Fase 3e: com acabamento): os
+## lados, o fundo, o rodapé recuado, os montantes da frente, a cimalha em dois
+## degraus no alto e a borda de cada prateleira; livros de lombada com frisos.
 func _estante(parent: Node) -> void:
-	# Parede oeste, metade norte, cheia.
 	var g := _group(parent, "Estante", Vector3(-W + 0.18, 0, -2.0))
 	var alt := 2.3
 	_box(g, "LadoN", Vector3(0.36, alt, 0.04), Vector3(0, alt / 2, -0.78), "madeira_escura")
 	_box(g, "LadoS", Vector3(0.36, alt, 0.04), Vector3(0, alt / 2, 0.78), "madeira_escura")
 	_box(g, "Fundo", Vector3(0.02, alt, 1.56), Vector3(-0.17, alt / 2, 0), "madeira_escura")
-	var prateleiras := [0.06, 0.5, 0.94, 1.38, 1.82, alt - 0.02]
+	var prateleiras := [0.1, 0.52, 0.95, 1.38, 1.82, alt - 0.02]
 	for i in prateleiras.size():
 		_box(g, "Prateleira%d" % i, Vector3(0.36, 0.04, 1.52), Vector3(0, prateleiras[i], 0), "madeira_escura")
+		# A borda da frente, um pouco mais alta que a tábua.
+		_box(g, "Borda%d" % i, Vector3(0.02, 0.05, 1.52), Vector3(0.175, prateleiras[i] - 0.005, 0), "madeira_escura")
+	# Os montantes da frente, cobrindo os lados.
+	for s in [-1, 1]:
+		_box(g, "Montante%d" % (s + 1), Vector3(0.025, alt, 0.07), Vector3(0.19, alt / 2, s * 0.775), "madeira_escura")
+	# O rodapé, recuado, e a cimalha no alto, em dois degraus.
+	_box(g, "Rodape", Vector3(0.03, 0.08, 1.6), Vector3(0.165, 0.04, 0), "madeira_escura")
+	_box(g, "CimalhaBaixo", Vector3(0.4, 0.05, 1.64), Vector3(0.02, alt + 0.025, 0), "madeira_escura")
+	_box(g, "CimalhaAlto", Vector3(0.44, 0.04, 1.7), Vector3(0.03, alt + 0.07, 0), "madeira_escura")
+	_box(g, "Friso", Vector3(0.02, 0.06, 1.56), Vector3(0.195, alt - 0.06, 0), "madeira_escura")
+	# Em cima da estante, uma caixa de arquivo e um rolo de mapas.
+	_box(g, "Caixa", Vector3(0.28, 0.16, 0.36), Vector3(0.0, alt + 0.17, -0.4), "papel_pardo")
+	var rolo := _cyl(g, "Rolo", 0.04, 0.04, 0.6, Vector3(0.02, alt + 0.13, 0.3), "papel", 8)
+	rolo.rotation_degrees.x = 90
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 41
 	var livros := []
@@ -589,28 +681,143 @@ func _estante(parent: Node) -> void:
 	_colisao(g, "Colisao", [[Vector3(0.36, alt, 1.6), Vector3(0, alt / 2, 0)]])
 
 
+## A lareira da parede leste (Fase 3e: "a lareira principalmente"): o peito de
+## tijolo até o teto; embaixo, o consolo de madeira escura dos anos 1920 —
+## pilastras com capitel, o friso e a prateleira com cimalha e mísulas —, um
+## quadro de azulejos verdes em volta da boca, a verga de ferro; dentro, a
+## fornalha com as faces de tijolo inclinadas, o fundo de fuligem e a grelha de
+## ferro de barras; na frente, o piso de pedra com o guarda-fogo de latão; ao
+## lado, o jogo de ferramentas e o cesto de lenha. Origem: o meio da parede; -X
+## é a sala.
 func _lareira(parent: Node) -> void:
-	# Parede leste. Abertura de 0,8 m; cinzas no fundo.
 	var g := _group(parent, "Lareira", Vector3(W, 0, -0.6))
 	var prof := 0.4
-	_box(g, "PilarN", Vector3(prof, 0.85, 0.4), Vector3(-prof / 2, 0.425, -0.6), "tijolo")
-	_box(g, "PilarS", Vector3(prof, 0.85, 0.4), Vector3(-prof / 2, 0.425, 0.6), "tijolo")
-	_box(g, "Chamine", Vector3(prof, H - 0.85, 1.6), Vector3(-prof / 2, (H + 0.85) / 2, 0), "tijolo")
-	_box(g, "FundoFogo", Vector3(0.05, 0.85, 0.8), Vector3(-0.03, 0.425, 0), "cinzas")
-	_box(g, "Lareiro", Vector3(0.6, 0.05, 1.8), Vector3(-0.3, 0.025, 0), "tijolo")
-	_box(g, "Cinzas", Vector3(0.3, 0.06, 0.5), Vector3(-0.2, 0.08, 0), "cinzas")
-	_box(g, "Grelha", Vector3(0.3, 0.12, 0.55), Vector3(-0.22, 0.12, 0), "ferro")
-	_box(g, "Consolo", Vector3(prof + 0.16, 0.08, 1.9), Vector3(-(prof + 0.16) / 2, 1.15, 0), "madeira_escura")
+	var boca := Vector2(0.36, 0.78)  # meia largura, altura
+	var frente := -prof
+	# O peito: dos lados da boca e acima dela, até o teto.
 	for s in [-1, 1]:
-		_cyl(g, "Castical%d" % s, 0.025, 0.04, 0.2, Vector3(-0.3, 1.29, s * 0.7), "latao", 6)
-	# A boca fica livre (a mira alcança a lenha, "Acender a lareira"): os pilares,
-	# o peito da chaminé acima da boca e o consolo, que avança mais.
+		var largo := 0.8 - boca.x
+		_box(g, "Peito%d" % (s + 1), Vector3(prof, boca.y, largo), Vector3(-prof / 2, boca.y / 2, s * (boca.x + largo / 2)), "tijolo")
+	_box(g, "Chamine", Vector3(prof, H - boca.y, 1.6), Vector3(-prof / 2, (H + boca.y) / 2, 0), "tijolo")
+	# A fornalha: o fundo de fuligem, as faces inclinadas, o teto escuro.
+	_box(g, "FundoFogo", Vector3(0.03, boca.y, boca.x * 1.3), Vector3(-0.05, boca.y / 2, 0), "fuligem")
+	for s in [-1, 1]:
+		var face := _box(g, "Face%d" % (s + 1), Vector3(0.3, boca.y, 0.03), Vector3(-0.22, boca.y / 2, s * (boca.x * 0.84)), "tijolo")
+		face.rotation_degrees.y = s * 14.0
+	_box(g, "TetoFogo", Vector3(0.36, 0.03, boca.x * 2.0), Vector3(-0.2, boca.y - 0.015, 0), "fuligem")
+	_box(g, "ChaoFogo", Vector3(0.36, 0.02, boca.x * 2.0), Vector3(-0.2, 0.01, 0), "cinzas")
+	_box(g, "Cinzas", Vector3(0.26, 0.03, 0.46), Vector3(-0.2, 0.035, 0), "cinzas")
+	# A verga de ferro sobre a boca.
+	_box(g, "Verga", Vector3(0.02, 0.05, boca.x * 2.0 + 0.08), Vector3(frente - 0.005, boca.y + 0.02, 0), "ferro")
+	_grelha(g, Vector3(-0.22, 0.0, 0))
+
+	# O quadro de azulejos em volta da boca, em fiadas de 15 cm.
+	var az := 0.15
+	var faixa := 0.16
+	for s in [-1, 1]:
+		for k in int((boca.y + faixa) / az) + 1:
+			var y := k * az + az / 2
+			if y > boca.y + faixa:
+				break
+			_box(g, "Azulejo%d_%d" % [s + 1, k], Vector3(0.012, az - 0.006, faixa - 0.006), Vector3(frente - 0.006, y, s * (boca.x + faixa / 2)), "azulejo")
+	for k in int((boca.x * 2.0 + faixa * 2.0) / az):
+		var z := -boca.x - faixa + k * az + az / 2
+		_box(g, "AzulejoAlto%d" % k, Vector3(0.012, faixa - 0.006, az - 0.006), Vector3(frente - 0.006, boca.y + faixa / 2, z), "azulejo")
+
+	# O consolo de madeira: pilastras com base e capitel, o friso, a prateleira
+	# com a cimalha por baixo e as mísulas nas pontas.
+	var mad := frente - 0.03
+	var pil := 0.11
+	var zp := boca.x + faixa + pil / 2
+	var alto := boca.y + faixa
+	for s in [-1, 1]:
+		_box(g, "Pilastra%d" % (s + 1), Vector3(0.06, alto, pil), Vector3(mad, alto / 2, s * zp), "madeira_escura")
+		_box(g, "BasePilastra%d" % (s + 1), Vector3(0.08, 0.1, pil + 0.03), Vector3(mad - 0.01, 0.05, s * zp), "madeira_escura")
+		_box(g, "Capitel%d" % (s + 1), Vector3(0.08, 0.05, pil + 0.03), Vector3(mad - 0.01, alto - 0.025, s * zp), "madeira_escura")
+		var misula := _box(g, "Misula%d" % (s + 1), Vector3(0.1, 0.1, 0.05), Vector3(mad - 0.06, alto + 0.17, s * (zp + 0.02)), "madeira_escura")
+		misula.rotation_degrees.z = 20.0
+	var friso := zp + pil / 2
+	_box(g, "Friso", Vector3(0.05, 0.16, friso * 2.0), Vector3(mad, alto + 0.08, 0), "madeira_escura")
+	_box(g, "FrisoFilete", Vector3(0.065, 0.02, friso * 2.0), Vector3(mad - 0.005, alto + 0.01, 0), "madeira_escura")
+	_box(g, "Cimalha", Vector3(0.12, 0.04, friso * 2.0 + 0.08), Vector3(mad - 0.04, alto + 0.18, 0), "madeira_escura")
+	var prateleira := alto + 0.225
+	_box(g, "Prateleira", Vector3(0.26, 0.05, friso * 2.0 + 0.18), Vector3(frente - 0.1, prateleira, 0), "madeira_escura")
+
+	# Na prateleira: os castiçais, o relógio de mesa no meio e um pote de fumo.
+	for s in [-1, 1]:
+		_cyl(g, "Castical%d" % s, 0.025, 0.04, 0.2, Vector3(frente - 0.1, prateleira + 0.125, s * 0.62), "latao", 6)
+		_cyl(g, "Vela%d" % s, 0.012, 0.012, 0.09, Vector3(frente - 0.1, prateleira + 0.27, s * 0.62), "porcelana", 6)
+	var relogio := _group(g, "RelogioMesa", Vector3(frente - 0.1, prateleira + 0.025, 0.0), -90)
+	_box(relogio, "Base", Vector3(0.26, 0.03, 0.1), Vector3(0, 0.015, 0), "madeira_escura")
+	_box(relogio, "Caixa", Vector3(0.22, 0.16, 0.08), Vector3(0, 0.11, 0), "madeira_escura")
+	var arco := _cyl(relogio, "Arco", 0.08, 0.08, 0.08, Vector3(0, 0.19, 0), "madeira_escura", 10)
+	arco.rotation_degrees.x = 90
+	_cyl(relogio, "Mostrador", 0.055, 0.055, 0.005, Vector3(0, 0.16, -0.042), "porcelana", 12).rotation_degrees.x = 90
+	_cyl(g, "PoteFumo", 0.04, 0.045, 0.1, Vector3(frente - 0.1, prateleira + 0.075, -0.32), "porcelana", 8)
+
+	# O piso de pedra na frente, um pouco alto, e o guarda-fogo de latão em volta.
+	var funda := 0.5
+	var larga := 0.8
+	_box(g, "Lareiro", Vector3(funda, 0.04, larga * 2.0), Vector3(frente - funda / 2, 0.02, 0), "pedra_lareira")
+	_box(g, "LareiroBorda", Vector3(0.03, 0.045, larga * 2.0), Vector3(frente - funda + 0.015, 0.0225, 0), "pedra_lareira")
+	var gf := frente - funda + 0.08
+	var gl := boca.x + faixa + 0.12
+	_box(g, "GuardaFogo", Vector3(0.02, 0.1, gl * 2.0), Vector3(gf, 0.09, 0), "latao")
+	_box(g, "GuardaFogoBarra", Vector3(0.035, 0.02, gl * 2.0 + 0.02), Vector3(gf, 0.15, 0), "latao")
+	for s in [-1, 1]:
+		_box(g, "GuardaFogoLado%d" % (s + 1), Vector3(frente - gf, 0.1, 0.02), Vector3((gf + frente) / 2, 0.09, s * gl), "latao")
+		_cyl(g, "GuardaFogoPomo%d" % (s + 1), 0.018, 0.018, 0.03, Vector3(gf, 0.175, s * gl), "latao", 6)
+
+	# O jogo de ferramentas, ao sul, e o cesto de lenha, ao norte.
+	var jogo := _group(g, "Ferramentas", Vector3(frente - 0.18, 0.04, larga - 0.1))
+	_cyl(jogo, "Base", 0.07, 0.08, 0.02, Vector3(0, 0.01, 0), "ferro", 8)
+	_cyl(jogo, "Haste", 0.008, 0.008, 0.62, Vector3(0, 0.32, 0), "ferro", 6)
+	_box(jogo, "Cabide", Vector3(0.14, 0.012, 0.012), Vector3(0, 0.62, 0), "latao")
+	for k in 3:
+		var x := -0.05 + k * 0.05
+		_cyl(jogo, "Cabo%d" % k, 0.007, 0.007, 0.5, Vector3(x, 0.34, 0.012), "ferro", 5)
+		_cyl(jogo, "Punho%d" % k, 0.012, 0.012, 0.05, Vector3(x, 0.6, 0.012), "latao", 6)
+	_box(jogo, "Pa", Vector3(0.06, 0.08, 0.008), Vector3(-0.05, 0.08, 0.012), "ferro")
+	_box(jogo, "Escova", Vector3(0.045, 0.07, 0.02), Vector3(0.05, 0.08, 0.012), "la_escura")
+	var cesto := _group(g, "CestoLenha", Vector3(frente - 0.2, 0.04, -larga + 0.05))
+	_cyl(cesto, "Cesto", 0.17, 0.15, 0.22, Vector3(0, 0.11, 0), "papel_pardo", 9)
+	for k in 4:
+		var tora := _cyl(cesto, "Tora%d" % k, 0.035, 0.04, 0.38, Vector3(-0.06 + (k % 2) * 0.1, 0.24 + (k / 2) * 0.06, 0), "madeira_escura", 7)
+		tora.rotation_degrees = Vector3(90, 0, -8.0 + k * 6.0)
+
+	# A boca fica livre (a mira alcança a lenha, "Acender a lareira"): o peito
+	# dos lados e acima, o consolo, que avança mais; o piso de pedra é baixo.
+	var lado := 0.8 - boca.x
 	_colisao(g, "Colisao", [
-		[Vector3(prof, 0.85, 0.55), Vector3(-prof / 2, 0.425, -0.675)],
-		[Vector3(prof, 0.85, 0.55), Vector3(-prof / 2, 0.425, 0.675)],
-		[Vector3(prof, H - 0.85, 1.9), Vector3(-prof / 2, (H + 0.85) / 2, 0)],
-		[Vector3(prof + 0.16, 0.1, 1.9), Vector3(-(prof + 0.16) / 2, 1.15, 0)],
+		[Vector3(prof + 0.06, boca.y, lado), Vector3(-(prof + 0.06) / 2, boca.y / 2, -(boca.x + lado / 2))],
+		[Vector3(prof + 0.06, boca.y, lado), Vector3(-(prof + 0.06) / 2, boca.y / 2, boca.x + lado / 2)],
+		[Vector3(prof, H - boca.y, 1.6), Vector3(-prof / 2, (H + boca.y) / 2, 0)],
+		[Vector3(prof + 0.24, 0.3, friso * 2.0 + 0.18), Vector3(-(prof + 0.24) / 2, prateleira - 0.12, 0)],
 	])
+
+
+## A grelha de ferro, um cesto de barras sobre quatro pés, onde a lenha das noites
+## frias se apoia (ver _lareira_noite).
+func _grelha(g: Node3D, c: Vector3) -> void:
+	var gr := _group(g, "Grelha", c)
+	var l := 0.25
+	var f := 0.13
+	for s in [-1, 1]:
+		for t in [-1, 1]:
+			_box(gr, "Pe%d%d" % [s + 1, t + 1], Vector3(0.02, 0.09, 0.02), Vector3(s * f, 0.045, t * l), "ferro")
+	for k in 6:
+		_box(gr, "Fundo%d" % k, Vector3(f * 2.0, 0.012, 0.012), Vector3(0, 0.09, -l + k * l * 2.0 / 5.0), "ferro")
+	for t in [-1, 1]:
+		_box(gr, "Trilho%d" % (t + 1), Vector3(f * 2.0 + 0.02, 0.015, 0.015), Vector3(0, 0.09, t * l), "ferro")
+	# A frente: barras de pé; atrás, mais baixas.
+	for k in 7:
+		var z := -l + k * l * 2.0 / 6.0
+		_box(gr, "Barra%d" % k, Vector3(0.012, 0.14, 0.012), Vector3(-f - 0.005, 0.155, z), "ferro")
+		_box(gr, "Atras%d" % k, Vector3(0.012, 0.1, 0.012), Vector3(f - 0.01, 0.135, z), "ferro")
+	_box(gr, "Aro", Vector3(0.016, 0.016, l * 2.0 + 0.02), Vector3(-f - 0.005, 0.225, 0), "ferro")
+	for s in [-1, 1]:
+		# As pinhas de latão na frente dos pés.
+		_cyl(gr, "Pinha%d" % (s + 1), 0.018, 0.022, 0.06, Vector3(-f - 0.03, 0.03, s * (l + 0.02)), "latao", 6)
 
 
 ## Poltrona de clube olhando para -Z local (gire o grupo para orientar; Fase 3d:
@@ -1301,7 +1508,7 @@ const ESCADA_X := 2.0
 const DEGRAU := Vector2(0.28, 0.18)
 ## A poltrona, ao lado da lareira e virada para ela (Fase 3e: estava no meio da
 ## sala), com a mesinha de apoio à direita: onde ele adormece nas noites 3 e 5.
-const POLTRONA_POS := Vector3(1.75, 0, 0.45)
+const POLTRONA_POS := Vector3(1.7, 0, 0.88)
 const POLTRONA_ROT := -28.0
 const MESINHA_ALTURA := 0.6
 

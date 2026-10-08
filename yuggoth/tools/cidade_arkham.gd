@@ -34,15 +34,17 @@ const HORAS := {
 		topo = Color(0.25, 0.27, 0.48), horizonte = Color(0.98, 0.6, 0.36), nuvens = 0.5, nuvem_cor = Color(0.98, 0.7, 0.55), estrelas = 0.0,
 		acesas = 0.35, vidro = Color(0.13, 0.1, 0.12),
 	},
+	# A noite um pouco mais clara (Fase 3e: "para conseguirmos ver o quão bom
+	# ficou a noite"): o luar nos telhados, o céu do horizonte, a névoa.
 	"noite": {
-		sol_dir = Vector3(0.2, 0.8, 0.4), sol_cor = Color(0.1, 0.12, 0.2), ambiente = Color(0.035, 0.04, 0.065),
-		neblina_cor = Color(0.04, 0.05, 0.08), neblina_de = 15.0, neblina_ate = 75.0, neblina_max = 0.9,
-		topo = Color(0.015, 0.02, 0.05), horizonte = Color(0.06, 0.065, 0.1), nuvens = 0.25, nuvem_cor = Color(0.07, 0.075, 0.1), estrelas = 1.0,
-		acesas = 1.0, vidro = Color(0.02, 0.025, 0.03),
+		sol_dir = Vector3(0.2, 0.8, 0.4), sol_cor = Color(0.2, 0.24, 0.36), ambiente = Color(0.06, 0.068, 0.1),
+		neblina_cor = Color(0.06, 0.07, 0.11), neblina_de = 18.0, neblina_ate = 85.0, neblina_max = 0.85,
+		topo = Color(0.02, 0.03, 0.07), horizonte = Color(0.1, 0.11, 0.16), nuvens = 0.25, nuvem_cor = Color(0.11, 0.12, 0.16), estrelas = 1.0,
+		acesas = 1.0, vidro = Color(0.025, 0.03, 0.04),
 	},
 	"chuva": {
-		sol_dir = Vector3(0.2, 0.8, 0.4), sol_cor = Color(0.06, 0.07, 0.1), ambiente = Color(0.035, 0.04, 0.05),
-		neblina_cor = Color(0.05, 0.055, 0.07), neblina_de = 5.0, neblina_ate = 42.0, neblina_max = 0.96,
+		sol_dir = Vector3(0.2, 0.8, 0.4), sol_cor = Color(0.1, 0.11, 0.15), ambiente = Color(0.05, 0.055, 0.07),
+		neblina_cor = Color(0.07, 0.075, 0.095), neblina_de = 6.0, neblina_ate = 48.0, neblina_max = 0.93,
 		topo = Color(0.03, 0.035, 0.045), horizonte = Color(0.06, 0.065, 0.08), nuvens = 0.95, nuvem_cor = Color(0.07, 0.075, 0.09), estrelas = 0.0,
 		acesas = 0.8, vidro = Color(0.02, 0.025, 0.03),
 	},

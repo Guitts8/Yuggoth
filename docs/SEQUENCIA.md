@@ -16,19 +16,24 @@ outra** quantas vezes quiser. Só selar decide. Selada, Wilmarth senta à mesa e
 devagar, a folha se dobra em três e entra no envelope (endereçado a Townshend; a
 partir de julho, à Posta-Restante de Brattleboro), a aba fecha, o selo é batido —
 e a carta vai **para a mão**. **A porta é o correio:**
-"Pôr a carta no correio" — ele abre a porta e, do outro lado do corredor, põe a
-carta na **calha de correio** de latão (frente de vidro, de andar em andar até a
-caixa do saguão); ela escorrega pela fenda e se vê descer atrás do vidro; a porta
-fecha. As cartas no meio do dia (Dias 5 e 6) saltam no tempo até a volta do correio. Postada a resposta do dia, falta só **o diário** 💭 (Dias 1
+"Pôr a carta no correio" — ele abre a porta (ao lado da maçaneta), atravessa a
+soleira e, do outro lado do corredor, põe a carta na **calha de correio** de latão
+(frente de vidro, de andar em andar até a caixa do saguão); ela escorrega pela fenda
+e se vê descer atrás do vidro; ele volta e fecha a porta. Em toda cena assim (selar,
+o diário, a calha, o lapso), **a cabeça é do jogador**: a cena leva o olhar, o mouse
+continua mexendo. As cartas no meio do dia (Dias 5 e 6) saltam no tempo até a volta do correio. Postada a resposta do dia, falta só **o diário** 💭 (Dias 1
 a 5): *"Faltava só anotar o dia no diário, como eu fazia ao fim de cada dia."* — o
 caderno vermelho à esquerda do mata-borrão, **"Anotar o dia"**. Wilmarth senta e
 **se serve** 💭 — café da garrafa térmica nos Dias 1 a 3; no Dia 4, o uísque do
-frasco escondido na gaveta (a Lei Seca), e dali em diante o frasco fica na mesa —,
+frasco escondido na gaveta (a Lei Seca), que volta escondido para ela; o copo fica na mesa —,
 bebe um gole; o caderno vem para diante dele e abre (à esquerda, a entrada anterior), ele se debruça
 e a pena da mesa escreve a entrada do dia, ao som dela; a entrada vai para o
 dossiê. **Todo dia termina assim**, e o jogador nunca sabe se aquela noite terá
-sonho: sem sonho (Dia 1), ele fecha o caderno, levanta, e vem o cartão do dia
-seguinte; com sonho, a última linha falha (ver *Os sonhos*). A porta, sem carta na
+sonho: sem sonho (Dia 1), ele fecha o caderno e levanta; com sonho, a última linha
+falha (ver *Os sonhos*). Acabado o dia, **"Ir para casa"**: a porta abre para o
+corredor, e o jogador anda por ele até a **escada**, no fim, que desce para a rua —
+chegar nela é o cartão do dia seguinte. A página do diário que enche vira, e a
+escrita continua na seguinte. A porta, sem carta na
 mão, só lembra: *"Antes de ir, anotar o dia no diário."* Fora dessa hora, **"Ler o
 diário"**: o caderno abre no último par e se folheia, folha por folha.
 
@@ -42,10 +47,10 @@ letra). Pacotes que não passam na fresta ficam no chão junto à porta.
 
 **Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5. Nem sempre no diário: na
 noite do disco (3) a entrada termina inteira, *"Antes de ir, quis ouvir o disco mais
-uma vez."*, e ele adormece na **cadeira de leitura**, ouvindo-o ("Ouvir o disco outra
-vez"); na noite da chuva (5), com o fogo aceso, *"Não ia conseguir dormir tão cedo.
+uma vez."* — "Ouvir o disco outra vez": ele baixa a agulha, senta na **poltrona** ao
+lado da lareira fria e ouve, e o sono vem com o disco; na noite da chuva (5), com o fogo aceso, *"Não ia conseguir dormir tão cedo.
 Fiquei diante do fogo, com o copo."* — **na poltrona diante da lareira** ("Sentar
-diante do fogo"), um gole, e o sono; acorda ali, de manhã, o fogo apagado. Nas
+diante do fogo"), o copo na mesinha ao lado, um gole, e o sono; acorda ali, de manhã, o fogo apagado. Nas
 noites 2 e 4, no diário: a última linha da entrada **falha** — a letra desce, torta e cada vez mais clara, a escrita fica
 lenta e para no meio da palavra; a pena tomba na página e a tinta se espalha e
 escorre. As pálpebras pesam (fecham e abrem devagar), a lâmpada baixa, **o relógio
@@ -55,17 +60,19 @@ Ele continua sentado à mesa, o diário aberto à frente: o escritório transfor
 na estética crua, com a névoa e um grave que bate devagar; andar o levanta; nada
 salta. Acorda-se numa ação: o sono escurece a tela, e ele acorda **de manhã,
 debruçado no diário** (a linha borrada, a aurora rosada pela janela, a lâmpada que
-ardeu a noite toda quase apagada); ergue a cabeça, e então o cartão do dia seguinte.
+ardeu a noite toda quase apagada); ergue a cabeça, e então vai para casa pelo corredor.
 | Noite | O sonho | Acorda |
 |---|---|---|
-| Dia 2 (as fotos) | Marcas de garra, de lama, da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá para o morro com o círculo de pedras | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
-| Dia 3 (o disco) | Tudo escuro; só o fonógrafo na mesa, sob uma luz, tocando sozinho a gravação longa | ao levantar a agulha |
-| Dia 4 (a pedra) | A pedra negra que nunca chegou está na mesa; pela janela, a plataforma de Keene, o trem parado, um homem magro de costas; a voz zumbida | ao examinar a pedra |
+| Dia 2 (as fotos) | Marcas de garra, de lama, da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá (em 3D) para o morro com o círculo de pedras, sob a lua | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
+| Dia 3 (o disco) | A sala some: ele está onde o disco foi gravado — 1 da manhã de 1º de maio de 1915, a boca fechada da caverna na encosta da Dark Mountain, sobre o pântano de Lee; vultos de manto na névoa, a lanterna de Akeley, o fonógrafo dele num toco tocando o disco de onde parou; uma das criaturas passa entre as árvores, de relance | ao levantar a agulha (ou no fim do disco) |
+| Dia 4 (a pedra) | A pedra negra que nunca chegou está na mesa; pela janela (em 3D), a plataforma de Keene de noite, os lampiões, o carrinho com o caixote e um homem magro de costas; a voz zumbida | ao examinar a pedra |
 | Dia 5 (AKELY) | Chove dentro da sala; o telefone toca | atendido: só um zumbido na linha, soletrando *A... K... E... L... Y.* |
 
 **O tempo passa na própria sala:** nos saltos dentro de um dia (Dias 4 a 6), não há
-tela preta. O jogador fica parado; a sala escurece, a **folhinha** no peitoril da
-janela perde uma folha por dia (com som), a luz fria da manhã entra e vai embora, e
+tela preta. O jogador fica parado (a cabeça livre), virado para a janela: Arkham passa
+as horas pela **janela viva** — a aurora, o dia, o entardecer, a noite, as janelas
+da cidade acendendo, as nuvens correndo, o sol cruzando e a sombra do caixilho
+varrendo a mesa —, a **folhinha** no peitoril perde uma folha por dia (com som), e
 o cartão aparece sobre a cena — o que chega cai pela fresta no primeiro escuro. A
 folhinha mostra a data o tempo todo (em inglês, como tudo o que é impresso na sala).
 
@@ -278,12 +285,14 @@ cilindro, nos dias seguintes.
 6. **Boston** (vinheta jogável): *"Naquela noite fui a Boston falar com o
    funcionário, tendo obtido no escritório o nome e o endereço dele."* O corredor
    da pensão, à noite: Wilmarth bate à porta 7; o rapaz abre só uma fresta e
-   responde dali, franco e gentil, sem convidar a entrar. Apresentar-se e três
-   perguntas — o homem de Keene, a voz (a sala amolece enquanto ele fala dela: *"Me
-   deixava tonto e com sono, só de ouvir"*), se o reconheceria (*"não tenho certeza
-   nem disso"*). *"Era um rapaz franco e simpático, mas vi que não podia acrescentar
-   nada..."* → **"Voltar a Arkham"**: o escritório já de noite, o abajur aceso, e o
-   narrador: a noite em claro escrevendo cartas.
+   responde dali, franco e gentil, sem convidar a entrar. A conversa tem **opções,
+   embaixo da tela**: apresentar-se; o homem de Keene; e então, à escolha, a voz (a
+   sala amolece enquanto ele fala dela: *"Me deixava tonto e com sono, só de
+   ouvir"*), se o reconheceria (*"não tenho certeza nem disso"*), ou agradecer e ir.
+   *"Era um rapaz franco e simpático, mas vi que não podia acrescentar nada..."* (ao
+   fim da conversa) → **"Voltar a Arkham"** (depois do homem de Keene): o escritório
+   já de noite, o abajur aceso, e o narrador: a noite em claro escrevendo cartas. No
+   fim do corredor da pensão, a janelinha dá para os telhados de Boston (em 3D).
 7. **As cartas da noite** (resposta, 21 de julho):
    | Tom | Abertura |
    |---|---|

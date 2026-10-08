@@ -309,78 +309,119 @@ cidade em 3D (*"ficou lindo"*), o chão, a ideia da calha. O princípio que vale
 tudo daqui em diante: **a câmera nunca fica presa** — *"a cabeça deve dar liberdade
 para o jogador, pois é quase a única que ele tem"*. Cenas que sentam ou aproximam
 Wilmarth podem levar o olhar até a ação, mas o mouse continua mexendo a cabeça.
-O que pediu, o porquê, e o que foi feito:
+O que pediu, o porquê, e o que foi feito. Commits: `9410cbd` (1), `d79096b` (3, 4),
+`f2b10c4` (5, 6, parte do 7), `410b6f0` (7, 9, 10), `9d69712` (10, 11), `74dc05b`
+(8), `e6052c8` (12) e o do acabamento (13).
 
-1. **Bug: a noite 5 quebrou** — sem como acender a lareira; sem fogo, nem o copo
+1. ✅ **Bug: a noite 5 quebrou** — sem como acender a lareira; sem fogo, nem o copo
    nem a poltrona. Causa: a caixa de colisão da lareira cobria a boca e a lenha, e o
    raio da mira batia nela antes de chegar a "Acender a lareira". O teste de alcance
-   não via porque disparava raios de dentro da caixa.
-2. **Bug: congelou ao mexer no envelope** (Dia 5, logo depois da lareira; a janela
-   parou). Rodava pelo editor — provável erro de script pausando no depurador. Não
-   reproduzido ainda com o save dele (maço, cartas soltas e exame funcionam).
-3. **Câmera livre no diário** — fica na distância de escrever, mas o mouse olha.
-4. **Selar**: a folha ainda passa por cima do envelope ao entrar (tirando da mesa
-   parece normal); câmera livre durante a dobra; fechar a carta mais rápido.
-5. **A calha**: a ideia é ótima, a animação não — a porta atravessa Wilmarth e ele
-   põe a carta na calha de muito longe. Pedido: abrir a porta, ir até a calha,
-   depositar a carta e voltar.
-6. **Ir para casa pelo corredor** — agora que o corredor existe, o fim do dia sai
-   por ele.
-7. **A poltrona e a cadeira**: a cadeira no meio da sala não faz sentido; a poltrona
-   vai para o lado da lareira, com uma mesinha de apoio para as bebidas. O uísque é
-   escondido (Lei Seca): não fica à vista na mesa.
-8. **Diário**: em vários dias a letra sai do caderno; ao encher a folha, ele vira
-   para a próxima e continua.
-9. **A noite do disco**: o disco começa antes de ele dormir; o sonho é genérico (o
-   fonógrafo só muda de lugar, para cima da mesa). Pedido: ele "revive" o que o disco
-   grava, em sonho, de relance.
-10. **3D em vez de painel**: a janela nos sonhos; o mi-go que passa na janela
-    (Dia 5) com modelo; a janelinha do corredor da pensão, em Boston.
-11. **Conversa com opções** embaixo da tela, para escolher (como Skyrim).
-12. **Lapso — decidido: janela viva, câmera livre.** Ele se volta para a janela, o
-    mouse continua livre; Arkham passa as horas acelerada (o sol cruza, a sombra do
-    caixilho varre a sala, as janelas da cidade acendem e apagam, as nuvens correm),
-    uma folha da folhinha cai por dia, e o cartão entra no escuro.
-13. **Acabamento, segunda passada**: a estante e os livros, a estrutura da janela, a
-    **lareira** (principalmente), a disposição dos móveis; e a cidade à noite um pouco
-    mais clara, para se ver a noite.
-14. Ainda por validar no playtest 5: do Dia 5 ao fim da demo.
+   não via porque disparava raios de dentro da caixa. Feito: a colisão em pedaços (a
+   boca livre); o teste conta raios que partem de dentro de um móvel
+   (`hit_from_inside`). Conferido com o save dele.
+2. ⏳ **Bug: congelou ao mexer no envelope** (Dia 5, logo depois da lareira; a
+   janela parou). O jogo rodava embutido no editor (`--remote-debug`); um erro de
+   script pausa o jogo no depurador e a janela parece congelada. **Não reproduzido**:
+   com o save dele, o maço, as cartas soltas, o exame e a leitura funcionam pela
+   mira e pela tecla de verdade. O processo do jogo ainda estava aberto, mas ele já
+   tinha fechado o editor sem ver o Depurador. Se acontecer de novo: olhar o painel
+   Depurador → Erros/Pilha do editor antes de fechar.
+3. ✅ **Câmera livre no diário** — fica na distância de escrever, mas o mouse olha.
+   Feito no Player, para todas as cenas: com `input_enabled` falso e o mouse preso,
+   o mouse soma um desvio (`_olhar_extra`) à direção que a cena dá; `olhar_para` o
+   desfaz quando a cena leva o olhar a algo novo; devolvido o controle, o desvio vira
+   a direção do corpo. Escrevendo, os olhos deixam de seguir a pena assim que o
+   jogador mexe a cabeça. Folheando (modal, mas com o mouse preso), também.
+4. ✅ **Selar**: a folha ainda passava por cima do envelope ao entrar — as dobras
+   ficavam a 3–5° do plano e a ponta subia mais que a espessura do envelope; agora
+   rentes (180°). Câmera livre (item 3). O fecho (aba, virar, selo) mais ligeiro.
+5. ✅ **A calha**: a porta atravessava Wilmarth e ele punha a carta de muito longe.
+   Agora ele abre a porta parado ao lado da maçaneta, fora do arco da folha,
+   atravessa a soleira até a calha, põe a carta de perto, a acompanha descendo pelo
+   vidro, volta e fecha a porta (`Player.conduzir`: a cena o leva a pé, com passos,
+   sem a física).
+6. ✅ **Ir para casa pelo corredor**: acabado o dia (o diário sem sonho, ou de
+   manhã depois do sonho), "Ir para casa" abre a porta e o corredor é do jogador; a
+   escada no fim, a leste, desce para a rua — chegar nela vira o dia. O corredor
+   ganhou a escada (degraus, corrimão, a luz de baixo), o lado do corredor da parede
+   da sala, o vão com montantes e alizar, e as colisões; a folha da porta tem a dela.
+7. ✅ **A poltrona e a cadeira**: a cadeira de leitura (no meio da sala) saiu; a
+   poltrona foi para o lado da lareira, virada para ela, com uma mesinha de apoio
+   (tampo redondo, pé de três garras, cinzeiro, um livro); o copo da noite do fogo
+   fica na mesinha. O uísque é escondido: o frasco sai da gaveta só para servir e
+   volta para ela; só o copo fica na mesa (`serviu_uisque`).
+8. ✅ **Diário**: a entrada tinha 11 linhas numa página que cabe 10. Cada página é
+   uma janela que recorta, com o texto inteiro dentro, que sobe uma folha por vez:
+   cheia a folha, a pena se ergue, a folha vira (a cheia vai para a esquerda) e a
+   escrita continua no alto da nova página. Folheando, cada entrada ocupa quantas
+   folhas precisar.
+9. ✅ **A noite do disco**: ele vai ao fonógrafo, baixa a agulha, senta na poltrona
+   olhando a lareira fria e ouve (~14 s, com as legendas); então o sono. O sonho sai
+   da sala (`Escritorio.sonhos_fora`): é a 1 da manhã de 1º de maio de 1915, junto à
+   boca fechada de uma caverna na encosta da Dark Mountain, sobre o pântano de Lee
+   (cap. III) — pinheiros e bétulas, o matacão arredondado, vultos de manto na névoa,
+   a lanterna de Akeley, o fonógrafo dele num toco tocando o disco de onde parou na
+   sala; uma das criaturas passa entre as árvores, de relance. Levantar a agulha (ou
+   o fim do disco) acorda, na poltrona. 💭 (os vultos e a criatura: o livro só tem as
+   vozes; nada é confirmado).
+10. ✅ **3D em vez de painel** (`tools/vistas.gd`, no feitio da cidade): a janela da
+    noite 2 (o círculo de pedras no alto de um morro, sob a lua, o mar de montanhas
+    atrás), a da noite 4 (a plataforma de Keene, os lampiões, o carrinho com o
+    caixote e o homem magro de costas), a noite 5 com Arkham na chuva; a janelinha da
+    pensão em Boston (telhados de tijolo, chaminés, caixas-d'água, a torre da
+    alfândega). O mi-go em 3D (`props/migo.gd`, do cap. I: rosado, corpo de
+    crustáceo, asas membranosas que batem, membros articulados com pinças, o elipsoide
+    convoluto de antenas curtas): passa pela janela no Dia 5 e cruza o céu nos Dias 3
+    e 6, em silhueta.
+11. ✅ **Conversa com opções** (`ui/opcoes_conversa.gd`): em pessoa
+    (`Interlocutor.com_opcoes`), as perguntas disponíveis aparecem numa coluna embaixo
+    da tela (W/S, setas ou mouse; E/Enter/clique; Esc sai), com a despedida; depois de
+    cada conversa, as que restam. Boston: depois do homem de Keene, a voz e o
+    reconhecimento viram duas escolhas, e já se pode ir. O telefone continua igual.
+12. ✅ **Lapso — a janela viva**: ele se volta para a janela (a cabeça é dele), e
+    Arkham passa as horas em 3D — a cidade do lapso tem materiais só dela, animados de
+    segmento em segmento (noite, aurora, dia, entardecer, noite; o último volta à hora
+    do dia corrente): céu, luz, névoa, as janelas acendendo e apagando, as nuvens
+    correndo; o sol cruza e a sombra do caixilho varre a mesa e o assoalho. Uma folha
+    da folhinha por dia; o cartão no escuro. Acordar de manhã usa a mesma cidade.
+13. ✅ **Acabamento, segunda passada**: a **lareira** (consolo de madeira com
+    pilastras, friso, prateleira com cimalha e mísulas; azulejos verdes em volta da
+    boca; a fornalha com faces inclinadas e fuligem; a grelha de barras; o piso de
+    pedra e o guarda-fogo de latão; ferramentas, cesto de lenha; relógio de mesa,
+    castiçais com velas, pote de fumo); a **estante** (montantes, bordas, rodapé,
+    cimalha; lombadas com frisos dourados e etiquetas; livros de série; em cima, uma
+    caixa e um rolo de mapas); a **janela** (duas de guilhotina com pinázios, o trilho
+    com a tranca, o alizar com cimalha, o peitoril com avental, o vão forrado, um
+    vidro); a disposição (item 7); a cidade à noite um pouco mais clara.
+14. ⏳ Por validar no playtest 5: tudo acima, e do Dia 5 ao fim da demo.
 
-## Onde estamos (revisão de 2026-10-08)
-**Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho (`55cf59e`)
-e a **3d inteira** (playtest 3, `30e90f6`..`6560d44`, mais `b0c89f1`). Teste de fumaça
-com 0 falhas no `6560d44`. Prólogo → fim da demo jogável de ponta a ponta, com arte e
-som provisórios. Nada por commitar; nenhum push feito (nem pedido).
+## Onde estamos (revisão de 2026-10-08, depois da 3e)
+**Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d e a
+**3e** (itens 1 e 3–13; o 2 não reproduzido). Teste de fumaça com 0 falhas. Nenhum
+push feito (nem pedido).
 
-**Esperando o usuário — o playtest 4** (Prólogo ao fim do Dia 6; F acelera, C mostra o
-painel antigo). O que lhe foi pedido para olhar:
-1. Selar: o ritmo, a folha no envelope oco, a vista de frente, o envelope subindo sem
-   atravessar a mesa.
-2. A calha: porta → corredor → calha → porta fecha. Se o ritual cansa em 5–6 repetições.
-3. Diário: a vista escrevendo (debruçado, os olhos seguem a pena); "Ler o diário" e
-   folhear com A/D.
-4. Café (Dias 1–3) e uísque (Dia 4: a gaveta, o frasco fica na mesa).
-5. O sono: noite 3 "Ouvir o disco outra vez", noite 5 lareira + "Sentar diante do fogo";
-   os olhos abrindo como fecharam.
-6. Boston: o 7 abrindo com a porta.
-7. **O principal: o que ainda parece "feito nas coxas"** na sala e na janela, em cada
-   hora (dia, entardecer, noite, chuva) — decide se há uma segunda passada.
+**Esperando o usuário — o playtest 5** (do Prólogo ao fim; ou do save do Dia 5). O
+que olhar:
+1. A cabeça livre em todas as cenas (selar, diário, calha, lapso, sono).
+2. A calha a pé (porta → calha → volta) e o fim do dia pelo corredor e a escada:
+   cansa em 5–6 repetições?
+3. O diário virando a folha ao encher; folhear entradas de duas folhas.
+4. A poltrona e a mesinha ao lado da lareira; o uísque voltando para a gaveta.
+5. A noite do disco: o disco antes do sono e o sonho no bosque da Dark Mountain.
+6. As janelas dos sonhos (noites 2 e 4), o mi-go na janela (Dia 5) e no céu (3 e 6).
+7. Boston: o menu de perguntas embaixo; a janelinha.
+8. O lapso pela janela viva.
+9. O acabamento: lareira, estante, janela, a noite da cidade.
+10. Do Dia 5 ao fim da demo (não jogado no playtest 4) — e se o congelamento voltar,
+    o Depurador do editor antes de fechar.
 
-**Decisões de texto pendentes (o usuário ainda não respondeu):**
-- Aprovar os **textos das 5 entradas do diário** (`diario_dia_1..5`, compostos com
-  frases do conto; ver FIDELIDADE) — as **3 e 5 mudaram** na 3d (terminam "Vou ouvi-lo
-  mais uma vez." e "Chove. Não vou para casa ainda."; a última linha não cai mais).
-- As falas novas `sono_disco` ("Antes de ir, quis ouvir o disco mais uma vez.") e
-  `sono_fogo` ("Não ia conseguir dormir tão cedo. Fiquei diante do fogo, com o copo.").
-- A calha, o café e o uísque são 💭 (invenção nossa), marcados na FIDELIDADE.
-- O **visual do sonho** (pendência antiga, de antes do v2): com a realidade mais rica,
-  ver se o contraste já basta ou o que falta (cor, pós, movimento, geometria).
-- "Deixar sem resposta" (Dia 2): trocar o texto da ação ou não.
+**Decisões de texto pendentes:** as entradas do diário (as 3 e 5 mudaram na 3d) e as
+falas `sono_disco`/`sono_fogo`; o visual do sonho (pendência antiga); "Deixar sem
+resposta" (Dia 2). O bosque do disco (os vultos, a criatura) é 💭.
 
-**Como retomar numa sessão nova:** ler este arquivo (a 3d e esta seção), esperar a
-lista do playtest 4 e registrá-la aqui como **Fase 3e** (pedido, porquê, o que foi
-feito, commit), no mesmo formato da 3d. Não começar a Fase 4 nem uma segunda passada
-de acabamento sem essa lista.
+**Como retomar numa sessão nova:** ler este arquivo (a 3e e esta seção), esperar a
+lista do playtest 5 e registrá-la como **Fase 3f**, no mesmo formato. Não começar a
+Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
 (GDD §12): opções de acessibilidade (tremor, afim, FOV — ainda não há nenhuma em
@@ -391,10 +432,9 @@ de acabamento sem essa lista.
 ## Próximos passos (em ordem)
 1. ✅ **A passagem para o sonho** (acima): diário + adormecer à mesa + acordar de manhã.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
-2b. ✅ O usuário jogou o **playtest 4** (até o começo do Dia 5) → **Fase 3e**.
-2c. **← AQUI.** A **Fase 3e** (acima), item por item, um commit cada; depois o
-   playtest 5 (do Dia 5 ao fim). Ainda abertos: aprovar as entradas do diário e as
-   falas `sono_disco`/`sono_fogo`, o visual do sonho e "Deixar sem resposta".
+2b. ✅ Playtest 4 (até o começo do Dia 5) → **Fase 3e** (acima).
+2c. **← AQUI.** O usuário joga o **playtest 5** (a checklist em "Onde estamos"); a
+   lista dele vira a **Fase 3f**.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 
