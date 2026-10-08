@@ -1131,6 +1131,8 @@ func _diario(g: Node3D, pena: Node3D) -> void:
 ## só com a flag `painel` (tecla C em depuração), para comparar.
 func _vista(parent: Node, hora: String, painel: String, nome := "Vista", z := -D - 1.2) -> Node3D:
 	var v := _group(parent, nome)
+	# O lapso começa e termina nesta hora (Lapso._cidade_viva).
+	v.set_meta(&"hora", hora)
 	var quad := _quad(v, "Painel", Vector2(5.0, 3.0), Vector3(0, 1.6, z), Vector3.ZERO, painel)
 	var so_painel := ConditionalNode.new()
 	so_painel.name = "SoComPainel"
@@ -1176,12 +1178,14 @@ func _lapso(g: Node3D) -> void:
 	sol.shadow_enabled = true
 	_add(lapso, sol)
 	lapso.sol = sol
-	var vista := _vista(lapso, "dia", "vista_dia", "VistaDia", -D - 1.18)
-	vista.visible = false
-	lapso.vista_dia = vista
-	var tarde := _vista(lapso, "entardecer", "vista_entardecer", "VistaTarde", -D - 1.17)
-	tarde.visible = false
-	lapso.vista_tarde = tarde
+	# A janela viva (Fase 3e): a cidade com materiais só dela, animados pelo lapso.
+	var viva: Node3D = _cidade.vista_viva("dia")
+	viva.visible = false
+	_add(lapso, viva)
+	for filho in viva.get_children():
+		filho.owner = cena
+	lapso.cidade = viva
+	lapso.horas = _cidade.horas_do_lapso()
 
 	# A folhinha: base de madeira, o bloco inclinado para trás, a folha do dia.
 	var f := _group(lapso, "Folhinha", Vector3(0.5, JANELA_Y.x + 0.03, -D + 0.1), -12)

@@ -130,6 +130,42 @@ func vista(hora: String) -> Node3D:
 	return raiz
 
 
+## A cidade do lapso (Fase 3e, "a janela viva"): com materiais só dela, que o
+## Lapso anima de hora em hora (components/lapso.gd); começa em `hora`.
+func vista_viva(hora: String) -> Node3D:
+	malhas()
+	var raiz := Node3D.new()
+	raiz.name = "CidadeViva"
+	var mats := materiais_para(HORAS[hora])
+	for parte in ["solido", "janelas"]:
+		var mi := MeshInstance3D.new()
+		mi.name = parte.capitalize()
+		mi.mesh = _malhas[parte]
+		mi.material_override = mats[parte]
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		raiz.add_child(mi)
+	var ceu := MeshInstance3D.new()
+	ceu.name = "Ceu"
+	ceu.mesh = _malhas.ceu
+	ceu.material_override = mats.ceu
+	ceu.position = Vector3(0, 30.0, -115.0)
+	ceu.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	raiz.add_child(ceu)
+	return raiz
+
+
+## As horas, com a aurora (rosada, o sol baixo a leste), para o lapso.
+func horas_do_lapso() -> Dictionary:
+	var h := HORAS.duplicate(true)
+	h["aurora"] = {
+		sol_dir = Vector3(0.9, 0.18, 0.3), sol_cor = Color(0.95, 0.62, 0.58), ambiente = Color(0.22, 0.2, 0.28),
+		neblina_cor = Color(0.66, 0.54, 0.58), neblina_de = 12.0, neblina_ate = 80.0, neblina_max = 0.85,
+		topo = Color(0.28, 0.3, 0.52), horizonte = Color(0.96, 0.66, 0.6), nuvens = 0.45, nuvem_cor = Color(0.97, 0.74, 0.72), estrelas = 0.15,
+		acesas = 0.4, vidro = Color(0.1, 0.08, 0.1),
+	}
+	return h
+
+
 func _mats(hora: String) -> Dictionary:
 	if not _materiais.has(hora):
 		_materiais[hora] = materiais_para(HORAS[hora])

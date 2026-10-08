@@ -17,19 +17,27 @@ const SEMANA := ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY
 ## 1928 é bissexto.
 const DIAS_NO_MES := [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-const DURACAO_TOTAL := 15.0
+const DURACAO_TOTAL := 18.0
 const CICLO_MIN := 3.5
 const COR_AURORA := Color(1.0, 0.62, 0.55)
 const COR_DIA := Color(0.95, 0.95, 1.0)
 const COR_TARDE := Color(1.0, 0.55, 0.25)
 
-## O sol da manhã que entra pela janela durante o lapso (apagado no resto do tempo).
+## O sol que entra pela janela durante o lapso (apagado no resto do tempo); ele
+## cruza o céu, e a sombra do caixilho varre a sala.
 @export var sol: Light3D
 @export var sol_energia := 6.0
-## As paisagens postas na frente da do dia corrente: o dia claro, e a aurora e o
-## fim de tarde (o céu alaranjado).
-@export var vista_dia: Node3D
-@export var vista_tarde: Node3D
+## Para onde o sol aponta de manhã e de tarde (no chão da sala, global).
+## (Perto da janela: mais longe, o raio passa acima dela e a parede o barra.)
+@export var sol_manha := Vector3(-1.6, 0, -1.2)
+@export var sol_tarde := Vector3(1.0, 0, -1.4)
+## A janela viva (Fase 3e): Arkham com materiais só dela, que o lapso anima de
+## hora em hora — o céu, a luz, a névoa, as janelas da cidade acendendo e
+## apagando, as nuvens correndo. Toma o lugar da vista do dia enquanto dura.
+@export var cidade: Node3D
+## As luzes da cidade por hora ("noite", "aurora", "dia", "entardecer", "chuva"),
+## no formato de tools/cidade_arkham.gd (HORAS).
+@export var horas: Dictionary = {}
 @export var ambiente: WorldEnvironment
 ## As luzes que escurecem à noite: todas as Light3D visíveis sob este nó.
 @export var sala: Node3D
@@ -43,12 +51,16 @@ const COR_TARDE := Color(1.0, 0.55, 0.25)
 @export_group("")
 ## Segundos de um dia que passa sozinho; vários dias dividem DURACAO_TOTAL, sem
 ## ficar mais curtos que CICLO_MIN cada.
-@export var ciclo := 7.0
+@export var ciclo := 9.0
 
 var passando := false
 var _ambiente_base := -1.0
 ## A manhã de depois de um sonho (amanhecer): as luzes como estavam.
 var _manha: Dictionary[Light3D, float] = {}
+## As vistas do dia escondidas enquanto a cidade viva está na janela.
+var _vistas_escondidas: Array[Node3D] = []
+## As nuvens correndo (soma no céu, para não pular).
+var _deriva := 0.0
 
 
 ## O Environment é um recurso da cena, compartilhado: saindo no meio, não pode
@@ -93,41 +105,116 @@ func passar(de: int, ate: int, no_escuro: Callable) -> void:
 	_ambiente_base = ambiente_base
 	var dias := maxi(1, ate - de)
 	var dur := clampf(DURACAO_TOTAL / dias, CICLO_MIN, ciclo)
-	# [fração do dia, energia do sol, cor do sol, vista, luz da sala, ambiente]
-	var horas := [
-		[0.16, 0.0, COR_AURORA, null, 0.06, 0.25],
-		[0.2, sol_energia * 0.45, COR_AURORA, vista_tarde, 0.1, 0.8],
-		[0.24, sol_energia, COR_DIA, vista_dia, 0.08, 1.6],
-		[0.24, sol_energia * 0.6, COR_TARDE, vista_tarde, 0.1, 1.0],
-		[0.16, 0.0, COR_TARDE, null, 1.0, 1.0],
+	# A janela viva: a cidade do lapso no lugar da vista do dia, na mesma hora.
+	var hora_do_dia := _cidade_viva(true)
+	# [fração do dia, energia do sol, cor do sol, hora da cidade, luz da sala,
+	# ambiente, onde o sol está (0 manhã .. 1 tarde)]
+	var segmentos := [
+		[0.16, 0.0, COR_AURORA, "noite", 0.06, 0.25, 0.0],
+		[0.2, sol_energia * 0.45, COR_AURORA, "aurora", 0.1, 0.8, 0.15],
+		[0.24, sol_energia, COR_DIA, "dia", 0.08, 1.6, 0.55],
+		[0.24, sol_energia * 0.6, COR_TARDE, "entardecer", 0.1, 1.0, 1.0],
+		[0.16, 0.0, COR_TARDE, "noite", 1.0, 1.0, 1.0],
 	]
+	var hora_atual := hora_do_dia
+	var onde_sol := 0.0
 	for k in dias:
-		for h in horas.size():
-			var hora: Array = horas[h]
-			var segundos: float = dur * hora[0]
-			if h == 1 or h == 3:
-				_vista(hora[3])
-			elif h == 2:
-				_vista(vista_dia)
+		for h in segmentos.size():
+			var seg: Array = segmentos[h]
+			var segundos: float = dur * seg[0]
+			# O último anoitecer volta à hora do dia corrente (a noite de chuva...).
+			var para: String = hora_do_dia if k == dias - 1 and h == segmentos.size() - 1 else seg[3]
 			var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
-			t.tween_property(sol, ^"light_energy", hora[1], segundos)
-			t.tween_property(sol, ^"light_color", hora[2], segundos)
+			t.tween_property(sol, ^"light_energy", seg[1], segundos)
+			t.tween_property(sol, ^"light_color", seg[2], segundos)
 			for l in luzes:
-				t.tween_property(l, ^"light_energy", luzes[l] * hora[4], segundos)
-			t.tween_property(env, ^"ambient_light_energy", ambiente_base * hora[5], segundos)
+				t.tween_property(l, ^"light_energy", luzes[l] * seg[4], segundos)
+			t.tween_property(env, ^"ambient_light_energy", ambiente_base * seg[5], segundos)
+			t.tween_method(_cidade_entre.bind(hora_atual, para), 0.0, 1.0, segundos)
+			t.tween_method(_sol_em, onde_sol, seg[6], segundos)
+			# As nuvens correm o dia todo.
+			t.tween_method(_nuvens, _deriva, _deriva + segundos * 0.035, segundos).set_trans(Tween.TRANS_LINEAR)
 			await t.finished
 			if not is_inside_tree():
 				return
+			hora_atual = para
+			onde_sol = 0.0 if h == segmentos.size() - 1 else seg[6]
 			if h == 0:
 				if k == 0:
 					no_escuro.call()
 				_arrancar_folha(de + k + 1)
-			elif h == 4:
-				_vista(null)
+	_cidade_viva(false)
 	for l in luzes:
 		l.light_energy = luzes[l]
 	env.ambient_light_energy = ambiente_base
 	passando = false
+
+
+## Põe (ou tira) a cidade viva na janela, escondendo as vistas do dia que estão
+## nela; devolve a hora da vista escondida (por onde o lapso começa e termina).
+func _cidade_viva(sim: bool) -> String:
+	if not sim:
+		if cidade:
+			cidade.visible = false
+		for v in _vistas_escondidas:
+			if is_instance_valid(v):
+				v.visible = true
+		_vistas_escondidas.clear()
+		return ""
+	var hora := "dia"
+	for v: Node3D in sala.find_children("Vista", "Node3D", true, false):
+		if v.is_visible_in_tree() and not is_ancestor_of(v):
+			hora = String(v.get_meta(&"hora", hora))
+			v.visible = false
+			_vistas_escondidas.append(v)
+	# A chuva da noite não atravessa os dias que passam.
+	for c: Node3D in sala.find_children("Chuva", "GPUParticles3D", true, false):
+		if c.is_visible_in_tree():
+			c.visible = false
+			_vistas_escondidas.append(c)
+	if not horas.has(hora):
+		hora = "dia"
+	if cidade:
+		cidade.visible = true
+		_cidade_entre(1.0, hora, hora)
+	return hora
+
+
+## A luz da cidade viva entre duas horas (k de 0 a 1).
+func _cidade_entre(k: float, de: String, para: String) -> void:
+	if cidade == null or not horas.has(de) or not horas.has(para):
+		return
+	var a: Dictionary = horas[de]
+	var b: Dictionary = horas[para]
+	for parte in [&"Solido", &"Janelas", &"Ceu"]:
+		var mi := cidade.get_node_or_null(NodePath(parte)) as MeshInstance3D
+		if mi == null:
+			continue
+		# Cada material só usa as chaves dele (as outras ficam guardadas, sem efeito).
+		var mat := mi.material_override as ShaderMaterial
+		for chave: String in a:
+			mat.set_shader_parameter(StringName(chave), _misturar(a[chave], b[chave], k))
+
+
+static func _misturar(a: Variant, b: Variant, k: float) -> Variant:
+	if a is float or a is int:
+		return lerpf(a, b, k)
+	return a.lerp(b, k)
+
+
+## O sol na posição do dia (0 manhã, 1 tarde): a luz entra torta e a sombra do
+## caixilho anda pelo assoalho.
+func _sol_em(k: float) -> void:
+	var alvo := sol_manha.lerp(sol_tarde, k)
+	sol.look_at(alvo)
+
+
+func _nuvens(v: float) -> void:
+	_deriva = v
+	if cidade:
+		var ceu := cidade.get_node_or_null(^"Ceu") as MeshInstance3D
+		if ceu:
+			(ceu.material_override as ShaderMaterial).set_shader_parameter(&"deriva", v)
 
 
 ## Manhã cedo, de uma vez (acordar debruçado na mesa depois de um sonho, no
@@ -141,7 +228,9 @@ func amanhecer() -> void:
 			l.light_energy *= 0.12
 	sol.light_color = COR_AURORA
 	sol.light_energy = sol_energia * 0.5
-	_vista(vista_tarde)
+	_sol_em(0.15)
+	_cidade_viva(true)
+	_cidade_entre(1.0, "aurora", "aurora")
 
 
 func desfazer_manha() -> void:
@@ -152,14 +241,8 @@ func desfazer_manha() -> void:
 			l.light_energy = _manha[l]
 	_manha.clear()
 	sol.light_energy = 0.0
-	_vista(null)
+	_cidade_viva(false)
 
-
-## Uma das paisagens do lapso na frente da do dia corrente (null: nenhuma).
-func _vista(qual: Node3D) -> void:
-	vista_dia.visible = qual == vista_dia
-	if vista_tarde:
-		vista_tarde.visible = qual == vista_tarde
 
 ## A folha de cima se solta e cai para a frente; a de baixo já mostra `data`.
 func _arrancar_folha(data: int) -> void:
