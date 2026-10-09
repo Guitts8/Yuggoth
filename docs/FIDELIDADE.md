@@ -34,7 +34,7 @@ Legenda: ✅ jogável · 📄 no GDD, ainda não construído · ➕ falta, entra
 | Situação no livro | No jogo |
 |---|---|
 | O disco chega no fim de junho, despachado de Brattleboro, com bilhete (medo das estradas; suspeita de **Walter Brown**) | ✅ Dia 3: pacote do expresso + bilhete |
-| Wilmarth **pega emprestada a máquina** do prédio da administração da universidade | ✅ Dia 3: caixote da administração; montar corneta, manivela e agulha |
+| Wilmarth **pega emprestada a máquina** do prédio da administração da universidade | ✅ Dia 3: a máquina comercial da administração, já montada, na mesinha junto à estante; só falta o cilindro |
 | Antes de tocar, relê a **transcrição** de Akeley (1º de maio de 1915, 1h, caverna da encosta oeste da Montanha Escura, Pântano de Lee) | ✅ Dia 3 |
 | Toca o disco: voz humana bostoniana, depois a voz zumbida; ouve "muitas outras vezes" | ✅ Dia 3: tocar e parar à vontade; legendas; luz pulsa; zumbido permanente depois |
 | Negociação para mandar a pedra; homem suspeito na agência de expresso de Brattleboro; cartas de Wilmarth extraviadas; correio passa a ser posta-restante em Brattleboro; foto do "exército" de pegadas diante das pegadas dos cães | ✅ Dia 4: carta de julho + a foto (fica nos dias seguintes) |

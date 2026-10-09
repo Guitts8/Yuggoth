@@ -1053,6 +1053,24 @@ func _sons() -> void:
 	# O café e o uísque antes do diário (Fase 3d).
 	_wav(_servir(), "servir", false)
 	_wav(_gaveta(), "gaveta", false)
+	# A marca de lama que se forma no chão, no sonho da noite 2 (Fase 3f).
+	_wav(_lama(), "lama", false)
+
+
+## Uma marca de lama se formando no chão: um estalo úmido e baixo, e bolhas.
+func _lama() -> PackedFloat32Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 61
+	var b := _buf(0.7)
+	for i in b.size():
+		var t := float(i) / RATE
+		var env := exp(-t * 8.0) * minf(1.0, t * 150.0)
+		var tom := sin(TAU * (150.0 - 80.0 * t) * t) * 0.5
+		b[i] = (rng.randf_range(-1, 1) * 0.6 + tom) * env * 0.7
+	_lowpass(b, 800.0)
+	for k in 4:
+		_clique(b, int(rng.randf_range(0.06, 0.4) * RATE), rng.randf_range(400.0, 800.0), 0.1, rng)
+	return b
 
 
 ## Grava WAV 16-bit mono. `loop` escreve o .import com loop ligado.
@@ -1741,26 +1759,51 @@ static func _dist_seg(p: Vector2, a: Vector2, b: Vector2) -> float:
 
 ## A marca de garra na lama (livro, cap. II: "de uma almofada central, pares de
 ## pinças serrilhadas se projetavam em direções opostas"). Topo da marca para -Y.
+## Fresca e úmida (playtest 5: "as pegadas pouco visíveis"): a lama escura, a
+## borda molhada que brilha à luz fria, e respingos em volta.
 func _pegada_garra() -> Image:
-	var img := _img(32, 32)
+	var img := _img(64, 64)
 	img.fill(Color(0, 0, 0, 0))
-	var lama := Color(0.13, 0.09, 0.06)
-	_pintar(img, lama, func(x: float, y: float) -> bool:
+	var c := 31.5
+	var marca := func(x: float, y: float) -> bool:
 		var p := Vector2(x, y)
-		if Vector2((x - 15.5) / 4.5, (y - 15.5) / 3.6).length() < 1.0:
+		if Vector2((x - c) / 9.0, (y - c) / 7.2).length() < 1.0:
 			return true
 		for lado in [-1.0, 1.0]:
 			for k in [-1.0, 1.0]:
-				var a := Vector2(15.5 + lado * 3.5, 15.5 + k * 2.0)
-				var b := Vector2(15.5 + lado * 14.0, 15.5 + k * 6.5)
-				if _dist_seg(p, a, b) < 1.3:
+				var a := Vector2(c + lado * 7.0, c + k * 4.0)
+				var b := Vector2(c + lado * 28.0, c + k * 13.0)
+				if _dist_seg(p, a, b) < 2.4:
 					return true
 				# Os dentes da serra, para dentro.
 				for t in range(1, 5):
 					var d := a.lerp(b, t / 5.0)
-					if _dist_seg(p, d, d + Vector2(0, -k * 2.2)) < 0.7:
+					if _dist_seg(p, d, d + Vector2(0, -k * 4.4)) < 1.3:
 						return true
-		return false)
+		return false
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 64
+	var respingos: Array[Vector3] = []
+	for i in 14:
+		var ang := rng.randf() * TAU
+		var r := rng.randf_range(12.0, 30.0)
+		respingos.append(Vector3(c + cos(ang) * r, c + sin(ang) * r * 0.7, rng.randf_range(0.8, 2.0)))
+	var dentro := func(x: float, y: float) -> bool:
+		if marca.call(x, y):
+			return true
+		for s in respingos:
+			if Vector2(x - s.x, y - s.y).length() < s.z:
+				return true
+		return false
+	var lama := Color(0.06, 0.045, 0.035)
+	var molhada := Color(0.5, 0.52, 0.55)
+	for y in 64:
+		for x in 64:
+			if not dentro.call(x + 0.5, y + 0.5):
+				continue
+			# A borda de cima e da esquerda (onde a luz bate) brilha, molhada.
+			var borda: bool = not dentro.call(x - 0.5, y - 0.5) or not dentro.call(x + 0.5, y - 1.5)
+			img.set_pixel(x, y, molhada if borda else lama)
 	return img
 
 

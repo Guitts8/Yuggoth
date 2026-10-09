@@ -3,15 +3,13 @@ extends Interactable
 ## A máquina comercial emprestada do prédio da administração (livro cap. III)
 ## que toca o cilindro de cera de Akeley — o set piece do Dia 3 (GDD §5.1).
 ##
-## Montagem: corneta, manivela e agulha chegam num caixote (flags `fono_*`,
-## marcadas por StateInteractable); o cilindro vem no pacote do expresso e é
-## posto aqui (`fono_cilindro`). Controle total: tocar e parar quando quiser.
+## A máquina chega montada (playtest 5: o livro diz que era uma máquina comercial
+## emprestada); o cilindro vem no pacote do expresso e é posto aqui
+## (`fono_cilindro`). Controle total: tocar e parar quando quiser.
 ## Tocar marca `tocou_disco`, soma `exposicao`, legenda cada trecho, faz a luz
 ## pulsar e os papéis tremerem na voz zumbida; ao parar pela primeira vez, o
 ## zumbido ambiente fica ligado para sempre. Da segunda vez em diante toca a
 ## gravação longa (💭 GDD: um trecho novo no fim, a voz zumbida diz "Wilmarth").
-
-const PECAS := {&"fono_corneta": "a corneta", &"fono_manivela": "a manivela", &"fono_agulha": "a agulha"}
 
 @export var gravacao: Gravacao
 @export var gravacao_longa: Gravacao
@@ -82,18 +80,10 @@ func _tem_cilindro() -> bool:
 	return GameState.has_flag(&"fono_cilindro") or cilindro_chegou == null or cilindro_chegou.is_met()
 
 
-func faltando() -> PackedStringArray:
-	var falta := PackedStringArray()
-	for flag: StringName in PECAS:
-		if not GameState.has_flag(flag):
-			falta.append(PECAS[flag])
-	return falta
-
-
 func _atualizar_prompt() -> void:
 	if tocando():
 		prompt = "Levantar a agulha"
-	elif not faltando().is_empty() or not _tem_cilindro():
+	elif not _tem_cilindro():
 		prompt = "Examinar o fonógrafo"
 	elif not GameState.has_flag(&"fono_cilindro"):
 		prompt = "Pôr o cilindro de cera"
@@ -107,12 +97,8 @@ func _on_interact(_by: Node) -> void:
 	if tocando():
 		_parar()
 		return
-	var falta := faltando()
-	if not falta.is_empty():
-		Events.notice_requested.emit("Ainda falta montar %s." % ", ".join(falta))
-		return
 	if not _tem_cilindro():
-		Events.notice_requested.emit("Montada. Falta o cilindro de Akeley.")
+		Events.notice_requested.emit("A máquina da administração, pronta. Falta o cilindro de Akeley.")
 		return
 	if not GameState.has_flag(&"fono_cilindro"):
 		GameState.set_flag(&"fono_cilindro")

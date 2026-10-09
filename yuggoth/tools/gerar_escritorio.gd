@@ -1160,36 +1160,60 @@ func _corredor(g: Node3D) -> void:
 	calha.som_calha = load(SFX_DIR + "calha_correio.wav")
 
 
-## A escada no fim do corredor (Fase 3e): os degraus descem para leste, entre
-## as paredes, para o andar de baixo, mal iluminado de lá; o corrimão de
-## madeira com o pilar no alto e os balaústres.
+## A escada no fim do corredor (Fase 3e; Fase 3f): o primeiro lanço desce para
+## leste, entre as paredes, até um patamar; o segundo vira para o sul e desce ao
+## andar de baixo, mal iluminado de lá; o corrimão de madeira com o pilar no alto,
+## os balaústres, e a volta no pilar do patamar.
 func _escada(c: Node3D, x: float, perto: float, fundo: float) -> void:
 	var e := _group(c, "Escada")
 	var n := 9
 	var largura := fundo - perto
 	var meio := (perto + fundo) / 2
-	var comprido := n * DEGRAU.x + 0.3
 	var desce := n * DEGRAU.y
 	for k in n:
 		var topo := -(k + 1) * DEGRAU.y
 		_box(e, "Degrau%d" % k, Vector3(DEGRAU.x, DEGRAU.y, largura), Vector3(x + (k + 0.5) * DEGRAU.x, topo - DEGRAU.y / 2, meio), "madeira_escura")
 		# O nariz do degrau, um pouco à frente.
 		_box(e, "Nariz%d" % k, Vector3(0.03, 0.025, largura), Vector3(x + k * DEGRAU.x + 0.005, topo - 0.0125, meio), "madeira_clara")
-	var fim := x + comprido
-	var baixo := -desce - 0.3
+	# O patamar, no fim do primeiro lanço (playtest 5: "a escada não leva a lugar
+	# nenhum"): dali o segundo lanço vira à direita (sul) e desce ao andar de
+	# baixo, que some na penumbra; o corrimão faz a volta no pilar do patamar.
+	var x2 := x + n * DEGRAU.x
+	var xe := x2 + largura
+	var y1 := -desce
+	var y2 := y1 - desce
+	var zf := fundo + n * DEGRAU.x
+	var zb := zf + 1.3
+	var baixo := y2 - 0.3
 	var alto := H - baixo
-	_quad(e, "ParedePerto", Vector2(comprido, alto), Vector3(x + comprido / 2, (H + baixo) / 2, perto), Vector3.ZERO, "parede_corredor")
-	_quad(e, "ParedeFundo", Vector2(comprido, alto), Vector3(x + comprido / 2, (H + baixo) / 2, fundo), Vector3(0, 180, 0), "parede_corredor")
-	_quad(e, "ParedeFim", Vector2(largura, alto), Vector3(fim, (H + baixo) / 2, meio), Vector3(0, -90, 0), "parede_corredor")
-	_quad(e, "Teto", Vector2(comprido, largura), Vector3(x + comprido / 2, H, meio), Vector3(90, 0, 0), "teto")
-	_quad(e, "PisoBaixo", Vector2(0.6, largura), Vector3(fim - 0.3, -desce, meio), Vector3(-90, 0, 0), "piso_corredor")
-	# O corrimão, do lado da parede da frente: o pilar no alto, a barra inclinada
-	# e os balaústres.
+	var cy := (H + baixo) / 2
+	_box(e, "Patamar", Vector3(largura, 0.12, largura), Vector3((x2 + xe) / 2, y1 - 0.06, meio), "madeira_escura")
+	_box(e, "PatamarNariz", Vector3(largura, 0.025, 0.03), Vector3((x2 + xe) / 2, y1 - 0.0125, fundo - 0.005), "madeira_clara")
+	for k in n:
+		var topo := y1 - (k + 1) * DEGRAU.y
+		var zk := fundo + (k + 0.5) * DEGRAU.x
+		_box(e, "Degrau2_%d" % k, Vector3(largura, DEGRAU.y, DEGRAU.x), Vector3((x2 + xe) / 2, topo - DEGRAU.y / 2, zk), "madeira_escura")
+		_box(e, "Nariz2_%d" % k, Vector3(largura, 0.025, 0.03), Vector3((x2 + xe) / 2, topo - 0.0125, fundo + k * DEGRAU.x + 0.005), "madeira_clara")
+	_quad(e, "PisoBaixo", Vector2(largura, zb - zf), Vector3((x2 + xe) / 2, y2, (zf + zb) / 2), Vector3(-90, 0, 0), "piso_corredor")
+	# As paredes do vão: a de perto corre os dois lanços; a de trás, só o primeiro.
+	_quad(e, "ParedePerto", Vector2(xe - x, alto), Vector3((x + xe) / 2, cy, perto), Vector3.ZERO, "parede_corredor")
+	_quad(e, "ParedeFundo", Vector2(x2 - x, alto), Vector3((x + x2) / 2, cy, fundo), Vector3(0, 180, 0), "parede_corredor")
+	_quad(e, "ParedeFim", Vector2(zb - perto, alto), Vector3(xe, cy, (perto + zb) / 2), Vector3(0, -90, 0), "parede_corredor")
+	_quad(e, "ParedeLanco2", Vector2(zb - fundo, alto), Vector3(x2, cy, (fundo + zb) / 2), Vector3(0, 90, 0), "parede_corredor")
+	_quad(e, "ParedeSul", Vector2(largura, alto), Vector3((x2 + xe) / 2, cy, zb), Vector3(0, 180, 0), "parede_corredor")
+	_quad(e, "Teto", Vector2(xe - x, largura), Vector3((x + xe) / 2, H, meio), Vector3(90, 0, 0), "teto")
+	_quad(e, "Teto2", Vector2(largura, zb - fundo), Vector3((x2 + xe) / 2, H, (fundo + zb) / 2), Vector3(90, 0, 0), "teto")
+	# O lambri do patamar, que se vê do alto.
+	_box(e, "LambriPatamar", Vector3(largura, 1.0, 0.02), Vector3((x2 + xe) / 2, y1 + 0.5, perto + 0.01), "lambri")
+	_box(e, "LambriPatamarFim", Vector3(0.02, 1.0, largura), Vector3(xe - 0.01, y1 + 0.5, meio), "lambri")
+
+	# O corrimão, do lado de dentro: o pilar no alto, a barra inclinada e os
+	# balaústres; no patamar, o outro pilar, e a volta para o segundo lanço.
 	var z := fundo - 0.07
 	var a := atan2(desce, n * DEGRAU.x)
+	var comp := Vector2(n * DEGRAU.x, desce).length()
 	var pilar := _box(e, "Pilar", Vector3(0.08, 1.05, 0.08), Vector3(x + 0.04, 0.525, z), "madeira_escura")
 	_cyl(e, "Pomo", 0.05, 0.045, 0.07, pilar.position + Vector3(0, 0.56, 0), "madeira_escura", 8)
-	var comp := Vector2(n * DEGRAU.x, desce).length()
 	var barra := _box(e, "Corrimao", Vector3(comp, 0.05, 0.06), Vector3(x + 0.04 + n * DEGRAU.x / 2, 0.95 - desce / 2, z), "madeira_escura")
 	barra.rotation.z = -a
 	for k in n:
@@ -1197,8 +1221,24 @@ func _escada(c: Node3D, x: float, perto: float, fundo: float) -> void:
 		var chao := -(k + 1) * DEGRAU.y
 		var topo := 0.95 - (bx - x - 0.04) * tan(a)
 		_box(e, "Balaustre%d" % k, Vector3(0.025, topo - chao, 0.025), Vector3(bx, (topo + chao) / 2, z), "madeira_escura")
-	# A luz de baixo, fraca: a escada desce para o escuro.
-	var luz := _omni(e, "LuzBaixo", Vector3(fim - 0.5, -desce + 0.6, meio), Color(1.0, 0.78, 0.5), 0.6, 3.0)
+	var xr := x2 + 0.07
+	var pilar2 := _box(e, "PilarPatamar", Vector3(0.08, 1.15, 0.08), Vector3(xr, y1 + 0.575, z), "madeira_escura")
+	_cyl(e, "PomoPatamar", 0.05, 0.045, 0.07, pilar2.position + Vector3(0, 0.61, 0), "madeira_escura", 8)
+	var barra2 := _box(e, "Corrimao2", Vector3(0.06, 0.05, comp), Vector3(xr, y1 + 0.95 - desce / 2, fundo + n * DEGRAU.x / 2), "madeira_escura")
+	barra2.rotation.x = a
+	for k in n:
+		var bz := fundo + (k + 0.5) * DEGRAU.x
+		var chao := y1 - (k + 1) * DEGRAU.y
+		var topo := y1 + 0.95 - (bz - fundo) * tan(a)
+		_box(e, "Balaustre2_%d" % k, Vector3(0.025, topo - chao, 0.025), Vector3(xr, (topo + chao) / 2, bz), "madeira_escura")
+	# No patamar, uma arandela fraca na parede do fim (mostra a volta); lá embaixo,
+	# outra luz fraca: o andar de baixo some na penumbra.
+	var arandela := Vector3(xe - 0.06, y1 + 1.75, meio + 0.2)
+	_box(e, "Arandela", Vector3(0.05, 0.12, 0.08), arandela, "latao")
+	_cyl(e, "Cupula", 0.05, 0.035, 0.09, arandela + Vector3(-0.06, 0.04, 0), "vidro_aceso", 8)
+	var luz_patamar := _omni(e, "LuzPatamar", arandela + Vector3(-0.25, -0.1, 0), Color(1.0, 0.74, 0.45), 0.9, 3.4)
+	luz_patamar.omni_attenuation = 1.4
+	var luz := _omni(e, "LuzBaixo", Vector3((x2 + xe) / 2, y2 + 0.9, zf + 0.6), Color(1.0, 0.76, 0.48), 1.0, 4.5)
 	luz.omni_attenuation = 1.5
 
 
@@ -1841,12 +1881,14 @@ func _dia_5(parent: Node) -> void:
 	_escrever(c28, "resposta_dia_5", &"leu_carta_akeley_28_agosto")
 
 	# Depois do bilhete, quem olhar para a janela vê algo passar lá fora, na
-	# chuva, a poucos metros do vidro: uma delas, em 3D (Fase 3e). Uma vez.
+	# chuva, rente ao vidro: uma delas, em 3D (Fase 3e). Uma vez. Playtest 5 ("o
+	# mi-go mais visível"): a uns dois metros da janela (mais perto, a asa entrava
+	# na parede), maior, e mais devagar — enche o vão da janela enquanto passa.
 	var sombra := Aparicao.new()
 	sombra.name = "Sombra"
-	sombra.position = Vector3(-3.6, 1.9, -D - 2.6)
-	sombra.deslocamento = Vector3(7.2, 0.5, -0.8)
-	sombra.duracao = 1.8
+	sombra.position = Vector3(-2.6, 1.45, -D - 2.0)
+	sombra.deslocamento = Vector3(5.4, 0.35, -0.4)
+	sombra.duracao = 2.6
 	sombra.distancia = 9.0
 	sombra.condition = _flag(&"leu_bilhete_akeley_agosto")
 	sombra.flag = &"viu_sombra_janela"
@@ -1855,12 +1897,13 @@ func _dia_5(parent: Node) -> void:
 	var vulto := Migo.new()
 	vulto.name = "Vulto"
 	vulto.rotation_degrees = Vector3(0, -95, 8)
-	vulto.batida = 0.32
+	vulto.scale = Vector3.ONE * 1.4
+	vulto.batida = 0.38
 	_add(sombra, vulto)
 	# Um clarão frio e curto que viaja com ela (a luz da rua na chuva): sem ele,
-	# o corpo some no escuro. Não alcança a sala.
-	var clarao := _omni(sombra, "Clarao", Vector3(0.3, 0.9, 1.2), Color(0.7, 0.75, 0.9), 0.9, 2.2)
-	clarao.omni_attenuation = 1.5
+	# o corpo some no escuro. Fica do lado de fora, quase sem alcançar a sala.
+	var clarao := _omni(sombra, "Clarao", Vector3(0.2, 1.3, -0.4), Color(0.7, 0.75, 0.9), 1.1, 1.9)
+	clarao.omni_attenuation = 1.6
 
 
 ## Dia 4 (cap. III): a pedra que não chega. O telegrama de quarta-feira, a carta
@@ -1997,53 +2040,6 @@ func _dia_3(parent: Node) -> Node3D:
 	_examinavel(tubo, Vector3(0.13, 0.07, 0.07), "Examinar o estojo", "O cilindro de cera",
 		"Um cilindro de cera escura, gravado com ditafone, no estojo de papelão. Na tampa, a letra apertada de Akeley: “1º de maio de 1915.”")
 
-	# O caixote da administração, no chão, com as peças da máquina emprestada.
-	var caixote := _group(g, "Caixote", Vector3(-1.5, 0, 2.05), 20)
-	_box(caixote, "Fundo", Vector3(0.5, 0.02, 0.38), Vector3(0, 0.01, 0), "madeira_clara")
-	for s in [-1, 1]:
-		_box(caixote, "Lado%d" % s, Vector3(0.02, 0.3, 0.38), Vector3(s * 0.24, 0.15, 0), "madeira_clara")
-		_box(caixote, "Frente%d" % s, Vector3(0.5, 0.3, 0.02), Vector3(0, 0.15, s * 0.18), "madeira_clara")
-	var rotulo := Label3D.new()
-	rotulo.name = "Rotulo"
-	rotulo.text = "MISKATONIC UNIVERSITY\nADMINISTRATION BLDG."
-	rotulo.font_size = 48
-	rotulo.pixel_size = 0.0004
-	rotulo.modulate = Color(0.15, 0.1, 0.08)
-	rotulo.position = Vector3(0, 0.17, 0.192)
-	rotulo.alpha_cut = Label3D.ALPHA_CUT_DISCARD
-	_add(caixote, rotulo)
-	# Aberto em cima: só paredes e fundo colidem. Uma caixa maciça bloqueava o
-	# raio de interação e as peças lá dentro nunca podiam ser miradas.
-	_colisao(caixote, "Colisao", [
-		[Vector3(0.5, 0.02, 0.38), Vector3(0, 0.01, 0)],
-		[Vector3(0.02, 0.3, 0.38), Vector3(-0.24, 0.15, 0)],
-		[Vector3(0.02, 0.3, 0.38), Vector3(0.24, 0.15, 0)],
-		[Vector3(0.5, 0.3, 0.02), Vector3(0, 0.15, -0.18)],
-		[Vector3(0.5, 0.3, 0.02), Vector3(0, 0.15, 0.18)],
-	])
-	# [flag, ação, posição, tamanho da área]
-	var pecas := [
-		[&"fono_corneta", "Montar a corneta", Vector3(-0.08, 0.12, 0), Vector3(0.3, 0.16, 0.2)],
-		[&"fono_manivela", "Montar a manivela", Vector3(0.12, 0.08, 0.06), Vector3(0.16, 0.1, 0.1)],
-		[&"fono_agulha", "Pôr uma agulha", Vector3(0.14, 0.06, -0.08), Vector3(0.12, 0.1, 0.1)],
-	]
-	for p: Array in pecas:
-		var peca := _grupo_se(caixote, "Peca_%s" % String(p[0]).trim_prefix("fono_"), _flag(p[0], true))
-		peca.position = p[2]
-		match p[0]:
-			&"fono_corneta":
-				var c := _cyl(peca, "Corneta", 0.12, 0.015, 0.3, Vector3.ZERO, "latao", 10)
-				c.rotation_degrees.z = 80
-			&"fono_manivela":
-				_box(peca, "Braco", Vector3(0.14, 0.012, 0.012), Vector3.ZERO, "ferro")
-				_cyl(peca, "Punho", 0.01, 0.01, 0.05, Vector3(0.07, 0.025, 0), "madeira_escura", 6)
-			&"fono_agulha":
-				_cyl(peca, "Lata", 0.025, 0.025, 0.012, Vector3.ZERO, "latao", 8)
-		var montar := _area(peca, StateInteractable.new(), "Montar", p[3]) as StateInteractable
-		montar.prompt = p[1]
-		montar.changes = {p[0]: 1.0}
-		montar.additive = false
-
 	_escrever(g, "resposta_dia_3", &"tocou_disco")
 	return g
 
@@ -2145,17 +2141,38 @@ func _sonho_garras(g: Node3D) -> void:
 	_add(g, caminho)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 22
-	# O caminho: da porta ao pé da mesa; depois o tampo e o peitoril.
+	# O caminho (playtest 5: mais marcas, frescas, úmidas): da porta ao pé da
+	# mesa, em duas fileiras, como de muitas patas; depois o tampo e o peitoril.
 	var de := Vector2(-1.0, 2.75)
 	var ate := Vector2(-0.05, -1.75)
 	var rumo := rad_to_deg(atan2(-(ate - de).x, -(ate - de).y))
-	for k in 12:
-		var p := de.lerp(ate, k / 11.0) + Vector2(0.12 if k % 2 else -0.12, 0)
-		_quad(g, "Pegada%d" % k, Vector2(0.32, 0.32), Vector3(p.x, 0.014, p.y), Vector3(-90, rumo, 0), "pegada")
-	for k in 3:
-		var p := Vector3(-0.1 + (0.1 if k % 2 else -0.1), MESA + 0.004, -1.95 - k * 0.22)
-		_quad(g, "PegadaMesa%d" % k, Vector2(0.2, 0.2), p, Vector3(-90, 0, 0), "pegada")
-	_quad(g, "PegadaPeitoril", Vector2(0.18, 0.18), Vector3(0.0, JANELA_Y.x + 0.035, -D + 0.02), Vector3(-90, 0, 0), "pegada")
+	for k in 20:
+		var lado := 1.0 if k % 2 else -1.0
+		var p := de.lerp(ate, k / 19.0) + Vector2(lado * rng.randf_range(0.1, 0.17), rng.randf_range(-0.05, 0.05))
+		_quad(g, "Pegada%d" % k, Vector2(0.36, 0.36), Vector3(p.x, 0.014 + k * 0.0002, p.y), Vector3(-90, rumo + rng.randf_range(-14, 14), 0), "pegada")
+	for k in 4:
+		var p := Vector3(-0.1 + (0.1 if k % 2 else -0.1), MESA + 0.004, -1.9 - k * 0.18)
+		_quad(g, "PegadaMesa%d" % k, Vector2(0.22, 0.22), p, Vector3(-90, rng.randf_range(-20, 20), 0), "pegada")
+	_quad(g, "PegadaPeitoril", Vector2(0.2, 0.2), Vector3(0.0, JANELA_Y.x + 0.035, -D + 0.02), Vector3(-90, 0, 0), "pegada")
+	# E as que se formam enquanto ele sonha (Rastro): em volta da cadeira, uma
+	# volta larga e outra mais fechada, chegando perto dele.
+	var rastro := Rastro.new()
+	rastro.name = "Rastro"
+	rastro.som = load(SFX_DIR + "lama.wav")
+	_add(g, rastro)
+	var centro := Vector2(0.05, -1.4)
+	var voltas: Array[Vector3] = []
+	for k in 7:
+		voltas.append(Vector3(lerpf(-115.0, 115.0, k / 6.0), 1.25, 1.0))
+	for k in 6:
+		voltas.append(Vector3(lerpf(100.0, -70.0, k / 5.0), lerpf(0.85, 0.5, k / 5.0), -1.0))
+	for k in voltas.size():
+		var v := voltas[k]
+		var a := deg_to_rad(v.x)
+		var p := centro + Vector2(sin(a), cos(a)) * v.y
+		# De lado, seguindo a volta.
+		var giro := v.x + (90.0 if v.z > 0.0 else -90.0)
+		_quad(rastro, "Fresca%d" % k, Vector2(0.36, 0.36), Vector3(p.x, 0.016 + k * 0.0002, p.y), Vector3(-90, giro, 0), "pegada")
 	var gatilho := NarrationTrigger.new()
 	gatilho.line = load("res://narrative/narration/sonho_garra.tres")
 	_area(g, gatilho, "NaPorta", Vector3(1.4, 2.0, 0.9), Vector3(-1.0, 1.0, 2.4))
@@ -2377,27 +2394,94 @@ func _abajur(parent: Node) -> SpotLight3D:
 	return luz
 
 
-## A máquina comercial emprestada da administração (cap. III), sobre o armário.
-## Um fonógrafo de cilindro: o disco de Akeley é um cilindro de cera.
+## A máquina comercial emprestada da administração (cap. III: "a commercial
+## machine"), que chega montada no Dia 3 — só falta o cilindro de Akeley. Um
+## fonógrafo de cilindro (o disco é um cilindro de cera) na sua própria mesinha,
+## junto à parede oeste, entre a estante e o quadro, onde chega a luz da janela
+## (playtest 5: "um lugar digno"): a caixa de carvalho com a placa preta, o
+## mecanismo à vista (o mandril, a rosca do carro, o diafragma de latão), a
+## manivela do lado, e a corneta grande de latão presa ao guindaste, a boca
+## virada para a sala. Na prateleira de baixo, estojos de cilindros.
 func _fonografo(parent: Node, dia3: Node3D) -> void:
 	var g := _grupo_se(parent, "MaquinaFonografo", _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, 3))
-	g.position = Vector3(-2.15, 0.9, 2.35)
-	g.rotation_degrees.y = -60
-	_box(g, "Caixa", Vector3(0.34, 0.14, 0.24), Vector3(0, 0.07, 0), "madeira_clara")
-	var mandril := _cyl(g, "Mandril", 0.028, 0.028, 0.15, Vector3(0, 0.19, 0.02), "ferro", 10)
+	g.position = Vector3(-W + 0.33, 0, -0.75)
+	# A frente (-Z local) para leste, para a sala; +X local é o sul.
+	g.rotation_degrees.y = -90
+	# A mesinha: tampo, saia, pernas torneadas e a prateleira de baixo.
+	var alto := 0.7
+	_box(g, "Tampo", Vector3(0.52, 0.03, 0.42), Vector3(0, alto - 0.015, 0), "madeira_escura")
+	_box(g, "Saia", Vector3(0.46, 0.07, 0.36), Vector3(0, alto - 0.065, 0), "madeira_escura")
+	for sx in [-1, 1]:
+		for sz in [-1, 1]:
+			_cyl(g, "Perna%d%d" % [sx + 1, sz + 1], 0.02, 0.016, alto - 0.03, Vector3(sx * 0.22, (alto - 0.03) / 2, sz * 0.17), "madeira_escura", 6)
+	_box(g, "Prateleira", Vector3(0.46, 0.02, 0.36), Vector3(0, 0.18, 0), "madeira_escura")
+	for k in 4:
+		_cyl(g, "Estojo%d" % k, 0.03, 0.03, 0.11, Vector3(-0.15 + k * 0.075, 0.245, 0.04 - (k % 2) * 0.05), "envelope", 8)
+	# A caixa de carvalho, com o rodapé, e a placa preta em cima.
+	var caixa_h := 0.15
+	var topo := alto + caixa_h
+	_box(g, "Caixa", Vector3(0.36, caixa_h, 0.24), Vector3(0, alto + caixa_h / 2, 0), "madeira_clara")
+	_box(g, "Rodape", Vector3(0.38, 0.02, 0.26), Vector3(0, alto + 0.01, 0), "madeira_clara")
+	_box(g, "Placa", Vector3(0.34, 0.008, 0.22), Vector3(0, topo + 0.004, 0), "esmalte_preto")
+	# O mecanismo: os mancais, o mandril, a rosca do carro e o diafragma.
+	var eixo_y := topo + 0.06
+	for s in [-1, 1]:
+		_box(g, "Mancal%d" % (s + 1), Vector3(0.016, 0.07, 0.03), Vector3(s * 0.12, topo + 0.035, -0.04), "ferro")
+	var mandril := _cyl(g, "Mandril", 0.026, 0.026, 0.2, Vector3(0, eixo_y, -0.04), "ferro", 12)
 	mandril.rotation_degrees.z = 90
+	var rosca := _cyl(g, "Rosca", 0.006, 0.006, 0.26, Vector3(0, topo + 0.085, 0.035), "aco", 6)
+	rosca.rotation_degrees.z = 90
+	_box(g, "Carro", Vector3(0.03, 0.025, 0.08), Vector3(-0.05, topo + 0.09, 0.0), "ferro")
+	var boca := Vector3(-0.05, eixo_y + 0.06, -0.04)
+	_cyl(g, "Diafragma", 0.03, 0.03, 0.014, boca + Vector3(0, -0.012, 0), "latao", 12)
 	var cilindro := _grupo_se(g, "Cilindro", _flag(&"fono_cilindro"))
-	var cera := _cyl(cilindro, "Cera", 0.032, 0.032, 0.11, Vector3(0, 0.19, 0.02), "cinzas", 10)
+	var cera := _cyl(cilindro, "Cera", 0.031, 0.031, 0.11, Vector3(-0.02, eixo_y, -0.04), "cinzas", 12)
 	cera.rotation_degrees.z = 90
-	var corneta := _grupo_se(g, "Corneta", _flag(&"fono_corneta"))
-	var cone := _cyl(corneta, "Cone", 0.16, 0.015, 0.4, Vector3(0.05, 0.38, -0.12), "latao", 10)
-	cone.rotation_degrees = Vector3(-55, 0, 0)
-	var manivela := _grupo_se(g, "Manivela", _flag(&"fono_manivela"))
-	_box(manivela, "Braco", Vector3(0.012, 0.12, 0.012), Vector3(0.18, 0.08, 0), "ferro")
-	var agulha := _grupo_se(g, "Agulha", _flag(&"fono_agulha"))
-	_box(agulha, "Diafragma", Vector3(0.05, 0.03, 0.05), Vector3(0, 0.24, 0.0), "latao")
+	# A manivela, do lado direito da caixa.
+	var manivela := _group(g, "Manivela", Vector3(-0.185, alto + 0.08, 0.0))
+	_cyl(manivela, "Eixo", 0.008, 0.008, 0.03, Vector3(-0.015, 0, 0), "ferro", 6).rotation_degrees.z = 90
+	_box(manivela, "Braco", Vector3(0.01, 0.1, 0.014), Vector3(-0.032, -0.04, 0), "ferro")
+	_cyl(manivela, "Punho", 0.011, 0.011, 0.045, Vector3(-0.055, -0.085, 0), "madeira_escura", 6).rotation_degrees.z = 90
+	# A corneta, do diafragma para cima e para a sala, em três trechos que se
+	# abrem; a boca com o aro. Oca: a parede de dentro é a face virada para o eixo.
+	var rumo := Vector3(0.55, 0.62, -0.42).normalized()
+	var corneta := _group(g, "Corneta", boca)
+	corneta.basis = Basis(Quaternion(Vector3.UP, rumo))
+	var trechos := [[0.012, 0.03, 0.26], [0.03, 0.075, 0.22], [0.075, 0.2, 0.16]]
+	var y := 0.0
+	for k in trechos.size():
+		var t: Array = trechos[k]
+		for dentro in [false, true]:
+			var mi := _cyl(corneta, "Trecho%d%s" % [k, "Dentro" if dentro else ""], t[1] - (0.003 if dentro else 0.0),
+				t[0] - (0.002 if dentro else 0.0), t[2], Vector3(0, y + t[2] / 2, 0), "latao", 14)
+			var malha := mi.mesh as CylinderMesh
+			malha.cap_top = false
+			malha.cap_bottom = false
+			malha.flip_faces = dentro
+		y += t[2]
+	var aro := MeshInstance3D.new()
+	aro.name = "Aro"
+	var toro := TorusMesh.new()
+	toro.inner_radius = 0.195
+	toro.outer_radius = 0.212
+	toro.rings = 16
+	toro.ring_segments = 4
+	aro.mesh = toro
+	aro.material_override = m["latao"]
+	aro.position = Vector3(0, y, 0)
+	_add(corneta, aro)
+	# O guindaste: a haste atrás da caixa, o braço e a corrente até a corneta.
+	var meio_corneta := boca + rumo * 0.36
+	var haste := Vector3(0.15, 0, 0.1)
+	var haste_alto := meio_corneta.y + 0.24
+	_cyl(g, "Haste", 0.007, 0.007, haste_alto - topo, Vector3(haste.x, (topo + haste_alto) / 2, haste.z), "ferro", 6)
+	var braco := Vector3(meio_corneta.x, haste_alto, meio_corneta.z) - Vector3(haste.x, haste_alto, haste.z)
+	var bg := _box(g, "BracoGuindaste", Vector3(0.012, 0.012, braco.length()), Vector3(haste.x, haste_alto, haste.z) + braco / 2, "ferro")
+	bg.rotation.y = atan2(braco.x, braco.z)
+	_box(g, "Corrente", Vector3(0.004, 0.17, 0.004), Vector3(meio_corneta.x, haste_alto - 0.085, meio_corneta.z), "ferro")
+	_colisao(g, "Colisao", [[Vector3(0.52, topo, 0.42), Vector3(0, topo / 2, 0)]])
 
-	var f := _area(g, Fonografo.new(), "Fonografo", Vector3(0.4, 0.35, 0.35), Vector3(0, 0.18, 0)) as Fonografo
+	var f := _area(g, Fonografo.new(), "Fonografo", Vector3(0.42, 0.3, 0.32), Vector3(0, topo + 0.05, 0)) as Fonografo
 	f.unique_name_in_owner = true
 	f.gravacao = load("res://narrative/gravacoes/disco_1915.tres")
 	f.gravacao_longa = load("res://narrative/gravacoes/disco_1915_longo.tres")
@@ -2415,12 +2499,12 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 	# agulha e vai ouvi-lo da poltrona, olhando a lareira fria; o sono vem com o
 	# disco (LugarSono). A área é maior que a do fonógrafo (ganha a mira) e só
 	# existe nessa noite.
-	var ouvir := _area(g, LugarSono.new(), "OuvirDeNovo", Vector3(0.52, 0.48, 0.48), Vector3(0, 0.18, 0)) as LugarSono
+	var ouvir := _area(g, LugarSono.new(), "OuvirDeNovo", Vector3(0.56, 0.42, 0.46), Vector3(0, topo + 0.05, 0)) as LugarSono
 	ouvir.noite = 3
 	ouvir.prompt = "Ouvir o disco outra vez"
 	ouvir.condition = _cond_valor(&"sono", ValueCondition.Op.IGUAL, 3)
 	ouvir.assento = _assento_poltrona
-	ouvir.diante = _marca(parent as Node3D, "DianteDisco", g.position + Vector3(0.6, -0.9, -0.34))
+	ouvir.diante = _marca(parent as Node3D, "DianteDisco", g.position + Vector3(0.62, 0, 0))
 	ouvir.olhar = _marca(parent as Node3D, "OlharLareiraFria", Vector3(W - 0.25, 0.35, -0.6))
 	ouvir.escutar = 14.0
 	ouvir.linha = load("res://narrative/narration/sono_disco.tres")

@@ -32,7 +32,8 @@ e a pena da mesa escreve a entrada do dia, ao som dela; a entrada vai para o
 dossiê. **Todo dia termina assim**, e o jogador nunca sabe se aquela noite terá
 sonho: sem sonho (Dia 1), ele fecha o caderno e levanta; com sonho, a última linha
 falha (ver *Os sonhos*). Acabado o dia, **"Ir para casa"**: a porta abre para o
-corredor, e o jogador anda por ele até a **escada**, no fim, que desce para a rua —
+corredor, e o jogador anda por ele até a **escada**, no fim, que desce para a rua
+(um lanço até o patamar, com a arandela, e a volta do corrimão para o andar de baixo, na penumbra) —
 chegar nela é o cartão do dia seguinte. A página do diário que enche vira, e a
 escrita continua na seguinte. A porta, sem carta na
 mão, só lembra: *"Antes de ir, anotar o dia no diário."* Fora dessa hora, **"Ler o
@@ -68,7 +69,7 @@ debruçado no diário** (a linha borrada, a aurora rosada pela janela, a lâmpad
 ardeu a noite toda quase apagada); ergue a cabeça, e então vai para casa pelo corredor.
 | Noite | O sonho | Acorda |
 |---|---|---|
-| Dia 2 (as fotos) | Marcas de garra, de lama, da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá (em 3D) para o morro com o círculo de pedras, sob a lua | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
+| Dia 2 (as fotos) | Marcas de garra, de lama fresca e úmida (a borda brilha à luz fria), em duas fileiras da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá (em 3D) para o morro com o círculo de pedras, sob a lua; e outras **se formam** enquanto ele sonha, com um estalo úmido, uma a uma, em volta da cadeira, cada vez mais perto dele | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
 | Dia 3 (o disco) | A sala some: ele está onde o disco foi gravado — 1 da manhã de 1º de maio de 1915, a boca fechada da caverna na encosta da Dark Mountain, sobre o pântano de Lee; vultos de manto na névoa, a lanterna de Akeley, o fonógrafo dele num toco tocando o disco de onde parou; uma das criaturas passa entre as árvores, de relance | ao levantar a agulha (ou no fim do disco) |
 | Dia 4 (a pedra) | A pedra negra que nunca chegou está na mesa; pela janela (em 3D), a plataforma de Keene de noite, os lampiões, o carrinho com o caixote e um homem magro de costas; a voz zumbida | ao examinar a pedra |
 | Dia 5 (AKELY) | Chove dentro da sala; o telefone toca | atendido: só um zumbido na linha, soletrando *A... K... E... L... Y.* |
@@ -228,26 +229,27 @@ debate público sobre o horror de Vermont terminou para sempre."*; tiradas as fo
 - **Bilhete de Akeley:** o medo das estradas, a Califórnia, e **Walter Brown** —
   suas pegadas viradas para a marca de garra.
 - **A transcrição de Akeley, na íntegra** (onde e quando gravou; o texto completo).
-  Ao fechá-la: *"A máquina da administração esperava no canto."*
-- No canto, o **caixote da administração da Miskatonic** com as peças, e sobre o
-  armário a **máquina emprestada** (fonógrafo de cilindro), desmontada.
+  Ao fechá-la: *"A máquina da administração esperava junto à estante, pronta."*
+- Junto à estante, na sua própria mesinha, a **máquina emprestada** da
+  administração (um fonógrafo de cilindro comercial, como no livro), já montada:
+  a caixa de carvalho, o mecanismo à vista, a corneta grande de latão no
+  guindaste, virada para a sala; estojos de cilindros na prateleira de baixo.
 
 **O que fazer:**
-1. **Montar** a corneta, a manivela e a agulha (cada uma tirada do caixote).
-2. **Pôr o cilindro de cera** na máquina (sai do estojo; antes de abrir o pacote,
-   a máquina montada só diz *"Falta o cilindro de Akeley."*).
-3. **"Dar corda e baixar a agulha"** → o disco toca (~1 min), com **legendas**:
+1. **Pôr o cilindro de cera** na máquina (sai do estojo; antes de abrir o pacote,
+   a máquina só diz *"A máquina da administração, pronta. Falta o cilindro de Akeley."*).
+2. **"Dar corda e baixar a agulha"** → o disco toca (~1 min), com **legendas**:
    ruídos; a voz humana culta ("...é o Senhor dos Bosques..." — "Iä!
    Shub-Niggurath!"); a **imitação zumbida** da fala; Azathoth, Yuggoth,
    Nyarlathotep, "a máscara de cera e o manto que esconde"; **a fala cortada pelo
    fim do disco**. Na voz zumbida, a luz pulsa e os papéis tremem.
    **"Levantar a agulha"** para a qualquer momento.
-4. Na primeira vez: exposição sobe bastante e **o zumbido fica para sempre** no
+3. Na primeira vez: exposição sobe bastante e **o zumbido fica para sempre** no
    ambiente. Narrador: *"Ainda hoje, a todo momento, ouço aquele zumbido fraco e
    diabólico..."*
-5. **"Tocar de novo"**: a gravação **dura mais** — no fim, a voz zumbida diz
+4. **"Tocar de novo"**: a gravação **dura mais** — no fim, a voz zumbida diz
    *"...Wil... marth..."* (não está na transcrição).
-6. Responder (3 de julho), só depois de ouvir:
+5. Responder (3 de julho), só depois de ouvir:
    | Tom | Abertura |
    |---|---|
    | cético | "Um ditafone grava o que um homem quiser pôr diante dele." |
@@ -354,7 +356,8 @@ junto à porta quando a luz volta.
    de julho** descreve o homem da agência do expresso como *"magro, ruivo, com jeito
    de roceiro"* — o que antes não dizia. Nenhum aviso.
 6. Depois do bilhete, quem olhar para a **janela** vê **um vulto passar** lá fora,
-   uma vez, sem som. "Olhar" a janela: *"Só a chuva, escorrendo no vidro."*
+   uma vez, sem som — uma das criaturas, a uns dois metros do vidro, grande,
+   devagar, as asas batendo na chuva, enchendo o vão da janela. "Olhar" a janela: *"Só a chuva, escorrendo no vidro."*
 7. **"Escrever a Akeley"** de novo — renovar a oferta (sem tom) → cartão: *"A
    resposta dele chegou a 28 de agosto."*
 8. **Carta de 28 de agosto**: já não é tão contra o plano; quer pôr as coisas em

@@ -1,6 +1,6 @@
 extends Node
-## Descartável (playtest 5, Fase 3f): o diário novo — fechado, a capa abrindo, as
-## folhas correndo até a fita, aberto. Em SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável (playtest 5, Fase 3f): o fonógrafo novo na mesinha dele, e o mi-go
+## do Dia 5 passando rente à janela. Em SHOT_DIR, com prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -15,32 +15,43 @@ func _ready() -> void:
 	await _s(0.5)
 	GameState.reset()
 	GameState.set_flag(&"prologo_concluido")
-	GameState.set_value(&"dia", 2)
-	GameState.set_flag(&"comecou_dia_2")
+	GameState.set_value(&"dia", 3)
+	GameState.set_flag(&"comecou_dia_3")
+	GameState.set_flag(&"fono_cilindro")
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
 	await _s(1.0)
 	Narrator.cancel()
 	var e: Escritorio = root.find_child("Escritorio", true, false)
-	var d := e.diario
-	e.player.global_position = Vector3(-0.1, 0, -1.45)
 	e.player.input_enabled = false
-	e.player.fov_forcado = 30.0
-	e.player.olhar_para(d.global_position + Vector3(0.07, 0, 0), 0.01)
+	var f := e.fonografo.global_position
+	e.player.global_position = Vector3(0.4, 0, 0.6)
+	e.player.olhar_para(f + Vector3(0, 0.15, 0), 0.01)
 	await _s(0.6)
-	_shot("%s_1_fechado" % tag)
-	e.player.fov_forcado = 0.0
-	d._abrir(e.player)
-	await _s(4.1)
-	_shot("%s_2_capa" % tag)
+	_shot("%s_1_fonografo" % tag)
+	e.player.global_position = Vector3(-1.5, 0, -0.45)
+	e.player.olhar_para(f + Vector3(0, 0.1, 0), 0.01)
 	await _s(0.6)
-	_shot("%s_3_correndo" % tag)
+	_shot("%s_2_fonografo_perto" % tag)
+	e.player.global_position = Vector3(0.9, 0, 1.6)
+	e.player.olhar_para(Vector3(-2.0, 0.9, -0.9), 0.01)
+	await _s(0.6)
+	_shot("%s_3_sala" % tag)
+
+	# O mi-go do Dia 5.
+	GameState.set_value(&"dia", 5)
+	GameState.set_flag(&"comecou_dia_5")
+	GameState.set_flag(&"leu_bilhete_akeley_agosto")
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+	await _s(1.0)
+	Narrator.cancel()
+	e = root.find_child("Escritorio", true, false)
+	e.player.input_enabled = false
+	e.player.global_position = Vector3(0, 0, -1.6)
+	e.player.olhar_para(Vector3(0, 1.62, -4.0), 0.01)
+	await _s(1.3)
+	_shot("%s_4_migo" % tag)
 	await _s(0.5)
-	_shot("%s_4_correndo" % tag)
-	await _s(2.5)
-	_shot("%s_5_aberto" % tag)
-	d.fechar(e.player)
-	await _s(1.6)
-	_shot("%s_6_fechando" % tag)
+	_shot("%s_5_migo" % tag)
 	SaveSystem.delete_save()
 	get_tree().quit()
 

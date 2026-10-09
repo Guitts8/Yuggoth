@@ -425,21 +425,13 @@ func _ready() -> void:
 	# --- Escritório: Dia 3, o disco (livro cap. III) ---
 	var fono: Fonografo = esc.fonografo
 	var escrever3: WriteReply = esc.find_child("Dia3", true, false).get_node("Escrever")
-	_check(fono.is_visible_in_tree() and fono.faltando().size() == 3, "a máquina emprestada chega desmontada")
+	_check(fono.is_visible_in_tree() and fono.prompt == "Examinar o fonógrafo", "a máquina emprestada chega montada; o cilindro ainda no pacote")
 	await _check_dia(esc, 3)
 	_check(not escrever3.can_interact(player), "responder só depois de ouvir o disco")
-	fono.interact(player)
-	_check(not GameState.has_flag(&"tocou_disco"), "sem corneta, manivela e agulha não toca")
-	# Como o jogador: de pé ao lado do caixote, mirar cada peça e apertar E.
-	var mirou := true
-	for montar: StateInteractable in esc.find_child("Caixote", true, false).find_children("Montar", "StateInteractable", true, false):
-		player.global_position = Vector3(-0.95, 0.0, 1.55)
-		await _mirar(player, (montar.get_child(0) as Node3D).global_position)
-		mirou = mirou and player._target == montar
-		await _press(&"interagir")
-	await _frames(2)
-	_check(mirou, "a mira alcança as peças dentro do caixote")
-	_check(fono.faltando().is_empty() and fono.prompt == "Examinar o fonógrafo", "peças montadas; o cilindro ainda no pacote")
+	# Como o jogador: diante da mesinha do fonógrafo, mirar a máquina.
+	player.global_position = esc.find_child("DianteDisco", true, false).global_position
+	await _mirar(player, fono.global_position)
+	_check(player._target == fono, "a mira alcança o fonógrafo na mesinha dele")
 	fono.interact(player)
 	_check(not GameState.has_flag(&"fono_cilindro"), "sem abrir o pacote, não há cilindro")
 	var dia3: Node3D = esc.find_child("Dia3", true, false)

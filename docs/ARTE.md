@@ -39,8 +39,8 @@ constante na sala; **C** = melhora, mas a caixa provisória aguenta.
 | Objeto | Onde | Notas |
 |---|---|---|
 | **Caixa das cartas de Akeley** | mesa, Prólogo | Examinável. Caixa de madeira ou papelão gasto, amarrada com barbante. Abre as memórias: é o primeiro objeto que o jogador gira na mão. |
-| **Fonógrafo** | armário, canto sudoeste | Set piece do Dia 3. Corneta de latão, prato, braço com agulha, **manivela removível** e **agulha separada** (o quebra-cabeça é achá-las). Prato e manivela giram: modelar como peças separadas. |
-| **Disco de fonógrafo** | chega no Dia 3 | Examinável. Rótulo pintado à mão com a data de 1915. |
+| **Fonógrafo** | mesinha própria junto à estante (parede oeste), do Dia 3 em diante | Set piece do Dia 3: uma máquina **comercial** de cilindro, emprestada da administração, que chega montada. Caixa de carvalho com placa preta, o mecanismo à vista (mancais, mandril, rosca do carro, diafragma de latão), manivela do lado, a **corneta grande de latão** no guindaste (haste, braço, corrente), a boca virada para a sala; a mesinha com estojos de cilindros embaixo. O mandril e a manivela giram: modelar como peças separadas. |
+| **Cilindro de cera** | chega no Dia 3 | No estojo de papelão, examinável; na tampa, a letra de Akeley com a data de 1915. |
 | **Fotografias de Akeley** | chegam no Dia 2 | Examináveis com lupa. Plano com espessura e borda de papel fotográfico; a imagem (pegadas, pedra negra) é textura — eu posso gerar uma versão borrada provisória. |
 | **Mãos de Wilmarth** | primeira pessoa | GDD §3.2: "mãos visíveis ao segurar documentos". Segurando papel e segurando a lamparina. Low-poly, punho da camisa e paletó. Precisa de rig simples. |
 | **Lamparina a querosene** | mesa (1928) e na mão (Ato III) | Tanque de latão, chaminé de vidro, botão da chama. É o objeto mais importante do jogo (GDD §8.1). |
@@ -94,7 +94,7 @@ os detalhes escondidos das fotos continuam funcionando por cima.
 
 ### C — a caixa provisória aguenta
 
-Quadro de cortiça, armário do fonógrafo, tapete, castiçais do
+Quadro de cortiça, mesinha do fonógrafo, tapete, castiçais do
 consolo, lambri (textura `lambri.png`), cortinas (faixas em zigue-zague), cesto de
 papéis, espátula de cartas, mata-borrão, máquina de escrever. O **mi-go** (Dia 5 na janela, Dias 3 e 6 no céu, o bosque da noite 3) já é 3D provisório
 (`props/migo.gd`, do cap. I); um `.glb` como filho `Modelo` o substitui. Deve continuar
