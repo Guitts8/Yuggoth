@@ -79,7 +79,7 @@ ardeu a noite toda quase apagada); ergue a cabeça, e então vai para casa pelo 
 | Noite | O sonho | Acorda |
 |---|---|---|
 | Dia 2 (as fotos) | A sala começa a se estilhaçar (o Vazio, abaixo); marcas de garra, de lama fresca e úmida (a borda brilha à luz fria), em duas fileiras da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá (em 3D) para o morro com o círculo de pedras, sob a lua; e outras **se formam** enquanto ele sonha, com um estalo úmido, uma a uma, em volta da cadeira, cada vez mais perto dele | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
-| Dia 3 (o disco) | A sala some: ele está onde o disco foi gravado — 1 da manhã de 1º de maio de 1915, a boca fechada da caverna na encosta da Dark Mountain, sobre o pântano de Lee; vultos de manto na névoa, a lanterna de Akeley, o fonógrafo dele num toco tocando o disco de onde parou; uma das criaturas passa entre as árvores, de relance. E a loucura: na voz zumbida, a voz vem **de trás dele** e a vista **se desdobra**; os vultos, de costas, **viram o rosto pálido** para ele quando ninguém olha; a lanterna **anda sozinha**, em volta dele e depois rumo aos vultos; as árvores perto **respiram**; e **pedaços do escritório** aparecem entre as árvores, fora da vista — a porta com a luz do corredor por baixo, o abajur verde aceso no chão, a cadeira dele virada para a caverna, um pedaço da estante | ao levantar a agulha (ou no fim do disco) |
+| Dia 3 (o disco) | A sala some: ele está onde o disco foi gravado — 1 da manhã de 1º de maio de 1915, a boca fechada da caverna na encosta da Dark Mountain, sobre o pântano de Lee; vultos de manto na névoa, a lanterna de Akeley, o fonógrafo dele num toco tocando o disco de onde parou; uma das criaturas passa entre as árvores, de relance. E a loucura: na voz zumbida, a voz vem **de trás dele** e a vista **se desdobra**; os vultos, de costas, **viram o rosto pálido** para ele quando ninguém olha; a lanterna **anda sozinha**, em volta dele e depois rumo aos vultos; as árvores perto **respiram**; e **pedaços do escritório** aparecem entre as árvores, fora da vista — a porta com a luz do corredor por baixo, o abajur verde aceso no chão, a cadeira dele virada para a caverna, um pedaço da estante. E o lugar se parte (o Vazio): além da clareira, o chão se solta em ilhas de terra, com as árvores em cima e a pedra em ponta por baixo, que sobem, afundam e boiam sobre um escuro com uma claridade fria lá no fundo; livros e folhas soltas flutuam na clareira | ao levantar a agulha (ou no fim do disco) |
 | Dia 4 (a pedra) | A sala mais estilhaçada; a pedra negra que nunca chegou está na mesa — uma estela de faces irregulares, o alto em duas águas tortas, uma quina lascada, fileiras de hieróglifos entalhados meio gastos; pela janela (em 3D), a plataforma de Keene de noite, os lampiões, o carrinho com o caixote e um homem magro de costas; a voz zumbida | ao examinar a pedra |
 | Dia 5 (AKELY) | A sala quase toda em pedaços; chove dentro dela; o telefone toca | atendido: só um zumbido na linha, soletrando *A... K... E... L... Y.* |
 
@@ -88,7 +88,9 @@ sonhos dentro da sala (noites 2, 4 e 5), as paredes leste e oeste e o teto viram
 estilhaços, com frestas escuras entre eles; perto das brechas, eles se soltam
 devagar, giram e boiam para fora, e o escuro aparece por trás, com pedaços de
 prédio boiando longe; livros (alguns abertos, batendo as folhas) e papéis soltos
-flutuam pela sala. Mais a cada noite. Acordado, a sala está inteira.
+flutuam pela sala. Mais a cada noite. Acordado, a sala está inteira. No sonho do
+disco (noite 3, fora da sala), o mesmo: o chão do bosque se parte em ilhas que
+boiam (playtest 7).
 
 **O tempo passa na própria sala:** nos saltos dentro de um dia (Dias 4 a 6), não há
 tela preta. O jogador fica parado (a cabeça livre), virado para a janela: Arkham passa
@@ -122,15 +124,22 @@ da última carta manuscrita enche a tela e a tinta vira o céu de Vermont.
 ---
 
 ## Menu principal ✅
-**Um livro aberto** (capa de couro, papel com grão, a sombra da lombada, páginas
-i e ii). À esquerda: *a partir de H. P. Lovecraft*, o título **"Os que
+**O Necronomicon** (playtest 7, como o livro dos menus de *Castlevania: Lords of
+Shadow 2*): um tomo gigante numa mesa escura, entre duas velas grossas cujas
+chamas tremem. O jogo abre com ele **fechado** — a capa pesada de couro quase
+negro, cantoneiras de metal, moldura em relevo, cravos, e no meio um medalhão
+com uma estrela de cinco pontas e um olho — e a capa se levanta e deita do outro
+lado. As páginas são de papel velho, amarelado e manchado, que sobe junto à
+lombada. À esquerda: *a partir de H. P. Lovecraft*, o título **"Os que
 Sussurram"**, *Vermont, 1928*, e a epígrafe — *"Tenham bem em mente que, no fim,
 eu não vi nenhum horror visual de fato."* (The Whisperer in Darkness, 1931). À
 direita, o **Sumário**: Continuar (só se há save), Novo jogo (pede confirmação se
-há save), Opções, Sair. **Opções** são as páginas seguintes — a folha vira (o som
-à esquerda; o mouse e a tela à direita) e volta ao fechar. **Esc** durante o jogo
-abre a pausa, no mesmo livro: *Pausa* e a data do dia (*Arkham, 18 de julho de
-1928*), e à direita Continuar, Opções, Menu principal, Sair.
+há save), Opções, Sair — o mouse aponta direto na página. **Opções** são as
+páginas seguintes — uma folha se levanta, se curva e deita do outro lado (o som à
+esquerda; o mouse e a tela à direita) e volta ao fechar. **Esc** durante o jogo
+abre a pausa, no mesmo livro, já aberto: *Pausa* e a data do dia (*Arkham, 18 de
+julho de 1928*), e à direita Continuar, Opções, Menu principal, Sair. **E** (sem
+nada na mira) pula a fala na tela.
 
 ---
 
@@ -338,8 +347,9 @@ cilindro, nos dias seguintes.
 
 ## 5. Dia 5 — O telegrama "AKELY" ✅ (15–29 de agosto)
 **Clima:** noite de chuva. Abajur na mesa, chuva na janela (som de chuva no lugar
-da tarde). Há lenha na lareira: **"Acender a lareira"** (fósforo, crepitar) aquece e
-clareia a metade leste da sala — vale para o Dia 6 também. As cartas de Akeley agora vêm em **letra trêmula** (o texto treme no
+da tarde). Há lenha na lareira: **"Acender a lareira"** — ele vai até ela, ajoelha-se, risca
+um fósforo, leva a chama ao jornal sob as toras, e o fogo pega no meio e se
+espalha, crepitando cada vez mais; aquece e clareia a metade leste da sala — vale para o Dia 6 também. As cartas de Akeley agora vêm em **letra trêmula** (o texto treme no
 leitor, mais a cada carta).
 **Ao começar:** *"As cartas de Akeley vinham agora numa letra que se tornara
 lamentavelmente trêmula. No dia 15 de agosto recebi uma carta frenética, que me

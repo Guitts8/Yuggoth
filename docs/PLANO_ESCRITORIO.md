@@ -572,39 +572,91 @@ O usuário jogou o playtest 6. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ 
     aparece por baixo) e volta ao fechar. A **pausa** no mesmo livro, com a data do
     dia (*Arkham, 18 de julho de 1928*).
 
-## Onde estamos (revisão de 2026-10-09, depois da 3g)
-**Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
-3e, a 3f e a **3g** (itens 1–16). Teste de fumaça com 0 falhas. Nenhum push feito
-(nem pedido).
+## Fase 3h — Ajustes do playtest 7 (2026-10-09)
+O usuário jogou o playtest 7. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera resposta.
+Aprovado: *"o sonho da marca da garra ficou EXCELENTE"* (o Vazio da noite 2) e o
+corredor "ficou bonito". Commits: `7b1db7d` (5), `3e843c3` (3, 6), `079207b` (2, 7),
+`aa2f564` (4), `b61b0f3` (1).
 
-**Esperando o usuário — o playtest 7** (do Dia 1 ao fim da demo; **F2** pula dias,
+1. ✅ **O menu como o de *Castlevania: Lords of Shadow 2*** — *"é o Necronomicon
+   afinal. Capa pesada, livro gigante, folhas velhas"*. Respondido: livro 3D numa
+   cena. Feito: `Necronomicon` (`ui/menu/necronomicon.gd`) — um tomo de meio metro
+   por página, aberto sobre uma mesa escura, entre duas velas grossas em pratos de
+   latão (as chamas e a luz tremendo, sombras); a capa de couro quase negro com
+   cantoneiras de metal, a moldura em relevo, os cravos e o medalhão com a estrela
+   de cinco pontas e o olho; as correias dos fechos pendendo, as fitas marcadoras; o
+   miolo grosso (o corte de centenas de folhas desiguais, `livro_corte.gdshader`); as
+   páginas de papel velho, amarelado, manchado, com pintas de mofo, que sobem junto
+   à lombada e escurecem no vinco e nas bordas (`livro_pagina.gdshader`). Ao abrir o
+   jogo, o livro está fechado, a capa para cima, e ela se levanta e deita do outro
+   lado. Os menus (principal, pausa, Opções) moram num SubViewport (`Paginas`) cuja
+   tinta é impressa nas páginas; o mouse aponta para a página pelo raio da câmera.
+   Passar às Opções vira uma folha de verdade, em 3D, que se curva (a frente com a
+   página que sai, o verso com a que chega), e volta. A pausa abre o livro já aberto.
+   A câmera respira e segue um pouco o mouse. O `Livro` de cada menu virou só o
+   arranjo nas páginas e a ponte para o Necronomicon.
+2. ✅ **Bugs visuais no corredor.** Os "batentes na frente das portas": o lambri, o
+   rodapé e as almofadas corriam a parede inteira e passavam por cima das portas
+   312 e 308 (e da calha); agora param nelas (`_trechos`). O "degrau mostrando o
+   limbo": o piso do corredor terminava 18 cm acima do primeiro degrau sem espelho,
+   e o patamar (12 cm) não descia até o primeiro degrau do segundo lanço — por esses
+   vãos via-se o vazio. Fechados (o espelho do primeiro degrau, o patamar mais
+   grosso); os narizes dos degraus foram para a borda da frente.
+3. ✅ **O diário dá uma bugadinha ao fechar** (o caderno na mesa). Medido quadro a
+   quadro: ao fechar, as páginas escritas sumiam de uma vez e no lugar ficava o
+   corte riscado do miolo. Agora o alto do miolo é a própria página (em branco; a
+   do dia, na fita, só depois que a última folha sai de cima dela), as folhas que
+   correm são papel pautado, e a página escrita da esquerda sai com a última folha.
+4. ✅ **Todos os sonhos com a estética do Vazio**, inclusive o do fonógrafo. As
+   noites 2, 4 e 5 já se partiam (na sala); a noite 3 (o bosque do disco) agora
+   também: além de 6 m da clareira (menos a faixa ao pé da encosta, com a caverna e
+   os vultos), o chão se solta em ilhas de terra com a pedra em ponta por baixo,
+   com as árvores, juncos e pedras que estavam nelas, e elas sobem, afundam, tombam
+   e boiam (`Vazio.soltos`); pedaços de pedra e madeira boiam longe; livros e as
+   folhas soltas flutuam na clareira; uma claridade fria vem de baixo, do vazio. A
+   colisão segue o chão que ficou.
+5. ✅ **Pular fala com E.** Com algo na mira, E interage; sem nada, pula a fala do
+   narrador e a de quem fala numa conversa ou no telefone (`Narrator.pular`,
+   `esperar_fala`); num modal, o E é do modal. Nas cenas sem controle não há mira,
+   então E sempre pula.
+6. ✅ **No diário, a vista presa à pena.** Escrevendo, os olhos ficam na linha (o
+   meio da página, na altura dela), puxam só 30% para a pena e vão na metade da
+   velocidade (`Diario.PUXAO_DA_PENA`) — em todas as entradas (é o mesmo código).
+7. ✅ **Uma animação para acender o fogo.** `AcenderLareira`: ele vai até a
+   lareira, ajoelha-se (`Player.abaixar`), risca um fósforo (a chama pequena na mão
+   e a luz dela), leva-o ao jornal amassado sob as toras, e o fogo pega no meio e se
+   espalha em ~6 s (`Fogo.intensidade`: as chamas, a luz e o crepitar crescem);
+   sacode o fósforo e se levanta.
+
+Também: o teste do vulto na janela (Dia 5) às vezes não pegava o mi-go visível
+(passa em 1,1 s, 8× acelerado); agora anota quando ele aparece.
+
+## Onde estamos (revisão de 2026-10-09, depois da 3h)
+**Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
+3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Nenhum push
+feito (nem pedido).
+
+**Esperando o usuário — o playtest 8** (do Dia 1 ao fim da demo; **F2** pula dias,
 **F3** recarrega). O que olhar:
-1. O menu em livro: a folha virando para as Opções e de volta; a pausa.
-2. A letra: Wilmarth em Petit Formal (leitor, resposta, diário) e os títulos em
-   Old Standard — agora se lê?
-3. A manhã do pé da escada, subindo: cansa em 6 repetições? E descer para ir para
-   casa.
-4. O corredor novo; a poltrona no lugar novo; a xícara e o café.
-5. A porta: ainda gira?
-6. O pacote que abre; as cartas saindo dos envelopes e do maço.
-7. Os sonhos estilhaçados (noites 2, 4, 5): forte demais, fraco demais? A
-   ondulação mais branda está boa?
-8. A pedra negra nova; o mi-go subindo diante da janela.
-9. Levantar da poltrona no sonho da noite 5 (andando) e acordar depois.
+1. O Necronomicon: a capa abrindo, as páginas, o mouse nas entradas, a folha
+   virando para as Opções e de volta, a pausa. É o que se pediu do *Lords of
+   Shadow 2*?
+2. O corredor e a escada (as portas sem lambri na frente, a escada sem vãos).
+3. O diário fechando; a vista escrevendo, mais solta.
+4. O sonho do disco partido em ilhas; os das noites 2, 4 e 5.
+5. E para pular falas.
+6. Acender a lareira (Dias 5 e 6).
 
 **Decisões de texto pendentes:** as entradas do diário (as 3 e 5 mudaram na 3d) e as
 falas `sono_disco`/`sono_fogo`; o visual do sonho (pendência antiga); "Deixar sem
-resposta" (Dia 2). O bosque do disco (os vultos, a criatura) é 💭. **O menu em
-livro:** o usuário disse "como havíamos decidido", mas não havia registro dos
-detalhes; foi feito como livro aberto (título e epígrafe à esquerda, Sumário à
-direita, Opções nas folhas seguintes) — confirmar no playtest 7 se era isso. O
+resposta" (Dia 2). O bosque do disco (os vultos, a criatura) é 💭. O
 congelamento do playtest 4 (envelope, Dia 5) nunca foi reproduzido; se voltar,
 olhar o painel Debugger do editor. `art/textures/grao.png.import` aparece
 modificado no git desde antes da 3g (reimportação do Godot); deixado de fora dos
 commits.
 
-**Como retomar numa sessão nova:** ler este arquivo (a 3g e esta seção), esperar a
-lista do playtest 7 e registrá-la como **Fase 3h**, no mesmo formato. Não começar a
+**Como retomar numa sessão nova:** ler este arquivo (a 3h e esta seção), esperar a
+lista do playtest 8 e registrá-la como **Fase 3i**, no mesmo formato. Não começar a
 Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
@@ -621,9 +673,10 @@ Fase 4 antes dela.
 2d. ✅ Fase 3f: feitos os itens 1–19 (o usuário respondeu os ❓ com as
    recomendações).
 2e. ✅ O usuário jogou o **playtest 6**; a lista virou a **Fase 3g**, toda feita.
-2f. **← AQUI.** O usuário joga o **playtest 7** (do Dia 1 ao fim da demo, ou com
-   F2): o menu em livro, a letra nova, a manhã do pé da escada, o corredor, os
-   sonhos estilhaçados; a lista vira a Fase 3h. Não começar a Fase 4 antes dela.
+2f. ✅ O usuário jogou o **playtest 7**; a lista virou a **Fase 3h**, toda feita.
+2g. **← AQUI.** O usuário joga o **playtest 8** (do Dia 1 ao fim da demo, ou com
+   F2): o Necronomicon, o corredor e a escada, o diário, o sonho do disco partido,
+   E para pular, a lareira; a lista vira a Fase 3i. Não começar a Fase 4 antes dela.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 
