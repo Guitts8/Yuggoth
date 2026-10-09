@@ -864,20 +864,48 @@ depois da farsa e uma noite em claro** (item 13).
    a cada toque —; a síntese fica só para o sobrenatural (o zumbido, as vozes do disco).
 3. 🔧 **"O modelo da janela do epílogo está bastante diferente."** A conferir em
    captura (o gabinete de 1930, no Prólogo, contra a janela dos Dias).
-4. 🔧 **Os certificados na parede legíveis.**
+4. ✅ **Os certificados na parede legíveis.** Feito: os dois diplomas têm o texto de
+   verdade (Label3D, em inglês como tudo o que é impresso: *Miskatonic University*
+   em fraktur, o nome dele em caligrafia, *Bachelor of Arts* 1911 e *Master of Arts*
+   1914 — os graus são nossos, o livro só diz "instrutor de literatura"), o
+   pergaminho novo (filete duplo, o selo de lacre com a fita) e são examináveis,
+   com a tradução embaixo; de perto, no exame, lê-se tudo. `_impresso()` no gerador
+   encolhe a linha que não cabe no papel.
 5. ✅ **Um corpo visível ao olhar para baixo?** O usuário pediu ajuda para decidir;
    escolheu **sem corpo** (como os jogos de PS1): nada muda.
-6. 🔧 **Os papéis do mural do corredor com algo para ler.**
+6. ✅ **Os papéis do mural do corredor com algo para ler.** Feito: seis avisos da
+   Miskatonic em 1928, em inglês, em papel liso (`AVISOS` no gerador), cada um
+   examinável ("Ler o aviso") com a tradução: o socorro às vítimas das enchentes de
+   Vermont (com que o livro começa), o horário de atendimento de Wilmarth (sala
+   310, e a nota dele: a Sociedade de Folclore), a biblioteca de Henry Armitage, uma
+   palestra sobre lendas das colinas, achados, um quarto para alugar.
 7. ✅ **Pular falas não pode ser o E** (*"acabei pulando algumas mensagens que não
    deveria"*): um botão próprio, longe da ação. Feito: **Espaço** (Y no controle), a
    ação `pular_fala`; o E só interage.
-8. 🔧 **O estojo do cilindro** (Dia 3): um modelo melhor.
-9. 🔧 **O mi-go do sonho do disco "muito expositivo"** (o usuário não tinha certeza).
+8. ✅ **O estojo do cilindro** (Dia 3): um modelo melhor. Feito: `_estojo_cilindro()`
+   — o tubo de papelão pardo, a tampa de papelão envernizado com a borda, o fundo,
+   duas cintas, a etiqueta impressa que dá a volta (*DICTAPHONE · WAX CYLINDER
+   RECORD*) e, na tampa, um disco de papel com a letra de Akeley (*May 1, 1915*).
+   O mesmo modelo dentro do pacote e nos estojos da prateleira do fonógrafo.
+9. ✅ **O mi-go do sonho do disco "muito expositivo"** (o usuário não tinha certeza).
    Recomendado e adotado: mais sugestão — longe, na névoa, por trás das árvores, só a
    silhueta e o som das asas. No livro, Wilmarth nunca vê uma delas viva; a única
-   vista clara do jogo continua sendo o relance na janela, no Dia 5.
-10. 🔧 **Boston: a saída é uma parede lisa** com "Voltar a Arkham". Uma escada de verdade.
-11. 🔧 **A pedra de Round Hill (noite 4) com o modelo quebrado.**
+   vista clara do jogo continua sendo o relance na janela, no Dia 5. Feito: a
+   `Aparicao` passa no alto da encosta, atrás da boca da caverna, mais longe (na
+   névoa), em 1,7 s, como silhueta escura com as asas batendo.
+10. ✅ **Boston: a saída é uma parede lisa** com "Voltar a Arkham". Uma escada de verdade.
+    Feito (`gerar_boston._escada`): um lanço de 8 degraus desce para o sul entre as
+    paredes, com a passadeira presa por varetas de latão, os narizes, os rodapés
+    inclinados, o corrimão na parede em suportes de ferro e o pilar no alto; no
+    patamar, um quadro velho, e o resto da escada vira para oeste e some no andar
+    de baixo, de onde sobe a luz amarela de uma arandela. Andável (rampas); descer
+    até o patamar, com a conversa feita, volta a Arkham (`%Descida`), e "Voltar a
+    Arkham" no alto da escada continua valendo.
+11. ✅ **A pedra de Round Hill (noite 4) com o modelo quebrado.** Os anéis torcidos
+    do `_monolito` dobravam as faces umas sobre as outras, e as normais suaves
+    espalhavam a textura como pano. Agora uma estela como a gravura do menu: a laje
+    de faces planas, mais larga embaixo, o alto partido em dentes, as arestas
+    chanfradas; os hieróglifos com a borda de baixo mais clara (pegam a luz).
 12. 🔧 **"O cuidado que tivemos com o livro do menu em tudo."** A diretriz da fase: cada
     peça mexida aqui sai no nível do Necronomicon (forma, material, desgaste,
     animação, som), a começar pelo que o jogador mais vê de perto.

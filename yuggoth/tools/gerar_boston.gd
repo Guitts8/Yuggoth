@@ -139,17 +139,10 @@ func _corredor() -> void:
 	luz.shadow_enabled = true
 	luz.omni_attenuation = 1.4
 
-	# Ao sul, o vão da escada: por onde Wilmarth chegou e por onde volta.
-	var esc := _group(c, "Escada", Vector3(0, 0, D_S))
-	_quad(esc, "Escuro", Vector2(2 * W, H), Vector3(0, H / 2, -0.01), Vector3(0, 180, 0), "esmalte_preto")
-	_box(esc, "Corrimao", Vector3(2 * W, 0.05, 0.05), Vector3(0, 0.95, -0.15), "madeira_escura")
-	for x in [-0.5, -0.17, 0.17, 0.5]:
-		_box(esc, "Balaustre%d" % int(x * 10), Vector3(0.03, 0.92, 0.03), Vector3(x, 0.46, -0.15), "madeira_escura")
-	# A luz do andar de baixo, rente ao chão, junto ao vão (sessão de tester 2:
-	# virado para a escada, era um retângulo todo preto, sem o corrimão).
-	var debaixo := _omni(esc, "LuzDeBaixo", Vector3(0, 0.55, -0.35), Color(1.0, 0.78, 0.5), 0.3, 2.0)
-	debaixo.omni_attenuation = 1.4
-	var sair := _area(c, Interactable.new(), "Saida", Vector3(2 * W, 1.6, 0.4), Vector3(0, 0.8, D_S - 0.3)) as Interactable
+	# Ao sul, a escada: por onde Wilmarth chegou e por onde volta (playtest 8:
+	# era um quadro preto com um corrimão — "uma parede lisa").
+	_escada(c)
+	var sair := _area(c, Interactable.new(), "Saida", Vector3(2 * W, 1.4, 0.5), Vector3(0, 0.7, D_S + 0.25)) as Interactable
 	sair.unique_name_in_owner = true
 	sair.prompt = "Voltar a Arkham"
 	# Depois do essencial (o homem de Keene), pode-se ir (Fase 3e: a conversa tem opções).
@@ -164,8 +157,120 @@ func _corredor() -> void:
 		[Vector3(0.2, H, PORTA_Z.x + D_N), Vector3(W + 0.1, H / 2, (-D_N + PORTA_Z.x) / 2)],
 		[Vector3(0.2, H - PORTA_H, PORTA_Z.y - PORTA_Z.x), Vector3(W + 0.1, (H + PORTA_H) / 2, (PORTA_Z.x + PORTA_Z.y) / 2)],
 		[Vector3(2 * W, H, 0.2), Vector3(0, H / 2, -D_N - 0.1)],
-		[Vector3(2 * W, H, 0.2), Vector3(0, H / 2, D_S + 0.1)],
 	])
+
+
+## Degrau da pensão (piso, espelho), mais íngreme que o da Miskatonic.
+const DEGRAU := Vector2(0.26, 0.19)
+const DEGRAUS := 8
+
+
+## A escada da pensão (playtest 8): um lanço reto desce para o sul, entre as
+## paredes, até um patamar; dali o resto vira para oeste e some no andar de
+## baixo, de onde sobe uma luz amarela. O corrimão na parede oeste, em suportes
+## de ferro, com o pilar no alto; a passadeira presa por varetas de latão.
+## Andável (a rampa por baixo dos narizes); no patamar, com a conversa feita,
+## ele vai (`%Descida`, Boston._on_descida).
+func _escada(c: Node3D) -> void:
+	var e := _group(c, "Escada", Vector3(0, 0, D_S))
+	var desce := DEGRAUS * DEGRAU.y
+	var corre := DEGRAUS * DEGRAU.x
+	var fundo := corre + 1.2  # o patamar, de corre a fundo
+	var baixo := -desce - 1.6
+	var alto := H - baixo
+	var cy := (H + baixo) / 2
+	for k in DEGRAUS:
+		var topo := -(k + 1) * DEGRAU.y
+		var z := (k + 0.5) * DEGRAU.x
+		_box(e, "Degrau%d" % k, Vector3(2 * W, DEGRAU.y, DEGRAU.x), Vector3(0, topo - DEGRAU.y / 2, z), "madeira_escura")
+		_box(e, "Nariz%d" % k, Vector3(2 * W, 0.025, 0.03), Vector3(0, topo - 0.0125, k * DEGRAU.x + 0.005), "madeira_clara")
+		# A passadeira desce pelo meio, presa por uma vareta de latão em cada degrau.
+		_box(e, "Passadeira%d" % k, Vector3(0.8, 0.006, DEGRAU.x), Vector3(0, topo + 0.003, z), "tapete")
+		_box(e, "Vareta%d" % k, Vector3(0.84, 0.012, 0.012), Vector3(0, topo + 0.008, (k + 1) * DEGRAU.x - 0.02), "latao")
+	# O espelho do primeiro degrau (não mostrar o vazio debaixo do piso).
+	_box(e, "Espelho", Vector3(2 * W, 0.24, 0.03), Vector3(0, -0.1, -0.015), "madeira_escura")
+	# O patamar, e o começo do lanço de baixo, que vira para oeste no escuro.
+	var yp := -desce
+	var largura2 := fundo - corre
+	var zm := (corre + fundo) / 2
+	_box(e, "Patamar", Vector3(2 * W, 0.3, largura2), Vector3(0, yp - 0.15, zm), "madeira_escura")
+	_quad(e, "PassadeiraPatamar", Vector2(0.8, largura2 - 0.2), Vector3(0, yp + 0.004, zm), Vector3(-90, 0, 0), "tapete")
+	for k in 4:
+		var topo := yp - (k + 1) * DEGRAU.y
+		_box(e, "Baixo%d" % k, Vector3(DEGRAU.x, DEGRAU.y, largura2), Vector3(-W - (k + 0.5) * DEGRAU.x, topo - DEGRAU.y / 2, zm), "madeira_escura")
+		_box(e, "BaixoNariz%d" % k, Vector3(0.03, 0.025, largura2), Vector3(-W - k * DEGRAU.x - 0.005, topo + DEGRAU.y - 0.0125, zm), "madeira_clara")
+	var xb := -W - 4 * DEGRAU.x
+	var yb := yp - 4 * DEGRAU.y
+	_box(e, "PisoBaixo", Vector3(0.6, 0.1, largura2), Vector3(xb - 0.3, yb - 0.05, zm), "madeira_escura")
+	# As paredes do vão: a leste corre tudo; a oeste, até o patamar (ali ela se
+	# abre para o lanço de baixo); a sul fecha o patamar.
+	var xf := xb - 0.6
+	_quad(e, "ParedeLeste", Vector2(fundo, alto), Vector3(W, cy, fundo / 2), Vector3(0, -90, 0), "parede_pensao")
+	_quad(e, "ParedeOeste", Vector2(corre, alto), Vector3(-W, cy, corre / 2), Vector3(0, 90, 0), "parede_pensao")
+	_quad(e, "ParedeOesteAlta", Vector2(largura2, H - yp - 2.1), Vector3(-W, (H + yp + 2.1) / 2, zm), Vector3(0, 90, 0), "parede_pensao")
+	_quad(e, "ParedeSul", Vector2(W - xf, alto), Vector3((W + xf) / 2, cy, fundo), Vector3(0, 180, 0), "parede_pensao")
+	_quad(e, "ParedeNorteBaixo", Vector2(-W - xf, yp + 2.1 - baixo), Vector3((xf - W) / 2, (yp + 2.1 + baixo) / 2, corre), Vector3.ZERO, "parede_pensao")
+	_quad(e, "ParedeFimBaixo", Vector2(largura2, alto), Vector3(xf, cy, zm), Vector3(0, 90, 0), "parede_pensao")
+	_quad(e, "Teto", Vector2(2 * W, fundo), Vector3(0, H, fundo / 2), Vector3(90, 0, 0), "teto")
+	_quad(e, "TetoBaixo", Vector2(-W - xf, largura2), Vector3((xf - W) / 2, yp + 2.1, zm), Vector3(90, 0, 0), "teto")
+	# Os rodapés que descem com os degraus (uma barra inclinada de cada lado).
+	var a := atan2(desce, corre)
+	var comp := Vector2(corre, desce).length()
+	for lado in [-1, 1]:
+		var r := _box(e, "Rodape%d" % (lado + 1), Vector3(0.03, 0.14, comp), Vector3(lado * (W - 0.015), -desce / 2 + 0.07, corre / 2), "madeira_escura")
+		r.rotation.x = a
+	# O corrimão na parede oeste, em suportes de ferro, e o pilar no alto.
+	var barra := _box(e, "Corrimao", Vector3(0.06, 0.05, comp + 0.1), Vector3(-W + 0.08, 0.9 - desce / 2, corre / 2), "madeira_escura")
+	barra.rotation.x = a
+	for k in 3:
+		var zz := 0.4 + k * (corre - 0.8) / 2
+		_box(e, "Suporte%d" % k, Vector3(0.08, 0.02, 0.02), Vector3(-W + 0.04, 0.9 - zz * tan(a) - 0.05, zz), "ferro")
+	var pilar := _box(e, "Pilar", Vector3(0.09, 1.05, 0.09), Vector3(-W + 0.08, 0.525, -0.08), "madeira_escura")
+	_cyl(e, "Pomo", 0.055, 0.05, 0.08, pilar.position + Vector3(0, 0.56, 0), "madeira_escura", 8)
+	# Um quadro velho no patamar (uma paisagem escura) e a arandela de baixo:
+	# a luz amarela que sobe do andar de baixo, pelo lanço que vira.
+	var quadro := _group(e, "Quadro", Vector3(W - 0.02, yp + 1.5, zm), -90)
+	_box(quadro, "Moldura", Vector3(0.5, 0.38, 0.03), Vector3.ZERO, "madeira_clara")
+	_box(quadro, "Tela", Vector3(0.42, 0.3, 0.035), Vector3.ZERO, "esmalte_preto")
+	var arandela := Vector3(xf + 0.03, yb + 1.7, zm)
+	_box(e, "Arandela", Vector3(0.05, 0.12, 0.08), arandela, "latao")
+	_cyl(e, "Cupula", 0.05, 0.035, 0.09, arandela + Vector3(0.06, 0.04, 0), "vidro_aceso", 8)
+	var luz := _omni(e, "LuzDeBaixo", arandela + Vector3(0.35, -0.2, 0), Color(1.0, 0.76, 0.46), 1.3, 4.0)
+	luz.omni_attenuation = 1.3
+	luz.shadow_enabled = true
+	var patamar_luz := _omni(e, "LuzPatamar", Vector3(0, yp + 1.2, zm), Color(1.0, 0.8, 0.55), 0.25, 2.5)
+	patamar_luz.omni_attenuation = 1.4
+	# A colisão: a rampa rente aos narizes, o patamar, o lanço de baixo e as paredes.
+	var n1 := Vector3(0, cos(a), sin(a)) * 0.1
+	var a2 := atan2(4 * DEGRAU.y, 4 * DEGRAU.x)
+	var comp2 := Vector2(4 * DEGRAU.x, 4 * DEGRAU.y).length()
+	var n2 := Vector3(-sin(a2), cos(a2), 0) * 0.1
+	_colisao(e, "Colisao", [
+		[Vector3(2 * W, 0.2, comp), Vector3(0, -desce / 2, corre / 2) - n1, Vector3(rad_to_deg(a), 0, 0)],
+		[Vector3(2 * W, 0.2, largura2 + 0.1), Vector3(0, yp - 0.1, zm)],
+		[Vector3(comp2, 0.2, largura2), Vector3(-W - 2 * DEGRAU.x, yp - 2 * DEGRAU.y, zm) - n2, Vector3(0, 0, rad_to_deg(a2))],
+		[Vector3(0.7, 0.2, largura2), Vector3(xb - 0.3, yb - 0.1, zm)],
+		[Vector3(0.2, alto, fundo), Vector3(W + 0.1, cy, fundo / 2)],
+		[Vector3(0.2, alto, corre), Vector3(-W - 0.1, cy, corre / 2)],
+		[Vector3(W - xf, alto, 0.2), Vector3((W + xf) / 2, cy, fundo + 0.1)],
+		[Vector3(-W - xf, alto, 0.2), Vector3((xf - W) / 2, cy, corre - 0.1)],
+		[Vector3(0.2, alto, largura2), Vector3(xf - 0.1, cy, zm)],
+	])
+	# No patamar: com a conversa feita, ele desce para a rua.
+	var area := Area3D.new()
+	area.name = "Descida"
+	area.collision_layer = 0
+	area.collision_mask = 1
+	area.monitorable = false
+	area.position = Vector3(0, yp + 1.0, zm + 0.2)
+	_add(e, area)
+	area.unique_name_in_owner = true
+	var forma := CollisionShape3D.new()
+	forma.name = "Forma"
+	var caixa := BoxShape3D.new()
+	caixa.size = Vector3(2 * W, 2.0, largura2 - 0.4)
+	forma.shape = caixa
+	_add(area, forma)
 
 
 ## A porta do rapaz: dobradiça ao norte, abre para dentro do quarto. Fechada até

@@ -163,6 +163,8 @@ func _materiais() -> void:
 	_mat("pedra_lareira", "reboco", {world = 2.0, cor = Color(0.5, 0.48, 0.45)})
 	_mat("fuligem", "cinzas", {world = 3.0, cor = Color(0.45, 0.42, 0.4)})
 	_mat("papel_pardo", "papel_pardo", {world = 3.0})
+	# A tampa e o fundo do estojo do cilindro (playtest 8): papelão envernizado, escuro.
+	_mat("papelao_escuro", "papel_pardo", {world = 3.0, cor = Color(0.42, 0.3, 0.24)})
 	_mat("barbante", "barbante", {world = 40.0})
 	_mat("mostrador", "mostrador", {})
 	_mat("ferro", "cinzas", {world = 4.0, cor = Color(0.5, 0.5, 0.55)})
@@ -1039,10 +1041,105 @@ func _quadros(g: Node3D) -> void:
 	var q := _group(g, "QuadroLareira", Vector3(face, 1.95, -0.6))
 	_box(q, "Moldura", Vector3(0.04, 0.6, 0.82), Vector3(-0.02, 0, 0), "latao")
 	_quad(q, "Tela", Vector2(0.7, 0.48), Vector3(-0.042, 0, 0), Vector3(0, -90, 0), "quadro")
+	# Playtest 8: "seria legal se os certificados na parede fossem legíveis". O
+	# texto de verdade, em inglês como tudo o que é impresso; examináveis, com a
+	# tradução embaixo. Os graus são nossos (o livro só diz "instrutor de
+	# literatura"): bacharel e mestre pela própria Miskatonic.
 	for k in 2:
-		var d := _group(g, "Diploma%d" % k, Vector3(W, 1.55 + k * 0.05, 1.05 + k * 0.5))
-		_box(d, "Moldura", Vector3(0.025, 0.36, 0.3), Vector3(-0.0125, 0, 0), "madeira_escura")
-		_quad(d, "Papel", Vector2(0.24, 0.3), Vector3(-0.026, 0, 0), Vector3(0, -90, 0), "diploma")
+		var d := _group(g, "Diploma%d" % k, Vector3(W, 1.55 + k * 0.05, 1.05 + k * 0.5), -90)
+		_box(d, "Moldura", Vector3(0.3, 0.36, 0.025), Vector3(0, 0, 0.0125), "madeira_escura")
+		_quad(d, "Papel", Vector2(0.24, 0.3), Vector3(0, 0, 0.026), Vector3.ZERO, "diploma")
+		var grau: String = ["Bachelor of Arts", "Master of Arts"][k]
+		var data: String = ["June 18, 1911", "June 17, 1914"][k]
+		# Poucas palavras, grandes: a 540 linhas, o miúdo vira risco (de perto,
+		# examinando, lê-se tudo).
+		_impresso(d, 0.0265, 0.2, [
+			["Miskatonic University", 0.105, 0.00022, FRAKTUR, Color(0.12, 0.08, 0.06)],
+			["ARKHAM · MASSACHUSETTS", 0.082, 0.0001, VERSALETE, Color(0.3, 0.22, 0.16)],
+			["The Trustees have conferred upon", 0.06, 0.00011, ITALICO, Color(0.2, 0.15, 0.12)],
+			["Albert N. Wilmarth", 0.03, 0.0002, CALIGRAFIA, Color(0.1, 0.07, 0.1)],
+			["the degree of", 0.002, 0.00011, ITALICO, Color(0.2, 0.15, 0.12)],
+			[grau, -0.024, 0.0002, FRAKTUR, Color(0.12, 0.08, 0.06)],
+			["with all its rights and honors.
+Given at Arkham, " + data + ".", -0.062, 0.0001, ITALICO, Color(0.2, 0.15, 0.12)],
+			["President            Secretary", -0.112, 0.00009, VERSALETE, Color(0.3, 0.22, 0.16)],
+		])
+		var ex := _area(d, Examinable.new(), "Examinar", Vector3(0.3, 0.36, 0.08), Vector3(0, 0, 0.04)) as Examinable
+		ex.prompt = "Examinar"
+		ex.title = ["O diploma de bacharel", "O diploma de mestre"][k]
+		ex.description = ["Universidade Miskatonic, Arkham, Massachusetts. O Conselho da Universidade, por indicação do Corpo Docente, confere a Albert N. Wilmarth o grau de Bacharel em Letras — 18 de junho de 1911.",
+			"Universidade Miskatonic. O grau de Mestre em Letras, conferido a Albert N. Wilmarth a 17 de junho de 1914. Quatorze anos depois, ainda instrutor de literatura."][k]
+		ex.initial_rotation = Vector3.ZERO
+
+
+## As letras do que está impresso nas paredes (diplomas, avisos).
+const FRAKTUR := "res://art/fonts/UnifrakturMaguntia-Book.ttf"
+const VERSALETE := "res://art/fonts/IMFellEnglish-SC.ttf"
+const ITALICO := "res://art/fonts/IMFellEnglish-Italic.ttf"
+const ROMANO := "res://art/fonts/IMFellEnglish-Regular.ttf"
+const TIPO := "res://art/fonts/OldStandard-Bold.ttf"
+const CALIGRAFIA := "res://art/fonts/PetitFormalScript-Regular.ttf"
+const MAQUINA := "res://art/fonts/OldStandard-Regular.ttf"
+
+## Os avisos do quadro do corredor: [linhas para _impresso, título, tradução].
+const AVISOS := [
+	[[["VERMONT", 0.085, 0.00016, TIPO, Color(0.1, 0.08, 0.08)],
+		["FLOOD RELIEF", 0.062, 0.00011, TIPO, Color(0.1, 0.08, 0.08)],
+		["Contributions for the sufferers\nof the November floods may be\nleft at the Bursar's Office,\nAdministration Building.\n\nClothing, blankets and\nfuel are most needed.", 0.0, 0.00012, ROMANO, Color(0.15, 0.12, 0.1)],
+		["— The Faculty Committee", -0.088, 0.00008, ITALICO, Color(0.2, 0.15, 0.12)]],
+		"Socorro às vítimas da enchente",
+		"Socorro às vítimas da enchente de Vermont. Contribuições para os flagelados das enchentes de novembro podem ser deixadas na Tesouraria, no Prédio da Administração. Precisa-se sobretudo de roupas, cobertores e combustível. — A Comissão do Corpo Docente"],
+	[[["DEPARTMENT OF ENGLISH", 0.05, 0.0001, VERSALETE, Color(0.15, 0.12, 0.1)],
+		["Office Hours", 0.03, 0.00009, ITALICO, Color(0.15, 0.12, 0.1)],
+		["Mr. A. N. Wilmarth, Room 310\nTuesdays and Thursdays, 2 to 4\nor by appointment.", -0.008, 0.00008, MAQUINA, Color(0.12, 0.1, 0.1)],
+		["(Wed. 3 — the Folk-Lore Society, Library 4)", -0.05, 0.00006, CALIGRAFIA, Color(0.1, 0.08, 0.14)]],
+		"O horário de atendimento",
+		"Departamento de Inglês. Horário de atendimento: Sr. A. N. Wilmarth, sala 310, terças e quintas, das 2 às 4, ou com hora marcada. Embaixo, na minha letra: \u201cQuarta, 3h — a Sociedade de Folclore, Biblioteca 4.\u201d"],
+	[[["LIBRARY", 0.074, 0.00012, TIPO, Color(0.1, 0.08, 0.08)],
+		["NOTICE", 0.056, 0.00008, VERSALETE, Color(0.15, 0.12, 0.1)],
+		["Volumes from the\nlocked cases may be\nconsulted only in the\npresence of the Librarian,\nand under no circumstances\nremoved from the\nbuilding.", -0.004, 0.00007, ROMANO, Color(0.15, 0.12, 0.1)],
+		["Henry Armitage\nLibrarian", -0.07, 0.00006, ITALICO, Color(0.2, 0.15, 0.12)]],
+		"Aviso da biblioteca",
+		"Biblioteca. Os volumes dos armários trancados só podem ser consultados na presença do Bibliotecário, e em nenhuma hipótese retirados do prédio. — Henry Armitage, Bibliotecário"],
+	[[["PUBLIC LECTURE", 0.04, 0.0001, TIPO, Color(0.1, 0.08, 0.08)],
+		["Hill Legends of Northern New England", 0.02, 0.00008, ITALICO, Color(0.15, 0.12, 0.1)],
+		["by Prof. Josiah Hartwell\nThursday evening at eight · Lecture Hall B", -0.012, 0.00006, ROMANO, Color(0.15, 0.12, 0.1)],
+		["All are welcome", -0.042, 0.00006, VERSALETE, Color(0.2, 0.15, 0.12)]],
+		"Uma palestra",
+		"Palestra pública: \u201cLendas das colinas do norte da Nova Inglaterra\u201d, pelo Prof. Josiah Hartwell. Quinta-feira, às oito da noite, Anfiteatro B. Entrada franca."],
+	[[["FOUND", 0.07, 0.00014, TIPO, Color(0.1, 0.08, 0.08)],
+		["in the Reading Room:\na pair of tortoise-shell\nspectacles, and an\numbrella with an ivory\nhandle.\n\nApply to the Janitor,\nbasement of Hall C.", -0.01, 0.00008, ROMANO, Color(0.15, 0.12, 0.1)]],
+		"Achados",
+		"Achados na Sala de Leitura: um par de óculos de tartaruga e um guarda-chuva de cabo de marfim. Procurar o zelador, no porão do Prédio C."],
+	[[["ROOM", 0.04, 0.0001, TIPO, Color(0.1, 0.08, 0.08)],
+		["to let, quiet\nhouse, gentleman\npreferred.\nInquire Mrs. Dobbs,\n47 Garrison St.", -0.012, 0.00006, CALIGRAFIA, Color(0.1, 0.08, 0.14)]],
+		"Um quarto",
+		"Aluga-se quarto, casa sossegada, prefere-se cavalheiro. Tratar com a Sra. Dobbs, Garrison St., 47."],
+]
+
+
+## Linhas impressas num papel virado para +Z local, centradas: cada linha é
+## [texto, y, pixel_size, fonte, cor]; `z` à frente do papel. Uma linha mais
+## larga que `largura` encolhe até caber (medida pela própria fonte).
+func _impresso(pai: Node3D, z: float, largura: float, linhas: Array) -> void:
+	for i in linhas.size():
+		var ln: Array = linhas[i]
+		var l := Label3D.new()
+		l.name = "Linha%d" % i
+		l.text = ln[0]
+		var fonte: Font = load(ln[3])
+		l.font = fonte
+		l.font_size = 64
+		var px := fonte.get_multiline_string_size(ln[0], HORIZONTAL_ALIGNMENT_CENTER, -1, 64).x
+		l.pixel_size = minf(ln[2], largura / maxf(px, 1.0))
+		l.modulate = ln[4]
+		l.outline_size = 0
+		l.line_spacing = -6.0
+		l.position = Vector3(0, ln[1], z)
+		l.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+		l.double_sided = false
+		l.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		_add(pai, l)
 
 
 ## O corredor da Miskatonic atrás da porta e, na parede da frente, a calha de
@@ -1162,13 +1259,27 @@ func _corredor(g: Node3D) -> void:
 	var avisos := _group(c, "Avisos", Vector3(-1.95, 1.55, fundo - 0.02), 180)
 	_box(avisos, "Moldura", Vector3(0.9, 0.62, 0.03), Vector3.ZERO, "madeira_escura")
 	_quad(avisos, "Cortica", Vector2(0.82, 0.54), Vector3(0, 0, 0.016), Vector3.ZERO, "cortica")
+	# Playtest 8: "os papéis no mural podem ter algo para ler". Avisos da
+	# Miskatonic em 1928, em inglês (examináveis, com a tradução): o socorro às
+	# vítimas das enchentes de Vermont (com que o livro começa), o horário de
+	# Wilmarth, a biblioteca de Armitage, uma palestra, um achado, um quarto.
 	var papeis := [[Vector2(0.16, 0.22), Vector2(-0.27, 0.08), 3], [Vector2(0.2, 0.14), Vector2(-0.04, 0.12), -2],
 		[Vector2(0.13, 0.19), Vector2(0.2, 0.1), 5], [Vector2(0.18, 0.12), Vector2(0.24, -0.13), -4],
 		[Vector2(0.15, 0.2), Vector2(-0.18, -0.13), 1], [Vector2(0.1, 0.13), Vector2(0.03, -0.14), -6]]
 	for i in papeis.size():
 		var pp: Array = papeis[i]
-		_quad(avisos, "Papel%d" % i, pp[0], Vector3(pp[1].x, pp[1].y, 0.019 + i * 0.0005), Vector3(0, 0, pp[2]), "papel")
-		_cyl(avisos, "Tacha%d" % i, 0.006, 0.006, 0.006, Vector3(pp[1].x, pp[1].y + pp[0].y * 0.42, 0.024), "latao", 5).rotation_degrees.x = 90
+		var av := _group(avisos, "Aviso%d" % i, Vector3(pp[1].x, pp[1].y, 0.019 + i * 0.0005))
+		av.rotation_degrees.z = pp[2]
+		# Papel liso (o "papel" tem pauta).
+		_quad(av, "Papel", pp[0], Vector3.ZERO, Vector3.ZERO, "envelope")
+		_cyl(av, "Tacha", 0.006, 0.006, 0.006, Vector3(0, pp[0].y * 0.42, 0.005), "latao", 5).rotation_degrees.x = 90
+		var aviso: Array = AVISOS[i]
+		_impresso(av, 0.0006, pp[0].x * 0.86, aviso[0])
+		var ex := _area(av, Examinable.new(), "Examinar", Vector3(pp[0].x, pp[0].y, 0.06), Vector3(0, 0, 0.02)) as Examinable
+		ex.prompt = "Ler o aviso"
+		ex.title = aviso[1]
+		ex.description = aviso[2]
+		ex.initial_rotation = Vector3.ZERO
 	var banco := _group(c, "Banco", Vector3(-1.95, 0, fundo - 0.22), 180)
 	_box(banco, "Assento", Vector3(1.2, 0.05, 0.34), Vector3(0, 0.45, 0), "madeira_escura")
 	_box(banco, "Encosto", Vector3(1.2, 0.32, 0.03), Vector3(0, 0.74, -0.16), "madeira_escura")
@@ -2250,7 +2361,8 @@ func _dia_3(parent: Node) -> Node3D:
 		cn.condition = _composta(CompositeCondition.Mode.TODAS, [_aberto(&"dia_3"),
 			_cond_valor(&"correio_dia_3_tiradas", ValueCondition.Op.MENOR, d[1])])
 		_add(folha, cn)
-	var tubo_dentro := _cyl(pacote, "DentroEstojo", 0.03, 0.03, 0.11, Vector3(0.06, 0.036, 0.0), "envelope", 10)
+	var tubo_dentro := _estojo_cilindro(pacote, "DentroEstojo")
+	tubo_dentro.position = Vector3(0.06, 0.036, 0.0)
 	tubo_dentro.rotation_degrees.x = 90
 	var cn_tubo := ConditionalNode.new()
 	cn_tubo.name = "AteTirar"
@@ -2292,16 +2404,53 @@ func _dia_3(parent: Node) -> Node3D:
 	var estojo := _grupo_se(g, "Estojo", _composta(CompositeCondition.Mode.TODAS,
 		[_cond_valor(&"correio_dia_3_tiradas", ValueCondition.Op.MAIOR_OU_IGUAL, 3), _flag(&"fono_cilindro", true)]))
 	estojo.position = Vector3(-0.15, MESA + 0.03, -2.34)
-	var tubo := _cyl(estojo, "Tubo", 0.03, 0.03, 0.11, Vector3.ZERO, "envelope", 10)
+	var tubo := _estojo_cilindro(estojo, "Tubo", "May 1, 1915")
 	tubo.rotation_degrees.z = 90
-	_examinavel(tubo, Vector3(0.13, 0.07, 0.07), "Examinar o estojo", "O cilindro de cera",
+	var ex_estojo := _examinavel(tubo, Vector3(0.07, 0.13, 0.07), "Examinar o estojo", "O cilindro de cera",
 		"Um cilindro de cera escura, gravado com ditafone, no estojo de papelão. Na tampa, a letra apertada de Akeley: “1º de maio de 1915.”")
+	ex_estojo.initial_rotation = Vector3(0, 0, -60)
 	pac.retirar = [bilhete.get_parent() as Node3D, transcricao.get_parent() as Node3D, estojo]
 	pac.prompts_retirar = PackedStringArray(["Tirar o bilhete", "Tirar a transcrição", "Tirar o estojo do cilindro"])
 	pac.saida_altura = tam.y + 0.02
 
 	_escrever(g, "resposta_dia_3", &"tocou_disco")
 	return g
+
+
+## O estojo de um cilindro de ditafone (playtest 8: "melhorar o modelo 3D do
+## estojo" — era um cilindro liso de papel): o tubo de papelão pardo, a tampa de
+## papelão envernizado com a borda, o fundo, duas cintas escuras e a etiqueta
+## impressa que dá a volta (DICTAPHONE / WAX CYLINDER RECORD, em inglês como tudo
+## o que é impresso). Com `mao`, um disco de papel na tampa com a letra de Akeley.
+## Ao longo do Y local, centrado na origem (11,5 cm).
+func _estojo_cilindro(pai: Node3D, nome: String, mao := "") -> Node3D:
+	var e := _group(pai, nome)
+	var r := 0.031
+	_cyl(e, "Corpo", r, r, 0.09, Vector3(0, -0.006, 0), "papel_pardo", 16)
+	_cyl(e, "Tampa", r + 0.0025, r + 0.0025, 0.03, Vector3(0, 0.0425, 0), "papelao_escuro", 16)
+	_cyl(e, "BordaTampa", r + 0.0035, r + 0.0035, 0.004, Vector3(0, 0.028, 0), "papelao_escuro", 16)
+	_cyl(e, "Fundo", r + 0.0012, r + 0.0012, 0.008, Vector3(0, -0.0535, 0), "papelao_escuro", 16)
+	_cyl(e, "Etiqueta", r + 0.0006, r + 0.0006, 0.042, Vector3(0, -0.012, 0), "envelope", 16)
+	for y in [-0.034, 0.01]:
+		_cyl(e, "Cinta%d" % int(y * 1000), r + 0.0009, r + 0.0009, 0.003, Vector3(0, y, 0), "papelao_escuro", 16)
+	# O impresso da etiqueta corre ao longo do tubo, virado para fora (+Z).
+	var marca := _letreiro(e, "Marca", "DICTAPHONE", Vector3(0, -0.012, r + 0.0012), 0.00011, Color(0.38, 0.08, 0.06))
+	marca.rotation_degrees.z = 90
+	var linha := _letreiro(e, "Linha", "WAX CYLINDER RECORD\nTHE DICTAPHONE CORP. · N. Y.", Vector3(0, -0.012, r + 0.0012), 0.000045, Color(0.16, 0.12, 0.1))
+	linha.rotation_degrees.z = 90
+	linha.position.x = -0.011
+	marca.position.x = 0.006
+	for l: Label3D in [marca, linha]:
+		l.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+		l.double_sided = false
+	if mao:
+		_cyl(e, "Disco", r - 0.004, r - 0.004, 0.0012, Vector3(0, 0.058, 0), "papel", 16)
+		var letra := _letreiro(e, "Letra", mao, Vector3(0, 0.0592, 0), 0.00009, Color(0.12, 0.09, 0.14))
+		letra.rotation_degrees.x = -90
+		letra.font = load("res://art/fonts/Tangerine-Regular.ttf")
+		letra.font_size = 64
+		letra.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+	return e
 
 
 ## Noite fria do dia `n` (Dias 5 e 6): a lenha na grelha e "Acender a lareira".
@@ -2584,21 +2733,27 @@ func _sonho_disco(g: Node3D) -> void:
 	# A lua, fria e alta, por entre as copas.
 	_omni(g, "Lua", clareira + Vector3(-2.0, 7.0, -3.0), Color(0.45, 0.52, 0.75), 0.9, 14.0)
 
-	# De relance: uma delas, atravessando entre as árvores, perto da caverna.
+	# De relance: uma delas, atravessando entre as árvores, acima da caverna.
+	# Playtest 8 ("não sei se o mi-go no sonho não está muito expositivo"): no
+	# livro, Wilmarth nunca vê uma delas viva — só a sugestão. Agora longe, no
+	# alto da encosta, atrás da boca da caverna e na névoa, só a silhueta escura
+	# com as asas batendo, e depressa; a vista clara fica para a janela, no Dia 5.
 	var passa := Aparicao.new()
 	passa.name = "Criatura"
-	passa.position = boca + Vector3(-4.5, 2.2, 2.2)
-	passa.deslocamento = Vector3(9.0, 0.8, -0.5)
-	passa.duracao = 2.6
-	passa.atraso = 1.2
-	passa.angulo = 28.0
-	passa.distancia = 12.0
+	passa.position = boca + Vector3(-5.5, 4.2, -3.5)
+	passa.deslocamento = Vector3(11.0, 1.6, -1.0)
+	passa.duracao = 1.7
+	passa.atraso = 1.0
+	passa.angulo = 24.0
+	passa.distancia = 18.0
 	passa.flag = &"viu_criatura_disco"
 	passa.exposure = 0.03
 	_add(g, passa)
 	var migo := Migo.new()
 	migo.name = "Migo"
-	migo.rotation_degrees.y = -90
+	migo.silhueta = true
+	migo.batida = 0.4
+	migo.rotation_degrees = Vector3(0, -90, -8)
 	_add(passa, migo)
 
 	_loucura_do_disco(g, mat, bosque, clareira)
@@ -2719,65 +2874,77 @@ func _sonho_pedra(g: Node3D) -> void:
 	_add(g, voz)
 
 
-## A pedra negra de Round Hill (playtest 6: eram duas caixas): uma estela de
-## faces irregulares, como cortada por "princípios geométricos" que ninguém
-## saberia dizer, mais larga embaixo, o alto cortado em viés e uma quina lascada.
-## Anéis de 9 lados em alturas fixas, cada vértice um pouco fora do lugar
-## (determinístico por `semente`); a base no chão (y 0), do tamanho `tam`.
+## A pedra negra de Round Hill (playtest 6: eram duas caixas; playtest 8: "o
+## modelo está quebrado" — os anéis torcidos dobravam as faces umas sobre as
+## outras, e as normais suaves espalhavam a textura como pano). Agora uma estela
+## como a da gravura do menu: uma laje de faces planas, mais larga embaixo, os
+## lados um pouco tortos, o alto **partido** em dentes, e as arestas chanfradas
+## (a face da frente e a de trás recuadas `chanfro`), cada face com a própria
+## normal. `tam` = largura, altura, espessura; a base no chão (y 0).
 func _monolito(pai: Node3D, nome: String, tam: Vector3, semente: int) -> MeshInstance3D:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = semente
-	var lados := 7
-	var alturas := [0.0, 0.1, 0.45, 0.8, 1.0]
-	var aneis: Array[PackedVector3Array] = []
-	# Os ângulos de cada lado são os mesmos de baixo a cima (arestas retas, de
-	# talhe), mas cada anel desloca e torce um pouco: faces planas que quebram.
-	var angulos: Array[float] = []
-	for k in lados:
-		angulos.append(TAU * k / lados + rng.randf_range(-0.22, 0.22))
-	for i in alturas.size():
-		var h: float = alturas[i]
-		var anel := PackedVector3Array()
-		var largura := lerpf(1.0, 0.72, h) * rng.randf_range(0.95, 1.05)
-		var torce := rng.randf_range(-0.08, 0.08)
-		for k in lados:
-			var a := angulos[k] + torce
-			var r := largura * rng.randf_range(0.9, 1.04)
-			var p := Vector3(cos(a) * tam.x * 0.5 * r, h * tam.y + rng.randf_range(-0.02, 0.02) * tam.y * float(i > 0), sin(a) * tam.z * 0.5 * r)
-			anel.append(p)
-		aneis.append(anel)
-	# O alto em duas águas tortas: a crista corre de um lado a outro, e as faces
-	# caem para a frente e para trás; uma quina lascada.
-	for k in lados:
-		var p := aneis[-1][k]
-		p.y = tam.y * (0.86 + 0.14 * (1.0 - absf(p.z) / (tam.z * 0.5))) - (p.x / tam.x + 0.5) * tam.y * 0.1
-		aneis[-1][k] = p
-	aneis[-1][2] = aneis[-1][2] * Vector3(0.75, 1.0, 0.75) - Vector3(0, tam.y * 0.1, 0)
+	var w := tam.x
+	var h := tam.y
+	# O contorno visto de frente, no sentido anti-horário: a base, o lado
+	# direito, o alto partido (da direita para a esquerda), o lado esquerdo.
+	var contorno := PackedVector2Array([
+		Vector2(-0.5, 0.0), Vector2(0.5, 0.0),
+		Vector2(0.49, 0.3), Vector2(0.46, 0.58), Vector2(0.44, 0.7),
+		Vector2(0.3, 0.76), Vector2(0.2, 0.71), Vector2(0.08, 0.86),
+		Vector2(-0.06, 0.82), Vector2(-0.2, 0.97), Vector2(-0.33, 0.93),
+		Vector2(-0.43, 0.88), Vector2(-0.46, 0.6), Vector2(-0.48, 0.3),
+	])
+	for i in contorno.size():
+		var q := contorno[i]
+		var j := Vector2(rng.randf_range(-0.012, 0.012), rng.randf_range(-0.012, 0.012) if q.y > 0.0 else 0.0)
+		contorno[i] = Vector2((q.x + j.x) * w, (q.y + j.y) * h)
+	# A face recuada: o contorno encolhido para o meio (o chanfro); o alto
+	# partido não tem chanfro (a quebra é viva).
+	var chanfro := minf(w, tam.z) * 0.12
+	var centro := Vector2(0.0, h * 0.45)
+	var dentro := PackedVector2Array()
+	for q in contorno:
+		var d := centro - q
+		var k := 0.4 if q.y > h * 0.69 else 1.0
+		dentro.append(q + d.normalized() * chanfro * k if q.y > 0.0 else Vector2(q.x * (1.0 - chanfro / w), 0.0))
+	var meia := tam.z * 0.5
+	var raso := meia - chanfro * 0.6
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for i in aneis.size() - 1:
-		for k in lados:
-			var a0 := aneis[i][k]
-			var a1 := aneis[i][(k + 1) % lados]
-			var b0 := aneis[i + 1][k]
-			var b1 := aneis[i + 1][(k + 1) % lados]
-			for p in [a0, b1, a1, a0, b0, b1]:
-				st.add_vertex(p)
-	# O alto (em leque, a partir do meio) e a base.
-	var topo := Vector3.ZERO
-	for p in aneis[-1]:
-		topo += p / lados
-	for k in lados:
-		st.add_vertex(topo)
-		st.add_vertex(aneis[-1][(k + 1) % lados])
-		st.add_vertex(aneis[-1][k])
-		st.add_vertex(Vector3.ZERO)
-		st.add_vertex(aneis[0][k])
-		st.add_vertex(aneis[0][(k + 1) % lados])
+	st.set_smooth_group(-1)
+	var tri := func(a: Vector3, b: Vector3, c: Vector3) -> void:
+		st.add_vertex(a)
+		st.add_vertex(b)
+		st.add_vertex(c)
+	var quad := func(a: Vector3, b: Vector3, c: Vector3, d: Vector3) -> void:
+		tri.call(a, b, c)
+		tri.call(a, c, d)
+	# A frente e as costas (a face recuada, triangulada).
+	var ind := Geometry2D.triangulate_polygon(dentro)
+	for t in range(0, ind.size(), 3):
+		var a := dentro[ind[t]]
+		var b := dentro[ind[t + 1]]
+		var c := dentro[ind[t + 2]]
+		tri.call(Vector3(a.x, a.y, meia), Vector3(c.x, c.y, meia), Vector3(b.x, b.y, meia))
+		tri.call(Vector3(a.x, a.y, -meia), Vector3(b.x, b.y, -meia), Vector3(c.x, c.y, -meia))
+	var n := contorno.size()
+	for i in n:
+		var j := (i + 1) % n
+		var o0 := contorno[i]
+		var o1 := contorno[j]
+		var d0 := dentro[i]
+		var d1 := dentro[j]
+		# O chanfro da frente e o de trás.
+		quad.call(Vector3(d0.x, d0.y, meia), Vector3(d1.x, d1.y, meia), Vector3(o1.x, o1.y, raso), Vector3(o0.x, o0.y, raso))
+		quad.call(Vector3(o0.x, o0.y, -raso), Vector3(o1.x, o1.y, -raso), Vector3(d1.x, d1.y, -meia), Vector3(d0.x, d0.y, -meia))
+		# O lado (a borda), de um chanfro ao outro.
+		quad.call(Vector3(o0.x, o0.y, raso), Vector3(o1.x, o1.y, raso), Vector3(o1.x, o1.y, -raso), Vector3(o0.x, o0.y, -raso))
 	st.generate_normals()
+	var mesh := st.commit()
 	var mi := MeshInstance3D.new()
 	mi.name = nome
-	mi.mesh = st.commit()
+	mi.mesh = mesh
 	mi.material_override = m["pedra_negra"]
 	_add(pai, mi)
 	return mi
@@ -2917,7 +3084,9 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 			_cyl(g, "Perna%d%d" % [sx + 1, sz + 1], 0.02, 0.016, alto - 0.03, Vector3(sx * 0.22, (alto - 0.03) / 2, sz * 0.17), "madeira_escura", 6)
 	_box(g, "Prateleira", Vector3(0.46, 0.02, 0.36), Vector3(0, 0.18, 0), "madeira_escura")
 	for k in 4:
-		_cyl(g, "Estojo%d" % k, 0.03, 0.03, 0.11, Vector3(-0.15 + k * 0.075, 0.245, 0.04 - (k % 2) * 0.05), "envelope", 8)
+		var est := _estojo_cilindro(g, "Estojo%d" % k)
+		est.position = Vector3(-0.15 + k * 0.075, 0.248, 0.04 - (k % 2) * 0.05)
+		est.rotation_degrees.y = -150.0 + k * 47.0
 	# A caixa de carvalho, com o rodapé, e a placa preta em cima.
 	var caixa_h := 0.15
 	var topo := alto + caixa_h

@@ -28,6 +28,10 @@ func _ready() -> void:
 		await _menu_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "olhar":
+		await _olhar_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "boston":
 		await _boston_fotos()
 		get_tree().quit()
@@ -179,6 +183,27 @@ func _boston_fotos() -> void:
 	p.head.rotation.x = -0.2
 	await _s(0.5)
 	await _shot("%s_boston_escada" % tag)
+	p.global_position = Vector3(0, 0, 2.8)
+	await _olhar(p, Vector3(0, 0, 6.0))
+	p.head.rotation.x = -0.45
+	await _s(0.5)
+	await _shot("%s_boston_escada_topo" % tag)
+	# Andando escada abaixo (a física): até o patamar.
+	p.global_position = Vector3(0, 0.1, 2.6)
+	await _olhar(p, Vector3(0, 0, 9.0))
+	Input.action_press(&"mover_frente")
+	await _s(2.6)
+	Input.action_release(&"mover_frente")
+	await _s(0.3)
+	print("ESCADA y=", p.global_position.y, " z=", p.global_position.z)
+	await _olhar(p, p.global_position + Vector3(-3, 0, 0.3))
+	p.head.rotation.x = -0.25
+	await _s(0.5)
+	await _shot("%s_boston_patamar" % tag)
+	await _olhar(p, Vector3(0, 0, 0))
+	p.head.rotation.x = 0.3
+	await _s(0.5)
+	await _shot("%s_boston_subindo" % tag)
 	p.global_position = Vector3(0, 0, 2.3)
 	p.rotation.y = base
 	b.bater.interact(p)
@@ -290,3 +315,59 @@ func _shot(nome: String) -> void:
 
 func _s(t: float) -> void:
 	await get_tree().create_timer(t).timeout
+
+
+## SHOT_MODO=olhar, SHOT_EXTRA="dia;chave=valor,chave=valor;ox,oy,oz>ax,ay,az|...":
+## o escritório no dia, com o estado, e uma foto de cada olho (o) para cada alvo (a).
+## Um alvo "exame:Caminho/Do/Examinable" abre o exame dele.
+func _olhar_fotos() -> void:
+	var partes := OS.get_environment("SHOT_EXTRA").split(";")
+	var estado := {}
+	for par in partes[1].split(",", false):
+		var kv := par.split("=")
+		estado[StringName(kv[0])] = int(kv[1]) if kv[1].is_valid_int() else (kv[1] == "true")
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	if int(partes[0]) == 0:
+		GameState.set_value(&"prologo_concluido", false)
+	GameState.set_value(&"dia", maxi(1, int(partes[0])))
+	for k: StringName in estado:
+		GameState.set_value(k, estado[k])
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+	await _s(2.0)
+	if int(partes[0]) == 0:
+		await _s(8.0)
+		SceneDirector.release_black()
+		await _s(1.0)
+	Narrator.cancel()
+	var esc := root.find_child("Escritorio", true, false) as Escritorio
+	var p := esc.player
+	if p.seated:
+		p.stand()
+	(esc.get_node("%Corredor") as Node3D).visible = true
+	var i := 0
+	for olho in partes[2].split("|", false):
+		if olho.begins_with("exame:"):
+			var ex := esc.get_node(olho.substr(6)) as Examinable
+			ex.interact(p)
+			await _s(1.5)
+			await _shot("%s_%d_exame" % [tag, i])
+			var viewer := root.find_child("ExamineViewer", true, false)
+			viewer._zoom = 1.0
+			await _s(1.0)
+			await _shot("%s_%d_exame_perto" % [tag, i])
+			viewer.close()
+			await _s(0.6)
+		else:
+			var oa := olho.split(">")
+			var o := oa[0].split_floats(",")
+			var a := oa[1].split_floats(",")
+			p.global_position = Vector3(o[0], o[1], o[2])
+			var alvo := Vector3(a[0], a[1], a[2])
+			p.look_at(Vector3(alvo.x, p.global_position.y, alvo.z))
+			var cam := p.camera.global_position
+			var d := alvo - cam
+			p.head.rotation.x = atan2(d.y, Vector2(d.x, d.z).length())
+			await _s(0.7)
+			await _shot("%s_%d" % [tag, i])
+		i += 1

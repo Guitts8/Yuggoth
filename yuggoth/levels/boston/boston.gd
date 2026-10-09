@@ -20,6 +20,7 @@ const ESCRITORIO := "res://levels/escritorio/escritorio.tscn"
 var _saindo := false
 
 @onready var saida: Interactable = %Saida
+@onready var descida: Area3D = %Descida
 @onready var folha: Node3D = %Folha
 @onready var bater: Interactable = %Bater
 @onready var player: Player = $Player
@@ -29,6 +30,7 @@ func _ready() -> void:
 	player.lamp.available = false
 	AudioDirector.play_ambience(som)
 	saida.interacted.connect(_voltar)
+	descida.body_entered.connect(_on_descida)
 	if GameState.has_flag(&"porta_aberta_boston"):
 		folha.rotation_degrees.y = fresta
 		_tirar_bater()
@@ -68,6 +70,13 @@ func _abrir() -> void:
 func _tirar_bater() -> void:
 	bater.visible = false
 	(bater.get_node(^"CollisionShape3D") as CollisionShape3D).set_deferred(&"disabled", true)
+
+
+## Descendo a escada até o patamar, com a conversa feita, ele vai (playtest 8);
+## antes dela, a escada é só escada.
+func _on_descida(corpo: Node3D) -> void:
+	if corpo == player and saida.can_interact(player):
+		_voltar(player)
 
 
 func _voltar(_by: Node) -> void:

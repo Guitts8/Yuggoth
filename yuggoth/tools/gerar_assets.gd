@@ -171,22 +171,32 @@ func _quadro() -> Image:
 ## Um diploma emoldurado: o papel creme, o título em linhas escuras, as linhas
 ## do texto e o selo vermelho embaixo.
 func _diploma() -> Image:
-	var w := 48
-	var h := 64
+	# Playtest 8: o texto agora é de verdade (Label3D, gerar_escritorio); aqui só o
+	# pergaminho, a moldura impressa de filete duplo e o selo de lacre com a fita.
+	var w := 96
+	var h := 120
 	var img := _img(w, h)
-	var n := _noise(73, 0.1)
+	var n := _noise(73, 0.08)
+	var mancha := _noise(74, 0.02)
 	for y in h:
 		for x in w:
-			var f := 0.95 + n.get_noise_2d(x, y) * 0.04
-			var c := Color(0.86, 0.82, 0.7)
-			if x < 3 or x > w - 4 or y < 3 or y > h - 4:
-				c = Color(0.7, 0.62, 0.45)
-			elif (y == 10 or y == 11) and x > 8 and x < w - 9:
-				c = Color(0.2, 0.17, 0.14)
-			elif y > 18 and y < 44 and y % 4 == 0 and x > 7 and x < w - 8 - (y * 7) % 9:
-				c = Color(0.45, 0.42, 0.36)
-			if Vector2(x - 34, y - 52).length() < 5.0:
-				c = Color(0.6, 0.12, 0.1)
+			var f := 0.95 + n.get_noise_2d(x, y) * 0.04 - maxf(0.0, mancha.get_noise_2d(x, y)) * 0.12
+			var c := Color(0.88, 0.83, 0.7)
+			var borda := mini(mini(x, w - 1 - x), mini(y, h - 1 - y))
+			if borda < 2:
+				c = Color(0.72, 0.64, 0.48)
+			elif borda == 5 or borda == 7:
+				c = Color(0.45, 0.36, 0.24)
+			if borda >= 5 and borda <= 7 and (x + y) % 6 == 0:
+				c = Color(0.55, 0.45, 0.3)
+			# O selo: a fita (duas pontas) e o lacre vermelho, embaixo à esquerda.
+			var sv := Vector2(x - 20, y - 100)
+			if absf(sv.x - sv.y * 0.35) < 2.5 and sv.y > 0 and sv.y < 16:
+				c = Color(0.25, 0.3, 0.55)
+			if absf(sv.x + sv.y * 0.35) < 2.5 and sv.y > 0 and sv.y < 16:
+				c = Color(0.25, 0.3, 0.55)
+			if sv.length() < 8.0 + sin(atan2(sv.y, sv.x) * 9.0) * 0.8:
+				c = Color(0.62, 0.12, 0.1) if sv.length() < 6.0 else Color(0.5, 0.08, 0.07)
 			img.set_pixel(x, y, _shade(c, f))
 	return img
 
@@ -1919,7 +1929,7 @@ func _glifo(img: Image, o: Vector2i, forma: int, largo: int, fundo: float) -> vo
 				img.set_pixel(q.x, q.y, c.lerp(Color(0.0, 0.0, 0.01), fundo))
 			if b.x < img.get_width() and b.y < img.get_height() and not (b - d) in pontos:
 				var c2 := img.get_pixel(b.x, b.y)
-				img.set_pixel(b.x, b.y, c2.lerp(Color(0.3, 0.3, 0.33), fundo * 0.75))
+				img.set_pixel(b.x, b.y, c2.lerp(Color(0.42, 0.42, 0.46), fundo * 0.85))
 
 
 ## Chama (para billboards): gota com borda irregular, amarela embaixo, vermelha na ponta.
