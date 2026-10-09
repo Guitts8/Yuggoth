@@ -8,8 +8,12 @@ const HOLD_BASE := 2.2
 const HOLD_PER_CHAR := 0.035
 const FADE_TIME := 0.8
 
+const FADE_PULO := 0.2
+
 var _label: RichTextLabel
 var _tween: Tween
+## O que está na mira do jogador: com algo ali, E interage em vez de pular.
+var _alvo: Interactable
 
 @onready var caption: RichTextLabel = %Caption
 @onready var card: RichTextLabel = %Card
@@ -21,6 +25,8 @@ func _ready() -> void:
 		label.hide()
 	Narrator.line_started.connect(_show_line)
 	Narrator.line_cancelled.connect(_cancel)
+	Narrator.pular_pedido.connect(_pular)
+	Events.interaction_target_changed.connect(func(alvo: Interactable) -> void: _alvo = alvo)
 	Events.modal_changed.connect(_on_modal_changed)
 
 
@@ -48,6 +54,24 @@ func _cancel() -> void:
 	if _label:
 		_label.hide()
 		_label = null
+
+
+## E sem nada na mira pula a fala (playtest 7). Com um modal aberto, o E é dele.
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed(&"interagir") or event.is_echo():
+		return
+	if Events.is_modal_open or is_instance_valid(_alvo):
+		return
+	Narrator.pular()
+
+
+func _pular() -> void:
+	if _label == null or _tween == null or not _label.visible:
+		return
+	_tween.kill()
+	_tween = create_tween()
+	_tween.tween_property(_label, "modulate:a", 0.0, FADE_PULO)
+	_tween.tween_callback(_on_line_done)
 
 
 func _on_line_done() -> void:

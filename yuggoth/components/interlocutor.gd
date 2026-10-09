@@ -144,9 +144,11 @@ func _dizer(l: Ligacao) -> void:
 		var segundos := maxf(SEG_MINIMO, fala.length() * SEG_POR_CHAR)
 		Events.subtitle_requested.emit(fala, segundos)
 		_murmurar(fala.get_slice(":", 0).strip_edges(), segundos * 0.85)
-		await get_tree().create_timer(segundos).timeout
+		var pulou := await Narrator.esperar_fala(segundos)
 		if not is_inside_tree():
 			return
+		if pulou and fala == l.falas[-1]:
+			Events.subtitle_requested.emit("", 0.0)
 	_voz.stop()
 	if l.sonho > 0.0:
 		_amolecer(0.0, 3.0)
