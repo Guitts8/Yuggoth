@@ -633,8 +633,11 @@ Também: o teste do vulto na janela (Dia 5) às vezes não pegava o mi-go visív
 
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
-3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Nenhum push
-feito (nem pedido).
+3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado
+ao GitHub (push). **Regra (2026-10-09):** cada commit é seguido de `git push`, e os
+arquivos de coordenação (este, `SEQUENCIA.md`, `FIDELIDADE.md`, `CLAUDE.md`, a
+memória) são atualizados junto com o trabalho — ver "Fluxo de trabalho" no
+`CLAUDE.md`.
 
 **Esperando o usuário — o playtest 8** (do Dia 1 ao fim da demo; **F2** pula dias,
 **F3** recarrega). O que olhar:

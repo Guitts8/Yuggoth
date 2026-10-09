@@ -109,6 +109,6 @@ if (-not $p.WaitForExit(600000)) { $p.Kill(); "TEMPO ESGOTADO" } else { "falhas:
 git status --short
 git log --oneline -10
 git diff --stat
-git add <arquivos>; git commit -m "..."     # um commit por feature, só local
-# push só quando você pedir
+git add <arquivos>; git commit -m "..."     # um commit por feature
+git push                                    # sempre logo depois de cada commit
 ```
