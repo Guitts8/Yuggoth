@@ -43,6 +43,8 @@ const FOV_ESCREVENDO := 30.0
 ## A primeira página, antes de qualquer entrada.
 const ROSTO := "\n\n\n[center]A. N. Wilmarth\n\nMiskatonic University\nArkham, 1928[/center]"
 const VIRAR_SEGUNDOS := 0.65
+## Escrevendo, quanto os olhos vão do meio da linha para a pena (0 a 1).
+const PUXAO_DA_PENA := 0.3
 
 @export var som_pena: AudioStream
 @export var som_papel: AudioStream
@@ -79,12 +81,15 @@ var _frente: MeshInstance3D
 var _verso: MeshInstance3D
 var _mat_vivo: ShaderMaterial
 var _mat_foto: ShaderMaterial
+var _mat_branco: Material
 ## A fita no par do dia (aberto); a ponta que sai pelo pé do miolo é do `_Corpo`.
 var _fita_aberta: Node3D
 var _capa: Node3D
 var _lombada: Node3D
 var _bloco_esq: Node3D
 var _bloco_dir: Node3D
+var _alto_esq: Node3D
+var _alto_dir: Node3D
 var _correndo: Array[Node3D] = []
 var _aberto: Node3D
 ## A pose atual (`_pose`): a capa (0 fechada, 1 deitada à esquerda) e o miolo
@@ -141,14 +146,20 @@ func _process(delta: float) -> void:
 ## Escrevendo, os olhos vão atrás da pena, com atraso (a linha corre, ele a
 ## acompanha e volta ao começo da seguinte), e a cabeça respira um pouco —
 ## até o jogador mexer a cabeça (a câmera é dele, playtest 4).
+##
+## Playtest 7: colada na pena, a vista ficava presa a ela. Agora os olhos ficam
+## na linha (o meio da página, na altura dela) e só puxam um pouco para a pena;
+## e vão devagar.
 func _seguir_a_pena(delta: float) -> void:
-	var alvo := global_transform * _na_pagina(_ponta_px() + Vector2(-30.0, 6.0))
+	var ponta := _ponta_px()
+	var linha := Vector2(TEXTURA.x * 0.75, ponta.y + 6.0)
+	var alvo := global_transform * _na_pagina(linha.lerp(ponta + Vector2(-30.0, 6.0), PUXAO_DA_PENA))
 	var olho := _player.camera.global_position
 	var yaw := atan2(-(alvo.x - olho.x), -(alvo.z - olho.z))
 	var pitch := atan2(alvo.y - olho.y, Vector2(alvo.x - olho.x, alvo.z - olho.z).length())
 	pitch += sin(_t * 1.3) * 0.006
 	yaw += sin(_t * 0.7) * 0.004
-	var k := 1.0 - exp(-1.8 * delta)
+	var k := 1.0 - exp(-0.9 * delta)
 	_player.rotation.y += angle_difference(_player.rotation.y, yaw) * k
 	_player.head.rotation.x = lerp_angle(_player.head.rotation.x, pitch, k)
 
@@ -170,7 +181,9 @@ func anotar(entrada: DocumentData, anterior: DocumentData, player: Player, falha
 	await _abrir(player)
 	if not is_inside_tree():
 		return
-	await player.olhar_para(global_transform * _na_pagina(_ponta_px()), 0.8).finished
+	var ponta := _ponta_px()
+	var linha := Vector2(TEXTURA.x * 0.75, ponta.y + 6.0)
+	await player.olhar_para(global_transform * _na_pagina(linha.lerp(ponta, PUXAO_DA_PENA)), 0.8).finished
 	if not is_inside_tree():
 		return
 
@@ -595,6 +608,7 @@ func _parar_pena() -> void:
 func _mostrar_aberto(sim: bool) -> void:
 	aberto = sim
 	_aberto.visible = sim
+	_pose(_k_capa, _k_folhas)
 
 
 ## Anima a pose de onde está até (`capa`, `folhas`); `correndo`, com o som das
@@ -625,6 +639,9 @@ func _pose(capa: float, folhas: float) -> void:
 	_bloco_dir.scale.y = direita
 	_bloco_esq.scale.y = maxf(esquerda, 0.0001)
 	_bloco_esq.visible = esquerda > 0.0003
+	_alto_dir.position.y = TABUA + direita
+	_alto_esq.position.y = TABUA + esquerda
+	_alto_esq.visible = _bloco_esq.visible
 	var angulo := PI * capa
 	var alto := TABUA + MIOLO * 2.0 + TABUA * 0.5
 	var queda := clampf(capa * 2.0 - 1.0, 0.0, 1.0)
@@ -636,7 +653,13 @@ func _pose(capa: float, folhas: float) -> void:
 	for i in _correndo.size():
 		var p := clampf((folhas - i * passo) / CORRER_JANELA, 0.0, 1.0)
 		var folha := _correndo[i]
-		folha.visible = p > 0.0 and p < 1.0
+		# A última fica deitada à esquerda (é a página escrita) até o par aberto
+		# cobri-la.
+		folha.visible = p > 0.0 and (p < 1.0 or i == _correndo.size() - 1) and not aberto
+		# A página do dia (à direita, na fita) só aparece quando a última folha
+		# sai de cima dela.
+		if i == _correndo.size() - 1:
+			_alto_dir.material_override = _mat_vivo if p > 0.0 else _mat_branco
 		folha.rotation.z = PI * smoothstep(0.0, 1.0, p)
 		folha.position.y = lerpf(TABUA + direita, TABUA + esquerda, p) + 0.0004 + sin(p * PI) * 0.006
 
@@ -659,6 +682,14 @@ func _montar() -> void:
 	var guarda := _cor("res://art/materials/papel.tres", Color(0.5, 0.36, 0.3))
 	var fita := _cor("res://art/materials/papel.tres", Color(0.62, 0.09, 0.08))
 	var miolo := Vector3(LARGURA - 0.006, 1.0, FUNDO - 0.008)
+	# A página em branco (pautada, como as do par aberto): o alto do miolo e as
+	# folhas que correm (playtest 7: o corte riscado no lugar da página, ao
+	# fechar, era um salto).
+	var branco := Selagem._material("res://art/materials/papel.tres")
+	branco.set_shader_parameter(&"albedo_tex", _pagina_em_branco())
+	branco.set_shader_parameter(&"albedo_color", Color.WHITE)
+	_mat_branco = branco
+	_mat_vivo = Selagem._material("res://art/materials/papel.tres")
 
 	var corpo := _no(self, "_Corpo")
 	# A contracapa (embaixo) e o miolo, que se reparte entre os dois lados ao abrir
@@ -667,11 +698,20 @@ func _montar() -> void:
 	for lado in [1.0, -1.0]:
 		var bloco := _no(corpo, "_BlocoDir" if lado > 0 else "_BlocoEsq")
 		bloco.position = Vector3(lado * (LARGURA * 0.5 - 0.001), TABUA, 0)
-		_caixa(bloco, miolo, Vector3(0, 0.5, 0), corte)
+		_sem_tampa(_caixa(bloco, miolo, Vector3(0, 0.5, 0), corte))
+		# O alto do miolo é a página: à direita, a do par aberto (a textura viva:
+		# fechando, ela fica onde estava); à esquerda, em branco. Fora do bloco
+		# (que escala), um pouco acima dele (`_pose`).
+		var alto := _folha(corpo, "_AltoDir" if lado > 0 else "_AltoEsq", -miolo.x * 0.5, miolo.x * 0.5,
+			0.5 if lado > 0 else 0.0, 1.0, Vector3.UP)
+		alto.position.x = bloco.position.x
+		alto.material_override = _mat_vivo if lado > 0 else branco
 		if lado > 0:
 			_bloco_dir = bloco
+			_alto_dir = alto
 		else:
 			_bloco_esq = bloco
+			_alto_esq = alto
 	# A capa gira na lombada (Z) e vai deitar do lado esquerdo: o couro com os
 	# cantos e a faixa da lombada por fora, a folha de guarda por dentro.
 	_capa = _no(corpo, "_Capa")
@@ -695,8 +735,13 @@ func _montar() -> void:
 	for i in CORRENDO:
 		var folha := _no(corpo, "_Correndo%d" % i)
 		folha.visible = false
-		_folha(folha, "_Cima", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.UP).material_override = corte
-		_folha(folha, "_Baixo", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.DOWN).material_override = corte
+		_folha(folha, "_Cima", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.UP).material_override = branco
+		# A última a chegar à esquerda (a primeira a sair, fechando) leva a página
+		# da esquerda do par aberto: o texto não some ao fechar, sai com a folha.
+		if i == CORRENDO - 1:
+			_folha(folha, "_Baixo", 0.0, LARGURA - 0.006, 0.5, 0.0, Vector3.DOWN).material_override = _mat_vivo
+		else:
+			_folha(folha, "_Baixo", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.DOWN).material_override = branco
 		_correndo.append(folha)
 
 	_aberto = _no(self, "_Aberto")
@@ -729,7 +774,6 @@ func _montar() -> void:
 	# As páginas: cada uma, metade da textura; a folha que vira gira na lombada,
 	# com a frente (para cima, deitada à direita) e o verso.
 	var wp := LARGURA - 0.004
-	_mat_vivo = Selagem._material("res://art/materials/papel.tres")
 	_mat_vivo.set_shader_parameter(&"albedo_tex", _vp.get_texture())
 	_mat_foto = Selagem._material("res://art/materials/papel.tres")
 	var y := TABUA + MIOLO + 0.0005
@@ -746,6 +790,20 @@ func _montar() -> void:
 	for mi in [_pag_esq, _pag_dir, _frente, _verso]:
 		mi.material_override = _mat_vivo
 	_pose(0.0, 0.0)
+
+
+## A textura da página em branco: o papel e as pautas, na escala do par aberto.
+static func _pagina_em_branco() -> Texture2D:
+	# Uma página só (metade do par), a meia resolução.
+	var img := Image.create(TEXTURA.x / 4, TEXTURA.y / 2, false, Image.FORMAT_RGB8)
+	img.fill(PAPEL)
+	var pauta := PAPEL.lerp(Color(0.42, 0.52, 0.68), 0.32)
+	var y := 20.0
+	while y < img.get_height() - 8:
+		for x in range(7, img.get_width() - 4):
+			img.set_pixel(x, int(y), pauta)
+		y += 15.0
+	return ImageTexture.create_from_image(img)
 
 
 ## Uma cópia do material com outra cor (o couro, o corte das folhas, a fita).
@@ -840,6 +898,25 @@ func _rotulo(janela: Control) -> RichTextLabel:
 	r.install_effect(IllegibleTextEffect.new())
 	janela.add_child(r)
 	return r
+
+
+## Tira a face de cima de uma caixa (o alto do miolo é outra malha, a página).
+static func _sem_tampa(mi: MeshInstance3D) -> void:
+	var arrays := (mi.mesh as BoxMesh).get_mesh_arrays()
+	var vs: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var ns: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+	var uvs: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
+	var idx: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for t in range(0, idx.size(), 3):
+		if ns[idx[t]].y > 0.9:
+			continue
+		for k in 3:
+			st.set_normal(ns[idx[t + k]])
+			st.set_uv(uvs[idx[t + k]])
+			st.add_vertex(vs[idx[t + k]])
+	mi.mesh = st.commit()
 
 
 func _no(pai: Node3D, nome: String) -> Node3D:
