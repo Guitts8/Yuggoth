@@ -26,6 +26,16 @@ extends Node3D
 @export var semente := 1
 ## Segundos até os estilhaços chegarem aonde boiam.
 @export var abertura := 7.0
+## Fora da sala (playtest 7: o bosque do disco): um nó (caminho a partir da raiz
+## da fase) cujos filhos — ilhas de chão já montadas — se soltam e boiam, mais
+## quanto mais longe de `centro_soltos` (global) além de `raio_firme`.
+@export var soltos := NodePath()
+@export var centro_soltos := Vector3.ZERO
+@export var raio_firme := 9.0
+## Os materiais dos pedaços que boiam longe (de art/materials).
+@export var materiais_destroco := PackedStringArray(["parede", "tijolo", "madeira_escura", "lambri", "pedra_lareira"])
+## A que distância do centro boiam esses pedaços.
+@export var distancia_destroco := Vector2(5.0, 9.0)
 
 const TAMANHO_ESTILHACO := 0.55
 const ESPESSURA := 0.09
@@ -123,6 +133,11 @@ func _montar() -> void:
 		var q := _raiz().get_node_or_null(NodePath(p)) as MeshInstance3D
 		if q and q.mesh is QuadMesh:
 			_estilhacar(q, rng)
+	var ilhas := _raiz().get_node_or_null(soltos) if not soltos.is_empty() else null
+	if ilhas:
+		for n in ilhas.get_children():
+			if n is Node3D:
+				_soltar(n, rng)
 	var centro := _centro_da_sala()
 	for i in destrocos:
 		_destroco(rng, centro)
@@ -262,14 +277,29 @@ func _estilhaco(q: MeshInstance3D, poly: Array, gt: Transform3D, fora: Vector3, 
 	_pecas.append([mi, repouso, desloca, base_rot + giro, rng.randf() * TAU, deriva, 0.05 * k])
 
 
+## Uma ilha de chão que se solta: as de perto da borda mal saem do lugar (só
+## as rachaduras aparecem), as de longe sobem ou afundam, se afastam e tombam.
+func _soltar(n: Node3D, rng: RandomNumberGenerator) -> void:
+	var p := n.global_position
+	var fora := Vector3(p.x - centro_soltos.x, 0, p.z - centro_soltos.z)
+	var d := fora.length()
+	fora = fora / maxf(d, 0.001)
+	var k := clampf((d - raio_firme) / 5.0, 0.2, 1.0) * intensidade
+	var repouso := n.position
+	var desloca := fora * k * rng.randf_range(1.0, 4.0) + Vector3(0, rng.randf_range(-1.8, 2.6) * k, 0)
+	var giro := Vector3(rng.randf_range(-1, 1), rng.randf_range(-0.4, 0.4), rng.randf_range(-1, 1)) * deg_to_rad(28.0) * k
+	var deriva := Vector3(rng.randf_range(-1, 1), rng.randf_range(-1, 1), rng.randf_range(-1, 1)) * 0.015 * k
+	_pecas.append([n, repouso, desloca, n.rotation + giro, rng.randf() * TAU, deriva, 0.12 * k])
+
+
 ## Um pedaço de prédio boiando no escuro, longe da sala.
 func _destroco(rng: RandomNumberGenerator, centro: Vector3) -> void:
-	var mats := ["parede", "tijolo", "madeira_escura", "lambri", "pedra_lareira"]
+	var mats := materiais_destroco
 	var mat := _sem_uv_do_mundo(load("res://art/materials/%s.tres" % mats[rng.randi() % mats.size()]))
 	var dir := Vector3(rng.randf_range(-1, 1), rng.randf_range(-0.3, 1.0), rng.randf_range(-1, 1)).normalized()
 	if dir.length() < 0.1:
 		dir = Vector3.UP
-	var pos := centro + dir * rng.randf_range(5.0, 9.0)
+	var pos := centro + dir * rng.randf_range(distancia_destroco.x, distancia_destroco.y)
 	var tam := Vector3(rng.randf_range(0.4, 2.2), rng.randf_range(0.3, 1.6), rng.randf_range(0.15, 0.6))
 	var caixa := BoxMesh.new()
 	caixa.size = tam

@@ -190,13 +190,16 @@ func boston() -> Node3D:
 ## `mat` é esse material (cor de vértice × textura); `clareira`, o meio do
 ## espaço livre (onde ele está); `boca`, a boca da caverna, ao norte. A meta
 ## `troncos` lista onde há tronco (para a colisão).
-func bosque(mat: Material, clareira: Vector3, boca: Vector3) -> Node3D:
+func bosque(mat: Material, clareira: Vector3, boca: Vector3, raio_chao := 0.0) -> Node3D:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1915
 	var m := Cidade.Malha.new()
 	var raiz := Node3D.new()
 	raiz.name = "Bosque"
 	var troncos := PackedVector3Array()
+	## Os ladrilhos de chão de 1 m que ficaram (o canto de menor x e z): a
+	## colisão do gerador segue eles.
+	var chao := PackedVector2Array()
 	# O chão: musgo e lama, em ladrilhos de 1 m (o afim não torce), com poças.
 	for x in range(-13, 13):
 		for z in range(-13, 11):
@@ -204,6 +207,11 @@ func bosque(mat: Material, clareira: Vector3, boca: Vector3) -> Node3D:
 			if rng.randf() < 0.06:
 				cor = Color(0.08, 0.09, 0.08)
 			var c := Vector3(roundf(clareira.x) + x, 0, roundf(clareira.z) + z)
+			# Partido (playtest 7, o Vazio): além do raio, o chão se soltou em ilhas
+			# (menos a faixa firme até a encosta, onde está a caverna).
+			if raio_chao > 0.0 and not _chao_firme(c + Vector3(0.5, 0, 0.5), clareira, boca, raio_chao):
+				continue
+			chao.append(Vector2(c.x, c.z))
 			m.quad_h(c, c + Vector3(1, 0, 1), cor)
 	# A encosta da montanha, ao norte da boca, subindo; e a boca da caverna
 	# nela, entupida pelo matacão de uma regularidade arredondada.
@@ -232,6 +240,8 @@ func bosque(mat: Material, clareira: Vector3, boca: Vector3) -> Node3D:
 		var rel := Vector2(p.x - clareira.x, p.z - clareira.z)
 		var no_caminho := rel.dot(ate_boca.normalized()) > 0.0 and absf(rel.cross(ate_boca.normalized())) < 2.4 and rel.length() < ate_boca.length() + 1.0
 		if rel.length() < 3.4 or no_caminho or p.z < boca.z + 0.5:
+			continue
+		if raio_chao > 0.0 and not _chao_firme(p, clareira, boca, raio_chao - 0.6):
 			continue
 		troncos.append(p)
 		var perto := rel.length() < 6.5 and respiram < 7
@@ -263,7 +273,79 @@ func bosque(mat: Material, clareira: Vector3, boca: Vector3) -> Node3D:
 	mi.material_override = mat
 	raiz.add_child(mi)
 	raiz.set_meta(&"troncos", troncos)
+	raiz.set_meta(&"chao", chao)
+	if raio_chao > 0.0:
+		raiz.add_child(_ilhas(mat, clareira, boca, raio_chao, rng))
 	return raiz
+
+
+## Até onde o chão do bosque partido fica firme: o raio em volta da clareira e a
+## faixa ao pé da encosta (a caverna, os vultos).
+const FAIXA_FIRME := 1.5
+
+
+static func _chao_firme(p: Vector3, clareira: Vector3, boca: Vector3, raio: float) -> bool:
+	return Vector2(p.x - clareira.x, p.z - clareira.z).length() <= raio or p.z < boca.z + FAIXA_FIRME
+
+
+## O chão além de `raio` (do centro da clareira), em ilhas de terra que o Vazio
+## solta e faz boiar (playtest 7: todos os sonhos se partindo, como as dimensões
+## do desconhecido em Dishonored). Cada ilha é um nó à parte, com a origem no
+## meio dela: o musgo em cima, a terra e a pedra por baixo, em ponta; nelas, as
+## árvores, juncos e pedras que estavam ali.
+func _ilhas(mat: Material, clareira: Vector3, boca: Vector3, raio: float, rng: RandomNumberGenerator) -> Node3D:
+	var ilhas := Node3D.new()
+	ilhas.name = "Ilhas"
+	var passo := 1.6
+	var n := 0
+	for i in range(-12, 13):
+		for j in range(-10, 13):
+			var c := clareira + Vector3(i * passo, 0, j * passo)
+			var d := Vector2(c.x - clareira.x, c.z - clareira.z).length()
+			if d < raio + passo * 0.4 or d > 19.0 or c.z < boca.z + FAIXA_FIRME + passo * 0.4:
+				continue
+			var m := Cidade.Malha.new()
+			var h := passo * 0.5
+			var topo: Array[Vector3] = []
+			for q: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(1, 1), Vector2(-1, 1)]:
+				topo.append(Vector3(q.x * h * 0.97 + rng.randf_range(-0.12, 0.12), 0, q.y * h * 0.97 + rng.randf_range(-0.12, 0.12)))
+			var musgo := Color(0.17, 0.2, 0.12) * rng.randf_range(0.8, 1.15)
+			m.quad(topo[0], topo[1], topo[2], topo[3], Vector3.UP, musgo)
+			# A terra (uma faixa) e a pedra em ponta por baixo.
+			var fundo := rng.randf_range(0.6, 1.6)
+			var meio: Array[Vector3] = []
+			for v in topo:
+				meio.append(v * rng.randf_range(0.8, 0.95) + Vector3(0, -rng.randf_range(0.2, 0.35), 0))
+			var ponta := Vector3(rng.randf_range(-0.3, 0.3), -fundo, rng.randf_range(-0.3, 0.3))
+			for k in 4:
+				var a := topo[k]
+				var b := topo[(k + 1) % 4]
+				var a2 := meio[k]
+				var b2 := meio[(k + 1) % 4]
+				var fora := ((a + b) * 0.5).normalized()
+				m.quad(a, b, b2, a2, (fora + Vector3.DOWN * 0.2).normalized(), Color(0.15, 0.1, 0.07) * rng.randf_range(0.8, 1.1))
+				m.tri(a2, b2, ponta, (fora + Vector3.DOWN).normalized(), Color(0.13, 0.13, 0.12) * rng.randf_range(0.7, 1.1))
+			# O que estava em cima.
+			var sorte := rng.randf()
+			var onde := Vector3(rng.randf_range(-0.3, 0.3), 0, rng.randf_range(-0.3, 0.3))
+			if sorte < 0.45:
+				if rng.randf() < 0.3:
+					_betula(m, onde, rng.randf_range(4.0, 7.0), rng)
+				else:
+					_abeto(m, onde, rng.randf_range(5.0, 9.0), Color(0.08, 0.13, 0.09) * rng.randf_range(0.8, 1.2), rng)
+			elif sorte < 0.65:
+				for k in 3:
+					m.piramide(rng.randf_range(0.15, 0.35), rng.randf_range(0.4, 1.0), onde + Vector3(rng.randf_range(-0.4, 0.4), 0, rng.randf_range(-0.4, 0.4)), 4, Color(0.2, 0.24, 0.12))
+			elif sorte < 0.75:
+				_bola(m, onde + Vector3(0, 0.2, 0), Vector3(0.45, 0.35, 0.4), Color(0.3, 0.3, 0.28), rng)
+			var mi := MeshInstance3D.new()
+			mi.name = "Ilha%d" % n
+			mi.mesh = m.fechar()
+			mi.material_override = mat
+			mi.position = c
+			ilhas.add_child(mi)
+			n += 1
+	return ilhas
 
 
 # --- As peças ----------------------------------------------------------------------

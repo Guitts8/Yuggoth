@@ -212,9 +212,11 @@ func _env_1930() -> Environment:
 func _env_bosque() -> Environment:
 	var e := _env_sonho()
 	e.ambient_light_color = Color(0.05, 0.065, 0.06)
-	e.fog_light_color = Color(0.035, 0.05, 0.045)
-	e.fog_depth_begin = 3.0
-	e.fog_depth_end = 13.0
+	# Funda o bastante para as ilhas do chão partido boiarem à vista, e um pouco
+	# mais clara que a noite: as ilhas, escuras, se recortam nela (playtest 7).
+	e.fog_light_color = Color(0.07, 0.1, 0.095)
+	e.fog_depth_begin = 4.0
+	e.fog_depth_end = 18.0
 	return e
 
 
@@ -2455,29 +2457,70 @@ func _sonho_garras(g: Node3D) -> void:
 ## parou na sala, com as legendas; vultos parados na névoa, junto da caverna, e
 ## uma das criaturas passando entre as árvores, para quem olhar. Acorda ao
 ## levantar a agulha (ou quando o disco acaba).
+## Até onde o chão do bosque do disco fica inteiro (o resto se parte em ilhas).
+const RAIO_BOSQUE := 6.0
+
+
 func _sonho_disco(g: Node3D) -> void:
 	var clareira := POLTRONA_POS + Vector3(-0.1, 0, -1.9)
 	var boca := POLTRONA_POS + Vector3(0.9, 0, -7.2)
 	var mat := load(MAT_DIR + "bosque.tres") as Material
-	var bosque: Node3D = _vistas.bosque(mat, clareira, boca)
+	# O chão além de 9 m da clareira se parte em ilhas que boiam (playtest 7: o
+	# Vazio também no sonho do disco).
+	var bosque: Node3D = _vistas.bosque(mat, clareira, boca, RAIO_BOSQUE)
 	_add(g, bosque)
 	for filho in bosque.find_children("*", "", true, false):
 		filho.owner = cena
-	# O chão, os troncos, a encosta; e um anel em volta (a névoa esconde o fim).
-	var formas := [[Vector3(30, 0.2, 30), Vector3(clareira.x, -0.1, clareira.z)]]
+	var v := Vazio.new()
+	v.name = "Vazio"
+	v.position = clareira
+	v.soltos = cena.get_path_to(bosque.get_node(^"Ilhas"))
+	v.centro_soltos = clareira
+	v.raio_firme = RAIO_BOSQUE
+	v.intensidade = 0.9
+	v.abertura = 12.0
+	v.livros = 5
+	v.papeis = 9
+	v.destrocos = 16
+	v.materiais_destroco = PackedStringArray(["pedra_negra", "madeira_escura", "pedra_lareira", "tijolo"])
+	v.distancia_destroco = Vector2(12.0, 20.0)
+	v.semente = 3
+	_add(g, v)
+	# Lá embaixo, no vazio, uma claridade fria que bate por baixo das ilhas.
+	var fundo := _omni(g, "LuzDoVazio", clareira + Vector3(0, -7.0, 0), Color(0.4, 0.6, 0.55), 1.6, 26.0)
+	fundo.omni_attenuation = 0.8
+	# O chão (o que ficou: uma faixa por fileira de ladrilhos), os troncos, a
+	# encosta; e, na borda do chão, paredes invisíveis (o escuro em volta não se
+	# pisa).
+	var chao: PackedVector2Array = bosque.get_meta(&"chao")
+	var tem := {}
+	for c in chao:
+		tem[Vector2i(roundi(c.x), roundi(c.y))] = true
+	var formas := []
+	var fileiras := {}
+	for c: Vector2i in tem:
+		fileiras.get_or_add(c.y, []).append(c.x)
+	for z: int in fileiras:
+		var xs: Array = fileiras[z]
+		xs.sort()
+		var ini: int = xs[0]
+		for i in xs.size():
+			var fim: bool = i == xs.size() - 1 or xs[i + 1] != xs[i] + 1
+			if fim:
+				var w: int = xs[i] + 1 - ini
+				formas.append([Vector3(w, 0.2, 1.0), Vector3(ini + w * 0.5, -0.1, z + 0.5)])
+				if i < xs.size() - 1:
+					ini = xs[i + 1]
+	for c: Vector2i in tem:
+		for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			if tem.has(c + d):
+				continue
+			var meio := Vector3(c.x + 0.5 + d.x * 0.5, 2.0, c.y + 0.5 + d.y * 0.5)
+			formas.append([Vector3(0.2 if d.x != 0 else 1.2, 4.0, 1.2 if d.x != 0 else 0.2), meio])
 	for p: Vector3 in bosque.get_meta(&"troncos"):
 		formas.append([Vector3(0.3, 3.0, 0.3), p + Vector3(0, 1.5, 0)])
 	formas.append([Vector3(12, 6, 1.0), boca + Vector3(0, 3, -0.6)])
-	for k in 12:
-		var a := TAU * k / 12.0
-		var p := clareira + Vector3(cos(a), 0, sin(a)) * 8.5
-		var parede := [Vector3(4.6, 4, 0.3), p + Vector3(0, 2, 0)]
-		formas.append(parede)
-	var colisao := _colisao(g, "Colisao", formas)
-	# Os pedaços do anel giram para fora do centro.
-	for k in 12:
-		var forma := colisao.get_child(colisao.get_child_count() - 12 + k) as Node3D
-		forma.rotation.y = -TAU * k / 12.0 + PI / 2
+	_colisao(g, "Colisao", formas)
 
 	# O toco com o fonógrafo de Akeley (o ditafone que gravou), virado para ele.
 	var toco_pos := clareira + Vector3(0.5, 0, -0.6)
