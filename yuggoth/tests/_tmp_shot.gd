@@ -1,6 +1,7 @@
 extends Node
-## Descartável (playtest 5, Fase 3f): o fonógrafo novo na mesinha dele, e o mi-go
-## do Dia 5 passando rente à janela. Em SHOT_DIR, com prefixo SHOT_TAG.
+## Descartável (playtest 5, Fase 3f): pôr na mesa à mão (o envelope viaja da mão
+## até o lugar) e o pacote do Dia 3 esvaziando peça por peça. Em SHOT_DIR, com
+## prefixo SHOT_TAG.
 
 var dir := OS.get_environment("SHOT_DIR")
 var tag := OS.get_environment("SHOT_TAG")
@@ -17,41 +18,32 @@ func _ready() -> void:
 	GameState.set_flag(&"prologo_concluido")
 	GameState.set_value(&"dia", 3)
 	GameState.set_flag(&"comecou_dia_3")
-	GameState.set_flag(&"fono_cilindro")
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
 	await _s(1.0)
 	Narrator.cancel()
 	var e: Escritorio = root.find_child("Escritorio", true, false)
-	e.player.input_enabled = false
-	var f := e.fonografo.global_position
-	e.player.global_position = Vector3(0.4, 0, 0.6)
-	e.player.olhar_para(f + Vector3(0, 0.15, 0), 0.01)
-	await _s(0.6)
-	_shot("%s_1_fonografo" % tag)
-	e.player.global_position = Vector3(-1.5, 0, -0.45)
-	e.player.olhar_para(f + Vector3(0, 0.1, 0), 0.01)
-	await _s(0.6)
-	_shot("%s_2_fonografo_perto" % tag)
-	e.player.global_position = Vector3(0.9, 0, 1.6)
-	e.player.olhar_para(Vector3(-2.0, 0.9, -0.9), 0.01)
-	await _s(0.6)
-	_shot("%s_3_sala" % tag)
-
-	# O mi-go do Dia 5.
-	GameState.set_value(&"dia", 5)
-	GameState.set_flag(&"comecou_dia_5")
-	GameState.set_flag(&"leu_bilhete_akeley_agosto")
-	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
-	await _s(1.0)
-	Narrator.cancel()
-	e = root.find_child("Escritorio", true, false)
-	e.player.input_enabled = false
-	e.player.global_position = Vector3(0, 0, -1.6)
-	e.player.olhar_para(Vector3(0, 1.62, -4.0), 0.01)
-	await _s(1.3)
-	_shot("%s_4_migo" % tag)
+	var pac: Correspondencia = e.find_child("Dia3", true, false).get_node("Pacote/Correio")
+	e.player.global_position = Vector3(0.3, 0, -1.35)
+	e.player.olhar_para(Vector3(0.3, 0.78, -2.15), 0.01)
 	await _s(0.5)
-	_shot("%s_5_migo" % tag)
+	pac.interact(e.player)
+	await _s(0.6)
+	(e.get_node(^"%PorNaMesa") as MesaCorreio).interact(e.player)
+	await _s(0.25)
+	_shot("%s_1_pousando" % tag)
+	await _s(0.8)
+	_shot("%s_2_na_mesa" % tag)
+	pac.interact(e.player)
+	await _s(0.5)
+	pac.interact(e.player)
+	await _s(0.25)
+	_shot("%s_3_tirando" % tag)
+	await _s(0.6)
+	pac.interact(e.player)
+	await _s(0.3)
+	pac.interact(e.player)
+	await _s(0.8)
+	_shot("%s_4_tirados" % tag)
 	SaveSystem.delete_save()
 	get_tree().quit()
 

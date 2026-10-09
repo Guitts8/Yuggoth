@@ -1993,11 +1993,13 @@ func _dia_3(parent: Node) -> Node3D:
 	var transcricao := _folha(g, "Transcricao", Vector3(0.25, MESA + 0.003, -2.05), -12, "transcricao_disco", "Ler a transcrição", false)
 	transcricao.get_parent().set_meta(&"treme", true)
 	bilhete.get_parent().set_meta(&"treme", true)
-	_dentro(bilhete.get_parent(), &"dia_3")
-	_dentro(transcricao.get_parent(), &"dia_3")
+	# Saem do pacote uma a uma (playtest 5: "abrir o pacote e tirar as coisas").
+	_retirada(bilhete.get_parent(), &"dia_3", 1, 99)
+	_retirada(transcricao.get_parent(), &"dia_3", 2, 99)
 
 	# O pacote do expresso não passa na fresta: fica no chão junto à porta. Na
-	# mesa, cortado o barbante, saem o bilhete, a transcrição e o estojo do cilindro.
+	# mesa, cortado o barbante, tiram-se o bilhete, a transcrição e o estojo do
+	# cilindro, um de cada vez.
 	var pacote := _group(g, "Pacote", Vector3(-0.45, 0, 2.45), 10)
 	var tam := Vector3(0.24, 0.1, 0.16)
 	_box(pacote, "Caixa", tam, Vector3(0, tam.y / 2, 0), "papel_pardo")
@@ -2031,14 +2033,17 @@ func _dia_3(parent: Node) -> Node3D:
 	etiqueta.rotation_degrees.x = -90
 	etiqueta.alpha_cut = Label3D.ALPHA_CUT_DISCARD
 	_add(pacote, etiqueta)
-	# Sai do pacote aberto; vai para a máquina com o cilindro.
+	# A última peça a sair do pacote; vai para a máquina com o cilindro.
 	var estojo := _grupo_se(g, "Estojo", _composta(CompositeCondition.Mode.TODAS,
-		[_aberto(&"dia_3"), _flag(&"fono_cilindro", true)]))
+		[_cond_valor(&"correio_dia_3_tiradas", ValueCondition.Op.MAIOR_OU_IGUAL, 3), _flag(&"fono_cilindro", true)]))
 	estojo.position = Vector3(-0.15, MESA + 0.03, -2.34)
 	var tubo := _cyl(estojo, "Tubo", 0.03, 0.03, 0.11, Vector3.ZERO, "envelope", 10)
 	tubo.rotation_degrees.z = 90
 	_examinavel(tubo, Vector3(0.13, 0.07, 0.07), "Examinar o estojo", "O cilindro de cera",
 		"Um cilindro de cera escura, gravado com ditafone, no estojo de papelão. Na tampa, a letra apertada de Akeley: “1º de maio de 1915.”")
+	pac.retirar = [bilhete.get_parent() as Node3D, transcricao.get_parent() as Node3D, estojo]
+	pac.prompts_retirar = PackedStringArray(["Tirar o bilhete", "Tirar a transcrição", "Tirar o estojo do cilindro"])
+	pac.saida_altura = tam.y + 0.02
 
 	_escrever(g, "resposta_dia_3", &"tocou_disco")
 	return g
@@ -2488,7 +2493,8 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 	f.zumbido = load(SFX_DIR + "zumbido.wav")
 	f.narracao_depois = load("res://narrative/narration/depois_do_disco.tres")
 	f.luz = dia3.get_node("Abajur/Luz")
-	f.cilindro_chegou = _aberto(&"dia_3")
+	# O cilindro está à mão quando o estojo sai do pacote (a última peça).
+	f.cilindro_chegou = _cond_valor(&"correio_dia_3_tiradas", ValueCondition.Op.MAIOR_OU_IGUAL, 3)
 	var tremem: Array[Node3D] = []
 	for n in dia3.get_children():
 		if n.has_meta(&"treme"):

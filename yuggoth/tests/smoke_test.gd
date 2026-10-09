@@ -259,13 +259,18 @@ func _ready() -> void:
 	_check(correio1.get_visual().global_position.distance_to(Vector3(-1.0, 0.0, 2.3)) < 1.0 \
 		and not carta_mesa.visible, "Dia 1: a carta chega fechada, no chão junto à porta")
 	_check(correio1.prompt == "Pegar o correio" and not mesa.can_interact(player) and not mesa.visible, "sem nada na mão, a mesa não pede nada")
+	var no_chao := correio1.get_visual().global_position
 	correio1.interact(player)
-	await _frames(2)
+	await _frames(1)
+	_check(correio1.get_visual().global_position.distance_to(no_chao) < 0.6, "pegar o correio: o envelope sobe do chão (sem teleporte)")
+	await _until(func() -> bool: return correio1.get_visual().global_position.distance_to(player.camera.global_position) < 0.6, 3.0)
 	_check(Correspondencia.na_mao == [correio1] and correio1.get_visual().global_position.distance_to(player.camera.global_position) < 0.6,
 		"pegar o correio: o envelope na mão")
 	_check(mesa.can_interact(player) and mesa.visible and not correio1.visible, "na mão: mirar a mesa para pôr o envelope")
 	mesa.interact(player)
-	await _frames(2)
+	await _frames(1)
+	_check(not correio1.get_visual().transform.is_equal_approx(correio1.mesa), "pôr na mesa: o envelope viaja da mão até lá")
+	await _until(func() -> bool: return correio1.get_visual().transform.is_equal_approx(correio1.mesa), 3.0)
 	_check(Correspondencia.na_mao.is_empty() and correio1.get_visual().transform.is_equal_approx(correio1.mesa) \
 		and correio1.prompt == "Abrir com a espátula" and not mesa.visible, "pôr na mesa: o envelope no lugar dele")
 	_check(not carta_mesa.visible, "fechado, a carta continua no envelope")
@@ -439,8 +444,17 @@ func _ready() -> void:
 	_check(pacote.prompt == "Pegar o pacote" and not dia3.get_node("Estojo").visible and not dia3.get_node("Bilhete").visible,
 		"Dia 3: o pacote do expresso fechado, no chão junto à porta")
 	await _abrir_correio(esc, pacote)
-	_check(not dia3.get_node("Pacote/Barbante").visible and dia3.get_node("Estojo").visible and dia3.get_node("Transcricao").visible,
-		"cortado o barbante: o bilhete, a transcrição e o estojo")
+	_check(not dia3.get_node("Pacote/Barbante").visible and not dia3.get_node("Estojo").visible and pacote.prompt == "Tirar o bilhete",
+		"cortado o barbante: as coisas ainda dentro do pacote")
+	var tirar := PackedStringArray()
+	while pacote.tiradas() < pacote.retirar.size():
+		tirar.append(pacote.prompt)
+		pacote.interact(player)
+		await _frames(1)
+	await _seconds(0.7)
+	_check(tirar == PackedStringArray(["Tirar o bilhete", "Tirar a transcrição", "Tirar o estojo do cilindro"])
+		and dia3.get_node("Estojo").visible and dia3.get_node("Transcricao").visible and dia3.get_node("Bilhete").visible
+		and pacote.prompt == "Examinar o pacote", "tirados do pacote, um a um: o bilhete, a transcrição e o estojo")
 	await _check_alcance(esc, "Dia 3, pacote aberto")
 	_check(fono.prompt == "Pôr o cilindro de cera", "com o pacote aberto, o cilindro vai para a máquina")
 	fono.interact(player)

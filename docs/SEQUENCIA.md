@@ -46,10 +46,12 @@ noite está no chão (a fala do correio vem aí). Entrando, a porta fecha atrás
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
 chão, junto à porta, iluminados pela luz do corredor que entra por baixo dela.
-**"Pegar o correio"** → o envelope fica na mão (uma coisa por vez) → mirar a
-escrivaninha, **"Pôr na mesa"** → **"Abrir com a espátula"** (som de papel rasgando)
+**"Pegar o correio"** → o envelope sobe do chão para a mão (pega-se tudo o que
+caiu, numa pilha) → mirar a escrivaninha, **"Pôr na mesa"** → cada coisa viaja da
+mão até o seu lugar na mesa → **"Abrir com a espátula"** (som de papel rasgando)
 → o conteúdo sai para a mesa; depois o envelope é examinável (carimbo, selos,
-letra). Pacotes que não passam na fresta ficam no chão junto à porta.
+letra). Pacotes que não passam na fresta ficam no chão junto à porta; aberto, o
+pacote se esvazia uma peça por vez ("Tirar o bilhete"...).
 
 **Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5. Nem sempre no diário: na
 noite do disco (3) a entrada termina inteira, *"Antes de ir, quis ouvir o disco mais
@@ -224,7 +226,7 @@ debate público sobre o horror de Vermont terminou para sempre."*; tiradas as fo
 **Na sala:**
 - **Pacote do American Railway Express**, no chão junto à porta (etiqueta de
   Brattleboro a Arkham), amarrado com barbante. Na mesa, **"Cortar o barbante"**:
-  saem o bilhete, a transcrição e o **estojo do cilindro de cera** (examinável:
+  tiram-se, um de cada vez, o bilhete, a transcrição e o **estojo do cilindro de cera** (examinável:
   *"1º de maio de 1915"*).
 - **Bilhete de Akeley:** o medo das estradas, a Califórnia, e **Walter Brown** —
   suas pegadas viradas para a marca de garra.

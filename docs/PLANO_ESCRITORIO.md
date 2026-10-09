@@ -457,10 +457,13 @@ arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera
     respingos), 20 marcas em duas fileiras; e um `Rastro` (`components/rastro.gd`):
     13 marcas que se formam uma a uma em volta da cadeira, cada vez mais perto, com
     um estalo úmido (`lama.wav`) no lugar de cada uma.
-15. 🔧 **Pôr as coisas na mesa à mão, em vez de teletransportar** (abrir o pacote e
+15. ✅ **Pôr as coisas na mesa à mão, em vez de teletransportar** (abrir o pacote e
     tirar as coisas). Decidido: o objeto viaja da mão até o lugar dele na mesa (sem
     lugar livre), e o pacote do Dia 3 se esvazia peça por peça como o envelope das
-    fotos.
+    fotos. Feito: pego, sobe do chão à mão; pousado, viaja num arco até o lugar
+    (`Correspondencia._pousar`); o pacote: "Tirar o bilhete", "Tirar a transcrição",
+    "Tirar o estojo do cilindro" (`prompts_retirar`); o cilindro só se põe depois
+    do estojo fora.
 16. ✅ **O fonógrafo**: modelo muito melhor (um fonógrafo de cilindro comercial: caixa
     de carvalho, mecanismo à vista, a corneta grande no braço) e um lugar digno (não no
     armário do canto). Feito: na sua mesinha (prateleira com estojos de cilindros),
@@ -518,9 +521,9 @@ Fase 4 antes dela.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
 2b. ✅ Playtest 4 (até o começo do Dia 5) → **Fase 3e** (acima).
 2c. ✅ O usuário jogou o **playtest 5** (até a noite 3); a lista virou a **Fase 3f**.
-2d. **← AQUI.** Fase 3f: feitos os itens 1–11, 13, 14, 16–18; o usuário respondeu os
-   ❓ (todas as recomendações); a fazer: 12 (as duas mãos), 15 (pôr na mesa à mão) e
-   19 (a loucura do sonho do disco).
+2d. **← AQUI.** Fase 3f: feitos os itens 1–11 e 13–18; o usuário respondeu os ❓
+   (todas as recomendações); a fazer: 12 (as duas mãos) e 19 (a loucura do sonho do
+   disco).
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

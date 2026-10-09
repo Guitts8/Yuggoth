@@ -13,8 +13,9 @@ extends Examinable
 ##                               Examinable como os outros.
 ##
 ## Pegar o correio junta tudo o que está no chão (uma pilha na mão); pôr na mesa
-## pousa tudo, cada um no seu lugar. Com a carta selada na mão (CartaSaida), não
-## se pega nada. Quando o nó começa a processar (o dia chega, ou a carta cruza o
+## pousa tudo, cada um no seu lugar. Nada se teletransporta (playtest 5): do chão
+## o envelope sobe até a mão, e da mão viaja, num arco, até o lugar dele na mesa.
+## Com a carta selada na mão (CartaSaida), não se pega nada. Quando o nó começa a processar (o dia chega, ou a carta cruza o
 ## correio no escuro de um salto no tempo), toca `som_chegada` no lugar onde ele
 ## está: o envelope passando pela fresta, o pacote pousado no chão.
 
@@ -34,6 +35,11 @@ static var na_mao: Array[Correspondencia] = []
 ## envelope para o seu lugar.
 @export var retirar: Array[Node3D] = []
 @export var prompt_retirar := "Tirar uma fotografia"
+## Um aviso para cada peça, na ordem (o pacote do Dia 3: o bilhete, a
+## transcrição, o estojo); faltando, `prompt_retirar`.
+@export var prompts_retirar: PackedStringArray = []
+## De que altura acima do visual as peças saem (a boca do pacote).
+@export var saida_altura := 0.02
 ## Some ao abrir (o barbante do pacote).
 @export var fechado: Node3D
 ## Um maço amarrado: ao desamarrar, estas cartas ficam soltas na mesa (cada uma
@@ -49,11 +55,23 @@ static var na_mao: Array[Correspondencia] = []
 @export var som_mao: AudioStream
 @export var som_abrir: AudioStream
 
+## Segundos do chão até a mão, e da mão até a mesa.
+const SUBIR := 0.35
+const POUSAR := 0.55
+
 var _chao: Transform3D
 var _forma: CollisionShape3D
 var _som: AudioStreamPlayer3D
 var _camera: Camera3D
 var _chegou := false
+## O estado que o visual mostra (para animar a passagem de um ao outro).
+var _mostrado := -1
+## Subindo do chão para a mão: de onde, e quanto já foi (0 a 1).
+var _mao_de: Transform3D
+var _mao_k := 1.0
+var _pousando: Tween
+## Na pilha, os de baixo pousam um pouco depois do de cima.
+var _atraso_pouso := 0.0
 
 
 func _ready() -> void:
@@ -129,14 +147,19 @@ func _on_interact(by: Node) -> void:
 
 func _pegar(camera: Camera3D) -> void:
 	_camera = camera
+	_mao_de = get_visual().global_transform
+	_mao_k = 0.0
 	na_mao.append(self)
 	GameState.set_value(chave(), NA_MAO)
 
 
-## Chamado pela MesaCorreio: da mão para a escrivaninha, cada um no seu lugar.
+## Chamado pela MesaCorreio: da mão para a escrivaninha, cada um no seu lugar
+## (o de cima primeiro, os outros logo atrás).
 static func pousar_tudo() -> void:
 	var pilha := na_mao.duplicate()
 	na_mao.clear()
+	for i in pilha.size():
+		pilha[pilha.size() - 1 - i]._atraso_pouso = i * 0.12
 	for c in pilha:
 		GameState.set_value(c.chave(), NA_MESA)
 	if not pilha.is_empty():
@@ -147,16 +170,36 @@ func _retirar() -> void:
 	var n := tiradas()
 	GameState.add(StringName("%s_tiradas" % chave()), 1)
 	_tocar(som_mao)
-	# A condição da peça já a mostrou (value_changed é síncrono): sai do envelope.
+	# A condição da peça já a mostrou (value_changed é síncrono): sai do envelope
+	# (ou da boca do pacote), sobe um pouco e deita no seu lugar.
 	var peca := retirar[n]
 	if peca and peca.is_inside_tree():
 		var lugar := peca.position
-		peca.global_position = get_visual().global_position + Vector3(0, 0.02, 0)
-		create_tween().tween_property(peca, ^"position", lugar, 0.4) \
-			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		var de := get_visual().global_position + Vector3(0, saida_altura, 0)
+		peca.global_position = de
+		var de_local := peca.position
+		create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT).tween_method(func(k: float) -> void:
+			peca.position = de_local.lerp(lugar, k) + Vector3.UP * sin(k * PI) * 0.05, 0.0, 1.0, 0.55)
 
 
-func _process(_delta: float) -> void:
+## Da mão até o lugar na mesa (`mesa`), num arco.
+func _pousar(visual: Node3D) -> void:
+	if _pousando:
+		_pousando.kill()
+	var de := visual.global_transform
+	var pai := visual.get_parent_node_3d()
+	var ate := pai.global_transform * mesa if pai else mesa
+	_pousando = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_pousando.tween_interval(_atraso_pouso)
+	_pousando.tween_method(func(k: float) -> void:
+		var t := de.interpolate_with(ate, k)
+		t.origin += Vector3.UP * sin(k * PI) * 0.08
+		visual.global_transform = t, 0.0, 1.0, POUSAR)
+	_pousando.tween_callback(func() -> void: visual.transform = mesa)
+	_atraso_pouso = 0.0
+
+
+func _process(delta: float) -> void:
 	if not _chegou:
 		_chegou = true
 		if estado() == NO_CHAO and som_chegada:
@@ -167,7 +210,12 @@ func _process(_delta: float) -> void:
 		var i := na_mao.size() - 1 - na_mao.find(self)
 		var rot := Basis.from_euler((mao_rotacao + Vector3(0, i * 4.0, -i * 3.0)) * PI / 180.0)
 		var pos := mao_posicao + Vector3(-0.018, 0.012, -0.008) * i
-		get_visual().global_transform = _camera.global_transform * Transform3D(rot, pos)
+		var mao := _camera.global_transform * Transform3D(rot, pos)
+		# Recém-pego, sobe do chão até a mão.
+		if _mao_k < 1.0:
+			_mao_k = minf(1.0, _mao_k + delta / SUBIR)
+			mao = _mao_de.interpolate_with(mao, smoothstep(0.0, 1.0, _mao_k))
+		get_visual().global_transform = mao
 
 
 func _on_value_changed(key: StringName, _value: Variant) -> void:
@@ -180,8 +228,11 @@ func _atualizar() -> void:
 	var visual := get_visual()
 	if e == NO_CHAO:
 		visual.transform = _chao
-	elif e != NA_MAO:
+	elif e == NA_MESA and _mostrado == NA_MAO and can_process() and visual.is_inside_tree():
+		_pousar(visual)
+	elif e != NA_MAO and not (_pousando and _pousando.is_running()):
 		visual.transform = mesa
+	_mostrado = e
 	if "aberto" in visual:
 		visual.set(&"aberto", e == ABERTO)
 	if fechado:
@@ -198,7 +249,11 @@ func _atualizar() -> void:
 		NA_MESA:
 			prompt = prompt_abrir
 		ABERTO:
-			prompt = prompt_retirar if tiradas() < retirar.size() else prompt_examinar
+			var n := tiradas()
+			if n >= retirar.size():
+				prompt = prompt_examinar
+			else:
+				prompt = prompts_retirar[n] if n < prompts_retirar.size() else prompt_retirar
 
 
 func _tocar(stream: AudioStream) -> void:
