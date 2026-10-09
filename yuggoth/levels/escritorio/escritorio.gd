@@ -633,17 +633,10 @@ func _saida_do_assento(lugar: LugarSono) -> Vector3:
 	var eixos := _eixos_do_assento(lugar)
 	# O marcador está no chão da sala (no pé do móvel).
 	var centro := lugar.assento.global_position
-	var forma := player.get_node(^"CollisionShape3D") as CollisionShape3D
-	var consulta := PhysicsShapeQueryParameters3D.new()
-	consulta.shape = forma.shape
-	consulta.collision_mask = 1
-	consulta.exclude = [player.get_rid()]
-	var espaco := get_world_3d().direct_space_state
 	for k: Vector2 in [Vector2(0.75, 0), Vector2(0.9, 0), Vector2(0.75, -0.45), Vector2(0.75, 0.45),
-			Vector2(1.1, 0), Vector2(1.0, -0.7), Vector2(1.0, 0.7), Vector2(1.3, 0)]:
+			Vector2(1.1, 0), Vector2(1.0, -0.7), Vector2(1.0, 0.7), Vector2(1.3, 0), Vector2(0.4, -0.8), Vector2(0.4, 0.8)]:
 		var p := centro + eixos[0] * k.x + eixos[1] * k.y
-		consulta.transform = Transform3D(Basis.IDENTITY, p) * forma.transform
-		if espaco.intersect_shape(consulta, 1).is_empty():
+		if player.livre(p):
 			return p
 	return centro + eixos[0] * 0.9
 

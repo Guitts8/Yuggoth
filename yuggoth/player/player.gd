@@ -65,6 +65,8 @@ var _fov_base := 75.0
 ## O desvio do olhar durante uma cena: (yaw, pitch), em radianos.
 var _olhar_extra := Vector2.ZERO
 var _pos_antes := Vector3.ZERO
+## O giro em curso de olhar_para (um novo o substitui).
+var _giro: Tween
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
@@ -110,6 +112,42 @@ func stand() -> void:
 		stood_up.emit()
 
 
+## Levantou-se andando (o jogador) de um assento cuja colisão o envolve (a
+## poltrona no sonho da noite 5; playtest 6: "acordo travado no mesmo lugar"): dá
+## o passo até o lugar livre mais perto, à frente de preferência.
+func _desencaixar() -> void:
+	if livre(global_position):
+		return
+	var frente := -global_basis.z
+	frente.y = 0.0
+	frente = frente.normalized()
+	for raio: float in [0.45, 0.65, 0.85, 1.1, 1.4]:
+		for k in 12:
+			# 0, +30°, -30°, +60°... a partir da frente.
+			var a := deg_to_rad(30.0 * ceilf(k / 2.0) * (1.0 if k % 2 == 1 else -1.0))
+			var p := global_position + frente.rotated(Vector3.UP, a) * raio
+			if livre(p):
+				var estava := conduzido
+				conduzido = true
+				var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+				t.tween_property(self, ^"global_position", p, 0.25 + raio * 0.4)
+				await t.finished
+				conduzido = estava
+				return
+
+
+## O corpo cabe em `ponto` (global, no chão) sem tocar no mundo.
+func livre(ponto: Vector3) -> bool:
+	var forma := get_node(^"CollisionShape3D") as CollisionShape3D
+	var consulta := PhysicsShapeQueryParameters3D.new()
+	consulta.shape = forma.shape
+	consulta.collision_mask = 1
+	consulta.exclude = [get_rid()]
+	# Um tico acima do chão: encostar no piso não é estar preso.
+	consulta.transform = Transform3D(Basis.IDENTITY, ponto + Vector3.UP * 0.03) * forma.transform
+	return get_world_3d().direct_space_state.intersect_shape(consulta, 1).is_empty()
+
+
 ## Onde ficam os olhos com o corpo em `de` (global), sentado ou de pé e
 ## debruçado o quanto `debrucado` diz, virado para `yaw`.
 func olhos_em(de: Vector3, yaw: float) -> Vector3:
@@ -125,13 +163,23 @@ func olhar_para(ponto: Vector3, segundos: float, de := global_position) -> Tween
 	# e o giro sai de onde os olhos estão, pelo lado mais curto (playtest 5: com o
 	# desvio desfeito à parte, o corpo e o desvio somados davam a volta longa — um
 	# "girinho" ao clicar na porta).
+	# Um giro anterior ainda correndo brigaria com este pela rotação (playtest 6:
+	# perto da maçaneta, o giro do caminho não tinha acabado quando vinha o de
+	# olhar para fora, e o corpo dava uma volta inteira).
+	if _giro and _giro.is_valid() and _giro.is_running():
+		var velho := _giro
+		velho.kill()
+		# Quem esperava por ele (await ...finished) segue em frente.
+		(func() -> void: velho.finished.emit()).call_deferred()
 	_assumir_olhar()
+	rotation.y = wrapf(rotation.y, -PI, PI)
 	var yaw := atan2(-(ponto.x - de.x), -(ponto.z - de.z))
 	var olho := olhos_em(de, yaw)
 	var pitch := atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(self, ^"rotation:y", rotation.y + angle_difference(rotation.y, yaw), segundos)
 	t.tween_property(head, ^"rotation:x", clampf(pitch, deg_to_rad(-85.0), deg_to_rad(85.0)), segundos)
+	_giro = t
 	return t
 
 
@@ -154,8 +202,11 @@ func conduzir(pontos: Array, olhar: Vector3, passo := 1.1) -> void:
 			facil = Tween.EASE_IN if i == 0 else (Tween.EASE_OUT if i == pontos.size() - 1 else Tween.EASE_IN_OUT)
 		t.tween_property(self, ^"global_position", p, s).set_ease(facil)
 		anterior = p
-	olhar_para(olhar, maxf(total, 0.5), anterior)
+	var giro := olhar_para(olhar, maxf(total, 0.5), anterior)
 	await t.finished
+	# O olhar dura no mínimo meio segundo: chega junto com ele.
+	if giro.is_valid() and giro.is_running():
+		await giro.finished
 	conduzido = estava
 
 
@@ -186,6 +237,7 @@ func _physics_process(delta: float) -> void:
 		if seated:
 			if move != Vector2.ZERO:
 				stand()
+				_desencaixar()
 			move = Vector2.ZERO
 			crouching = false
 	if pode_olhar():
