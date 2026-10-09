@@ -481,38 +481,46 @@ arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera
     de peças (e com ele a porta entrando na caixa). As flags `fono_*` não valem mais.
 18. ✅ **O mi-go mais visível**: mais perto, maior na janela. Feito: a uns 2 m do vidro
     (a 1,25 m a asa atravessava a parede), escala 1,4, 2,6 s para cruzar.
-19. 🔧 **O sonho do disco: mais estranheza, um efeito de loucura.** Decidido: todas — o escritório
+19. ✅ **O sonho do disco: mais estranheza, um efeito de loucura.** Feito: `Espreita`
+    (`components/espreita.gd`: muda só fora da vista — aparece, vira o rosto, anda
+    para o próximo ponto) nos vultos (de costas; viram o rosto pálido), na lanterna
+    (anda em volta dele e rumo aos vultos) e em quatro pedaços do escritório (a porta
+    com a fresta acesa, o abajur verde, a cadeira, um pedaço da estante); `Respira`
+    nas sete árvores mais perto da clareira; no `Fonografo`, `voz_por_tras` e
+    `visao_dupla` (o global `psx_dupla` no pós) na voz zumbida. Decidido: todas — o escritório
     aparecendo em pedaços no bosque; a voz vindo de trás dele e não do fonógrafo; os
     vultos que viram a cabeça quando não olhados; as árvores respirando; a lanterna de
     Akeley andando sozinha; visão dupla nas vozes zumbidas.
 20. ⏳ Por jogar: do Dia 3 de manhã (o save dele) ao fim da demo.
 
-## Onde estamos (revisão de 2026-10-08, depois da 3e)
-**Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d e a
-**3e** (itens 1 e 3–13; o 2 não reproduzido). Teste de fumaça com 0 falhas. Nenhum
-push feito (nem pedido).
+## Onde estamos (revisão de 2026-10-08, depois da 3f)
+**Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
+3e e a **3f** (itens 1–19). Teste de fumaça com 0 falhas. Nenhum push feito (nem
+pedido).
 
-**Esperando o usuário — o playtest 5** (do Prólogo ao fim; ou do save do Dia 5). O
+**Esperando o usuário — o playtest 6** (do Dia 1 ao fim da demo; F8 pula dias). O
 que olhar:
-1. A cabeça livre em todas as cenas (selar, diário, calha, lapso, sono).
-2. A calha a pé (porta → calha → volta) e o fim do dia pelo corredor e a escada:
-   cansa em 5–6 repetições?
-3. O diário virando a folha ao encher; folhear entradas de duas folhas.
-4. A poltrona e a mesinha ao lado da lareira; o uísque voltando para a gaveta.
-5. A noite do disco: o disco antes do sono e o sonho no bosque da Dark Mountain.
-6. As janelas dos sonhos (noites 2 e 4), o mi-go na janela (Dia 5) e no céu (3 e 6).
-7. Boston: o menu de perguntas embaixo; a janelinha.
-8. O lapso pela janela viva.
-9. O acabamento: lareira, estante, janela, a noite da cidade.
-10. Do Dia 5 ao fim da demo (não jogado no playtest 4) — e se o congelamento voltar,
-    o Depurador do editor antes de fechar.
+1. A porta em duas ações: "Abrir a porta", o corredor livre, "Pôr a carta na
+   calha", a porta que fecha sozinha ao voltar. E a manhã pelo corredor, todo dia:
+   cansa em 6 repetições?
+2. O girinho ao clicar na porta: sumiu?
+3. O diário de couro: a capa, as folhas correndo até a fita; fechar ao contrário.
+4. As duas mãos: Akeley (Tangerine) e Wilmarth (Pinyon Script) no leitor, na
+   escrita da resposta e no diário — legíveis o bastante?
+5. O fonógrafo montado, junto à estante; pôr o correio na mesa à mão; o pacote do
+   Dia 3 esvaziando peça por peça.
+6. A escada com o patamar; a xícara com o café.
+7. O sonho da noite 2 (as pegadas que se formam) e o do disco (a voz por trás, a
+   visão dupla, os vultos que viram, a lanterna que anda, as árvores que respiram,
+   os pedaços do escritório).
+8. O mi-go do Dia 5, rente à janela.
 
 **Decisões de texto pendentes:** as entradas do diário (as 3 e 5 mudaram na 3d) e as
 falas `sono_disco`/`sono_fogo`; o visual do sonho (pendência antiga); "Deixar sem
 resposta" (Dia 2). O bosque do disco (os vultos, a criatura) é 💭.
 
-**Como retomar numa sessão nova:** ler este arquivo (a 3e e esta seção), esperar a
-lista do playtest 5 e registrá-la como **Fase 3f**, no mesmo formato. Não começar a
+**Como retomar numa sessão nova:** ler este arquivo (a 3f e esta seção), esperar a
+lista do playtest 6 e registrá-la como **Fase 3g**, no mesmo formato. Não começar a
 Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
@@ -526,8 +534,13 @@ Fase 4 antes dela.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
 2b. ✅ Playtest 4 (até o começo do Dia 5) → **Fase 3e** (acima).
 2c. ✅ O usuário jogou o **playtest 5** (até a noite 3); a lista virou a **Fase 3f**.
-2d. **← AQUI.** Fase 3f: feitos os itens 1–18; o usuário respondeu os ❓ (todas as
-   recomendações); a fazer: 19 (a loucura do sonho do disco).
+2d. ✅ Fase 3f: feitos os itens 1–19 (o usuário respondeu os ❓ com as
+   recomendações).
+2e. **← AQUI.** O usuário joga o **playtest 6** (do Dia 1 ao fim da demo, ou com F8):
+   a porta em duas ações e a manhã pelo corredor (cansa?), o diário que abre na
+   fita, as duas mãos no leitor, o fonógrafo junto à estante, pôr na mesa à mão, o
+   sonho da noite 2 e a loucura do sonho do disco; a lista vira a Fase 3g. Não
+   começar a Fase 4 antes dela.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

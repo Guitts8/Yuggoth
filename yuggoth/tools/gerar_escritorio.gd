@@ -2197,7 +2197,7 @@ func _sonho_disco(g: Node3D) -> void:
 	var mat := load(MAT_DIR + "bosque.tres") as Material
 	var bosque: Node3D = _vistas.bosque(mat, clareira, boca)
 	_add(g, bosque)
-	for filho in bosque.get_children():
+	for filho in bosque.find_children("*", "", true, false):
 		filho.owner = cena
 	# O chão, os troncos, a encosta; e um anel em volta (a névoa esconde o fim).
 	var formas := [[Vector3(30, 0.2, 30), Vector3(clareira.x, -0.1, clareira.z)]]
@@ -2229,9 +2229,24 @@ func _sonho_disco(g: Node3D) -> void:
 	fono.gravacao_longa = load("res://narrative/gravacoes/disco_1915_longo.tres")
 	fono.exposicao_repeticao = 0.0
 	fono.flag_ao_parar = &"acordou_noite_3"
+	# Na voz zumbida, a voz vem de trás dele, e a vista se desdobra (Fase 3f).
+	fono.voz_por_tras = true
+	fono.visao_dupla = 0.8
 
-	# A lanterna de Akeley no chão, junto do toco: a única luz quente.
-	var lanterna := _group(g, "Lanterna", toco_pos + Vector3(-0.45, 0, 0.25))
+	# A lanterna de Akeley no chão, junto do toco: a única luz quente. Anda
+	# sozinha (Espreita): cada vez que ele não olha, está noutro lugar — em volta
+	# dele, e depois rumo à caverna, até os vultos.
+	var lanterna := Espreita.new()
+	lanterna.name = "Lanterna"
+	lanterna.position = toco_pos + Vector3(-0.45, 0, 0.25)
+	lanterna.pontos = PackedVector3Array([
+		clareira + Vector3(1.6, 0, 1.2), clareira + Vector3(-0.4, 0, 2.0), clareira + Vector3(-1.8, 0, 0.5),
+		clareira + Vector3(-1.5, 0, -1.5), clareira.lerp(boca, 0.55) + Vector3(-0.6, 0, 0), boca + Vector3(0.3, 0, 2.1)])
+	lanterna.intervalo = 4.0
+	lanterna.espera = 10.0
+	lanterna.altura = 0.2
+	lanterna.angulo_visto = 50.0
+	_add(g, lanterna)
 	_cyl(lanterna, "Base", 0.06, 0.065, 0.04, Vector3(0, 0.02, 0), "ferro", 8)
 	_cyl(lanterna, "Vidro", 0.045, 0.045, 0.12, Vector3(0, 0.1, 0), "vidro_aceso", 8)
 	_cyl(lanterna, "Tampa", 0.03, 0.06, 0.04, Vector3(0, 0.18, 0), "ferro", 8)
@@ -2257,6 +2272,97 @@ func _sonho_disco(g: Node3D) -> void:
 	migo.name = "Migo"
 	migo.rotation_degrees.y = -90
 	_add(passa, migo)
+
+	_loucura_do_disco(g, mat, bosque, clareira)
+
+
+## O sonho do disco enlouquece (Fase 3f, item 19): os vultos diante da caverna,
+## de costas para ele, viram o rosto pálido para ele quando ninguém olha; e
+## pedaços do escritório aparecem entre as árvores, um de cada vez, sempre fora
+## da vista — a porta com a luz do corredor por baixo, o abajur verde aceso no
+## chão, a cadeira dele virada para a caverna, um pedaço da estante encostado
+## numa árvore. (As árvores perto da clareira respiram: Respira, nas vistas.)
+func _loucura_do_disco(g: Node3D, mat: Material, bosque: Node3D, clareira: Vector3) -> void:
+	var vultos: PackedVector3Array = bosque.get_meta(&"vultos")
+	for k in vultos.size():
+		var v := Espreita.new()
+		v.name = "Vulto%d" % k
+		v.position = vultos[k]
+		# De costas para ele, olhando a caverna.
+		v.rotation.y = PI
+		v.virar = true
+		v.intervalo = 2.4 + k * 1.1
+		v.espera = 6.0 + k * 2.0
+		v.altura = 1.55
+		_add(g, v)
+		_add(v, _vistas.vulto(mat))
+
+	# A porta do escritório, de pé sozinha entre as árvores, fechada, com a luz
+	# do corredor por baixo.
+	var porta := _pedaco(g, "PedacoPorta", clareira + Vector3(-5.0, 0, 0.9), 90, 14.0)
+	_box(porta, "Folha", Vector3(PORTA_L, PORTA_H, 0.05), Vector3(0, PORTA_H / 2, 0), "madeira_escura")
+	_quad(porta, "Frente", Vector2(PORTA_L, PORTA_H), Vector3(0, PORTA_H / 2, -0.026), Vector3(0, 180, 0), "porta")
+	_quad(porta, "Costas", Vector2(PORTA_L, PORTA_H), Vector3(0, PORTA_H / 2, 0.026), Vector3.ZERO, "porta")
+	for s in [-1, 1]:
+		_box(porta, "Batente%d" % (s + 1), Vector3(0.08, PORTA_H + 0.08, 0.1), Vector3(s * (PORTA_L / 2 + 0.04), (PORTA_H + 0.08) / 2, 0), "madeira_clara")
+	_box(porta, "Verga", Vector3(PORTA_L + 0.16, 0.08, 0.1), Vector3(0, PORTA_H + 0.04, 0), "madeira_clara")
+	_box(porta, "Macaneta", Vector3(0.05, 0.05, 0.06), Vector3(0.36, 1.0, -0.06), "latao")
+	_quad(porta, "Fresta", Vector2(PORTA_L - 0.04, 0.012), Vector3(0, 0.006, -0.03), Vector3(0, 180, 0), "vidro_aceso")
+	var corredor := _omni(porta, "LuzCorredor", Vector3(0, 0.08, -0.25), Color(1.0, 0.8, 0.55), 0.6, 1.6)
+	corredor.omni_attenuation = 1.6
+
+	# O abajur verde da escrivaninha, aceso, no chão do bosque.
+	var abajur := _pedaco(g, "PedacoAbajur", clareira + Vector3(3.6, 0, 2.4), -35, 22.0)
+	_cyl(abajur, "Base", 0.08, 0.09, 0.03, Vector3(0, 0.015, 0), "latao", 10)
+	_cyl(abajur, "Haste", 0.01, 0.01, 0.34, Vector3(0, 0.2, 0), "latao", 6)
+	var cupula := _box(abajur, "Cupula", Vector3(0.36, 0.06, 0.16), Vector3(0, 0.38, -0.04), "esmalte_verde")
+	cupula.rotation_degrees.x = -8
+	var luz := _omni(abajur, "Luz", Vector3(0, 0.3, -0.06), Color(1.0, 0.82, 0.55), 0.9, 2.6)
+	luz.omni_attenuation = 1.4
+
+	# A cadeira dele, virada para a caverna, no caminho.
+	var cadeira := _pedaco(g, "PedacoCadeira", clareira + Vector3(1.4, 0, -4.4), 180, 30.0)
+	_box(cadeira, "Assento", Vector3(0.44, 0.04, 0.42), Vector3(0, 0.46, 0), "madeira_clara")
+	for sx in [-1, 1]:
+		for sz in [-1, 1]:
+			_box(cadeira, "Perna%d%d" % [sx + 1, sz + 1], Vector3(0.035, 0.46, 0.035), Vector3(sx * 0.19, 0.23, sz * 0.18), "madeira_clara")
+	for k in 4:
+		_box(cadeira, "Ripa%d" % k, Vector3(0.03, 0.42, 0.02), Vector3(-0.13 + k * 0.087, 0.7, 0.2), "madeira_clara")
+	_box(cadeira, "Encosto", Vector3(0.44, 0.06, 0.03), Vector3(0, 0.93, 0.2), "madeira_clara")
+
+	# Um pedaço da estante, com livros, encostado numa árvore.
+	var estante := _pedaco(g, "PedacoEstante", clareira + Vector3(-3.4, 0, -3.2), 30, 38.0)
+	estante.rotation_degrees.x = -9
+	for s in [-1, 1]:
+		_box(estante, "Lado%d" % (s + 1), Vector3(0.03, 1.3, 0.3), Vector3(s * 0.45, 0.65, 0), "madeira_escura")
+	var livros := []
+	for p in 3:
+		_box(estante, "Prateleira%d" % p, Vector3(0.9, 0.025, 0.3), Vector3(0, 0.05 + p * 0.42, 0), "madeira_escura")
+		if p == 2:
+			break
+		var x := -0.42
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 300 + p
+		while x < 0.38:
+			var larg := rng.randf_range(0.03, 0.06)
+			var alto := rng.randf_range(0.24, 0.33)
+			livros.append([Vector3(larg, alto, 0.22), Vector3(x + larg / 2, 0.0625 + p * 0.42 + alto / 2, 0.02), Vector3.ZERO, CORES_LIVRO[rng.randi() % CORES_LIVRO.size()]])
+			x += larg + 0.004
+	_lote(estante, "Livros", livros, "capa_livro")
+
+
+## Um pedaço do escritório que aparece no sonho do disco fora da vista (Espreita).
+func _pedaco(g: Node3D, nome: String, pos: Vector3, rot_y: float, espera: float) -> Espreita:
+	var e := Espreita.new()
+	e.name = nome
+	e.position = pos
+	e.rotation_degrees.y = rot_y
+	e.aparecer = true
+	e.espera = espera
+	e.intervalo = 1.5
+	e.altura = 0.8
+	_add(g, e)
+	return e
 
 
 ## Noite do Dia 4 (a pedra que não chega): a pedra negra está na mesa; pela

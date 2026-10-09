@@ -216,13 +216,16 @@ func bosque(mat: Material, clareira: Vector3, boca: Vector3) -> Node3D:
 	_bola(m, boca + Vector3(0, 1.0, 0.35), Vector3(1.15, 1.05, 0.7), Color(0.4, 0.4, 0.38), rng)
 	for s in [-1.0, 1.0]:
 		m.caixa(Vector3(1.0, 2.6, 1.2), boca + Vector3(s * 1.7, 1.2, 0.0), Color(0.3, 0.3, 0.28))
-	# Vultos parados na névoa, diante da caverna, de mantos escuros: não se
-	# chega perto (o sonho acaba antes).
+	# Vultos parados na névoa, diante da caverna, de mantos escuros: quem os põe
+	# é o gerador (`vulto()`, cada um à parte: viram a cabeça quando ninguém olha).
+	var vultos := PackedVector3Array()
 	for k in 3:
-		var p := boca + Vector3(-2.0 + k * 2.0, 0, 0.9 + (k % 2) * 0.4)
-		_vulto(m, p, Color(0.02, 0.02, 0.025))
+		vultos.append(boca + Vector3(-2.0 + k * 2.0, 0, 0.9 + (k % 2) * 0.4))
+	raiz.set_meta(&"vultos", vultos)
 	# As árvores: pinheiros-cicuta escuros e bétulas pálidas, em volta, deixando
-	# a clareira e o caminho até a caverna.
+	# a clareira e o caminho até a caverna. As mais perto da clareira têm malha
+	# própria e respiram (Respira; Fase 3f).
+	var respiram := 0
 	for k in 80:
 		var p := clareira + Vector3(rng.randf_range(-12, 12), 0, rng.randf_range(-11, 9))
 		var ate_boca := Vector2(boca.x - clareira.x, boca.z - clareira.z)
@@ -231,10 +234,25 @@ func bosque(mat: Material, clareira: Vector3, boca: Vector3) -> Node3D:
 		if rel.length() < 3.4 or no_caminho or p.z < boca.z + 0.5:
 			continue
 		troncos.append(p)
+		var perto := rel.length() < 6.5 and respiram < 7
+		var alvo := Cidade.Malha.new() if perto else m
+		var base := Vector3.ZERO if perto else p
 		if rng.randf() < 0.3:
-			_betula(m, p, rng.randf_range(5.0, 8.0), rng)
+			_betula(alvo, base, rng.randf_range(5.0, 8.0), rng)
 		else:
-			_abeto(m, p, rng.randf_range(6.0, 11.0), Color(0.08, 0.13, 0.09) * rng.randf_range(0.8, 1.2), rng)
+			_abeto(alvo, base, rng.randf_range(6.0, 11.0), Color(0.08, 0.13, 0.09) * rng.randf_range(0.8, 1.2), rng)
+		if perto:
+			var r := Respira.new()
+			r.name = "Respira%d" % respiram
+			r.position = p
+			r.fase = respiram * 0.35
+			var arvore := MeshInstance3D.new()
+			arvore.name = "Arvore"
+			arvore.mesh = alvo.fechar()
+			arvore.material_override = mat
+			r.add_child(arvore)
+			raiz.add_child(r)
+			respiram += 1
 	# Juncos e moitas do pântano, ao sul.
 	for k in 40:
 		var p := clareira + Vector3(rng.randf_range(-11, 11), 0, rng.randf_range(3, 9))
@@ -363,6 +381,20 @@ func _bola(m: Cidade.Malha, c: Vector3, r: Vector3, cor: Color, rng: RandomNumbe
 			var d: Vector3 = pontos[jj + 1][(i + 1) % lados]
 			var n := ((a + b + cc + d) / 4.0 - c).normalized()
 			m.quad(a, b, d, cc, n, cor * rng.randf_range(0.9, 1.08))
+
+
+## Um vulto de manto sozinho, com o rosto pálido sob o capuz virado para +Z (a
+## noite do disco, Fase 3f: os vultos viram a cabeça quando ninguém olha — o
+## rosto é o que mostra que viraram).
+func vulto(mat: Material) -> MeshInstance3D:
+	var m := Cidade.Malha.new()
+	_vulto(m, Vector3.ZERO, Color(0.02, 0.02, 0.025))
+	m.caixa(Vector3(0.13, 0.17, 0.03), Vector3(0, 1.57, 0.15), Color(0.5, 0.48, 0.44))
+	var mi := MeshInstance3D.new()
+	mi.name = "Malha"
+	mi.mesh = m.fechar()
+	mi.material_override = mat
+	return mi
 
 
 ## Um vulto de manto, de pé, o capuz baixo: um cone alongado e a cabeça.

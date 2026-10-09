@@ -174,3 +174,7 @@ psx_snap={
 "type": "float",
 "value": 1.0
 }
+psx_dupla={
+"type": "float",
+"value": 0.0
+}

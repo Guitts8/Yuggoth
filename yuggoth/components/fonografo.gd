@@ -28,8 +28,17 @@ extends Interactable
 ## Marcada quando a agulha levanta ou o disco acaba (o do sonho da noite 3: é
 ## assim que ele acorda).
 @export var flag_ao_parar: StringName
+@export_group("Sonho")
+## Na voz zumbida, a voz vem de trás de quem ouve, não da corneta (o disco no
+## sonho da noite 3, Fase 3f).
+@export var voz_por_tras := false
+## Na voz zumbida, a vista se desdobra (o global `psx_dupla` do pós), até tanto.
+@export_range(0.0, 1.0, 0.01) var visao_dupla := 0.0
+@export_group("")
 
 var _som: AudioStreamPlayer3D
+var _som_casa := Vector3.ZERO
+var _dupla := 0.0
 var _atual: Gravacao
 var _trecho := -1
 var _luz_base := 0.0
@@ -44,6 +53,7 @@ func _ready() -> void:
 	_som.bus = &"Voice"
 	_som.unit_size = 3.0
 	add_child(_som)
+	_som_casa = _som.position
 	_som.finished.connect(_terminou)
 	GameState.value_changed.connect(_atualizar_prompt.unbind(2))
 	_atualizar_prompt()
@@ -124,8 +134,9 @@ func tocar(desde := 0.0) -> void:
 	_atualizar_prompt()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not tocando() or _atual == null:
+		_desdobrar(0.0, delta)
 		return
 	var t := _som.get_playback_position()
 	var i := _atual.trecho_em(t)
@@ -134,6 +145,14 @@ func _process(_delta: float) -> void:
 		if i >= 0:
 			Events.subtitle_requested.emit(_atual.legendas[i], _atual.fim_do_trecho(i) - t + 0.4)
 	var zumbindo := i >= 0 and _atual.tipos[i] == Gravacao.Tipo.ZUMBIDA
+	if voz_por_tras:
+		var cam := get_viewport().get_camera_3d()
+		if zumbindo and cam:
+			# Às costas dele, um pouco acima do ombro, e acompanha quando ele vira.
+			_som.global_position = cam.global_position + cam.global_basis.z * 1.3 + Vector3.UP * 0.15
+		else:
+			_som.position = _som_casa
+	_desdobrar(visao_dupla if zumbindo else 0.0, delta)
 	if luz:
 		var pulso := 0.5 + 0.5 * sin(t * TAU * 7.0)
 		luz.light_energy = _luz_base * (1.0 - 0.35 * pulso if zumbindo else 1.0)
@@ -150,9 +169,28 @@ func _terminou() -> void:
 	_parar()
 
 
+## A visão dupla vai e volta devagar (só quem a pede mexe no global).
+func _desdobrar(alvo: float, delta: float) -> void:
+	if visao_dupla <= 0.0 or is_equal_approx(_dupla, alvo):
+		return
+	_dupla = move_toward(_dupla, alvo, delta * 0.7)
+	RenderingServer.global_shader_parameter_set(&"psx_dupla", _dupla)
+
+
+func _exit_tree() -> void:
+	if _dupla > 0.0:
+		_dupla = 0.0
+		RenderingServer.global_shader_parameter_set(&"psx_dupla", 0.0)
+
+
 func _parar() -> void:
 	if _som.playing:
 		_som.stop()
+	_som.position = _som_casa
+	# A agulha levantada desfaz a vista dupla de uma vez (o sonho acaba ali).
+	if _dupla > 0.0:
+		_dupla = 0.0
+		RenderingServer.global_shader_parameter_set(&"psx_dupla", 0.0)
 	if luz:
 		luz.light_energy = _luz_base
 	for n in _repouso:
