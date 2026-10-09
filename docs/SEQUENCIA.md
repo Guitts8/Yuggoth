@@ -65,7 +65,10 @@ noite do disco (3) a entrada termina inteira, *"Antes de ir, quis ouvir o disco 
 uma vez."* — "Ouvir o disco outra vez": ele baixa a agulha, senta na **poltrona** ao
 lado da lareira fria e ouve, e o sono vem com o disco; na noite da chuva (5), com o fogo aceso, *"Não ia conseguir dormir tão cedo.
 Fiquei diante do fogo, com o copo."* — **na poltrona diante da lareira** ("Sentar
-diante do fogo"), o copo na mesinha ao lado, um gole, e o sono; acorda ali, de manhã, o fogo apagado. Nas
+diante do fogo"), o copo na mesinha ao lado, um gole, e o sono; acorda ali, de manhã, o fogo apagado. (Se a
+lareira não foi acesa, a fala lembra: *"…A sala esfriara; faltava acender a lareira e ficar diante do fogo,
+com o copo."* — acesa, a poltrona chama.) Dentro de um sonho, a porta não oferece "Ir para casa" nem o
+caderno "Ler o diário". Nas
 noites 2 e 4, no diário: a última linha da entrada **falha** — a letra desce, torta e cada vez mais clara, a escrita fica
 lenta e para no meio da palavra; a pena tomba na página e a tinta se espalha e
 escorre. As pálpebras pesam (fecham e abrem devagar), a lâmpada baixa, **o relógio

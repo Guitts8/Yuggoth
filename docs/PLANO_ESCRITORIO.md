@@ -631,6 +631,63 @@ corredor "ficou bonito". Commits: `7b1db7d` (5), `3e843c3` (3, 6), `079207b` (2,
 Também: o teste do vulto na janela (Dia 5) às vezes não pegava o mi-go visível
 (passa em 1,1 s, 8× acelerado); agora anota quando ele aparece.
 
+## Sessão de tester (2026-10-09, antes do playtest 8)
+O usuário pediu: *"faça o papel de tester… passe por todos os dias testando
+possibilidades e corrigindo bugs"*. Em vez de só o roteiro feliz do teste de
+fumaça, um segundo teste, **`tests/caminhos_test.tscn`** (estende o de fumaça e
+usa as mesmas ajudas), joga os caminhos que o jogador pode tomar fora dele, e um
+**macaco** (`CAMINHOS=macaco`, `SEMENTE=n`) joga a demo inteira ao acaso: a cada
+passo, uma das interações disponíveis (as menos usadas primeiro), mirando de
+verdade; nas telas, qualquer abertura, carta amassada, folhear; no meio das cenas,
+a pausa, o dossiê, E para pular. Todo erro no log (um `Logger`) vira falha.
+
+Commit: `b62e9b2`. O macaco (semente 1) jogou a demo inteira, do Dia 1 à tinta
+da última carta, ~6.000 ações, sem travar nem sair do mapa, depois das correções.
+
+Bugs achados e corrigidos:
+1. ✅ **A pausa (Esc) ou o dossiê (Tab) no meio de uma cena devolviam o controle.**
+   Fechada a tela, o `Player` fazia `input_enabled = true` — no meio de selar a
+   carta, do diário, da lareira, da porta, da calha, do lapso: ele andava sentado,
+   levantava no meio do diário. Agora a tela aberta desliga por cima do que a cena
+   quer (`Player._modal` × `_livre_na_cena`), e fechada volta o que a cena quer; as
+   cenas devolvem com `input_enabled = true` (não mais `not is_modal_open`).
+2. ✅ **A noite do Dia 5 sem a lareira acesa.** Acender o fogo não é obrigatório,
+   mas "Sentar diante do fogo" só existe com ele: anotado o dia sem fogo, a fala
+   dizia *"Fiquei diante do fogo, com o copo"* e nada aparecia — o jogador ficava
+   sem saber o que fazer. Agora `sono_fogo` tem uma variante com a lareira apagada:
+   *"…A sala esfriara; faltava acender a lareira e ficar diante do fogo, com o
+   copo."* (💬 texto novo, esperando aprovação, como o resto de `sono_fogo`).
+3. ✅ **Erros "Lambda capture was freed" no log** (2 por partida). Ler a carta
+   enquanto ela ainda voava do envelope para a mesa (o `DocumentPickup` a tira da
+   cena) deixava o tween chamando um lambda com o nó já liberado. Os tweens do
+   conteúdo (`Correspondencia._sair`, `_retirar`) seguram a peça por referência fraca.
+4. ✅ **No sonho, a porta oferecia "Ir para casa" e o caderno "Ler o diário"** (o
+   sonho da poltrona, noite 5; a porta também nas noites 2 e 4) — e não faziam
+   nada. Saem da mira enquanto `sonhando`.
+5. ✅ **Lapso por cima de outra cena.** Uma ligação que salta no tempo (Dia 5, a
+   resposta ao telegrama) podia acabar com ele ajoelhado acendendo a lareira: as duas
+   cenas brigavam pelo corpo e pela cabeça, e a que acabava primeiro devolvia o
+   controle no meio da outra. O lapso agora espera a cena em curso (`Player.em_cena`).
+6. ✅ A lareira não conferia se a fase ainda existia antes de devolver o controle
+   (sair para o menu no fim da animação).
+8. ✅ **Preso sentado, entre a pausa e o diário** (achado pelo macaco, semente 1,
+   Dia 2): "Ler o diário" → Tab (o dossiê) enquanto o caderno ainda abre → fechar o
+   dossiê → Esc. "Há tela aberta" era um booleano só: fechar o dossiê o dava por
+   falso com o diário ainda aberto, e o Esc seguinte abria a pausa em vez de fechar
+   o caderno — e de novo, e de novo. Agora `Events.modal(dono, aberta)` registra
+   quem tem tela aberta; `modal_changed` só sai quando abre a primeira ou fecha a
+   última (e uma tela que some sem fechar, com a fase trocada, sai do registro).
+7. ✅ No teste de fumaça, "levantar a agulha; o zumbido fica" falhava às vezes (o
+   zumbido sobe num tween de processo; com o tempo 8×, dois quadros de física não
+   bastavam). Espera o zumbido.
+
+Conferido e sem bug: sair para o menu no meio do correio e no meio do sonho e
+continuar (volta à manhã do checkpoint, nada pendurado na mão, sem a estética do
+sonho); descer a escada com a carta na mão (o dia não acaba; volta, a porta fecha,
+posta depois); folhear o diário vazio no Dia 1 (Esc fecha o caderno, não abre a
+pausa); continuar no checkpoint de Boston; todo documento resolve texto em todo tom
+de resposta, com as tags BBCode fechadas dentro do parágrafo.
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado
@@ -638,6 +695,9 @@ ao GitHub (push). **Regra (2026-10-09):** cada commit é seguido de `git push`, 
 arquivos de coordenação (este, `SEQUENCIA.md`, `FIDELIDADE.md`, `CLAUDE.md`, a
 memória) são atualizados junto com o trabalho — ver "Fluxo de trabalho" no
 `CLAUDE.md`.
+
+**Sessão de tester feita** (acima, `b62e9b2`): pausa e dossiê no meio das cenas,
+telas sobrepostas, a noite sem fogo, a porta no sonho; `caminhos_test` e o macaco.
 
 **Esperando o usuário — o playtest 8** (do Dia 1 ao fim da demo; **F2** pula dias,
 **F3** recarrega). O que olhar:
