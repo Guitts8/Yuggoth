@@ -62,11 +62,13 @@ func close() -> void:
 
 
 func _on_options() -> void:
+	# A tinta deste menu sai das páginas (estão todos no mesmo livro); a das
+	# Opções chega com a folha virando.
 	var foto := Livro.foto_da_pagina(livro, false)
-	buttons.hide()
+	livro.hide()
 	options_menu.open(foto)
 	await options_menu.closed
-	buttons.show()
+	livro.show()
 	options_button.grab_focus()
 	await livro.folhear(options_menu.foto_saida, true)
 

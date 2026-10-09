@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://main/game_root.gd" id="1_root"]
 [ext_resource type="Shader" path="res://shaders/psx_post.gdshader" id="2_post"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://ui/menu/pause_menu.tscn" id="10_pause_menu"]
 [ext_resource type="PackedScene" path="res://ui/menu/options_menu.tscn" id="11_options_menu"]
 [ext_resource type="PackedScene" path="res://ui/reply_writer.tscn" id="12_reply"]
+[ext_resource type="Script" path="res://ui/menu/necronomicon.gd" id="13_necro"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
 shader = ExtResource("2_post")
@@ -61,10 +62,27 @@ layer = 110
 [node name="Menus" type="CanvasLayer" parent="."]
 layer = 50
 
-[node name="MainMenu" parent="Menus" node_paths=PackedStringArray("options_menu") instance=ExtResource("9_main_menu")]
+[node name="Necronomicon" type="Control" parent="Menus"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("13_necro")
+
+[node name="Paginas" type="SubViewport" parent="Menus/Necronomicon"]
+process_mode = 3
+disable_3d = true
+transparent_bg = true
+size = Vector2i(1240, 840)
+
+[node name="MainMenu" parent="Menus/Necronomicon/Paginas" node_paths=PackedStringArray("options_menu") instance=ExtResource("9_main_menu")]
 options_menu = NodePath("../OptionsMenu")
 
-[node name="PauseMenu" parent="Menus" node_paths=PackedStringArray("options_menu") instance=ExtResource("10_pause_menu")]
+[node name="PauseMenu" parent="Menus/Necronomicon/Paginas" node_paths=PackedStringArray("options_menu") instance=ExtResource("10_pause_menu")]
 options_menu = NodePath("../OptionsMenu")
 
-[node name="OptionsMenu" parent="Menus" instance=ExtResource("11_options_menu")]
+[node name="OptionsMenu" parent="Menus/Necronomicon/Paginas" instance=ExtResource("11_options_menu")]

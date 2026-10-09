@@ -35,8 +35,8 @@ var _transitioning := false
 
 @onready var world_container: SubViewportContainer = $WorldContainer
 @onready var world: SubViewport = $WorldContainer/World
-@onready var main_menu: MainMenu = $Menus/MainMenu
-@onready var pause_menu: PauseMenu = $Menus/PauseMenu
+@onready var main_menu: MainMenu = $Menus/Necronomicon/Paginas/MainMenu
+@onready var pause_menu: PauseMenu = $Menus/Necronomicon/Paginas/PauseMenu
 @onready var _post: ShaderMaterial = world_container.material
 
 

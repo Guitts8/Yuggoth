@@ -167,8 +167,8 @@ func _ready() -> void:
 	_check(AudioDirector._lowpass.cutoff_hz > 2000.0, "exposição abre o filtro do zumbido")
 
 	# --- Pausa e menus ---
-	var pause: PauseMenu = root.get_node("Menus/PauseMenu")
-	var main_menu: MainMenu = root.get_node("Menus/MainMenu")
+	var pause: PauseMenu = root.get_node("Menus/Necronomicon/Paginas/PauseMenu")
+	var main_menu: MainMenu = root.get_node("Menus/Necronomicon/Paginas/MainMenu")
 	await _press(&"ui_cancel")
 	_check(pause.visible and get_tree().paused, "Esc abre a pausa e congela o jogo")
 	_check(Events.is_modal_open, "pausa é modal")
@@ -621,6 +621,14 @@ func _ready() -> void:
 	_check(dia5.visible and esc.world_env.environment == esc.ambientes_dia[5], "Dia 5: noite no escritório")
 	_check(AudioDirector.get_ambience() == esc.sons_dia[5], "Dia 5: chuva")
 	await _check_dia(esc, 5)
+	# O vulto na janela passa rápido (1,1 s; 8× acelerado, um punhado de
+	# quadros) e pode passar antes da hora, quando a mira percorre a sala
+	# (_check_alcance): anota quando ele aparece, desde já.
+	var sombra: Node3D = dia5.get_node("Sombra")
+	var apareceu := [false]
+	sombra.visibility_changed.connect(func() -> void:
+		if sombra.visible:
+			apareceu[0] = true)
 	var acender: AcenderLareira = dia5.get_node("AcenderLareira")
 	_check(not dia5.get_node("Fogo").visible and acender.can_interact(player), "Dia 5: a lareira apagada, com lenha")
 	acender.interact(player)
@@ -701,8 +709,8 @@ func _ready() -> void:
 	player.head.rotation.x = 0.0
 	await _until(func() -> bool: return GameState.has_flag(&"viu_sombra_janela"), 5.0)
 	_check(GameState.has_flag(&"viu_sombra_janela"), "olhando a janela, algo passa lá fora")
-	await _until(func() -> bool: return dia5.get_node("Sombra").visible, 5.0)
-	_check(dia5.get_node("Sombra").visible, "o vulto atravessa a janela")
+	await _until(func() -> bool: return apareceu[0], 5.0)
+	_check(apareceu[0], "o vulto atravessa a janela")
 	renovar.interact(player)
 	await _frames(1)
 	writer._choose(renovar.reply.options[0])
