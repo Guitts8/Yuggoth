@@ -6,21 +6,31 @@ extends Resource
 
 ## Duas mãos (playtest 5): MANUSCRITO é a letra de Akeley (e de quem mais
 ## escrever à mão), "apertada, arcaica" — Tangerine; WILMARTH, a de Wilmarth
-## (respostas, diário, o relato, o rascunho), copperplate legível — Pinyon Script.
-## As duas são OFL (art/fonts, com a licença ao lado).
+## (respostas, diário, o relato, o rascunho), copperplate — Petit Formal Script
+## (playtest 6: a Pinyon não se lia). O jornal e o que não é letra de mão em
+## Old Standard, a serifada das publicações do começo do século XX (também a
+## fonte padrão da interface). Todas OFL (art/fonts, com a licença ao lado).
 enum Style { MANUSCRITO, DATILOGRAFADO, JORNAL, TELEGRAMA, WILMARTH }
 
 const STYLE_FONTS := {
 	Style.MANUSCRITO: ["res://art/fonts/Tangerine-Regular.ttf"],
 	Style.DATILOGRAFADO: ["Courier New", "Courier", "monospace"],
-	Style.JORNAL: ["Georgia", "Times New Roman", "serif"],
+	Style.JORNAL: ["res://art/fonts/OldStandard-Regular.ttf"],
 	Style.TELEGRAMA: ["Courier New", "Courier", "monospace"],
-	Style.WILMARTH: ["res://art/fonts/PinyonScript-Regular.ttf"],
+	Style.WILMARTH: ["res://art/fonts/PetitFormalScript-Regular.ttf"],
 }
+## A serifada de reserva (o que faltar na letra de mão) e da interface.
+const SERIFADA := "res://art/fonts/OldStandard-Regular.ttf"
 ## As letras de mão têm o olho pequeno para o corpo: o tamanho cresce tanto.
 const STYLE_SCALE := {
 	Style.MANUSCRITO: 1.5,
-	Style.WILMARTH: 1.2,
+	Style.WILMARTH: 1.0,
+}
+## Entrelinha extra das letras de mão (px por 27 px de corpo): a Petit Formal tem
+## hastes longas, e as linhas se encostavam.
+const STYLE_ENTRELINHA := {
+	Style.MANUSCRITO: 0,
+	Style.WILMARTH: 7,
 }
 const FONT_SLOTS: Array[StringName] = [&"normal_font", &"italics_font", &"bold_font", &"bold_italics_font"]
 
@@ -65,6 +75,8 @@ static func apply_fonts(label: RichTextLabel, doc_style: Style, size := 0) -> vo
 	var final := roundi(size * float(STYLE_SCALE.get(doc_style, 1.0)))
 	for slot in [&"normal_font_size", &"italics_font_size", &"bold_font_size", &"bold_italics_font_size"]:
 		label.add_theme_font_size_override(slot, final)
+	if STYLE_ENTRELINHA.has(doc_style):
+		label.add_theme_constant_override(&"line_separation", roundi(STYLE_ENTRELINHA[doc_style] * final / 27.0))
 	for slot in FONT_SLOTS:
 		var key := "%d:%s" % [doc_style, slot]
 		if not _font_cache.has(key):
@@ -78,10 +90,9 @@ static func _fonte(doc_style: Style, slot: StringName) -> Font:
 	if String(nomes[0]).begins_with("res://"):
 		var arquivo := load(nomes[0]) as FontFile
 		# O que faltar na letra de mão (um sinal raro) vem de uma serifada.
-		var reserva := SystemFont.new()
-		reserva.font_names = PackedStringArray(["Georgia", "Times New Roman", "serif"])
 		var f := arquivo.duplicate() as FontFile
-		f.fallbacks = [reserva]
+		if nomes[0] != SERIFADA:
+			f.fallbacks = [load(SERIFADA)]
 		base = f
 	else:
 		var sistema := SystemFont.new()

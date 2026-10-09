@@ -34,13 +34,12 @@ const CORRER_JANELA := 0.3
 ## por pixel do mundo com a vista apertada sobre a página.
 const TEXTURA := Vector2i(640, 448)
 const MARGEM := Vector2(26.0, 30.0)
-const FONTE := 21
-const ENTRELINHA := 3
+const FONTE := 25
 const LETRAS_POR_SEGUNDO := 20.0
 const TINTA := Color(0.1, 0.08, 0.13)
 const PAPEL := Color(0.88, 0.84, 0.73)
 ## A vista apertada, debruçado sobre a página.
-const FOV_ESCREVENDO := 38.0
+const FOV_ESCREVENDO := 30.0
 ## A primeira página, antes de qualquer entrada.
 const ROSTO := "\n\n\n[center]A. N. Wilmarth\n\nMiskatonic University\nArkham, 1928[/center]"
 const VIRAR_SEGUNDOS := 0.65
@@ -835,7 +834,6 @@ func _rotulo(janela: Control) -> RichTextLabel:
 	r.position = Vector2.ZERO
 	r.size = Vector2(janela.size.x, janela.size.y * 6.0)
 	r.add_theme_color_override(&"default_color", TINTA)
-	r.add_theme_constant_override(&"line_separation", ENTRELINHA)
 	DocumentData.apply_fonts(r, DocumentData.Style.WILMARTH, FONTE)
 	r.install_effect(TremorTextEffect.new())
 	r.install_effect(QuedaTextEffect.new())
