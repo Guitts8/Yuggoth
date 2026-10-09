@@ -493,6 +493,31 @@ arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera
     Akeley andando sozinha; visão dupla nas vozes zumbidas.
 20. ⏳ Por jogar: do Dia 3 de manhã (o save dele) ao fim da demo.
 
+## Fase 3g — Ajustes do playtest 6 (2026-10-08)
+O usuário jogou o playtest 6. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera resposta.
+
+1. ✅ **F8 fecha o jogo.** Rodando pelo editor, F8 é o "parar o projeto" do Godot
+   (o jogo em execução repassa a tecla ao editor; o log da sessão acaba sem erro
+   nenhum). Feito: **F2** pula o dia, **F3** recarrega — longe de F5–F12.
+2. 🔧 **Os títulos estão em letra bastão**, e a copperplate (Pinyon) é difícil de
+   ler: a leitura tem de ficar mais clara.
+3. 🔧 **No diário, a escrita não se lê** (a mesma copperplate).
+4. 🔧 **Ao abrir a porta, o personagem gira.**
+5. 🔧 **O corredor está simples demais**: melhorar o modelo.
+6. 🔧 **O café está com a textura do chão.**
+7. 🔧 **O dia começa diante da porta**: começar no pé da escada.
+8. 🔧 **Abrir o pacote quando chega**, antes de tirar as coisas.
+9. 🔧 **A poltrona está perto demais das paredes.**
+10. 🔧 **O sonho: livros flutuando, paredes quebradas e estilhaçadas**, como as
+    dimensões do Vazio em *Dishonored*.
+11. 🔧 **A ondulação está forte demais**: diminuir.
+12. 🔧 **O modelo da pedra** (o sonho da pedra negra) tem de melhorar.
+13. 🔧 **Algumas cartas ainda se teletransportam**: sem suavidade.
+14. 🔧 **O mi-go passou devagar e claro demais** diante da casa: mais rápido, talvez
+    subindo na vertical em vez de vagar na horizontal.
+15. 🔧 **Acordar depois de "Sentar diante do fogo": travado** no mesmo lugar.
+16. 🔧 **O menu como páginas de um livro**, como decidido.
+
 ## Onde estamos (revisão de 2026-10-08, depois da 3f)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e e a **3f** (itens 1–19). Teste de fumaça com 0 falhas. Nenhum push feito (nem

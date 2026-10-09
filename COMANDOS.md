@@ -59,8 +59,8 @@ exportado):
 | Tecla | O quê |
 |---|---|
 | **F** (segurar) | Acelera tudo 8× (falas, lapsos, sonhos, animações) |
-| **F8** | **Pula para o dia seguinte**: dá o dia corrente por feito (correio aberto, resposta escrita, dia anotado) e abre o escritório na manhã seguinte. No Prólogo, pula para o Dia 1. Não passa do Dia 6 (o último da demo). Feche janelas abertas antes |
-| **F9** | **Recarrega o dia**: abre o escritório de novo no mesmo dia, com o que já foi feito. Serve para destravar sem pular |
+| **F2** | **Pula para o dia seguinte**: dá o dia corrente por feito (correio aberto, resposta escrita, dia anotado) e abre o escritório na manhã seguinte. No Prólogo, pula para o Dia 1. Não passa do Dia 6 (o último da demo). Feche janelas abertas antes |
+| **F3** | **Recarrega o dia**: abre o escritório de novo no mesmo dia, com o que já foi feito. Serve para destravar sem pular |
 | C | Troca a vista da janela entre a cidade 3D e o painel antigo |
 
 ## Os comandos crus

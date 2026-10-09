@@ -3,15 +3,17 @@ extends Node
 ## depuração): segurar F acelera tudo VELOCIDADE vezes (falas do narrador,
 ## telefonemas, cartões, lapsos, sonhos, animações), com um aviso no canto.
 ## C troca a vista da janela entre a cidade em 3D e o painel antigo (flag `painel`).
-## F8 pula para o dia seguinte (playtest 5: um dia que trava não pode prender o
+## F2 pula para o dia seguinte (playtest 5: um dia que trava não pode prender o
 ## teste dos outros): dá o dia corrente por feito e recarrega o escritório na
-## manhã seguinte. No Prólogo, pula para o Dia 1. F9 recarrega o escritório no
-## mesmo dia, do jeito que o estado está (destrava sem avançar).
+## manhã seguinte. No Prólogo, pula para o Dia 1. F3 recarrega o escritório no
+## mesmo dia, do jeito que o estado está (destrava sem avançar). Longe de F5–F12:
+## rodando pelo editor, o jogo repassa essas ao Godot (playtest 6: F8 é o "parar
+## o projeto", e fechava o jogo).
 
 const VELOCIDADE := 8.0
 const TECLA := KEY_F
-const TECLA_PULAR := KEY_F8
-const TECLA_RECARREGAR := KEY_F9
+const TECLA_PULAR := KEY_F2
+const TECLA_RECARREGAR := KEY_F3
 const ESCRITORIO := "res://levels/escritorio/escritorio.tscn"
 ## O último dia da demo (Escritorio.dia_do_interludio): dali não se pula.
 const ULTIMO_DIA := 6

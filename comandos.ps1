@@ -48,7 +48,7 @@ function Ajuda {
 Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
 
   JOGAR
-    jogar              abre o jogo (janela própria; F8 pula o dia, F9 recarrega)
+    jogar              abre o jogo (janela própria; F2 pula o dia, F3 recarrega)
     jogar-log          abre o jogo e mostra o console (erros aparecem aqui)
     editor             abre o projeto no editor do Godot
 

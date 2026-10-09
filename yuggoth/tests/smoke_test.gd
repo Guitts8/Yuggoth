@@ -798,7 +798,7 @@ func _ready() -> void:
 	_check(not SceneDirector.hold_black, "depois da demo, a tela preta não fica presa")
 	Engine.time_scale = 1.0
 
-	# Depuração (playtest 5): F8 pula o dia; o seguinte encontra o que espera do pulado.
+	# Depuração (playtest 5): F2 pula o dia; o seguinte encontra o que espera do pulado.
 	var depuracao := root.get_node_or_null(^"/root/Depuracao")
 	if depuracao:
 		GameState.reset()
@@ -813,10 +813,10 @@ func _ready() -> void:
 		var esc_p := root.find_children("*", "Escritorio", true, false).front() as Escritorio
 		_check(GameState.get_value(&"dia") == 3 and GameState.has_flag(&"anotou_dia_2") and GameState.get_value(&"correio_dia_2_tiradas") == 9
 			and esc_p and esc_p.find_child("Fotografias", true, false).visible and GameState.get_value(&"data") == esc_p.datas_dia[3],
-			"F8: pula do Dia 2 ao 3, com as fotografias tiradas e a data do dia")
+			"F2: pula do Dia 2 ao 3, com as fotografias tiradas e a data do dia")
 		depuracao.pular_dia()
 		await _until(func() -> bool: return GameState.get_value(&"dia") == 4 and not SceneDirector.is_busy, 30.0)
-		_check(GameState.has_flag(&"tocou_disco") and GameState.has_flag(&"fono_cilindro"), "F8: pulado o Dia 3, o fonógrafo já tocou")
+		_check(GameState.has_flag(&"tocou_disco") and GameState.has_flag(&"fono_cilindro"), "F2: pulado o Dia 3, o fonógrafo já tocou")
 		SceneDirector.clear_level()
 
 	# Paginar sem abrir (abrir marcaria `leu_<id>`); no fim, porque é um quadro longo.
