@@ -641,7 +641,7 @@ passo, uma das interações disponíveis (as menos usadas primeiro), mirando de
 verdade; nas telas, qualquer abertura, carta amassada, folhear; no meio das cenas,
 a pausa, o dossiê, E para pular. Todo erro no log (um `Logger`) vira falha.
 
-Commits: `b62e9b2` (itens 1–8), e o do item 9. O macaco jogou a demo inteira, do
+Commits: `b62e9b2` (itens 1–8) e `f479c18` (item 9). O macaco jogou a demo inteira, do
 Dia 1 à tinta da última carta (~6.000 ações cada), com as sementes 1 e 2, sem
 travar nem sair do mapa, depois das correções.
 
