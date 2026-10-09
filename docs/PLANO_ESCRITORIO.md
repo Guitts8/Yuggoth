@@ -727,9 +727,18 @@ olhar o painel Debugger do editor. `art/textures/grao.png.import` aparece
 modificado no git desde antes da 3g (reimportação do Godot); deixado de fora dos
 commits.
 
-**Como retomar numa sessão nova:** ler este arquivo (a 3h e esta seção), esperar a
-lista do playtest 8 e registrá-la como **Fase 3i**, no mesmo formato. Não começar a
-Fase 4 antes dela.
+**Como retomar numa sessão nova:** ler este arquivo (a 3h, a "Sessão de tester" e
+esta seção). O usuário pediu (2026-10-09) **mais sessões de testes** antes do
+playtest 8: seguir no papel de tester — rodar `comandos.ps1 caminhos` e
+`comandos.ps1 macaco <semente>` (sementes novas: 3, 4, …; as 1 e 2 já passam),
+acrescentar a `tests/caminhos_test.gd` os caminhos novos que o usuário pedir, e cada
+bug achado vira um item novo da "Sessão de tester" (ou de uma sessão nova), com o
+commit. Ideias ainda não testadas: as respostas em todos os tons jogadas de ponta a
+ponta (o macaco sorteia, mas não força cada tom), F2/F3 no meio de cenas, o menu
+principal e as Opções (o Necronomicon) por teclado e mouse, sair para o menu durante
+a tinta do fim da demo, e conferências visuais por captura (`tests/_tmp_shot`).
+Quando vier a lista do playtest 8, registrá-la como **Fase 3i**, no mesmo formato.
+Não começar a Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
 (GDD §12): opções de acessibilidade (tremor, afim, FOV — ainda não há nenhuma em
@@ -746,7 +755,9 @@ Fase 4 antes dela.
    recomendações).
 2e. ✅ O usuário jogou o **playtest 6**; a lista virou a **Fase 3g**, toda feita.
 2f. ✅ O usuário jogou o **playtest 7**; a lista virou a **Fase 3h**, toda feita.
-2g. **← AQUI.** O usuário joga o **playtest 8** (do Dia 1 ao fim da demo, ou com
+2g. ✅ **Sessão de tester** (acima): `caminhos_test` e o macaco; 9 bugs corrigidos.
+2h. **← AQUI.** Mais sessões de testes (o usuário pediu; ver "Como retomar"), e
+   depois o usuário joga o **playtest 8** (do Dia 1 ao fim da demo, ou com
    F2): o Necronomicon, o corredor e a escada, o diário, o sonho do disco partido,
    E para pular, a lareira; a lista vira a Fase 3i. Não começar a Fase 4 antes dela.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
