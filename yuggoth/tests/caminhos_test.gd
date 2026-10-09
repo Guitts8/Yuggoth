@@ -71,7 +71,7 @@ func _ready() -> void:
 	# CAMINHOS=escada_com_a_carta,... roda só esses (depuração do próprio teste).
 	# O macaco é longo (o jogo inteiro): só quando pedido (CAMINHOS=macaco).
 	for parte: Callable in [_textos, _modais_no_meio_das_cenas, _menu_no_meio_do_dia, _escada_com_a_carta,
-			_diario_vazio, _noite_sem_fogo, _continuar_em_boston, _macaco]:
+			_diario_vazio, _noite_sem_fogo, _exame_na_ligacao_de_keene, _continuar_em_boston, _macaco]:
 		var nome := parte.get_method().trim_prefix("_")
 		if (so.is_empty() and nome != "macaco") or nome in so:
 			print("-- %s" % parte.get_method())
@@ -398,6 +398,43 @@ func _noite_sem_fogo() -> void:
 	await _ir_para_casa(esc)
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 6 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 6, "e a noite segue até setembro")
+
+
+# --- 6b. Examinando quando a ligação leva a Boston ---------------------------------
+
+## O macaco (semente 2): examinando algo enquanto o relato de Keene acabava, a fase
+## trocava para Boston com o visualizador aberto sobre um objeto já liberado (erro
+## a cada quadro, a tela de exame presa em Boston). E as cartas da noite apareciam
+## na mesa uns segundos antes da troca.
+func _exame_na_ligacao_de_keene() -> void:
+	var esc := await _dia(4, {&"comecou_dia_4": true, &"ligou_agencia_arkham": true, &"ligou_boston": true,
+		&"ligou_telegrama_noturno": true, &"narrou_cartao_sexta": true, &"correio_telegrama_pedra": 3, &"correio_julho": 3})
+	await _entrar(esc)
+	var tel: Telefone = esc.find_child("Telefone", true, false)
+	_check(tel.atual() != null and tel.atual().id == &"relato_keene", "sexta-feira: o telefone toca (Keene)")
+	tel.interact(esc.player)
+	await _frames(2)
+	var escrever: WriteReply = esc.find_child("Dia4", true, false).get_node("Escrever")
+	var alvo: Examinable = null
+	for e: Examinable in esc.find_children("*", "Examinable", true, false):
+		if e.is_visible_in_tree() and e.can_interact(esc.player):
+			alvo = e
+			break
+	var viewer: Control = root.get_node("UI/ExamineViewer")
+	var escreveu_antes := [false]
+	while tel.em_ligacao() or SceneDirector.current_level == ESCRITORIO:
+		if is_instance_valid(alvo) and not viewer.visible and not Events.is_modal_open:
+			alvo.interact(esc.player)
+		if is_instance_valid(escrever) and escrever.can_interact(esc.player):
+			escreveu_antes[0] = true
+		await get_tree().process_frame
+		if SceneDirector.is_busy:
+			break
+	await _until(func() -> bool: return SceneDirector.current_level.ends_with("boston.tscn") and not SceneDirector.is_busy, 30.0)
+	await _frames(3)
+	_check(not escreveu_antes[0], "as cartas da noite só depois de Boston")
+	_check(SceneDirector.current_level.ends_with("boston.tscn") and not viewer.visible and not Events.is_modal_open,
+		"examinando quando a ligação acaba: em Boston, o exame fechado e nenhuma tela presa")
 
 
 # --- 7. Continuar em Boston -----------------------------------------------------------

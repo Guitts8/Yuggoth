@@ -641,8 +641,9 @@ passo, uma das interações disponíveis (as menos usadas primeiro), mirando de
 verdade; nas telas, qualquer abertura, carta amassada, folhear; no meio das cenas,
 a pausa, o dossiê, E para pular. Todo erro no log (um `Logger`) vira falha.
 
-Commit: `b62e9b2`. O macaco (semente 1) jogou a demo inteira, do Dia 1 à tinta
-da última carta, ~6.000 ações, sem travar nem sair do mapa, depois das correções.
+Commits: `b62e9b2` (itens 1–8), e o do item 9. O macaco jogou a demo inteira, do
+Dia 1 à tinta da última carta (~6.000 ações cada), com as sementes 1 e 2, sem
+travar nem sair do mapa, depois das correções.
 
 Bugs achados e corrigidos:
 1. ✅ **A pausa (Esc) ou o dossiê (Tab) no meio de uma cena devolviam o controle.**
@@ -677,6 +678,14 @@ Bugs achados e corrigidos:
    o caderno — e de novo, e de novo. Agora `Events.modal(dono, aberta)` registra
    quem tem tela aberta; `modal_changed` só sai quando abre a primeira ou fecha a
    última (e uma tela que some sem fechar, com a fase trocada, sai do registro).
+9. ✅ **Examinando algo quando a ligação de Keene leva a Boston** (o macaco,
+   semente 2, Dia 4): a fase trocava com o visualizador aberto sobre um objeto já
+   liberado — erro a cada quadro, e a tela de exame presa sobre Boston. O
+   `ExamineViewer` se fecha quando o alvo some. E "Escrever a Akeley" (Dia 4) aparecia
+   na mesa uns segundos antes da troca (a ligação marca `ligou_relato_keene` antes de
+   ir): agora só com `voltou_de_boston` — as cartas da noite, como no livro.
+   (Gerador e cena: só essa condição; a cena não foi regenerada inteira para não
+   mexer nos ids.)
 7. ✅ No teste de fumaça, "levantar a agulha; o zumbido fica" falhava às vezes (o
    zumbido sobe num tween de processo; com o tempo 8×, dois quadros de física não
    bastavam). Espera o zumbido.

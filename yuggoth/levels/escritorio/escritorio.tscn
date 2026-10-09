@@ -3326,7 +3326,7 @@ size = Vector3(0.22, 0.05, 0.14)
 
 [sub_resource type="Resource" id="Resource_mcvxf"]
 script = ExtResource("63_abadd")
-key = &"ligou_relato_keene"
+key = &"voltou_de_boston"
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_s728f"]
 size = Vector3(0.36, 0.2, 0.36)

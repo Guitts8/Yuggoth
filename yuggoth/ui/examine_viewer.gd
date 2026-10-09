@@ -79,7 +79,7 @@ func open(target: Examinable) -> void:
 
 
 func close() -> void:
-	var target := _target
+	var target: Examinable = _target if is_instance_valid(_target) else null
 	_target = null
 	if _model:
 		_model.queue_free()
@@ -118,6 +118,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	if not visible or _model == null:
+		return
+	# O que se examinava sumiu (a fase trocou: a ligação de Keene leva a Boston).
+	if not is_instance_valid(_target):
+		close()
 		return
 	var turn := Input.get_vector(&"olhar_esquerda", &"olhar_direita", &"olhar_cima", &"olhar_baixo")
 	if turn != Vector2.ZERO:

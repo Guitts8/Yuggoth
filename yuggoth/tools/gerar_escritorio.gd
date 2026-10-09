@@ -2138,7 +2138,10 @@ func _dia_4(parent: Node) -> void:
 		carimbo_data = "JUL 12\n1928",
 	}, "Envelope de Brattleboro",
 		"A letra de Akeley, mais trêmula. Carimbo de Brattleboro, 12 de julho — ele já não confia no correio de Townshend.")
-	_escrever(g, "resposta_dia_4", &"ligou_relato_keene")
+	# As cartas da noite, de volta de Boston (a ligação de Keene marca a flag uns
+	# segundos antes da troca de fase: dava para começar a escrever e ir a Boston
+	# com a carta aberta — o macaco, sessão de tester).
+	_escrever(g, "resposta_dia_4", &"voltou_de_boston")
 
 	# A foto de julho vem no envelope e fica junto das outras, dali em diante.
 	var julho := _grupo_se(parent, "FotografiaJulho", _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, 4))
