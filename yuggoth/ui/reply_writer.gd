@@ -52,7 +52,7 @@ func open(reply: ReplyData) -> void:
 		child.queue_free()
 	_mostrar_aberturas()
 	show()
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 	_focar_primeira()
 
 
@@ -170,7 +170,7 @@ func _close() -> void:
 	_chosen = null
 	hide()
 	_repor()
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 
 
 func _repor() -> void:

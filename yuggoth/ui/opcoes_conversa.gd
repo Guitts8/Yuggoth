@@ -64,7 +64,7 @@ func _ready() -> void:
 		coluna.add_child(l)
 		_rotulos.append(l)
 	_focar(0)
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 
 
 func _exit_tree() -> void:
@@ -107,6 +107,6 @@ func _confirmar(i: int) -> void:
 		return
 	if atual == self:
 		atual = null
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 	escolhida.emit(i)
 	queue_free()

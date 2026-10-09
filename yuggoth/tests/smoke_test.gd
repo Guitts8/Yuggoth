@@ -471,7 +471,9 @@ func _ready() -> void:
 	_check(is_equal_approx(GameState.get_number(&"exposicao") - exp_antes, fono.exposicao_primeira), "ouvir o disco aumenta a exposição")
 	_check(legendas.size() > 0 and legendas[0] == "(SONS INDISTINGUÍVEIS)", "legenda da gravação")
 	fono.interact(player)
-	await _frames(2)
+	# O zumbido sobe num tween de processo: com o tempo acelerado, vários quadros
+	# de física cabem num de processo, e dois deles não bastavam.
+	await _until(AudioDirector.is_hum_on, 3.0)
 	Events.subtitle_requested.disconnect(ouvir)
 	_check(not fono.tocando() and AudioDirector.is_hum_on(), "levantar a agulha; o zumbido fica")
 	player.global_position = Vector3(0, 0, -1.4)

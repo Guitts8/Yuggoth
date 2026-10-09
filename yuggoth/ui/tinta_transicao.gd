@@ -29,13 +29,13 @@ func _init() -> void:
 func _exit_tree() -> void:
 	if _modal:
 		_modal = false
-		Events.modal_changed.emit(false)
+		Events.modal(self, false)
 
 
 func tocar(doc: DocumentData) -> void:
 	_montar(doc)
 	_modal = true
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 	var t := create_tween().set_parallel()
 	t.tween_property(_fundo, "modulate:a", 1.0, 1.5)
 	t.tween_property(_papel, "modulate:a", 1.0, 1.5)

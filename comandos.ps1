@@ -54,7 +54,11 @@ Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
 
   TESTAR
     teste              teste de fumaça (~5 min; código = número de falhas)
-    importar           reimporta o projeto (depois de class_name nova ou asset gerado)
+    caminhos           os caminhos fora do roteiro (pausa no meio das cenas, menu e
+                       continuar, a noite sem fogo, Boston...; ~5 min)
+    macaco [semente]   um jogador ao acaso joga a demo inteira (~15 min); acusa
+                       travamentos, quedas do mapa e erros no log
+    importar          reimporta o projeto (depois de class_name nova ou asset gerado)
     captura <tag>      roda tests/_tmp_shot (capturas em .logs\capturas)
 
   GERAR (sobrescrevem arquivos gerados)
@@ -112,6 +116,12 @@ switch ($acao) {
 	"jogar-log" { & $godot --path $projeto }
 	"editor" { Start-Process $godotJanela -ArgumentList "-e", "--path", "`"$projeto`"" }
 	"teste" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/smoke_test.tscn") 600 "teste") }
+	"caminhos" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 900 "caminhos") }
+	"macaco" {
+		$env:CAMINHOS = "macaco"
+		if ($arg) { $env:SEMENTE = $arg }
+		exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 2400 "macaco")
+	}
 	"importar" { exit (Godot-Com-Limite @("--headless", "--path", ".", "--import") 300 "importar") }
 	"captura" {
 		$env:SHOT_DIR = Join-Path $logs "capturas"

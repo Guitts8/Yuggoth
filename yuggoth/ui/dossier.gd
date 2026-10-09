@@ -32,7 +32,7 @@ func open() -> void:
 	for doc in GameState.dossier:
 		list.add_item(doc.title)
 	show()
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 	if list.item_count > 0:
 		list.select(0)
 		list.grab_focus()
@@ -40,7 +40,7 @@ func open() -> void:
 
 func close() -> void:
 	hide()
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 
 
 func _open_document(index: int) -> void:

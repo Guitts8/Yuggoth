@@ -193,8 +193,12 @@ func _retirar() -> void:
 		var de := get_visual().global_position + Vector3(0, saida_altura, 0)
 		peca.global_position = de
 		var de_local := peca.position
+		# Pela referência fraca: lida no meio do caminho, a peça some (DocumentPickup).
+		var ref: WeakRef = weakref(peca)
 		create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT).tween_method(func(k: float) -> void:
-			peca.position = de_local.lerp(lugar, k) + Vector3.UP * sin(k * PI) * 0.05, 0.0, 1.0, 0.55)
+			var no := ref.get_ref() as Node3D
+			if no:
+				no.position = de_local.lerp(lugar, k) + Vector3.UP * sin(k * PI) * 0.05, 0.0, 1.0, 0.55)
 
 
 ## As abas da tampa se abrem (o pacote), devagar.
@@ -240,14 +244,18 @@ func _sair(n: Node3D, de: Vector3, atraso: float) -> void:
 	var ate := n.global_transform
 	var inicio := Transform3D(ate.basis, de)
 	n.global_transform = inicio
+	# Pela referência fraca: o jogador pode ler a carta no meio do caminho, e ela
+	# some (DocumentPickup); o nó preso no lambda daria erro a cada quadro.
+	var ref: WeakRef = weakref(n)
 	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_interval(atraso)
 	t.tween_method(func(k: float) -> void:
-		if not is_instance_valid(n):
+		var no := ref.get_ref() as Node3D
+		if no == null or not no.is_inside_tree():
 			return
 		var x := inicio.interpolate_with(ate, k)
 		x.origin += Vector3.UP * sin(k * PI) * 0.06
-		n.global_transform = x, 0.0, 1.0, SAIR)
+		no.global_transform = x, 0.0, 1.0, SAIR)
 
 
 ## Da mão até o lugar na mesa (`mesa`), num arco.

@@ -51,14 +51,14 @@ func open() -> void:
 	data.text = data_por_extenso(int(GameState.get_value(&"data", 0)))
 	buttons.show()
 	show()
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 	resume_button.grab_focus()
 
 
 func close() -> void:
 	hide()
 	get_tree().paused = false
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 
 
 func _on_options() -> void:

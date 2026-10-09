@@ -40,11 +40,20 @@ const DEBRUCAR_AVANCA := 0.28
 ## a cabeça continua livre (playtest 4: "a cabeça deve dar liberdade para o
 ## jogador, pois é quase a única que ele tem"): o mouse soma um desvio à direção
 ## que a cena dá; devolvido o controle, o desvio vira a direção do corpo e da cabeça.
+## Uma tela aberta (modal) também desliga, por cima do que a cena quer: fechada a
+## tela, volta o que a cena quer — a pausa ou o dossiê abertos no meio de uma cena
+## (selar, o diário, a lareira) não devolvem o controle antes da hora.
 var input_enabled := true:
+	get:
+		return _livre_na_cena and not _modal
 	set(v):
-		if v and not input_enabled:
+		var antes := input_enabled
+		_livre_na_cena = v
+		if input_enabled and not antes:
 			_assumir_olhar()
-		input_enabled = v
+## O que a cena quer (input_enabled sem a tela aberta).
+var _livre_na_cena := true
+var _modal := false
 ## Sentado só olha em volta; tentar andar levanta (Prólogo, GDD §5.0).
 var seated := false
 ## Levado por uma cena (a calha, a porta): a cena move o corpo, sem a física
@@ -283,6 +292,11 @@ func _look(delta: Vector2) -> void:
 	_olhar_extra.y = clampf(_olhar_extra.y - delta.y, deg_to_rad(-85.0) - head.rotation.x, deg_to_rad(85.0) - head.rotation.x)
 
 
+## Uma cena o tem agora (selar, acender a lareira...), com ou sem tela aberta.
+func em_cena() -> bool:
+	return not _livre_na_cena
+
+
 ## O mouse mexe a cabeça sempre que está preso — também numa cena (e folheando
 ## o diário, que é modal mas não solta o mouse). As telas o soltam.
 func pode_olhar() -> bool:
@@ -354,5 +368,8 @@ func _update_target() -> void:
 
 
 func _on_modal_changed(is_open: bool) -> void:
-	input_enabled = not is_open
+	var antes := input_enabled
+	_modal = is_open
+	if input_enabled and not antes:
+		_assumir_olhar()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if is_open else Input.MOUSE_MODE_CAPTURED

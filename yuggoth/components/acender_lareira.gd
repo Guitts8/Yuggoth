@@ -119,6 +119,8 @@ func _on_interact(by: Node) -> void:
 		return
 	player.abaixar = 0.0
 	await _esperar(0.6)
+	if not is_inside_tree():
+		return
 	player.input_enabled = true
 	_acendendo = false
 

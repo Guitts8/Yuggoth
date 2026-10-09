@@ -37,7 +37,7 @@ func open(doc: DocumentData) -> void:
 	_show_page()
 	# Na primeira abertura o papel ainda não tem tamanho; pagina no quadro seguinte.
 	_repaginate.call_deferred(doc)
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 
 	var read_flag := doc.get_read_flag()
 	if not GameState.has_flag(read_flag):
@@ -122,7 +122,7 @@ func close() -> void:
 	var doc := _doc
 	_doc = null
 	hide()
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 	Events.document_closed.emit(doc)
 
 

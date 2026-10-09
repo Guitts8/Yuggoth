@@ -133,7 +133,8 @@ func _process(delta: float) -> void:
 	# dela). Na hora de anotar o dia, só "Anotar"; fora dela, "Ler".
 	var anotar_pode := _anotar != null and not _ocupado and _anotar.can_interact(null)
 	_ligar_area(_anotar, anotar_pode)
-	_ligar_area(_ler, not _ocupado and not anotar_pode)
+	# Num sonho (a poltrona da noite 5), o caderno fechado na mesa não se folheia.
+	_ligar_area(_ler, not _ocupado and not anotar_pode and int(GameState.get_value(&"sonhando", 0)) == 0)
 	if _escrevendo and pena:
 		var ponta := global_transform * _na_pagina(_ponta_px())
 		# A pena sobe e desce um pouco, de letra em letra.
@@ -258,7 +259,7 @@ func ler(player: Player) -> void:
 		return
 	lendo = true
 	_pode_virar = true
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 	# Modal para o resto do jogo (o Esc é daqui, não do menu de pausa), mas o
 	# mouse continua preso: não há o que clicar.
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -268,7 +269,7 @@ func ler(player: Player) -> void:
 		if not is_inside_tree():
 			return
 	_mostrar_dica(false)
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 	player.input_enabled = false
 
 

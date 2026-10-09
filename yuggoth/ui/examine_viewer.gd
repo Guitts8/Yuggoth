@@ -75,7 +75,7 @@ func open(target: Examinable) -> void:
 	title_label.text = target.title
 	caption.text = target.description
 	show()
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 
 
 func close() -> void:
@@ -86,7 +86,7 @@ func close() -> void:
 		_model = null
 	_hotspots.clear()
 	hide()
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 	Events.examine_closed.emit(target)
 
 

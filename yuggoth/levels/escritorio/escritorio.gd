@@ -331,7 +331,7 @@ func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
 	# Selada, ele se levanta com a carta na mão.
 	player.stand()
 	selando = false
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 	Narrator.say(reply.narracao_depois if reply.narracao_depois else linha_resposta_selada)
 
 
@@ -342,8 +342,9 @@ func _process(_delta: float) -> void:
 	var fora := _fora()
 	porta.prompt = "Abrir a porta" if CartaSaida.atual else "Ir para casa"
 	# Aberta, a porta não se usa: o corredor está ali. Cada lado tem a sua área.
+	# Num sonho, ela não leva a lugar nenhum: não oferece "Ir para casa".
 	var fechada := not calha.porta_aberta and not calha.movendo
-	_ligar(porta, fechada and not fora)
+	_ligar(porta, fechada and not fora and int(GameState.get_value(&"sonhando", 0)) == 0)
 	_ligar(porta_fora, fechada and fora)
 	_ligar(por_na_calha, CartaSaida.atual != null and calha.porta_aberta and not postando)
 	calha.corredor.visible = calha.porta_aberta or calha.movendo or fora
@@ -421,7 +422,7 @@ func _abrir_porta(de_fora: bool) -> void:
 		await calha.abrir(player)
 	if not is_inside_tree():
 		return
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 
 
 ## Na calha do corredor, a carta vai (CalhaCorreio.por_na_calha). A resposta do
@@ -443,7 +444,7 @@ func _on_por_na_calha(_by: Node) -> void:
 	if reply.id == StringName("resposta_dia_%d" % dia_do_interludio):
 		_para_o_interludio()
 		return
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 	if reply.id == StringName("resposta_dia_%d" % dia()):
 		GameState.set_value(&"diario", dia())
 		Narrator.say(linha_diario)
@@ -523,7 +524,7 @@ func _on_anotar(_by: Node) -> void:
 			if lugar.linha:
 				Narrator.say(lugar.linha)
 			_saindo = false
-			player.input_enabled = not Events.is_modal_open
+			player.input_enabled = true
 			return
 		await get_tree().create_timer(0.8).timeout
 	if not is_inside_tree():
@@ -663,7 +664,7 @@ func _on_ler_diario(_by: Node) -> void:
 	if not is_inside_tree():
 		return
 	player.stand()
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 
 
 func _entrada(n: int) -> DocumentData:
@@ -679,7 +680,7 @@ func _hora_de_ir() -> void:
 	player.fov_forcado = 0.0
 	_pode_ir = true
 	_saindo = false
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 	Events.notice_requested.emit("Hora de ir para casa.")
 
 
@@ -721,7 +722,7 @@ func _fim_do_dia() -> void:
 		return
 	SaveSystem.checkpoint()
 	_saindo = false
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 	_inicio_do_dia()
 
 
@@ -736,7 +737,7 @@ func _sonhar(noite: int) -> void:
 	await _adormecer(noite)
 	if not is_inside_tree():
 		return
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 	var t := 0.0
 	while t < duracao_sonho and not (GameState.has_flag(acordar) and not Events.is_modal_open and not Narrator.is_speaking()):
 		await get_tree().process_frame
@@ -943,6 +944,12 @@ func passar_tempo(cartao: NarrationLine) -> void:
 	var de := _data()
 	var ate: int = datas_cartao.get(cartao.id, de + 1)
 	em_lapso = true
+	# Uma cena em curso (ajoelhado acendendo a lareira quando a ligação acaba)
+	# termina antes: as duas brigariam pelo corpo e pela cabeça.
+	while player.em_cena():
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
 	player.input_enabled = false
 	_olhar_a_janela()
 	# A fala que veio antes (ex.: a de depois de selar) termina primeiro: o cartão
@@ -962,7 +969,7 @@ func passar_tempo(cartao: NarrationLine) -> void:
 		await get_tree().process_frame
 		if not is_inside_tree():
 			return
-	player.input_enabled = not Events.is_modal_open
+	player.input_enabled = true
 	em_lapso = false
 
 

@@ -31,13 +31,13 @@ func open() -> void:
 	buttons.show()
 	show()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	Events.modal_changed.emit(true)
+	Events.modal(self, true)
 	(continue_button if continue_button.visible else new_game_button).grab_focus()
 
 
 func close() -> void:
 	hide()
-	Events.modal_changed.emit(false)
+	Events.modal(self, false)
 
 
 func _on_new_game() -> void:
