@@ -709,7 +709,7 @@ dia capturado de vários pontos (`tests/_tmp_shot`: o pé da escada, a porta, a 
 nas quatro direções, a mesa, o cesto, o canto do armário; `SHOT_MODO=sonhos` as
 noites 2–5, `SHOT_MODO=boston` a pensão; `SHOT_SONDA` lista as malhas numa caixa).
 
-Commit: `PENDENTE`.
+Commit: `50ea10c`.
 
 Bugs achados e corrigidos:
 1. ✅ **O jogo travava sem controle pelo resto da partida** (o macaco, semente 7, tom
