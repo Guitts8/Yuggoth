@@ -32,16 +32,21 @@ e a pena da mesa escreve a entrada do dia, ao som dela; a entrada vai para o
 dossiê. **Todo dia termina assim**, e o jogador nunca sabe se aquela noite terá
 sonho: sem sonho (Dia 1), ele fecha o caderno e levanta; com sonho, a última linha
 falha (ver *Os sonhos*). Acabado o dia, **"Ir para casa"**: a porta abre para o
-corredor, e o jogador anda por ele até a **escada**, no fim, que desce para a rua
-(um lanço até o patamar, com a arandela, e a volta do corrimão para o andar de baixo, na penumbra) —
-chegar nela é o cartão do dia seguinte. A página do diário que enche vira, e a
+corredor (lambri em almofadas, a passadeira, dois globos de luz, o quadro de avisos
+e o banco, a porta 312 com o vidro fosco aceso, a janela do poço de luz com o
+radiador no fim, a plaqueta *A. N. WILMARTH — LITERATURE* junto à porta dele), e o
+jogador anda por ele até a **escada**, no fim, que desce para a rua (um lanço até
+o patamar, com a arandela, e a volta do corrimão para o andar de baixo) — descer
+até o patamar é o cartão do dia seguinte. A página do diário que enche vira, e a
 escrita continua na seguinte. A porta, sem carta na
 mão, só lembra: *"Antes de ir, anotar o dia no diário."* Fora dessa hora, **"Ler o
 diário"**: o caderno abre no último par e se folheia, folha por folha.
 
-**A manhã**, em todos os dias: ele chega pelo corredor — o dia começa no alto da
-escada, diante da porta fechada do escritório; **"Abrir a porta"**, e o correio da
-noite está no chão (a fala do correio vem aí). Entrando, a porta fecha atrás dele.
+**A manhã**, em todos os dias (e a volta de Boston): o dia começa **no pé da
+escada**, no andar de baixo, junto à porta da rua (os vidros foscos, o capacho);
+ele sobe os dois lanços e anda pelo corredor até a porta fechada do escritório;
+**"Abrir a porta"**, e o correio da noite está no chão (a fala do correio vem aí).
+Entrando, a porta fecha atrás dele.
 
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
@@ -49,9 +54,11 @@ chão, junto à porta, iluminados pela luz do corredor que entra por baixo dela.
 **"Pegar o correio"** → o envelope sobe do chão para a mão (pega-se tudo o que
 caiu, numa pilha) → mirar a escrivaninha, **"Pôr na mesa"** → cada coisa viaja da
 mão até o seu lugar na mesa → **"Abrir com a espátula"** (som de papel rasgando)
-→ o conteúdo sai para a mesa; depois o envelope é examinável (carimbo, selos,
-letra). Pacotes que não passam na fresta ficam no chão junto à porta; aberto, o
-pacote se esvazia uma peça por vez ("Tirar o bilhete"...).
+→ o conteúdo sai de dentro do envelope, num arco, até o seu lugar na mesa (de um
+maço desamarrado, as cartas soltas, uma depois da outra); depois o envelope é
+examinável (carimbo, selos, letra). Pacotes que não passam na fresta ficam no chão
+junto à porta; aberto, as abas se abrem e o pacote se esvazia uma peça por vez
+("Tirar o bilhete"...).
 
 **Os sonhos 💭** — na noite depois dos Dias 2, 3, 4 e 5. Nem sempre no diário: na
 noite do disco (3) a entrada termina inteira, *"Antes de ir, quis ouvir o disco mais
@@ -71,10 +78,17 @@ debruçado no diário** (a linha borrada, a aurora rosada pela janela, a lâmpad
 ardeu a noite toda quase apagada); ergue a cabeça, e então vai para casa pelo corredor.
 | Noite | O sonho | Acorda |
 |---|---|---|
-| Dia 2 (as fotos) | Marcas de garra, de lama fresca e úmida (a borda brilha à luz fria), em duas fileiras da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá (em 3D) para o morro com o círculo de pedras, sob a lua; e outras **se formam** enquanto ele sonha, com um estalo úmido, uma a uma, em volta da cadeira, cada vez mais perto dele | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
+| Dia 2 (as fotos) | A sala começa a se estilhaçar (o Vazio, abaixo); marcas de garra, de lama fresca e úmida (a borda brilha à luz fria), em duas fileiras da porta até a mesa onde ele dorme, subindo por ela até a janela, que dá (em 3D) para o morro com o círculo de pedras, sob a lua; e outras **se formam** enquanto ele sonha, com um estalo úmido, uma a uma, em volta da cadeira, cada vez mais perto dele | ao seguir as marcas de volta até a porta, onde começam: *"Chamei-a de pegada, mas “marca de garra” seria melhor."* |
 | Dia 3 (o disco) | A sala some: ele está onde o disco foi gravado — 1 da manhã de 1º de maio de 1915, a boca fechada da caverna na encosta da Dark Mountain, sobre o pântano de Lee; vultos de manto na névoa, a lanterna de Akeley, o fonógrafo dele num toco tocando o disco de onde parou; uma das criaturas passa entre as árvores, de relance. E a loucura: na voz zumbida, a voz vem **de trás dele** e a vista **se desdobra**; os vultos, de costas, **viram o rosto pálido** para ele quando ninguém olha; a lanterna **anda sozinha**, em volta dele e depois rumo aos vultos; as árvores perto **respiram**; e **pedaços do escritório** aparecem entre as árvores, fora da vista — a porta com a luz do corredor por baixo, o abajur verde aceso no chão, a cadeira dele virada para a caverna, um pedaço da estante | ao levantar a agulha (ou no fim do disco) |
-| Dia 4 (a pedra) | A pedra negra que nunca chegou está na mesa; pela janela (em 3D), a plataforma de Keene de noite, os lampiões, o carrinho com o caixote e um homem magro de costas; a voz zumbida | ao examinar a pedra |
-| Dia 5 (AKELY) | Chove dentro da sala; o telefone toca | atendido: só um zumbido na linha, soletrando *A... K... E... L... Y.* |
+| Dia 4 (a pedra) | A sala mais estilhaçada; a pedra negra que nunca chegou está na mesa — uma estela de faces irregulares, o alto em duas águas tortas, uma quina lascada, fileiras de hieróglifos entalhados meio gastos; pela janela (em 3D), a plataforma de Keene de noite, os lampiões, o carrinho com o caixote e um homem magro de costas; a voz zumbida | ao examinar a pedra |
+| Dia 5 (AKELY) | A sala quase toda em pedaços; chove dentro dela; o telefone toca | atendido: só um zumbido na linha, soletrando *A... K... E... L... Y.* |
+
+**O Vazio** (playtest 6, como as dimensões do desconhecido em *Dishonored*): nos
+sonhos dentro da sala (noites 2, 4 e 5), as paredes leste e oeste e o teto viram
+estilhaços, com frestas escuras entre eles; perto das brechas, eles se soltam
+devagar, giram e boiam para fora, e o escuro aparece por trás, com pedaços de
+prédio boiando longe; livros (alguns abertos, batendo as folhas) e papéis soltos
+flutuam pela sala. Mais a cada noite. Acordado, a sala está inteira.
 
 **O tempo passa na própria sala:** nos saltos dentro de um dia (Dias 4 a 6), não há
 tela preta. O jogador fica parado (a cabeça livre), virado para a janela: Arkham passa
@@ -108,9 +122,15 @@ da última carta manuscrita enche a tela e a tinta vira o céu de Vermont.
 ---
 
 ## Menu principal ✅
-Título **"Os que Sussurram"**, subtítulo *Vermont, 1928*. Continuar (só se há
-save), Novo jogo (pede confirmação se há save), Opções (volumes, sensibilidade,
-inverter eixo, tela cheia), Sair. **Esc** durante o jogo abre a pausa.
+**Um livro aberto** (capa de couro, papel com grão, a sombra da lombada, páginas
+i e ii). À esquerda: *a partir de H. P. Lovecraft*, o título **"Os que
+Sussurram"**, *Vermont, 1928*, e a epígrafe — *"Tenham bem em mente que, no fim,
+eu não vi nenhum horror visual de fato."* (The Whisperer in Darkness, 1931). À
+direita, o **Sumário**: Continuar (só se há save), Novo jogo (pede confirmação se
+há save), Opções, Sair. **Opções** são as páginas seguintes — a folha vira (o som
+à esquerda; o mouse e a tela à direita) e volta ao fechar. **Esc** durante o jogo
+abre a pausa, no mesmo livro: *Pausa* e a data do dia (*Arkham, 18 de julho de
+1928*), e à direita Continuar, Opções, Menu principal, Sair.
 
 ---
 
@@ -225,7 +245,8 @@ debate público sobre o horror de Vermont terminou para sempre."*; tiradas as fo
 
 **Na sala:**
 - **Pacote do American Railway Express**, no chão junto à porta (etiqueta de
-  Brattleboro a Arkham), amarrado com barbante. Na mesa, **"Cortar o barbante"**:
+  Brattleboro a Arkham), amarrado com barbante. Na mesa, **"Abrir o pacote"**: o
+  barbante cai, as abas da caixa se abrem, e o que veio se vê lá dentro;
   tiram-se, um de cada vez, o bilhete, a transcrição e o **estojo do cilindro de cera** (examinável:
   *"1º de maio de 1915"*).
 - **Bilhete de Akeley:** o medo das estradas, a Califórnia, e **Walter Brown** —
@@ -359,7 +380,8 @@ junto à porta quando a luz volta.
    de roceiro"* — o que antes não dizia. Nenhum aviso.
 6. Depois do bilhete, quem olhar para a **janela** vê **um vulto passar** lá fora,
    uma vez, sem som — uma das criaturas, a uns dois metros do vidro, grande,
-   devagar, as asas batendo na chuva, enchendo o vão da janela. "Olhar" a janela: *"Só a chuva, escorrendo no vidro."*
+   **subindo** de baixo do peitoril até sumir no alto, as asas batendo na chuva,
+   em pouco mais de um segundo. "Olhar" a janela: *"Só a chuva, escorrendo no vidro."*
 7. **"Escrever a Akeley"** de novo — renovar a oferta (sem tom) → cartão: *"A
    resposta dele chegou a 28 de agosto."*
 8. **Carta de 28 de agosto**: já não é tão contra o plano; quer pôr as coisas em

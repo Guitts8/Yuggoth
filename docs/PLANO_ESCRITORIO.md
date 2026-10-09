@@ -499,53 +499,105 @@ O usuário jogou o playtest 6. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ 
 1. ✅ **F8 fecha o jogo.** Rodando pelo editor, F8 é o "parar o projeto" do Godot
    (o jogo em execução repassa a tecla ao editor; o log da sessão acaba sem erro
    nenhum). Feito: **F2** pula o dia, **F3** recarrega — longe de F5–F12.
-2. 🔧 **Os títulos estão em letra bastão**, e a copperplate (Pinyon) é difícil de
-   ler: a leitura tem de ficar mais clara.
-3. 🔧 **No diário, a escrita não se lê** (a mesma copperplate).
-4. 🔧 **Ao abrir a porta, o personagem gira.**
-5. 🔧 **O corredor está simples demais**: melhorar o modelo.
-6. 🔧 **O café está com a textura do chão.**
-7. 🔧 **O dia começa diante da porta**: começar no pé da escada.
-8. 🔧 **Abrir o pacote quando chega**, antes de tirar as coisas.
-9. 🔧 **A poltrona está perto demais das paredes.**
-10. 🔧 **O sonho: livros flutuando, paredes quebradas e estilhaçadas**, como as
-    dimensões do Vazio em *Dishonored*.
-11. 🔧 **A ondulação está forte demais**: diminuir.
-12. 🔧 **O modelo da pedra** (o sonho da pedra negra) tem de melhorar.
-13. 🔧 **Algumas cartas ainda se teletransportam**: sem suavidade.
-14. 🔧 **O mi-go passou devagar e claro demais** diante da casa: mais rápido, talvez
-    subindo na vertical em vez de vagar na horizontal.
-15. 🔧 **Acordar depois de "Sentar diante do fogo": travado** no mesmo lugar.
-16. 🔧 **O menu como páginas de um livro**, como decidido.
+2. ✅ **Os títulos estão em letra bastão**, e a copperplate (Pinyon) é difícil de
+   ler. Feito: comparadas cinco copperplates no papel do leitor (Pinyon, Petit
+   Formal, Parisienne, Meddon, Italianno): **Wilmarth em Petit Formal Script**, de
+   longe a mais clara, com entrelinha maior (`STYLE_ENTRELINHA`). Os títulos, a
+   interface toda (fonte padrão do projeto) e o jornal em **Old Standard**, a
+   serifada das publicações do começo do século XX. Akeley continua em Tangerine.
+3. ✅ **No diário, a escrita não se lê.** Além da letra, era escala: o mundo é
+   desenhado a ~480 linhas. Feito: corpo 21 → 25 e a vista debruçada mais
+   apertada (FOV 38 → 30); a página enche a tela e a letra se lê.
+4. ✅ **Ao abrir a porta, o personagem gira.** Medido: perto da maçaneta, o giro do
+   caminho (no mínimo 0,5 s) ainda corria quando vinha o de olhar para fora; os
+   dois tweens brigavam pela rotação e o corpo dava 352–441°. Feito: um giro novo
+   substitui o anterior (`Player._giro`; quem esperava o velho segue) e parte do
+   ângulo normalizado; `conduzir` espera o olhar terminar. Agora 45–81°.
+5. ✅ **O corredor está simples demais.** Feito: almofadas no lambri (as duas
+   paredes), cimalha no alto, passadeira vermelha com galões de latão, dois globos
+   de luz com roseta, a janela de guilhotina do poço de luz no fim (vidro fosco)
+   com o radiador de ferro embaixo, o quadro de avisos com papéis pregados e o
+   banco, a porta 312 (vidro fosco aceso, bandeira) e a 308 do lado da sala
+   (apagada), a plaqueta de latão *A. N. WILMARTH — LITERATURE* junto à porta, o
+   cinzeiro de pé no alto da escada; lá embaixo, a porta da rua.
+6. ✅ **O café está com a textura do chão.** Era a textura de papel pautado em
+   coordenadas de mundo — no café e na porcelana (a xícara, o pires): as linhas
+   pareciam tábuas. Feito: líquidos, porcelana e vidro fosco sobre o grão neutro.
+7. ✅ **Começar o dia no pé da escada.** Feito: a escada é andável (rampas de
+   colisão rentes aos narizes dos dois lanços, o patamar, o andar de baixo com as
+   paredes do vão); a marca `Porta` está lá embaixo, junto à porta da rua — a
+   manhã e a volta de Boston começam ali (~5 s de subida até a porta); o dia
+   acaba descendo, no patamar (`%Escada`). O piso do corredor passava 20 cm sobre
+   a boca da escada e virava um degrau invisível no alto. O teste sobe e desce
+   andando, com a física.
+8. ✅ **Abrir o pacote antes de tirar as coisas.** Feito: o pacote é uma caixa de
+   papelão aberta em cima com duas abas (`Correspondencia.abas`, meta `aberta`);
+   **"Abrir o pacote"**: o barbante cai, as abas se abrem, e o bilhete, a
+   transcrição e o estojo se veem lá dentro até saírem, um a um.
+9. ✅ **A poltrona perto demais das paredes.** Feito: de (1,7; 0,88) para (1,15;
+   0,95), ainda virada para o fogo (−32°); a mesinha vai junto.
+10. ✅ **O sonho estilhaçado, como o Vazio de *Dishonored*.** Feito: `Vazio`
+    (`components/vazio.gd`) nas noites dentro da sala (2, 4, 5), mais a cada noite:
+    as paredes leste e oeste e o teto viram estilhaços do mesmo material (UV do
+    lugar original), com frestas escuras; perto das `brechas`, eles se soltam em
+    ~7 s, giram e boiam para fora; pedaços de prédio boiam no escuro; livros
+    (um em três aberto, batendo as folhas) e papéis flutuam. Acordado, as paredes
+    voltam. A névoa do sonho ficou mais funda (até 12 m) para os destroços.
+11. ✅ **A ondulação forte demais.** Era o redemoinho afim das texturas, que no
+    sonho (e com exposição alta) ia a 5×. Feito: 2,5×; o tremor de vértices 2,5 →
+    2,0; a onda da tela pela metade.
+12. ✅ **O modelo da pedra.** Feito: no lugar de duas caixas, uma estela de faces
+    irregulares (`_monolito`: anéis de 7 lados com arestas de talhe, mais larga
+    embaixo, o alto em duas águas tortas, uma quina lascada) e a textura nova
+    (128 px, veios, fileiras de hieróglifos entalhados — sulco escuro, borda clara
+    —, meio gastos).
+13. ✅ **Cartas que ainda se teletransportavam.** Eram duas: ao abrir um envelope, a
+    carta de dentro surgia pronta na mesa; ao desamarrar um maço, as cartas soltas
+    surgiam cada uma no seu lugar. Feito: aberto, tudo o que só aparece aberto sai
+    de dentro do envelope (ou do maço), num arco, até o seu lugar, uma peça depois
+    da outra (`Correspondencia._tirar_conteudo`).
+14. ✅ **O mi-go devagar e claro demais.** Feito: sobe na vertical, de baixo do
+    peitoril até sumir no alto, em 1,1 s (era 2,6 s na horizontal), as asas mais
+    rápidas, o clarão mais fraco.
+15. ✅ **Travado depois de "Sentar diante do fogo".** Era no próprio sonho da noite
+    5: ele adormece sentado na poltrona, e andar o levantava dentro da colisão
+    dela. Feito: levantando-se andando, ele dá o passo até o lugar livre mais perto
+    (`Player._desencaixar`, `Player.livre`); o teste confere.
+16. ✅ **O menu como páginas de um livro.** Feito: `Livro` (`ui/menu/livro.gd`) — a
+    capa de couro, as páginas com grão e a sombra da lombada, os números de página;
+    o tema de tinta (botões como entradas de sumário, sublinhados no foco). Menu
+    principal: à esquerda o título, *Vermont, 1928* e a epígrafe do conto; à
+    direita o **Sumário**. As **Opções** são as páginas seguintes: a folha vira de
+    verdade (a imagem da página que sai se levanta e deita do outro lado, a nova
+    aparece por baixo) e volta ao fechar. A **pausa** no mesmo livro, com a data do
+    dia (*Arkham, 18 de julho de 1928*).
 
-## Onde estamos (revisão de 2026-10-08, depois da 3f)
+## Onde estamos (revisão de 2026-10-09, depois da 3g)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
-3e e a **3f** (itens 1–19). Teste de fumaça com 0 falhas. Nenhum push feito (nem
-pedido).
+3e, a 3f e a **3g** (itens 1–16). Teste de fumaça com 0 falhas. Nenhum push feito
+(nem pedido).
 
-**Esperando o usuário — o playtest 6** (do Dia 1 ao fim da demo; F8 pula dias). O
-que olhar:
-1. A porta em duas ações: "Abrir a porta", o corredor livre, "Pôr a carta na
-   calha", a porta que fecha sozinha ao voltar. E a manhã pelo corredor, todo dia:
-   cansa em 6 repetições?
-2. O girinho ao clicar na porta: sumiu?
-3. O diário de couro: a capa, as folhas correndo até a fita; fechar ao contrário.
-4. As duas mãos: Akeley (Tangerine) e Wilmarth (Pinyon Script) no leitor, na
-   escrita da resposta e no diário — legíveis o bastante?
-5. O fonógrafo montado, junto à estante; pôr o correio na mesa à mão; o pacote do
-   Dia 3 esvaziando peça por peça.
-6. A escada com o patamar; a xícara com o café.
-7. O sonho da noite 2 (as pegadas que se formam) e o do disco (a voz por trás, a
-   visão dupla, os vultos que viram, a lanterna que anda, as árvores que respiram,
-   os pedaços do escritório).
-8. O mi-go do Dia 5, rente à janela.
+**Esperando o usuário — o playtest 7** (do Dia 1 ao fim da demo; **F2** pula dias,
+**F3** recarrega). O que olhar:
+1. O menu em livro: a folha virando para as Opções e de volta; a pausa.
+2. A letra: Wilmarth em Petit Formal (leitor, resposta, diário) e os títulos em
+   Old Standard — agora se lê?
+3. A manhã do pé da escada, subindo: cansa em 6 repetições? E descer para ir para
+   casa.
+4. O corredor novo; a poltrona no lugar novo; a xícara e o café.
+5. A porta: ainda gira?
+6. O pacote que abre; as cartas saindo dos envelopes e do maço.
+7. Os sonhos estilhaçados (noites 2, 4, 5): forte demais, fraco demais? A
+   ondulação mais branda está boa?
+8. A pedra negra nova; o mi-go subindo diante da janela.
+9. Levantar da poltrona no sonho da noite 5 (andando) e acordar depois.
 
 **Decisões de texto pendentes:** as entradas do diário (as 3 e 5 mudaram na 3d) e as
 falas `sono_disco`/`sono_fogo`; o visual do sonho (pendência antiga); "Deixar sem
 resposta" (Dia 2). O bosque do disco (os vultos, a criatura) é 💭.
 
-**Como retomar numa sessão nova:** ler este arquivo (a 3f e esta seção), esperar a
-lista do playtest 6 e registrá-la como **Fase 3g**, no mesmo formato. Não começar a
+**Como retomar numa sessão nova:** ler este arquivo (a 3g e esta seção), esperar a
+lista do playtest 7 e registrá-la como **Fase 3h**, no mesmo formato. Não começar a
 Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
@@ -561,11 +613,10 @@ Fase 4 antes dela.
 2c. ✅ O usuário jogou o **playtest 5** (até a noite 3); a lista virou a **Fase 3f**.
 2d. ✅ Fase 3f: feitos os itens 1–19 (o usuário respondeu os ❓ com as
    recomendações).
-2e. **← AQUI.** O usuário joga o **playtest 6** (do Dia 1 ao fim da demo, ou com F8):
-   a porta em duas ações e a manhã pelo corredor (cansa?), o diário que abre na
-   fita, as duas mãos no leitor, o fonógrafo junto à estante, pôr na mesa à mão, o
-   sonho da noite 2 e a loucura do sonho do disco; a lista vira a Fase 3g. Não
-   começar a Fase 4 antes dela.
+2e. ✅ O usuário jogou o **playtest 6**; a lista virou a **Fase 3g**, toda feita.
+2f. **← AQUI.** O usuário joga o **playtest 7** (do Dia 1 ao fim da demo, ou com
+   F2): o menu em livro, a letra nova, a manhã do pé da escada, o corredor, os
+   sonhos estilhaçados; a lista vira a Fase 3h. Não começar a Fase 4 antes dela.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 
