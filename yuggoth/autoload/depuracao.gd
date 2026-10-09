@@ -120,14 +120,22 @@ func pular_dia() -> void:
 	_abrir_escritorio("(teste) Pulado para o Dia %d" % (n + 1))
 
 
-## Recarrega o escritório no dia corrente, com o estado como está.
+## Recarrega o escritório no dia corrente, com o estado como está. Uma carta
+## selada e ainda não postada volta à mão (a resposta já conta como escrita: sem
+## ela, não haveria o que postar).
 func recarregar_dia() -> void:
 	if not _pode_mexer():
 		return
+	var escritorio := get_tree().root.find_children("*", "Escritorio", true, false)
+	var carta: ReplyData = escritorio[0].carta_por_postar if not escritorio.is_empty() else null
 	for chave: StringName in [&"sono", &"sonhando"]:
 		GameState.set_value(chave, 0)
 	GameState.set_value(&"sonho", 0.0)
-	_abrir_escritorio("(teste) Dia %d recarregado" % int(GameState.get_value(&"dia", 1)))
+	await _abrir_escritorio("(teste) Dia %d recarregado" % int(GameState.get_value(&"dia", 1)))
+	escritorio = get_tree().root.find_children("*", "Escritorio", true, false)
+	if carta and not escritorio.is_empty():
+		escritorio[0].carta_por_postar = carta
+		CartaSaida.criar(escritorio[0].miskatonic, carta)
 
 
 func _abrir(c: Correspondencia) -> void:

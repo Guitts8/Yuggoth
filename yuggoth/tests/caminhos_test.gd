@@ -28,7 +28,8 @@ class Registro extends Logger:
 	var erros := PackedStringArray()
 
 	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool, error_type: int, script_backtraces: Array[ScriptBacktrace]) -> void:
-		if error_type == ERROR_TYPE_WARNING:
+		# Avisos não contam, menos o de uma tela liberada sem fechar (Events).
+		if error_type == ERROR_TYPE_WARNING and not (code + rationale).contains("Tela liberada"):
 			return
 		var onde := "%s:%d" % [file, line]
 		if not script_backtraces.is_empty() and script_backtraces[0].get_frame_count() > 0:
@@ -49,9 +50,10 @@ func _anotar_acao(texto: String) -> void:
 
 func _ready() -> void:
 	OS.add_logger(_registro)
-	# O macaco também tem o seu: roda junto com os caminhos.
+	# O macaco também tem o seu (um por semente): roda junto com os caminhos e com
+	# outros macacos.
 	var so := OS.get_environment("CAMINHOS").split(",", false)
-	SaveSystem.save_path = SAVE_CAMINHOS.replace("caminhos", "macaco") if "macaco" in so else SAVE_CAMINHOS
+	SaveSystem.save_path = SAVE_CAMINHOS.replace("caminhos", "macaco_" + OS.get_environment("SEMENTE")) if "macaco" in so else SAVE_CAMINHOS
 	SaveSystem.delete_save()
 	Settings.settings_path = SETTINGS_CAMINHOS
 	DirAccess.remove_absolute(SETTINGS_CAMINHOS)
@@ -71,7 +73,8 @@ func _ready() -> void:
 	# CAMINHOS=escada_com_a_carta,... roda só esses (depuração do próprio teste).
 	# O macaco é longo (o jogo inteiro): só quando pedido (CAMINHOS=macaco).
 	for parte: Callable in [_textos, _modais_no_meio_das_cenas, _menu_no_meio_do_dia, _escada_com_a_carta,
-			_diario_vazio, _noite_sem_fogo, _exame_na_ligacao_de_keene, _continuar_em_boston, _macaco]:
+			_diario_vazio, _noite_sem_fogo, _exame_na_ligacao_de_keene, _diario_na_ligacao_de_keene, _continuar_em_boston,
+			_legenda_presa, _depuracao_no_meio_das_cenas, _menu_no_fim_da_demo, _menu_pelo_teclado, _macaco]:
 		var nome := parte.get_method().trim_prefix("_")
 		if (so.is_empty() and nome != "macaco") or nome in so:
 			print("-- %s" % parte.get_method())
@@ -437,6 +440,26 @@ func _exame_na_ligacao_de_keene() -> void:
 		"examinando quando a ligação acaba: em Boston, o exame fechado e nenhuma tela presa")
 
 
+## O macaco (semente 7, sessão de tester 2): lendo o diário enquanto o relato de
+## Keene acabava, a fase trocava para Boston com o caderno aberto; a tela nunca
+## fechava, e o jogador ficava sem controle pelo resto do jogo.
+func _diario_na_ligacao_de_keene() -> void:
+	var esc := await _dia(4, {&"comecou_dia_4": true, &"ligou_agencia_arkham": true, &"ligou_boston": true,
+		&"ligou_telegrama_noturno": true, &"narrou_cartao_sexta": true, &"correio_telegrama_pedra": 3, &"correio_julho": 3})
+	await _entrar(esc)
+	var tel: Telefone = esc.find_child("Telefone", true, false)
+	tel.interact(esc.player)
+	await _until(func() -> bool: return tel.em_ligacao() and esc.player.input_enabled, 20.0)
+	var ler: Interactable = esc.diario.get_node("Ler")
+	_check(ler.can_interact(esc.player), "ao telefone com Keene: \"Ler o diário\"")
+	ler.interact(esc.player)
+	await _until(func() -> bool: return SceneDirector.current_level.ends_with("boston.tscn") and not SceneDirector.is_busy, 120.0)
+	await _seconds(1.0)
+	var boston: Boston = root.find_child("Boston", true, false)
+	_check(boston != null and not Events.is_modal_open and boston.player.input_enabled,
+		"lendo o diário quando a ligação leva a Boston: lá, nenhuma tela presa, e ele anda")
+
+
 # --- 7. Continuar em Boston -----------------------------------------------------------
 
 ## O checkpoint da Boston (a troca de fase salva): sair dali para o menu e
@@ -479,6 +502,227 @@ func _continuar_em_boston() -> void:
 	_check((esc.find_child("Dia4", true, false).get_node("Escrever") as WriteReply).can_interact(esc.player), "as cartas da noite esperam")
 
 
+# --- 7b. A legenda presa ------------------------------------------------------------------
+
+## Sessão de tester 2: a legenda de som (o disco, o telefone, uma conversa) ficava
+## na tela depois de sair para o menu ou trocar de fase, até o tempo dela acabar —
+## e reaparecia por cima do jogo continuado.
+func _legenda_presa() -> void:
+	var hud := root.get_node("UI/HUD")
+	var esc := await _dia(4, {&"comecou_dia_4": true, &"fono_corneta": true, &"fono_manivela": true, &"fono_agulha": true,
+		&"fono_cilindro": true, &"cilindro_chegou": true, &"tocou_disco": true})
+	await _entrar(esc)
+	# No tempo normal: acelerado, a legenda acabaria sozinha durante o fade.
+	Engine.time_scale = 1.0
+	var legendas: Array[String] = []
+	var ouvir := func(t: String, _s: float) -> void: legendas.append(t)
+	Events.subtitle_requested.connect(ouvir)
+	esc.fonografo.tocar()
+	await _until(func() -> bool: return legendas.any(func(t: String) -> bool: return not t.is_empty()), 60.0)
+	Events.subtitle_requested.disconnect(ouvir)
+	_check(hud.subtitle.modulate.a > 0.5 and not hud.subtitle.text.is_empty(), "o disco tocando: a legenda na tela")
+	await root.quit_to_menu()
+	await _frames(2)
+	await root.continue_game()
+	await _until(func() -> bool: return not SceneDirector.is_busy and SceneDirector.current_level == ESCRITORIO, 20.0)
+	await _frames(3)
+	_check(_sem_legenda(), "saído para o menu com o disco tocando: ao continuar, a legenda não volta")
+	Engine.time_scale = 8.0
+
+
+func _sem_legenda() -> bool:
+	var hud := root.get_node("UI/HUD")
+	return hud.subtitle.text.is_empty() or hud.subtitle.modulate.a < 0.05
+
+
+# --- 7c. F2/F3 no meio das cenas -----------------------------------------------------------
+
+## Os atalhos de teste (F2 pula o dia, F3 recarrega) no meio de uma cena: selando,
+## escrevendo o diário, adormecendo, ao telefone, no lapso, acendendo a lareira.
+## Nada fica pendurado (a tela de sonho, as pálpebras, a legenda, a pausa), e o dia
+## seguinte (ou o mesmo) se joga.
+func _depuracao_no_meio_das_cenas() -> void:
+	var dep := get_node_or_null(^"/root/Depuracao")
+	if dep == null:
+		return
+	# Selando a carta, F3: a carta selada não se perde (antes, a resposta ficava
+	# escrita e a carta sumia com o load — não havia mais o que postar).
+	var esc := await _dia(1)
+	await _ler_carta_1(esc)
+	var escrever: WriteReply = esc.find_child("Escrever", true, false)
+	escrever.interact(esc.player)
+	await _frames(1)
+	writer._choose(escrever.reply.options[0])
+	writer._finish_writing()
+	writer._seal()
+	await _until(func() -> bool: return esc.selando, 10.0)
+	await _seconds(1.0)
+	esc = await _atalho(dep.recarregar_dia)
+	await _limpo(esc, 1, "F3 selando")
+	_check(CartaSaida.atual != null, "F3 selando: a carta selada continua na mão")
+	if CartaSaida.atual:
+		await _porta(esc)
+	_check(GameState.get_value(&"diario") == 1, "F3 selando: a carta vai pela calha, e falta o diário")
+
+	# Escrevendo o diário, F2.
+	await _anotar(esc)
+	await _until(func() -> bool: return esc.diario.aberto, 45.0)
+	esc = await _atalho(dep.pular_dia)
+	await _limpo(esc, 2, "F2 escrevendo o diário")
+
+	# Adormecendo à mesa (a noite 2), F2.
+	esc = await _dia(2, {&"comecou_dia_2": true, &"escreveu_resposta_dia_2": true, &"resposta_dia_2": 0, &"diario": 2})
+	await _entrar(esc)
+	await _anotar(esc)
+	await _until(func() -> bool: return GameState.get_number(&"sonho") > 0.2, 120.0)
+	_check(GameState.get_number(&"sonho") > 0.2, "Dia 2: adormecendo à mesa")
+	esc = await _atalho(dep.pular_dia)
+	await _limpo(esc, 3, "F2 adormecendo")
+
+	# Ao telefone (o relato de Keene, que leva a Boston), F2: nem a legenda nem a
+	# Boston vêm depois.
+	esc = await _dia(4, {&"comecou_dia_4": true, &"ligou_agencia_arkham": true, &"ligou_boston": true,
+		&"ligou_telegrama_noturno": true, &"narrou_cartao_sexta": true, &"correio_telegrama_pedra": 3, &"correio_julho": 3})
+	await _entrar(esc)
+	var tel: Telefone = esc.find_child("Telefone", true, false)
+	var legendas: Array[String] = []
+	var ouvir := func(t: String, _s: float) -> void: legendas.append(t)
+	Events.subtitle_requested.connect(ouvir)
+	tel.interact(esc.player)
+	await _until(func() -> bool: return legendas.any(func(t: String) -> bool: return not t.is_empty()), 30.0)
+	Events.subtitle_requested.disconnect(ouvir)
+	esc = await _atalho(dep.pular_dia)
+	await _limpo(esc, 5, "F2 ao telefone")
+	await _seconds(3.0)
+	_check(SceneDirector.current_level == ESCRITORIO and GameState.get_value(&"dia") == 5, "F2 ao telefone: a ligação não leva a Boston depois")
+
+	# No meio do lapso (Dia 5), F2.
+	esc = await _dia(5, {&"comecou_dia_5": true})
+	await _entrar(esc)
+	SceneDirector.time_skip(load("res://narrative/narration/cartao_aprofundava.tres"))
+	await _until(func() -> bool: return esc.lapso.passando, 30.0)
+	await _seconds(0.5)
+	esc = await _atalho(dep.pular_dia)
+	await _limpo(esc, 6, "F2 no meio do lapso")
+
+	# Acendendo a lareira (Dia 6), F3.
+	esc = await _dia(6, {&"comecou_dia_6": true})
+	await _entrar(esc)
+	var acender: AcenderLareira = esc.find_child("Dia6", true, false).get_node("AcenderLareira")
+	acender.interact(esc.player)
+	await _seconds(1.0)
+	_check(not esc.player.input_enabled, "Dia 6: acendendo a lareira")
+	esc = await _atalho(dep.recarregar_dia)
+	await _limpo(esc, 6, "F3 acendendo a lareira")
+
+
+## Aperta o atalho de teste e espera o escritório novo (o atalho volta o tempo a 1×).
+func _atalho(acao: Callable) -> Escritorio:
+	acao.call()
+	await _until(func() -> bool: return SceneDirector.is_busy, 5.0)
+	await _until(func() -> bool: return not SceneDirector.is_busy, 30.0)
+	await _frames(3)
+	Engine.time_scale = 8.0
+	return root.find_child("Escritorio", true, false) as Escritorio
+
+
+## Depois de um atalho no meio de uma cena: o dia `n`, nada pendurado, e ele entra.
+func _limpo(esc: Escritorio, n: int, quando: String) -> void:
+	await _seconds(1.5)
+	var pendurados := root.get_tree().root.find_children("*", "Palpebras", true, false) \
+		+ root.get_tree().root.find_children("*", "TintaTransicao", true, false)
+	_check(esc != null and GameState.get_value(&"dia") == n and not Events.is_modal_open and not get_tree().paused
+		and pendurados.is_empty() and Correspondencia.na_mao.is_empty(),
+		"%s: o Dia %d, sem tela nem pálpebras presas %s" % [quando, n, pendurados])
+	_check(root.dream_level < 0.2 and is_zero_approx(GameState.get_number(&"sonho")) and int(GameState.get_value(&"sonhando", 0)) == 0,
+		"%s: sem o sonho" % quando)
+	_check(_sem_legenda(), "%s: sem legenda presa" % quando)
+	if esc == null:
+		return
+	await _entrar(esc)
+	_check(esc.player.input_enabled and not esc.player.seated and is_zero_approx(esc.player.debrucado), "%s: ele entra e anda" % quando)
+
+
+# --- 7d. O menu no fim da demo ---------------------------------------------------------------
+
+## Postada a última carta, a tinta e o cartão do fim em tela preta. No cartão,
+## o Esc abre a pausa; sair para o menu e continuar volta à manhã do Dia 6, sem a
+## tela preta presa.
+func _menu_no_fim_da_demo() -> void:
+	var esc := await _dia(6, {&"comecou_dia_6": true, &"escreveu_resposta_dia_6": true, &"resposta_dia_6": 1})
+	await _entrar(esc)
+	CartaSaida.criar(esc.miskatonic, load("res://narrative/replies/resposta_dia_6.tres"))
+	await _frames(2)
+	await _porta(esc)
+	var tinta_na_tela := func() -> bool: return get_tree().root.get_children().any(func(n: Node) -> bool: return n is TintaTransicao)
+	await _until(tinta_na_tela, 60.0)
+	_check(tinta_na_tela.call(), "a última carta postada: a tinta")
+	await _press(&"ui_cancel")
+	_check(not pause.visible, "durante a tinta, a pausa não abre")
+	await _until(func() -> bool: return not tinta_na_tela.call() and SceneDirector.hold_black and Narrator.is_speaking(), 120.0)
+	Engine.time_scale = 1.0
+	await _press(&"ui_cancel")
+	_check(pause.visible, "no cartão do fim, o Esc abre a pausa")
+	if pause.visible:
+		await root.quit_to_menu()
+		await _frames(3)
+	Engine.time_scale = 8.0
+	await _seconds(2.0)
+	_check(main_menu.visible and not SceneDirector.hold_black and not get_tree().paused, "saído no cartão do fim: o menu, sem a tela presa")
+	await root.continue_game()
+	await _until(func() -> bool: return not SceneDirector.is_busy and SceneDirector.current_level == ESCRITORIO, 20.0)
+	await _seconds(2.0)
+	esc = root.find_child("Escritorio", true, false)
+	_check(GameState.get_value(&"dia") == 6 and SceneDirector._fade.modulate.a < 0.05 and not SceneDirector.hold_black and not main_menu.visible,
+		"continuar: a manhã do Dia 6, à vista")
+	await _entrar(esc)
+	_check(esc.player.input_enabled and CartaSaida.atual == null, "e ele entra, sem carta na mão")
+
+
+# --- 7e. O menu pelo teclado ------------------------------------------------------------------
+
+## O Necronomicon sem mouse: as setas andam pelo sumário, Enter abre as Opções (a
+## folha vira), Esc volta com o foco nas Opções, e Continuar volta ao jogo.
+func _menu_pelo_teclado() -> void:
+	await _dia(2)
+	await root.quit_to_menu()
+	await _until(func() -> bool: return main_menu.visible and not SceneDirector.is_busy, 10.0)
+	Engine.time_scale = 1.0
+	await _seconds(2.0)
+	var foco := func() -> Control: return main_menu.get_viewport().gui_get_focus_owner()
+	_check(foco.call() == main_menu.continue_button, "menu: o foco começa em Continuar (há save)")
+	await _press(&"ui_down")
+	await _press(&"ui_down")
+	_check(foco.call() == main_menu.options_button, "menu: duas setas para baixo, Opções")
+	await _tecla(&"ui_accept")
+	await _seconds(1.5)
+	var opcoes: OptionsMenu = main_menu.options_menu
+	_check(opcoes.visible and opcoes.get_viewport().gui_get_focus_owner() != null, "Enter: as Opções, com o foco num controle")
+	await _press(&"ui_cancel")
+	await _seconds(1.5)
+	_check(not opcoes.visible and main_menu.visible and foco.call() == main_menu.options_button, "Esc: de volta ao sumário, o foco nas Opções")
+	await _press(&"ui_up")
+	await _press(&"ui_up")
+	_check(foco.call() == main_menu.continue_button, "menu: duas setas para cima, Continuar")
+	await _tecla(&"ui_accept")
+	await _until(func() -> bool: return not main_menu.visible and not SceneDirector.is_busy and SceneDirector.current_level == ESCRITORIO, 20.0)
+	Engine.time_scale = 8.0
+	await _frames(3)
+	_check(not main_menu.visible and SceneDirector.current_level == ESCRITORIO and GameState.get_value(&"dia") == 2 and not Events.is_modal_open,
+		"Enter em Continuar: de volta ao Dia 2")
+
+
+## Aperta e solta (os botões agem na soltura, como no teclado de verdade).
+func _tecla(action: StringName) -> void:
+	await _press(action)
+	var solta := InputEventAction.new()
+	solta.action = action
+	solta.pressed = false
+	Input.parse_input_event(solta)
+	for i in 3:
+		await get_tree().process_frame
+
+
 # --- 8. O macaco ----------------------------------------------------------------------
 
 ## Um jogador ao acaso, do Dia 1 ao fim da demo (CAMINHOS=macaco, SEMENTE=n para
@@ -491,7 +735,7 @@ func _continuar_em_boston() -> void:
 func _macaco() -> void:
 	var semente := int(OS.get_environment("SEMENTE")) if OS.has_environment("SEMENTE") else int(Time.get_unix_time_from_system()) % 100000
 	seed(semente)
-	print("   semente %d" % semente)
+	print("   semente %d%s" % [semente, ", tom %s" % OS.get_environment("TOM") if OS.has_environment("TOM") else ""])
 	await _dia(1)
 	var usos: Dictionary[String, int] = {}
 	var dia := 1
@@ -580,6 +824,12 @@ func _macaco_passo(usos: Dictionary[String, int], mira_falhou: PackedStringArray
 				await _press(&"ui_cancel")  # mais tarde
 			else:
 				var opcoes: Array = writer._reply.options
+				# TOM=-1/0/1: sempre a resposta desse tom (as que só têm uma, sem tom, vão assim).
+				if OS.has_environment("TOM"):
+					var tom := int(OS.get_environment("TOM"))
+					var desse := opcoes.filter(func(o: ReplyOption) -> bool: return int(o.tom) == tom)
+					if not desse.is_empty():
+						opcoes = desse
 				_anotar_acao("escrever: abertura")
 				writer._choose(opcoes[randi() % opcoes.size()])
 		elif randf() < 0.2:
@@ -700,6 +950,11 @@ func _ir_ate(player: Player, alvo: Interactable) -> bool:
 			continue
 		var pe := Vector3(origem.x, chao, origem.z)
 		if not player.livre(pe):
+			continue
+		# Só onde há chão (sessão de tester 2: posto além da fresta da porta do
+		# rapaz, em Boston, onde o jogador não chega a pé, caía no vazio).
+		var chao_q := PhysicsRayQueryParameters3D.create(pe + Vector3.UP * 0.3, pe + Vector3.DOWN * 0.5, 1, [player.get_rid()])
+		if space.intersect_ray(chao_q).is_empty():
 			continue
 		var q := PhysicsRayQueryParameters3D.create(origem, centro, 3, [player.get_rid()])
 		q.collide_with_areas = true

@@ -129,6 +129,9 @@ var _saiu := false
 ## O salto no tempo de uma carta postada (Dias 5 e 6): espera ele voltar à sala
 ## e a porta fechar.
 var _salto_pendente: NarrationLine
+## A resposta selada (ou selando) que ainda não foi postada: o F3 da depuração a
+## devolve à mão depois de recarregar (Depuracao.recarregar_dia).
+var carta_por_postar: ReplyData
 
 
 func _ready() -> void:
@@ -320,6 +323,7 @@ func _entrar_pela_porta() -> void:
 ## (Selagem), e vai para a mão; quem a manda é a porta (_on_porta).
 func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
 	selando = true
+	carta_por_postar = reply
 	player.input_enabled = false
 	var selagem := Selagem.new()
 	var onde := Transform3D(Basis.IDENTITY, SELAGEM_POS)
@@ -440,6 +444,7 @@ func _on_por_na_calha(_by: Node) -> void:
 	if not is_inside_tree():
 		return
 	carta.postar()
+	carta_por_postar = null
 	postando = false
 	if reply.id == StringName("resposta_dia_%d" % dia_do_interludio):
 		_para_o_interludio()

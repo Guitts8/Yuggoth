@@ -236,7 +236,8 @@ Noite sem sonho: fecha o caderno, levanta; tela preta, cartão *"Fim de maio."*,
   | A marca perto da casa (muito borrada) | "diabolicamente" parecida com a outra |
   | A casa de Akeley | os cães e Akeley com a pera do disparador |
 - **O debate:** o rascunho do Dia 1 e, agora, **três cartas de opositores** (carimbo
-  de Arkham) e a carta datilografada de um leitor (Charles Fort).
+  de Arkham) e a carta datilografada de um leitor (Charles Fort), à direita do
+  mata-borrão, entre o tinteiro e a lâmpada (os envelopes no fundo da carta).
 
 **O que fazer:** ler a carta; olhar as fotos; **"Deixar sem resposta"** os opositores
 (só depois de ler a 2ª carta) → rascunho e cartas somem, e o narrador: *"o meu
@@ -334,7 +335,9 @@ cilindro, nos dias seguintes.
    *"Era um rapaz franco e simpático, mas vi que não podia acrescentar nada..."* (ao
    fim da conversa) → **"Voltar a Arkham"** (depois do homem de Keene): o escritório
    já de noite, o abajur aceso, e o narrador: a noite em claro escrevendo cartas. No
-   fim do corredor da pensão, a janelinha dá para os telhados de Boston (em 3D).
+   fim do corredor da pensão, a janelinha dá para os telhados de Boston (em 3D);
+   na outra ponta, o vão da escada, com o corrimão na luz fraca que sobe do andar
+   de baixo — é por ali que ele volta.
 7. **As cartas da noite** (resposta, 21 de julho):
    | Tom | Abertura |
    |---|---|

@@ -20,6 +20,11 @@ var tempo: Node
 
 var _root: Node
 var _fade: ColorRect
+## As fases já carregadas ficam na memória (são poucas: o escritório e Boston).
+## Sessão de tester 2: a volta de Boston recarregava num thread, do zero, centenas
+## de recursos do escritório (liberados com a fase velha), e às vezes o jogo
+## travava ali (2 vezes em ~12 testes de fumaça). Da memória, a troca é imediata.
+var _cenas: Dictionary[String, PackedScene] = {}
 
 
 func _ready() -> void:
@@ -52,13 +57,18 @@ func change_level(path: String, spawn: StringName = &"", fade := true) -> void:
 	# A fase nova decide de novo no _ready() se segura a tela preta.
 	hold_black = false
 	get_tree().paused = true
-	ResourceLoader.load_threaded_request(path)
+	var scene: PackedScene = _cenas.get(path)
+	if scene == null:
+		ResourceLoader.load_threaded_request(path)
 	if fade:
 		await fade_out()
 
-	while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-		await get_tree().process_frame
-	var scene := ResourceLoader.load_threaded_get(path) as PackedScene
+	if scene == null:
+		while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			await get_tree().process_frame
+		scene = ResourceLoader.load_threaded_get(path) as PackedScene
+		if scene:
+			_cenas[path] = scene
 	if scene == null:
 		push_error("Falha ao carregar fase %s." % path)
 		get_tree().paused = false
@@ -67,7 +77,7 @@ func change_level(path: String, spawn: StringName = &"", fade := true) -> void:
 		return
 
 	# Na hora da troca (não antes): a fase velha ainda pode falar durante o fade.
-	Narrator.cancel()
+	_calar()
 	var level: Node = _root.load_level(scene)
 	_place_player(level, spawn)
 	current_level = path
@@ -87,9 +97,16 @@ func clear_level() -> void:
 		return
 	_root.unload_level()
 	hold_black = false
-	Narrator.cancel()
+	_calar()
 	current_level = ""
 	current_spawn = &""
+
+
+## A fase que sai leva o que dizia: a fala do narrador e a legenda de som (o
+## disco, o telefone, uma conversa), que ficava na tela até o tempo dela acabar.
+func _calar() -> void:
+	Narrator.cancel()
+	Events.subtitle_requested.emit("", 0.0)
 
 
 ## Também usado por sequências que trocam o cenário no escuro (ex.: Prólogo).

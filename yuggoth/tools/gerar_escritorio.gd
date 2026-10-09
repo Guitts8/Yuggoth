@@ -993,6 +993,7 @@ func _miskatonic() -> void:
 	_quad(g, "Fresta", Vector2(0.88, 0.012), Vector3(-1.0, 0.006, D - 0.062), Vector3(0, 180, 0), "vidro_aceso")
 	var corredor := _omni(g, "LuzCorredor", Vector3(-0.95, 0.12, D - 0.3), Color(1.0, 0.8, 0.55), 0.5, 2.2)
 	corredor.omni_attenuation = 1.6
+	corredor.light_cull_mask &= ~CAMADA_SEM_FRESTA
 
 	_corredor(g)
 	_lapso(g)
@@ -1012,9 +1013,21 @@ func _miskatonic() -> void:
 	entrar.prompt = "Abrir a porta"
 
 	# Canto sudoeste: o armário. A máquina emprestada chega no Dia 3 (_fonografo).
+	# A frente (+Z local) para leste, para a sala (sessão de tester 2: era um bloco
+	# liso, com a junção das portas virada para a parede).
 	var a := _group(g, "Armario", Vector3(-2.15, 0, 2.35), 90)
-	_box(a, "Movel", Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0), "madeira_escura")
-	_box(a, "Juncao", Vector3(0.01, 0.8, 0.01), Vector3(0, 0.45, -0.255), "ferro")
+	_box(a, "Rodape", Vector3(0.76, 0.07, 0.44), Vector3(0, 0.035, -0.02), "madeira_escura")
+	_box(a, "Corpo", Vector3(0.8, 0.8, 0.46), Vector3(0, 0.47, -0.02), "madeira_escura")
+	_box(a, "Tampo", Vector3(0.86, 0.035, 0.52), Vector3(0, 0.8875, 0), "madeira_escura")
+	for s in [-1, 1]:
+		var lado := "O" if s < 0 else "L"
+		_box(a, "Porta" + lado, Vector3(0.37, 0.68, 0.02), Vector3(s * 0.19, 0.47, 0.22), "madeira_escura")
+		_box(a, "Almofada" + lado, Vector3(0.27, 0.52, 0.012), Vector3(s * 0.19, 0.47, 0.236), "madeira_escura")
+		_box(a, "Puxador" + lado, Vector3(0.02, 0.06, 0.02), Vector3(s * 0.035, 0.6, 0.24), "latao")
+	# A luz do corredor, rente ao chão junto à porta, acendia a frente inteira do
+	# armário à noite: ele fica fora dela (camada 2 de render, fora do cull da luz).
+	for mi: MeshInstance3D in a.find_children("*", "MeshInstance3D", false, false):
+		mi.layers = CAMADA_SEM_FRESTA
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
 
 
@@ -1744,7 +1757,10 @@ func _cesto(parent: Node) -> void:
 	var dentro := _cyl(c, "Dentro", 0.14, 0.1, 0.33, Vector3(0, 0.175, 0), "madeira_clara", 9)
 	(dentro.mesh as CylinderMesh).cap_top = false
 	(dentro.mesh as CylinderMesh).flip_faces = true
-	_cyl(c, "Aro", 0.155, 0.155, 0.02, Vector3(0, 0.335, 0), "madeira_escura", 9)
+	# Só a faixa: com as tampas, o aro fechava a boca do cesto.
+	var aro := _cyl(c, "Aro", 0.155, 0.155, 0.02, Vector3(0, 0.335, 0), "madeira_escura", 9).mesh as CylinderMesh
+	aro.cap_top = false
+	aro.cap_bottom = false
 	_colisao(c, "Colisao", [[Vector3(0.3, 0.34, 0.3), Vector3(0, 0.17, 0)]])
 
 
@@ -1766,6 +1782,8 @@ func _cortinas(parent: Node) -> void:
 # --- Os dias --------------------------------------------------------------------
 
 const MESA := 0.78  # altura do tampo da escrivaninha
+## Camada de render do que a luz da fresta (LuzCorredor) não alcança: o armário.
+const CAMADA_SEM_FRESTA := 2
 ## A porta do escritório (sul): o meio do vão, a largura e a altura da folha.
 const PORTA_X := -1.0
 const PORTA_L := 0.92
@@ -3042,15 +3060,17 @@ func _debate(parent: Node) -> void:
 	_folha(g, "Rascunho", Vector3(0.52, MESA + 0.002, -2.12), -20, "rascunho_editor", "Ler o rascunho", false)
 
 	var op := _grupo_se(g, "Opositores", _cond_valor(&"dia", ValueCondition.Op.IGUAL, 2))
-	_folha(op, "CartaLeitor", Vector3(0.42, MESA + 0.002, -2.42), 14, "carta_opositor", "Ler a carta do leitor", false)
+	# Sessão de tester 2: a carta e os envelopes passavam por baixo da base da
+	# lâmpada. A carta fica por cima do rascunho; os envelopes, no fundo dela.
+	_folha(op, "CartaLeitor", Vector3(0.4, MESA + 0.004, -2.43), 6, "carta_opositor", "Ler a carta do leitor", false)
 	for i in 3:
-		_envelope(op, "Opositor%d" % i, Vector3(0.66, MESA + i * 0.0045, -2.44), -8 + i * 9, {
+		_envelope(op, "Opositor%d" % i, Vector3(0.38, MESA + 0.0105 + i * 0.0045, -2.52), -4 + i * 7, {
 			remetente = "",
 			destinatario = "Prof. A. N. Wilmarth\nMiskatonic University\nArkham, Mass.",
 			carimbo_cidade = "ARKHAM",
 			carimbo_data = "MAY %d\n1928" % (17 + i),
 		})
-	var deixar := _area(op, StateInteractable.new(), "DeixarSemResposta", Vector3(0.22, 0.05, 0.14), Vector3(0.66, MESA + 0.02, -2.44)) as StateInteractable
+	var deixar := _area(op, StateInteractable.new(), "DeixarSemResposta", Vector3(0.22, 0.06, 0.13), Vector3(0.38, MESA + 0.05, -2.525)) as StateInteractable
 	deixar.prompt = "Deixar sem resposta"
 	deixar.changes = {&"debate_encerrado": 1.0}
 	deixar.additive = false

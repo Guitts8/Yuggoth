@@ -22,8 +22,8 @@ só para aquele comando. A saída do Godot de cada ação fica em `.logs\` (fora
 | `jogar-log` | Abre o jogo com o console junto (os erros aparecem nele) |
 | `editor` | Abre o projeto no editor do Godot |
 | `teste` | Teste de fumaça (~5 min). O código de saída é o número de falhas |
-| `caminhos` | Os caminhos fora do roteiro (~5 min): a pausa e o dossiê no meio das cenas, sair para o menu e continuar no meio do dia e do sonho, descer a escada com a carta, o diário vazio, a noite do Dia 5 sem fogo, continuar em Boston, os textos em todo tom |
-| `macaco [semente]` | Um jogador ao acaso joga a demo inteira (~15 min): ações em qualquer ordem, telas no meio das cenas, cartas amassadas. Acusa travamentos (com as últimas ações), quedas do mapa e erros no log. Com a semente, repete (quase sempre) as mesmas escolhas |
+| `caminhos` | Os caminhos fora do roteiro (~5 min): a pausa e o dossiê no meio das cenas, sair para o menu e continuar no meio do dia e do sonho, descer a escada com a carta, o diário vazio, a noite do Dia 5 sem fogo, continuar em Boston, os textos em todo tom; a legenda que ficava na tela ao trocar de fase, F2/F3 no meio das cenas, sair para o menu no cartão do fim, o menu só pelo teclado, o diário aberto na ida a Boston (~10 min) |
+| `macaco [semente] [tom]` | Um jogador ao acaso joga a demo inteira (~15 min): ações em qualquer ordem, telas no meio das cenas, cartas amassadas. Acusa travamentos (com as últimas ações), quedas do mapa e erros no log. Com a semente, repete (quase sempre) as mesmas escolhas; com o tom (-1, 0 ou 1), toda resposta a Akeley sai nesse tom |
 | `importar` | Reimporta o projeto (depois de uma `class_name` nova ou de gerar assets) |
 | `captura <tag>` | Roda `tests/_tmp_shot` e salva as capturas em `.logs\capturas` |
 | `gerar-assets` | Texturas e sons provisórios, e importa |
@@ -79,6 +79,7 @@ cd yuggoth
 & $godot --headless --path . res://tests/smoke_test.tscn   # teste de fumaça (~5 min)
 & $godot --headless --path . res://tests/caminhos_test.tscn   # caminhos fora do roteiro (~5 min)
 $env:CAMINHOS = "macaco"; $env:SEMENTE = "1"                  # o macaco: a demo inteira ao acaso
+$env:TOM = "-1"                                               # (opcional) toda resposta nesse tom
 & $godot --headless --path . res://tests/caminhos_test.tscn   # (~15 min; sem SEMENTE, uma nova)
 & $godot --headless --path . --import               # importar
 

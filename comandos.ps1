@@ -7,7 +7,8 @@
 
 param(
 	[string]$acao = "ajuda",
-	[string]$arg = ""
+	[string]$arg = "",
+	[string]$arg2 = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -56,8 +57,10 @@ Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
     teste              teste de fumaça (~5 min; código = número de falhas)
     caminhos           os caminhos fora do roteiro (pausa no meio das cenas, menu e
                        continuar, a noite sem fogo, Boston...; ~5 min)
-    macaco [semente]   um jogador ao acaso joga a demo inteira (~15 min); acusa
-                       travamentos, quedas do mapa e erros no log
+    macaco [semente] [tom]
+                       um jogador ao acaso joga a demo inteira (~15 min); acusa
+                       travamentos, quedas do mapa e erros no log. Com o tom
+                       (-1, 0 ou 1), toda resposta a Akeley sai nesse tom
     importar          reimporta o projeto (depois de class_name nova ou asset gerado)
     captura <tag>      roda tests/_tmp_shot (capturas em .logs\capturas)
 
@@ -116,10 +119,11 @@ switch ($acao) {
 	"jogar-log" { & $godot --path $projeto }
 	"editor" { Start-Process $godotJanela -ArgumentList "-e", "--path", "`"$projeto`"" }
 	"teste" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/smoke_test.tscn") 600 "teste") }
-	"caminhos" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 900 "caminhos") }
+	"caminhos" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 1500 "caminhos") }
 	"macaco" {
 		$env:CAMINHOS = "macaco"
 		if ($arg) { $env:SEMENTE = $arg }
+		if ($arg2) { $env:TOM = $arg2 }
 		exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 2400 "macaco")
 	}
 	"importar" { exit (Godot-Com-Limite @("--headless", "--path", ".", "--import") 300 "importar") }

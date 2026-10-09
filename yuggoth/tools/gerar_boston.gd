@@ -145,6 +145,10 @@ func _corredor() -> void:
 	_box(esc, "Corrimao", Vector3(2 * W, 0.05, 0.05), Vector3(0, 0.95, -0.15), "madeira_escura")
 	for x in [-0.5, -0.17, 0.17, 0.5]:
 		_box(esc, "Balaustre%d" % int(x * 10), Vector3(0.03, 0.92, 0.03), Vector3(x, 0.46, -0.15), "madeira_escura")
+	# A luz do andar de baixo, rente ao chão, junto ao vão (sessão de tester 2:
+	# virado para a escada, era um retângulo todo preto, sem o corrimão).
+	var debaixo := _omni(esc, "LuzDeBaixo", Vector3(0, 0.55, -0.35), Color(1.0, 0.78, 0.5), 0.3, 2.0)
+	debaixo.omni_attenuation = 1.4
 	var sair := _area(c, Interactable.new(), "Saida", Vector3(2 * W, 1.6, 0.4), Vector3(0, 0.8, D_S - 0.3)) as Interactable
 	sair.unique_name_in_owner = true
 	sair.prompt = "Voltar a Arkham"

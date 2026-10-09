@@ -196,7 +196,9 @@ func _ready() -> void:
 	await _frames(2)
 	_check(is_zero_approx(root.dream_level), "mundo firme com exposição 0")
 	GameState.set_value(&"sonho", 1.0)
-	await _frames(2)
+	# dream_level sai no _process: quadros de processo, não de física.
+	for i in 2:
+		await get_tree().process_frame
 	_check(is_equal_approx(root.dream_level, 1.0), "sonho liga a estética crua")
 	GameState.set_value(&"sonho", 0.0)
 	GameState.set_value(&"exposicao", 1.0)
@@ -261,18 +263,20 @@ func _ready() -> void:
 	_check(correio1.prompt == "Pegar o correio" and not mesa.can_interact(player) and not mesa.visible, "sem nada na mão, a mesa não pede nada")
 	var no_chao := correio1.get_visual().global_position
 	correio1.interact(player)
-	await _frames(1)
+	# Logo depois, sem esperar quadro (a 8×, um quadro longo cobria a subida inteira).
 	_check(correio1.get_visual().global_position.distance_to(no_chao) < 0.6, "pegar o correio: o envelope sobe do chão (sem teleporte)")
 	await _until(func() -> bool: return correio1.get_visual().global_position.distance_to(player.camera.global_position) < 0.6, 3.0)
 	_check(Correspondencia.na_mao == [correio1] and correio1.get_visual().global_position.distance_to(player.camera.global_position) < 0.6,
 		"pegar o correio: o envelope na mão")
 	_check(mesa.can_interact(player) and mesa.visible and not correio1.visible, "na mão: mirar a mesa para pôr o envelope")
 	mesa.interact(player)
-	await _frames(1)
+	# Logo depois (sem esperar quadro: sob carga e a 8×, um quadro só cobria o arco
+	# inteiro), ainda não está na mesa — não se teletransporta.
 	_check(not correio1.get_visual().transform.is_equal_approx(correio1.mesa), "pôr na mesa: o envelope viaja da mão até lá")
-	await _until(func() -> bool: return correio1.get_visual().transform.is_equal_approx(correio1.mesa), 3.0)
-	_check(Correspondencia.na_mao.is_empty() and correio1.get_visual().transform.is_equal_approx(correio1.mesa) \
-		and correio1.prompt == "Abrir com a espátula" and not mesa.visible, "pôr na mesa: o envelope no lugar dele")
+	var na_mesa := func() -> bool: return Correspondencia.na_mao.is_empty() and not mesa.visible \
+		and correio1.get_visual().transform.is_equal_approx(correio1.mesa) and correio1.prompt == "Abrir com a espátula"
+	await _until(na_mesa, 3.0)
+	_check(na_mesa.call(), "pôr na mesa: o envelope no lugar dele")
 	_check(not carta_mesa.visible, "fechado, a carta continua no envelope")
 	correio1.interact(player)
 	await _frames(2)
@@ -469,7 +473,10 @@ func _ready() -> void:
 	await _frames(3)
 	_check(fono.tocando() and GameState.has_flag(&"tocou_disco"), "o disco toca")
 	_check(is_equal_approx(GameState.get_number(&"exposicao") - exp_antes, fono.exposicao_primeira), "ouvir o disco aumenta a exposição")
-	_check(legendas.size() > 0 and legendas[0] == "(SONS INDISTINGUÍVEIS)", "legenda da gravação")
+	# O áudio não acelera com o tempo 8×: a primeira legenda vem quando o som chega
+	# ao primeiro trecho, em tempo real.
+	await _until(func() -> bool: return legendas.size() > 0, 3.0)
+	_check(legendas.size() > 0 and legendas[0] == "(SONS INDISTINGUÍVEIS)", "legenda da gravação %s" % [legendas])
 	fono.interact(player)
 	# O zumbido sobe num tween de processo: com o tempo acelerado, vários quadros
 	# de física cabem num de processo, e dois deles não bastavam.
@@ -1111,6 +1118,9 @@ func _check_dia(esc: Escritorio, n: int) -> void:
 
 
 func _check_alcance(esc: Node3D, quando: String, limites := Vector2(2.3, 2.8)) -> void:
+	# O que acabou de sair do envelope ainda voa até o lugar (e a física acompanha
+	# no quadro de física seguinte): confere o que assentou.
+	await _seconds(1.0)
 	await _frames(2)
 	var fora := _inalcancaveis(esc, limites)
 	_check(fora.is_empty(), "%s: toda interação visível ao alcance da mira %s" % [quando, fora if fora else ""])

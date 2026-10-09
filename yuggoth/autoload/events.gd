@@ -23,25 +23,29 @@ var is_modal_open := false
 ## Quem tem uma tela aberta agora. As telas se sobrepõem (o dossiê aberto enquanto
 ## o diário abria): com um booleano só, fechar uma dava tudo por fechado, e o Esc
 ## seguinte abria a pausa em vez de fechar o caderno (o macaco, sessão de tester).
-var _modais: Dictionary[Object, bool] = {}
+## A chave é o id da instância, com o nome de quem abriu: um dicionário tipado de
+## Object não apaga a chave de um objeto já liberado (sessão de tester 2: a tela
+## que sumia sem fechar ficava aberta para sempre, e o jogador sem controle).
+var _modais: Dictionary[int, String] = {}
 
 
 ## Uma tela abriu (`aberta`) ou fechou. modal_changed só sai quando muda o todo:
 ## a primeira que abre, a última que fecha.
 func modal(dono: Object, aberta: bool) -> void:
 	if aberta:
-		_modais[dono] = true
+		_modais[dono.get_instance_id()] = str(dono)
 	else:
-		_modais.erase(dono)
+		_modais.erase(dono.get_instance_id())
 	_atualizar_modal()
 
 
 func _process(_delta: float) -> void:
 	# Uma tela que sumiu sem fechar (a fase trocada no meio) não fica aberta.
 	if not _modais.is_empty():
-		for dono: Variant in _modais.keys():
-			if not is_instance_valid(dono):
-				_modais.erase(dono)
+		for id: int in _modais.keys():
+			if not is_instance_id_valid(id):
+				push_warning("Tela liberada sem fechar: %s" % _modais[id])
+				_modais.erase(id)
 		_atualizar_modal()
 
 

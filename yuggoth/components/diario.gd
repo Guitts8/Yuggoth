@@ -72,6 +72,8 @@ var _par := 0
 var _virando := false
 var _pode_virar := false
 var _dica: CanvasLayer
+## O caderno é uma tela aberta (Events.modal) enquanto se folheia.
+var _tela := false
 ## As duas páginas abertas (cada uma, metade da textura) e a folha que vira:
 ## `_mat_vivo` mostra o par atual; `_mat_foto`, uma foto do par anterior.
 var _pag_esq: MeshInstance3D
@@ -125,6 +127,11 @@ func _exit_tree() -> void:
 	if _dica:
 		_dica.queue_free()
 		_dica = null
+	# A fase trocada com o caderno aberto (a ligação de Keene leva a Boston): a
+	# tela fecha com ele (sessão de tester 2: ficava aberta, e o jogador sem controle).
+	if _tela:
+		_tela = false
+		Events.modal(self, false)
 
 
 func _process(delta: float) -> void:
@@ -259,6 +266,7 @@ func ler(player: Player) -> void:
 		return
 	lendo = true
 	_pode_virar = true
+	_tela = true
 	Events.modal(self, true)
 	# Modal para o resto do jogo (o Esc é daqui, não do menu de pausa), mas o
 	# mouse continua preso: não há o que clicar.
@@ -269,6 +277,7 @@ func ler(player: Player) -> void:
 		if not is_inside_tree():
 			return
 	_mostrar_dica(false)
+	_tela = false
 	Events.modal(self, false)
 	player.input_enabled = false
 

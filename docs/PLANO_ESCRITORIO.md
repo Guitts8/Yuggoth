@@ -697,6 +697,76 @@ posta depois); folhear o diário vazio no Dia 1 (Esc fecha o caderno, não abre 
 pausa); continuar no checkpoint de Boston; todo documento resolve texto em todo tom
 de resposta, com as tags BBCode fechadas dentro do parágrafo.
 
+## Sessão de tester 2 (2026-10-09, antes do playtest 8)
+O usuário pediu: *"aplique testes nos dias e corrija possíveis bugs, também
+verifique os possíveis bugs visuais e os corrija"*. Rodados a fumaça, os caminhos e o
+macaco com sementes novas (3 a 13), e o macaco agora pode **forçar o tom** das
+respostas (`TOM=-1/0/1`, `comandos.ps1 macaco <semente> <tom>`): a demo inteira
+respondida sempre cética, neutra ou crédula. Caminhos novos em
+`tests/caminhos_test.gd`: a legenda presa, F2/F3 no meio das cenas, o menu no cartão
+do fim, o menu só pelo teclado, o diário aberto na ida a Boston. Para o visual, cada
+dia capturado de vários pontos (`tests/_tmp_shot`: o pé da escada, a porta, a sala
+nas quatro direções, a mesa, o cesto, o canto do armário; `SHOT_MODO=sonhos` as
+noites 2–5, `SHOT_MODO=boston` a pensão; `SHOT_SONDA` lista as malhas numa caixa).
+
+Commit: `PENDENTE`.
+
+Bugs achados e corrigidos:
+1. ✅ **O jogo travava sem controle pelo resto da partida** (o macaco, semente 7, tom
+   cético, Dia 5). O registro de telas abertas (`Events._modais`) era um
+   `Dictionary[Object, bool]`: um dicionário tipado não apaga a chave de um objeto
+   já liberado (o Godot recusa, com erro a cada quadro), então a tela que sumia
+   sem fechar ficava "aberta" para sempre — o jogador parado, a pausa sem abrir.
+   Quem sumia: o **diário**, aberto ("Ler o diário") enquanto a ligação de Keene
+   acabava e levava a Boston (Dia 4). Agora a chave é o id da instância (a tela
+   liberada sai do registro, com o aviso "Tela liberada sem fechar", que o
+   `caminhos_test` conta como falha), e o diário fecha a sua tela no `_exit_tree`.
+2. ✅ **A legenda de som ficava na tela depois de trocar de fase ou sair para o
+   menu** (o disco, o telefone, a conversa em Boston) até o tempo dela acabar — e
+   reaparecia por cima do jogo continuado. O SceneDirector apaga a legenda junto
+   com a fala do narrador (`_calar`).
+3. ✅ (depuração) **F3 no meio de selar perdia a carta**: a resposta ficava escrita
+   e a carta sumia com o load — não havia mais o que postar. O F3 devolve à mão a
+   carta selada e não postada (`Escritorio.carta_por_postar`).
+4. ✅ (teste) O macaco se punha, ao mirar, além da fresta da porta do rapaz em
+   Boston, onde não há chão (o jogador não chega lá a pé) e caía do mapa. Só se põe
+   onde há chão.
+5. ✅ (teste) Quatro conferências do teste de fumaça falhavam às vezes, pelo tamanho
+   do quadro: "pegar o correio" e "pôr na mesa" (sob carga, a 8×, o arco inteiro
+   cabia num quadro), a primeira legenda do disco (o áudio não acelera com o tempo)
+   e "sonho liga a estética crua" (sai no `_process`; esperava quadros de física);
+   e a conferência de alcance da mira logo depois de algo sair do envelope (as
+   peças ainda no arco): `_check_alcance` espera 1 s de jogo. Depois disso, 14
+   fumaças com 0 falhas (9 delas com outros testes rodando junto).
+5b. ✅ **O jogo às vezes travava de vez na volta de Boston** (2 em ~12 testes de
+   fumaça, sempre em "Voltar a Arkham", o processo vivo e nenhum quadro mais). Só
+   essa troca recarregava do zero, num thread, centenas de recursos do escritório
+   (liberados junto com a fase velha) — o padrão de um impasse entre o carregamento
+   em thread e o thread principal. A causa exata no motor não foi isolada. O
+   SceneDirector agora guarda as fases já carregadas (`_cenas`: o escritório e
+   Boston), e a troca para uma delas é imediata, sem carregar nada.
+
+Bugs visuais corrigidos (nos geradores; as cenas regeneradas só mudam de ids):
+6. ✅ **O armário do canto sudoeste era um bloco liso**, com a junção das portas
+   virada para a parede; à noite, a luz da fresta da porta o acendia inteiro, alaranjado,
+   no escuro. Agora tem rodapé, tampo, duas portas almofadadas e puxadores de latão,
+   e fica fora da luz da fresta (camada de render 2, fora do cull dela).
+7. ✅ **O cesto de papéis tinha tampa**: o aro era um cilindro com tampas e fechava a
+   boca. Agora é só a faixa (o cesto vai receber as folhas amassadas na Fase 5).
+8. ✅ **Dia 2: os envelopes dos opositores passavam por baixo da base da lâmpada**, e
+   a carta do leitor, por baixo dela e do rascunho. A carta fica por cima do
+   rascunho, à direita do tinteiro; os envelopes, no fundo dela, longe da lâmpada.
+9. ✅ **Boston: virado para a escada, um retângulo todo preto** — a única luz do
+   corredor ficava a 3 m e nem o corrimão aparecia. Uma luz fraca do andar de baixo,
+   junto ao vão: o corrimão e os balaústres se leem.
+
+Conferido e sem bug: as manhãs dos seis dias (escada, porta, sala, mesa), as noites
+2–5 (o visual do sonho segue pendente, como antes), Boston; F2/F3 escrevendo o
+diário, adormecendo, ao telefone, no meio do lapso, acendendo a lareira (nada
+pendurado: pálpebras, sonho, legenda, pausa); durante a tinta do fim a pausa não
+abre, e no cartão do fim abre — sair para o menu e continuar volta à manhã do Dia 6;
+o Necronomicon só pelo teclado (setas, Enter nas Opções, Esc de volta, Continuar).
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado
@@ -707,6 +777,10 @@ memória) são atualizados junto com o trabalho — ver "Fluxo de trabalho" no
 
 **Sessão de tester feita** (acima, `b62e9b2`): pausa e dossiê no meio das cenas,
 telas sobrepostas, a noite sem fogo, a porta no sonho; `caminhos_test` e o macaco.
+**Sessão de tester 2 feita** (acima): o travamento pela tela liberada sem fechar (o
+diário na ida a Boston), a legenda presa, o F3 que perdia a carta; no visual, o
+armário, o cesto, os papéis sob a lâmpada (Dia 2), o vão da escada em Boston; o
+macaco com o tom forçado.
 
 **Esperando o usuário — o playtest 8** (do Dia 1 ao fim da demo; **F2** pula dias,
 **F3** recarrega). O que olhar:
@@ -727,18 +801,15 @@ olhar o painel Debugger do editor. `art/textures/grao.png.import` aparece
 modificado no git desde antes da 3g (reimportação do Godot); deixado de fora dos
 commits.
 
-**Como retomar numa sessão nova:** ler este arquivo (a 3h, a "Sessão de tester" e
-esta seção). O usuário pediu (2026-10-09) **mais sessões de testes** antes do
-playtest 8: seguir no papel de tester — rodar `comandos.ps1 caminhos` e
-`comandos.ps1 macaco <semente>` (sementes novas: 3, 4, …; as 1 e 2 já passam),
-acrescentar a `tests/caminhos_test.gd` os caminhos novos que o usuário pedir, e cada
-bug achado vira um item novo da "Sessão de tester" (ou de uma sessão nova), com o
-commit. Ideias ainda não testadas: as respostas em todos os tons jogadas de ponta a
-ponta (o macaco sorteia, mas não força cada tom), F2/F3 no meio de cenas, o menu
-principal e as Opções (o Necronomicon) por teclado e mouse, sair para o menu durante
-a tinta do fim da demo, e conferências visuais por captura (`tests/_tmp_shot`).
-Quando vier a lista do playtest 8, registrá-la como **Fase 3i**, no mesmo formato.
-Não começar a Fase 4 antes dela.
+**Como retomar numa sessão nova:** ler este arquivo (a 3h, as duas sessões de
+tester e esta seção). Se o usuário pedir mais testes: `comandos.ps1 caminhos`,
+`comandos.ps1 macaco <semente> [tom]` (as sementes 1 a 13 já passam; o tom -1/0/1
+força as respostas), capturas com `tests/_tmp_shot` (`SHOT_MODO`, `SHOT_DIAS`), e
+cada bug achado vira um item novo de uma sessão de tester, com o commit. Ainda não
+testado: o menu e as Opções pelo mouse (o raio da câmera até a página), o Prólogo
+fora do roteiro (pausa no cartão, andar sentado), Boston pelo macaco com a conversa
+inteira em todas as ordens. Quando vier a lista do playtest 8, registrá-la como
+**Fase 3i**, no mesmo formato. Não começar a Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
 (GDD §12): opções de acessibilidade (tremor, afim, FOV — ainda não há nenhuma em
@@ -756,8 +827,9 @@ Não começar a Fase 4 antes dela.
 2e. ✅ O usuário jogou o **playtest 6**; a lista virou a **Fase 3g**, toda feita.
 2f. ✅ O usuário jogou o **playtest 7**; a lista virou a **Fase 3h**, toda feita.
 2g. ✅ **Sessão de tester** (acima): `caminhos_test` e o macaco; 9 bugs corrigidos.
-2h. **← AQUI.** Mais sessões de testes (o usuário pediu; ver "Como retomar"), e
-   depois o usuário joga o **playtest 8** (do Dia 1 ao fim da demo, ou com
+2h. ✅ **Sessão de tester 2** (acima): o travamento da tela liberada, a legenda
+   presa, o F3; o armário, o cesto, o Dia 2, Boston; o macaco com tom.
+2i. **← AQUI.** O usuário joga o **playtest 8** (do Dia 1 ao fim da demo, ou com
    F2): o Necronomicon, o corredor e a escada, o diário, o sonho do disco partido,
    E para pular, a lareira; a lista vira a Fase 3i. Não começar a Fase 4 antes dela.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
