@@ -19,9 +19,10 @@ extends Node
 @export var jitter_range := Vector2(0.25, 1.0)
 ## Texturas "escorrendo" (mapeamento afim). Acima de 1 amplifica o erro: com a
 ## geometria subdividida, é o que devolve o redemoinho dos polígonos gigantes.
-@export var affine_range := Vector2(0.15, 5.0)
+## Playtest 6 ("a ondulação está forte demais"): de 5 para 2,5 no sonho.
+@export var affine_range := Vector2(0.15, 2.5)
 ## Grossura da grade de tremor (1 = meio pixel do viewport).
-@export var snap_range := Vector2(1.0, 2.5)
+@export var snap_range := Vector2(1.0, 2.0)
 @export var vignette_range := Vector2(0.35, 0.7)
 
 ## Quanto o visual está em "sonho" agora (0–1), já combinando exposição e `sonho`.

@@ -22,7 +22,7 @@ const float BAYER[16] = float[16](
 void fragment() {
 	float e = exposure * exposure;
 	vec2 uv = UV;
-	uv.x += sin(uv.y * 38.0 + TIME * 1.7) * 0.003 * e;
+	uv.x += sin(uv.y * 38.0 + TIME * 1.7) * 0.0015 * e;
 
 	vec2 split = vec2(0.004 * e, 0.0);
 	vec3 col = vec3(
