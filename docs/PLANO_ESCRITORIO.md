@@ -774,7 +774,7 @@ mantendo nosso gráfico característico, mas com boas animações"*, com três i
 de *Castlevania: Lords of Shadow* (o livro do menu: moldura de ferro rebitada,
 papel queimado nas bordas com manchas rubras, gravura grande à esquerda, título
 gótico e sumário à direita, setas rubras na entrada escolhida, a dica de controle
-embaixo). Commit: `PENDENTE`.
+embaixo). Commit: `cc98f0a`.
 
 O Necronomicon refeito (`ui/menu/`):
 1. ✅ **No grão do jogo.** O livro agora é renderizado em ~540 linhas, com o
