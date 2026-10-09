@@ -427,10 +427,12 @@ arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera
 7. ✅ **A xícara, com o café à vista**: decidido — a xícara de porcelana fica. Era
    uma copa fechada: o café ficava escondido dentro. Agora aberta (sem tampa, a parede
    de dentro, a borda), e o café alarga ao subir, rente à parede (meta `afunila`).
-8. 🔧 **O diário**: o modelo mais agradável (capa de couro com cantos, lombada com
+8. ✅ **O diário**: o modelo mais agradável (capa de couro com cantos, lombada com
    nervuras, fita marcadora, páginas com bordas); a abertura com sentido — a capa abre,
    as folhas correm até a fita (a página do dia), e não uma página só caindo no meio;
-   fechar ao contrário.
+   fechar ao contrário. Feito em `Diario._pose(capa, folhas)`: a capa gira e desce à
+   mesa; nove folhas correm da pilha da direita à da esquerda enquanto o miolo passa
+   de um lado ao outro; a fita sai pelo pé e, aberto, deita no par do dia.
 9. ✅ **Ao clicar na porta, ele dá um girinho** em algumas situações. Causa: o
    `olhar_para` girava o corpo pelo lado curto e desfazia o desvio do mouse à parte;
    somados, davam a volta longa. Agora o desvio vira a direção do corpo antes do giro.

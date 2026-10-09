@@ -27,7 +27,7 @@ a 5): *"Faltava só anotar o dia no diário, como eu fazia ao fim de cada dia."*
 caderno vermelho à esquerda do mata-borrão, **"Anotar o dia"**. Wilmarth senta e
 **se serve** 💭 — café da garrafa térmica nos Dias 1 a 3; no Dia 4, o uísque do
 frasco escondido na gaveta (a Lei Seca), que volta escondido para ela; o copo fica na mesa —,
-bebe um gole; o caderno vem para diante dele e abre (à esquerda, a entrada anterior), ele se debruça
+bebe um gole; o caderno (couro com cantos, a lombada com nervuras, a fita vermelha) vem para diante dele e abre — a capa deita à esquerda, as folhas correm até a fita, no par do dia (à esquerda, a entrada anterior), ele se debruça
 e a pena da mesa escreve a entrada do dia, ao som dela; a entrada vai para o
 dossiê. **Todo dia termina assim**, e o jogador nunca sabe se aquela noite terá
 sonho: sem sonho (Dia 1), ele fecha o caderno e levanta; com sonho, a última linha

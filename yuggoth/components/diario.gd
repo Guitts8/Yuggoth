@@ -15,11 +15,21 @@ extends Node3D
 ## A origem do nó é a lombada: fechado, o caderno fica do lado +X dela; aberto,
 ## as duas páginas, uma de cada lado. Peças montadas em código (nomes com "_",
 ## fora do .tscn); o gerador põe só o nó, as áreas e a pena.
+##
+## O caderno (playtest 5): capa de couro com cantos e a lombada de couro mais
+## escuro, com nervuras; o corte das folhas; a fita marcadora vermelha. Abre com
+## sentido: a capa gira na lombada e deita à esquerda; as folhas correm, umas
+## atrás das outras, até a fita (o miolo passa da direita para a esquerda), e o
+## par aberto é o do dia. Fecha ao contrário. `_pose(capa, folhas)`.
 
 const LARGURA := 0.15
 const FUNDO := 0.215
+## O miolo de cada lado, aberto; fechado, os dois juntos.
 const MIOLO := 0.017
 const TABUA := 0.003
+## As folhas que correm ao abrir, e quanto do caminho cada uma leva.
+const CORRENDO := 9
+const CORRER_JANELA := 0.3
 ## O par de páginas abertas é uma textura só (SubViewport), ~1 pixel da textura
 ## por pixel do mundo com a vista apertada sobre a página.
 const TEXTURA := Vector2i(640, 448)
@@ -70,9 +80,18 @@ var _frente: MeshInstance3D
 var _verso: MeshInstance3D
 var _mat_vivo: ShaderMaterial
 var _mat_foto: ShaderMaterial
-var _fechado: Node3D
+## A fita no par do dia (aberto); a ponta que sai pelo pé do miolo é do `_Corpo`.
+var _fita_aberta: Node3D
 var _capa: Node3D
+var _lombada: Node3D
+var _bloco_esq: Node3D
+var _bloco_dir: Node3D
+var _correndo: Array[Node3D] = []
 var _aberto: Node3D
+## A pose atual (`_pose`): a capa (0 fechada, 1 deitada à esquerda) e o miolo
+## (0 todo à direita, 1 aberto na fita).
+var _k_capa := 0.0
+var _k_folhas := 0.0
 var _vp: SubViewport
 ## Cada página é uma janela (recorta) com o rótulo dentro; o rótulo sobe para
 ## mostrar a folha seguinte do mesmo texto (playtest 4: a letra saía do caderno).
@@ -187,10 +206,9 @@ func _abrir(player: Player) -> void:
 	t = _tween()
 	t.tween_property(self, ^"transform", lugar_aberto, 1.0)
 	await t.finished
-	_tocar(som_papel)
-	t = _tween()
-	t.tween_property(_capa, ^"rotation:z", PI, 0.9)
-	await t.finished
+	# A capa abre; as folhas correm até a fita.
+	await _animar_pose(1.0, 0.0, 0.9)
+	await _animar_pose(1.0, 1.0, 1.3, true)
 	_mostrar_aberto(true)
 
 	# Debruça-se: a cabeça vai à frente sobre a página e a vista se aperta nela.
@@ -406,12 +424,10 @@ func fechar(player: Player) -> void:
 	t.tween_property(player, ^"debrucado", 0.0, 1.0)
 	_pena_para_casa(0.8)
 	await t.finished
+	# Ao contrário: as folhas voltam para a direita, a capa fecha por cima.
 	_mostrar_aberto(false)
-	_capa.rotation.z = PI
-	_tocar(som_papel)
-	t = _tween()
-	t.tween_property(_capa, ^"rotation:z", 0.0, 0.9)
-	await t.finished
+	await _animar_pose(1.0, 0.0, 1.0, true)
+	await _animar_pose(0.0, 0.0, 0.9)
 	t = _tween()
 	t.tween_property(self, ^"transform", _casa, 1.0)
 	await t.finished
@@ -427,7 +443,7 @@ func repor() -> void:
 	_escrevendo = false
 	_parar_pena()
 	transform = _casa
-	_capa.rotation.z = 0.0
+	_pose(0.0, 0.0)
 	_mostrar_aberto(false)
 	if pena:
 		pena.transform = _pena_casa
@@ -580,7 +596,50 @@ func _parar_pena() -> void:
 func _mostrar_aberto(sim: bool) -> void:
 	aberto = sim
 	_aberto.visible = sim
-	_fechado.visible = not sim
+
+
+## Anima a pose de onde está até (`capa`, `folhas`); `correndo`, com o som das
+## folhas passando (umas atrás das outras).
+func _animar_pose(capa: float, folhas: float, segundos: float, correndo := false) -> void:
+	var de := Vector2(_k_capa, _k_folhas)
+	var ate := Vector2(capa, folhas)
+	var t := _tween()
+	t.tween_method(func(k: float) -> void:
+		var p := de.lerp(ate, k)
+		_pose(p.x, p.y), 0.0, 1.0, segundos)
+	_tocar(som_papel)
+	if correndo:
+		for i in 3:
+			get_tree().create_timer(segundos * (0.25 + i * 0.25)).timeout.connect(_tocar.bind(som_papel))
+	await t.finished
+
+
+## O caderno entre fechado e aberto na fita. `capa` 0..1: a capa gira na lombada
+## e deita à esquerda (a dobradiça desce à mesa na segunda metade, sem a capa
+## entrar nela). `folhas` 0..1: o miolo passa da direita para a esquerda, e as
+## folhas soltas viram, cada uma no seu trecho, da pilha da direita à da esquerda.
+func _pose(capa: float, folhas: float) -> void:
+	_k_capa = capa
+	_k_folhas = folhas
+	var direita := MIOLO * (2.0 - folhas)
+	var esquerda := MIOLO * folhas
+	_bloco_dir.scale.y = direita
+	_bloco_esq.scale.y = maxf(esquerda, 0.0001)
+	_bloco_esq.visible = esquerda > 0.0003
+	var angulo := PI * capa
+	var alto := TABUA + MIOLO * 2.0 + TABUA * 0.5
+	var queda := clampf(capa * 2.0 - 1.0, 0.0, 1.0)
+	_capa.rotation.z = angulo
+	_capa.position.y = lerpf(alto, TABUA * 0.5, queda)
+	# A lombada cobre o miolo; aberto, fica sob o vinco.
+	_lombada.scale.y = TABUA * (2.0 - capa) + maxf(direita, esquerda) - 0.0005 * capa
+	var passo := (1.0 - CORRER_JANELA) / maxf(1.0, CORRENDO - 1.0)
+	for i in _correndo.size():
+		var p := clampf((folhas - i * passo) / CORRER_JANELA, 0.0, 1.0)
+		var folha := _correndo[i]
+		folha.visible = p > 0.0 and p < 1.0
+		folha.rotation.z = PI * smoothstep(0.0, 1.0, p)
+		folha.position.y = lerpf(TABUA + direita, TABUA + esquerda, p) + 0.0004 + sin(p * PI) * 0.006
 
 
 func _tween() -> Tween:
@@ -595,24 +654,55 @@ func _tocar(som: AudioStream) -> void:
 # --- Montagem -------------------------------------------------------------------
 
 func _montar() -> void:
-	var capa := Selagem._material("res://art/materials/capa_livro.tres")
-	capa.set_shader_parameter(&"albedo_color", Color(0.4, 0.16, 0.12))
-	var papel := Selagem._material("res://art/materials/papel.tres")
+	var capa := _cor("res://art/materials/capa_livro.tres", Color(0.4, 0.16, 0.12))
+	var couro := _cor("res://art/materials/capa_livro.tres", Color(0.19, 0.08, 0.06))
+	var corte := _cor("res://art/materials/papel.tres", Color(0.86, 0.8, 0.66))
+	var guarda := _cor("res://art/materials/papel.tres", Color(0.5, 0.36, 0.3))
+	var fita := _cor("res://art/materials/papel.tres", Color(0.62, 0.09, 0.08))
+	var miolo := Vector3(LARGURA - 0.006, 1.0, FUNDO - 0.008)
 
-	_fechado = _no(self, "_Fechado")
-	_caixa(_fechado, Vector3(LARGURA, TABUA, FUNDO), Vector3(LARGURA * 0.5, TABUA * 0.5, 0), capa)
-	_caixa(_fechado, Vector3(LARGURA - 0.006, MIOLO, FUNDO - 0.008), Vector3(LARGURA * 0.5 - 0.001, TABUA + MIOLO * 0.5, 0), papel)
-	_caixa(_fechado, Vector3(0.005, MIOLO + TABUA * 2.0, FUNDO), Vector3(0.0025, (MIOLO + TABUA * 2.0) * 0.5, 0), capa)
-	# A capa de cima gira na lombada (Z) e vai deitar do lado esquerdo.
-	_capa = _no(_fechado, "_Capa")
-	_capa.position = Vector3(0, TABUA * 1.5 + MIOLO, 0)
-	_caixa(_capa, Vector3(LARGURA, TABUA, FUNDO), Vector3(LARGURA * 0.5, 0, 0), capa)
+	var corpo := _no(self, "_Corpo")
+	# A contracapa (embaixo) e o miolo, que se reparte entre os dois lados ao abrir
+	# (pivôs no pé: a escala em y é a altura).
+	_caixa(corpo, Vector3(LARGURA, TABUA, FUNDO), Vector3(LARGURA * 0.5, TABUA * 0.5, 0), capa)
+	for lado in [1.0, -1.0]:
+		var bloco := _no(corpo, "_BlocoDir" if lado > 0 else "_BlocoEsq")
+		bloco.position = Vector3(lado * (LARGURA * 0.5 - 0.001), TABUA, 0)
+		_caixa(bloco, miolo, Vector3(0, 0.5, 0), corte)
+		if lado > 0:
+			_bloco_dir = bloco
+		else:
+			_bloco_esq = bloco
+	# A capa gira na lombada (Z) e vai deitar do lado esquerdo: o couro com os
+	# cantos e a faixa da lombada por fora, a folha de guarda por dentro.
+	_capa = _no(corpo, "_Capa")
+	var tabua := _caixa(_capa, Vector3(LARGURA, TABUA, FUNDO), Vector3(LARGURA * 0.5, 0, 0), capa)
+	_cantos(tabua, TABUA * 0.5 + 0.0004, couro)
+	_caixa(tabua, Vector3(0.024, 0.0008, FUNDO + 0.001), Vector3(-LARGURA * 0.5 + 0.012, TABUA * 0.5 + 0.0004, 0), couro)
+	_caixa(tabua, Vector3(LARGURA - 0.01, 0.0005, FUNDO - 0.01), Vector3(0.002, -TABUA * 0.5 - 0.0003, 0), guarda)
+	# A lombada de couro escuro com as nervuras (pivô no pé).
+	_lombada = _no(corpo, "_Lombada")
+	_caixa(_lombada, Vector3(0.006, 1.0, FUNDO + 0.001), Vector3(-0.003, 0.5, 0), couro)
+	for k in 4:
+		var z := lerpf(-FUNDO * 0.36, FUNDO * 0.36, k / 3.0)
+		_caixa(_lombada, Vector3(0.003, 0.9, 0.007), Vector3(-0.0065, 0.5, z), couro)
+	# A fita: desce pelo pé do miolo e deita na mesa; aberto, corre no par do dia.
+	var pe := FUNDO * 0.5 + 0.0008
+	_caixa(corpo, Vector3(0.006, TABUA + MIOLO, 0.0005), Vector3(0.0075, (TABUA + MIOLO) * 0.5, pe), fita)
+	var ponta := _caixa(corpo, Vector3(0.006, 0.0005, 0.036), Vector3(0.0095, 0.0003, pe + 0.018), fita)
+	ponta.rotation.y = deg_to_rad(-9.0)
+
+	_correndo.clear()
+	for i in CORRENDO:
+		var folha := _no(corpo, "_Correndo%d" % i)
+		folha.visible = false
+		_folha(folha, "_Cima", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.UP).material_override = corte
+		_folha(folha, "_Baixo", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.DOWN).material_override = corte
+		_correndo.append(folha)
 
 	_aberto = _no(self, "_Aberto")
 	_aberto.visible = false
-	for s in [-1.0, 1.0]:
-		_caixa(_aberto, Vector3(LARGURA, TABUA, FUNDO), Vector3(s * LARGURA * 0.5, TABUA * 0.5, 0), capa)
-		_caixa(_aberto, Vector3(LARGURA - 0.004, MIOLO, FUNDO - 0.008), Vector3(s * (LARGURA * 0.5 - 0.001), TABUA + MIOLO * 0.5, 0), papel)
+	_fita_aberta = _caixa(_aberto, Vector3(0.006, 0.0005, FUNDO - 0.012), Vector3(0.0075, TABUA + MIOLO + 0.0012, 0.002), fita)
 
 	_vp = SubViewport.new()
 	_vp.name = "_Folhas"
@@ -656,6 +746,20 @@ func _montar() -> void:
 	_verso = _folha(_virada, "_Verso", 0.0, wp, 0.5, 0.0, Vector3.DOWN)
 	for mi in [_pag_esq, _pag_dir, _frente, _verso]:
 		mi.material_override = _mat_vivo
+	_pose(0.0, 0.0)
+
+
+## Uma cópia do material com outra cor (o couro, o corte das folhas, a fita).
+static func _cor(caminho: String, cor: Color) -> Material:
+	var mat := Selagem._material(caminho)
+	mat.set_shader_parameter(&"albedo_color", cor)
+	return mat
+
+
+## Os cantos de couro nas pontas de fora da capa (`tabua`, centrada na origem).
+func _cantos(tabua: Node3D, y: float, mat: Material) -> void:
+	for s in [-1.0, 1.0]:
+		_caixa(tabua, Vector3(0.024, 0.0008, 0.024), Vector3(LARGURA * 0.5 - 0.0115, y, s * (FUNDO * 0.5 - 0.0115)), mat)
 
 
 func _altura_virada() -> float:
