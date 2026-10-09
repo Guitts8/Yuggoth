@@ -594,7 +594,14 @@ O usuário jogou o playtest 6. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ 
 
 **Decisões de texto pendentes:** as entradas do diário (as 3 e 5 mudaram na 3d) e as
 falas `sono_disco`/`sono_fogo`; o visual do sonho (pendência antiga); "Deixar sem
-resposta" (Dia 2). O bosque do disco (os vultos, a criatura) é 💭.
+resposta" (Dia 2). O bosque do disco (os vultos, a criatura) é 💭. **O menu em
+livro:** o usuário disse "como havíamos decidido", mas não havia registro dos
+detalhes; foi feito como livro aberto (título e epígrafe à esquerda, Sumário à
+direita, Opções nas folhas seguintes) — confirmar no playtest 7 se era isso. O
+congelamento do playtest 4 (envelope, Dia 5) nunca foi reproduzido; se voltar,
+olhar o painel Debugger do editor. `art/textures/grao.png.import` aparece
+modificado no git desde antes da 3g (reimportação do Godot); deixado de fora dos
+commits.
 
 **Como retomar numa sessão nova:** ler este arquivo (a 3g e esta seção), esperar a
 lista do playtest 7 e registrá-la como **Fase 3h**, no mesmo formato. Não começar a
