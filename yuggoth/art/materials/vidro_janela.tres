@@ -1,13 +1,13 @@
 [gd_resource type="ShaderMaterial" format=3]
 
-[ext_resource type="Shader" path="res://shaders/psx_unlit.gdshader" id="1_va2wk"]
-[ext_resource type="Texture2D" path="res://art/textures/grao.png" id="2_ciaee"]
+[ext_resource type="Shader" path="res://shaders/psx_unlit.gdshader" id="1_24v7a"]
+[ext_resource type="Texture2D" path="res://art/textures/grao.png" id="2_su01u"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_va2wk")
-shader_parameter/albedo_tex = ExtResource("2_ciaee")
-shader_parameter/albedo_color = Color(0.8, 0.66, 0.45, 1)
+shader = ExtResource("1_24v7a")
+shader_parameter/albedo_tex = ExtResource("2_su01u")
+shader_parameter/albedo_color = Color(0.44, 0.48, 0.52, 1)
 shader_parameter/uv_scale = null
 shader_parameter/world_uv = true
 shader_parameter/tiles_per_meter = 3.0

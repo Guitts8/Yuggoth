@@ -1866,26 +1866,60 @@ func _homem_magro() -> Image:
 
 ## A pedra negra de Round Hill: quase preta, com hieróglifos rasos que pegam luz.
 func _pedra_negra() -> Image:
-	var img := _img()
-	var n := _noise(64, 0.2)
+	# Playtest 6 ("o modelo da pedra deve melhorar"): 128 px, a pedra com veios e
+	# um brilho gasto; os hieróglifos entalhados em fileiras — o sulco escuro com a
+	# borda de baixo clara —, meio apagados pelo tempo (o livro: "half worn away").
+	var t := 128
+	var img := _img(t, t)
+	var n := _noise(64, 0.06)
+	var veio := _noise(65, 0.02)
+	var gasto := _noise(66, 0.05)
+	for y in t:
+		for x in t:
+			var v := 0.1 + n.get_noise_2d(x, y) * 0.04
+			v += maxf(0.0, 0.5 - absf(veio.get_noise_2d(x * 0.6, y * 1.4)) * 8.0) * 0.05
+			img.set_pixel(x, y, Color(v, v * 0.98, v * 1.07))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 64
-	for y in 64:
-		for x in 64:
-			var v := 0.06 + n.get_noise_2d(x, y) * 0.03
-			img.set_pixel(x, y, Color(v, v, v * 1.05))
-	for fila in 6:
-		var x := 4
-		while x < 58:
-			var y := 6 + fila * 10
-			var glifo := rng.randi_range(0, 3)
-			for k in 6:
-				var px := x + (k if glifo % 2 == 0 else (k % 3) * 2)
-				var py := y + (k / 2 if glifo < 2 else 5 - k)
-				if px < 64 and py < 64:
-					img.set_pixel(px, py, Color(0.16, 0.16, 0.18))
-			x += rng.randi_range(6, 9)
+	for fila in 9:
+		var y := 8 + fila * 13
+		var x := 6
+		while x < t - 10:
+			var forma := rng.randi_range(0, 5)
+			var largo := rng.randi_range(5, 8)
+			# O tempo comeu boa parte deles.
+			var fundo := clampf(0.55 + gasto.get_noise_2d(x, y) * 1.4, 0.0, 1.0)
+			if fundo > 0.15:
+				_glifo(img, Vector2i(x, y), forma, largo, fundo)
+			x += largo + rng.randi_range(3, 5)
 	return img
+
+
+## Um hieróglifo de Round Hill: traços curvos e ganchos que não são de alfabeto
+## nenhum, entalhados (sulco escuro, borda de baixo clara), com força `fundo`.
+func _glifo(img: Image, o: Vector2i, forma: int, largo: int, fundo: float) -> void:
+	var pontos: Array[Vector2i] = []
+	for k in 10:
+		var u := k / 9.0
+		var p := Vector2.ZERO
+		match forma:
+			0: p = Vector2(u * largo, 4.0 + sin(u * PI * 2.0) * 3.0)
+			1: p = Vector2(largo * 0.5 + cos(u * PI * 1.5) * largo * 0.45, 4.0 + sin(u * PI * 1.5) * 4.0)
+			2: p = Vector2(u * largo, u * 8.0) if k < 5 else Vector2((1.0 - u) * largo, u * 8.0)
+			3: p = Vector2(largo * 0.5, u * 9.0) if k < 6 else Vector2(largo * (u - 0.5), 9.0 - u * 3.0)
+			4: p = Vector2(largo * 0.5 + sin(u * PI * 3.0) * largo * 0.4, u * 9.0)
+			_: p = Vector2(u * largo, 8.0 - absf(sin(u * PI)) * 7.0)
+		pontos.append(o + Vector2i(roundi(p.x), roundi(p.y)))
+	for p in pontos:
+		for d: Vector2i in [Vector2i.ZERO, Vector2i(1, 0)]:
+			var q := p + d
+			var b := q + Vector2i(0, 1)
+			if q.x >= 0 and q.y >= 0 and q.x < img.get_width() and q.y < img.get_height():
+				var c := img.get_pixel(q.x, q.y)
+				img.set_pixel(q.x, q.y, c.lerp(Color(0.0, 0.0, 0.01), fundo))
+			if b.x < img.get_width() and b.y < img.get_height() and not (b - d) in pontos:
+				var c2 := img.get_pixel(b.x, b.y)
+				img.set_pixel(b.x, b.y, c2.lerp(Color(0.3, 0.3, 0.33), fundo * 0.75))
 
 
 ## Chama (para billboards): gota com borda irregular, amarela embaixo, vermelha na ponta.

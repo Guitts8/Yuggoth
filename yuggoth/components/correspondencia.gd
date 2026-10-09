@@ -14,7 +14,10 @@ extends Examinable
 ##
 ## Pegar o correio junta tudo o que está no chão (uma pilha na mão); pôr na mesa
 ## pousa tudo, cada um no seu lugar. Nada se teletransporta (playtest 5): do chão
-## o envelope sobe até a mão, e da mão viaja, num arco, até o lugar dele na mesa.
+## o envelope sobe até a mão, e da mão viaja, num arco, até o lugar dele na mesa;
+## aberto, o que estava dentro (a carta, as cartas soltas de um maço) sai dele até
+## o seu lugar, uma peça depois da outra (playtest 6). Um pacote tem `abas`, que
+## se abrem antes de se tirar qualquer coisa.
 ## Com a carta selada na mão (CartaSaida), não se pega nada. Quando o nó começa a processar (o dia chega, ou a carta cruza o
 ## correio no escuro de um salto no tempo), toca `som_chegada` no lugar onde ele
 ## está: o envelope passando pela fresta, o pacote pousado no chão.
@@ -46,6 +49,9 @@ static var na_mao: Array[Correspondencia] = []
 ## no seu `mesa`, ainda fechadas), e o maço some (`some_ao_abrir`).
 @export var soltar: Array[Correspondencia] = []
 @export var some_ao_abrir := false
+## As abas da tampa (o pacote): abrem ao abrir, para a rotação (graus) da meta
+## `aberta` de cada uma; fechadas, a rotação com que nasceram.
+@export var abas: Array[Node3D] = []
 @export_group("Na mão")
 ## Posição e rotação (graus) do visual em relação à câmera.
 @export var mao_posicao := Vector3(0.17, -0.17, -0.42)
@@ -58,6 +64,9 @@ static var na_mao: Array[Correspondencia] = []
 ## Segundos do chão até a mão, e da mão até a mesa.
 const SUBIR := 0.35
 const POUSAR := 0.55
+## Saindo de dentro, ao abrir: quanto leva cada peça, e o intervalo entre elas.
+const SAIR := 0.6
+const SAIR_INTERVALO := 0.18
 
 var _chao: Transform3D
 var _forma: CollisionShape3D
@@ -72,6 +81,8 @@ var _mao_k := 1.0
 var _pousando: Tween
 ## Na pilha, os de baixo pousam um pouco depois do de cima.
 var _atraso_pouso := 0.0
+## A rotação de cada aba fechada.
+var _abas_fechadas: Array[Vector3] = []
 
 
 func _ready() -> void:
@@ -79,6 +90,8 @@ func _ready() -> void:
 	add_to_group(&"correspondencia")
 	_chao = get_visual().transform
 	_forma = get_node(^"CollisionShape3D")
+	for aba in abas:
+		_abas_fechadas.append(aba.rotation_degrees)
 	_som = AudioStreamPlayer3D.new()
 	_som.name = "Chegada"
 	_som.bus = &"SFX"
@@ -138,6 +151,8 @@ func _on_interact(by: Node) -> void:
 			_tocar(som_abrir)
 			for carta in soltar:
 				GameState.set_value(carta.chave(), NA_MESA)
+			_abrir_abas()
+			_tirar_conteudo.call_deferred()
 		ABERTO:
 			if tiradas() < retirar.size():
 				_retirar()
@@ -180,6 +195,59 @@ func _retirar() -> void:
 		var de_local := peca.position
 		create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT).tween_method(func(k: float) -> void:
 			peca.position = de_local.lerp(lugar, k) + Vector3.UP * sin(k * PI) * 0.05, 0.0, 1.0, 0.55)
+
+
+## As abas da tampa se abrem (o pacote), devagar.
+func _abrir_abas() -> void:
+	if abas.is_empty():
+		return
+	var t := create_tween().set_parallel().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	for i in abas.size():
+		t.tween_property(abas[i], ^"rotation_degrees", abas[i].get_meta(&"aberta", Vector3.ZERO), 0.7).set_delay(i * 0.15)
+
+
+## Aberto, o que só aparece aberto (o conteúdo, as cartas soltas do maço) sai de
+## dentro até o seu lugar, um depois do outro — nada surge pronto na mesa.
+func _tirar_conteudo() -> void:
+	var raiz := owner if owner else get_tree().current_scene
+	if raiz == null:
+		return
+	var de := get_visual().global_position + Vector3(0, saida_altura, 0)
+	var k := 0
+	for cn: ConditionalNode in raiz.find_children("*", "ConditionalNode", true, false):
+		var n := cn.get_parent() as Node3D
+		if n == null or n in retirar or get_visual().is_ancestor_of(n) or n == get_visual():
+			continue
+		if not n.is_visible_in_tree() or not _cita(cn.condition):
+			continue
+		_sair(n, de, k * SAIR_INTERVALO)
+		k += 1
+
+
+## A condição pede esta correspondência aberta (sozinha ou junto com outras).
+func _cita(c: Condition) -> bool:
+	if c is ValueCondition:
+		var v := c as ValueCondition
+		return v.key == chave() and not v.negate and v.value >= ABERTO 			and v.op in [ValueCondition.Op.MAIOR_OU_IGUAL, ValueCondition.Op.IGUAL]
+	if c is CompositeCondition:
+		for sub in (c as CompositeCondition).conditions:
+			if _cita(sub):
+				return true
+	return false
+
+
+func _sair(n: Node3D, de: Vector3, atraso: float) -> void:
+	var ate := n.global_transform
+	var inicio := Transform3D(ate.basis, de)
+	n.global_transform = inicio
+	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_interval(atraso)
+	t.tween_method(func(k: float) -> void:
+		if not is_instance_valid(n):
+			return
+		var x := inicio.interpolate_with(ate, k)
+		x.origin += Vector3.UP * sin(k * PI) * 0.06
+		n.global_transform = x, 0.0, 1.0, SAIR)
 
 
 ## Da mão até o lugar na mesa (`mesa`), num arco.
@@ -225,6 +293,7 @@ func _on_value_changed(key: StringName, _value: Variant) -> void:
 
 func _atualizar() -> void:
 	var e := estado()
+	var antes := _mostrado
 	var visual := get_visual()
 	if e == NO_CHAO:
 		visual.transform = _chao
@@ -237,6 +306,13 @@ func _atualizar() -> void:
 		visual.set(&"aberto", e == ABERTO)
 	if fechado:
 		fechado.visible = e != ABERTO
+	# Abrindo agora, as abas vão devagar (_abrir_abas); num load, já abertas.
+	if e != ABERTO:
+		for i in abas.size():
+			abas[i].rotation_degrees = _abas_fechadas[i]
+	elif antes != NA_MESA:
+		for aba in abas:
+			aba.rotation_degrees = aba.get_meta(&"aberta", Vector3.ZERO)
 	var sumiu := some_ao_abrir and e == ABERTO
 	if some_ao_abrir:
 		visual.visible = not sumiu

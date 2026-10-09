@@ -237,8 +237,8 @@ func _ready() -> void:
 	esc = root.find_child("Escritorio", true, false)
 	_check(esc.miskatonic.visible and not esc.player.seated, "recarregar depois do Prólogo vai direto ao escritório")
 	await _frames(2)
-	_check(esc._fora() and not esc.calha.porta_aberta and esc.calha.corredor.visible and esc.porta_fora.can_interact(esc.player)
-		and not esc.porta.can_interact(esc.player), "o dia começa no corredor, diante da porta fechada")
+	_check(esc._fora() and not esc.calha.porta_aberta and esc.calha.corredor.visible and esc.player.global_position.y < -3.0
+		and not esc.porta.can_interact(esc.player), "o dia começa no pé da escada, com a porta fechada lá em cima")
 	await _check_dia(esc, 1)
 	_check(not esc._fora() and not esc.calha.porta_aberta and not esc.calha.corredor.visible, "entrou: a porta fecha atrás dele")
 
@@ -600,6 +600,8 @@ func _ready() -> void:
 	Narrator.line_started.disconnect(ouvir_narrador)
 	_check(GameState.has_flag(&"narrou_depois_relato") and not ditas.any(func(d: String) -> bool: return d.contains("Na manhã de quarta-feira")),
 		"a noite em claro escrevendo cartas (sem repetir o correio da manhã)")
+	# De volta de Boston, pela escada, como de manhã.
+	await _entrar(esc)
 	var escrever4: WriteReply = dia4.get_node("Escrever")
 	_check(escrever4.can_interact(player), "depois do relato, as cartas da noite")
 	escrever4.interact(player)
@@ -919,6 +921,14 @@ func _sonho_no_teste(esc: Escritorio, n: int, acordar: Callable) -> void:
 	_check(GameState.get_value(&"sonhando") == n and is_equal_approx(GameState.get_number(&"sonho"), 1.0) and grupo.visible
 		and not esc.find_child("Dias", true, false).visible and esc.player.input_enabled, "a noite do Dia %d: o sonho" % n)
 	await _check_alcance(esc, "Sonho da noite %d" % n)
+	if lugar and esc.player.seated:
+		# Playtest 6: no sonho da poltrona, levantar andando o prendia dentro dela.
+		Input.action_press(&"mover_frente")
+		await _frames(3)
+		Input.action_release(&"mover_frente")
+		await _seconds(1.5)
+		_check(not esc.player.seated and esc.player.livre(esc.player.global_position),
+			"no sonho da noite %d, levantar da poltrona andando o deixa livre" % n)
 	acordar.call()
 	await _frames(2)
 	var viewer: Control = esc.get_tree().root.find_child("ExamineViewer", true, false)
@@ -968,7 +978,8 @@ func _ir_para_casa(esc: Escritorio) -> void:
 		await get_tree().physics_frame
 		t += get_physics_process_delta_time()
 	Input.action_release(&"mover_frente")
-	_check(esc._saindo or GameState.get_value(&"dia") == n + 1, "pelo corredor até a escada: o dia acaba")
+	_check(esc._saindo or GameState.get_value(&"dia") == n + 1, "pelo corredor até a escada: o dia acaba"
+		+ ("" if esc._saindo or GameState.get_value(&"dia") == n + 1 else " (parou em %s, pode_ir %s, porta %s)" % [esc.player.global_position, esc._pode_ir, esc.calha.porta_aberta]))
 
 
 ## Postada a resposta do dia: "Anotar o dia" no caderno, como o jogador.
@@ -1025,11 +1036,41 @@ func _entrar(esc: Escritorio) -> void:
 		return
 	if esc._fora() and not esc.calha.porta_aberta:
 		await _until(func() -> bool: return player.input_enabled and not SceneDirector.hold_black, 30.0)
+		if player.global_position.y < -0.1:
+			await _subir_a_escada(esc)
 		esc.porta_fora.interact(player)
 		await _until(func() -> bool: return esc.calha.porta_aberta and player.input_enabled, 20.0)
 	await _frames(2)
 	player.global_position = Vector3(-0.2, player.global_position.y, 1.4)
 	await _until(func() -> bool: return not esc.calha.porta_aberta and not esc.calha.movendo, 20.0)
+	await _frames(2)
+
+
+## De manhã (playtest 6): do pé da escada, os dois lanços acima e o corredor
+## até a porta, andando como o jogador (com a física: a escada é andável).
+func _subir_a_escada(esc: Escritorio) -> void:
+	var pe := esc.get_node(^"Porta") as Node3D
+	var x := pe.global_position.x
+	var meio := esc.escada.global_position.z
+	await _andar(esc.player, [Vector3(x, 0, meio + 0.2), Vector3(1.6, 0, meio), esc.calha.diante_fora])
+	_check(esc.player.global_position.y > -0.05 and esc.player.global_position.distance_to(esc.calha.diante_fora) < 0.4,
+		"de manhã, ele sobe a escada e chega à porta")
+
+
+## Anda pelos `pontos` (só x/z contam), como o jogador, com a física.
+func _andar(player: Player, pontos: Array, limite := 30.0) -> void:
+	var t := 0.0
+	for alvo: Vector3 in pontos:
+		while t < limite:
+			var p := player.global_position
+			var rumo := Vector3(alvo.x, p.y, alvo.z)
+			if p.distance_to(rumo) < 0.25:
+				break
+			player.look_at(rumo)
+			Input.action_press(&"mover_frente")
+			await get_tree().physics_frame
+			t += get_physics_process_delta_time()
+	Input.action_release(&"mover_frente")
 	await _frames(2)
 
 

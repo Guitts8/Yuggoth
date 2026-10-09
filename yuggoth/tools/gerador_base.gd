@@ -174,7 +174,8 @@ func _lote(parent: Node, name: String, pecas: Array, mat: String) -> MeshInstanc
 	return mi
 
 
-## Corpo estático com uma caixa de colisão por item: [tamanho, posição].
+## Corpo estático com uma caixa de colisão por item: [tamanho, posição] ou
+## [tamanho, posição, rotação em graus] (as rampas da escada).
 func _colisao(parent: Node, name: String, boxes: Array) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = name
@@ -186,6 +187,8 @@ func _colisao(parent: Node, name: String, boxes: Array) -> StaticBody3D:
 		box.size = boxes[i][0]
 		shape.shape = box
 		shape.position = boxes[i][1]
+		if boxes[i].size() > 2:
+			shape.rotation_degrees = boxes[i][2]
 		_add(body, shape)
 	return body
 
