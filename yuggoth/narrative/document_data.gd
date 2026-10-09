@@ -4,13 +4,23 @@ extends Resource
 ## O texto mostrado é a primeira variante cuja condição vale; senão, `pages`.
 ## Nenhuma troca de variante é anunciada ao jogador (GDD §6.2).
 
-enum Style { MANUSCRITO, DATILOGRAFADO, JORNAL, TELEGRAMA }
+## Duas mãos (playtest 5): MANUSCRITO é a letra de Akeley (e de quem mais
+## escrever à mão), "apertada, arcaica" — Tangerine; WILMARTH, a de Wilmarth
+## (respostas, diário, o relato, o rascunho), copperplate legível — Pinyon Script.
+## As duas são OFL (art/fonts, com a licença ao lado).
+enum Style { MANUSCRITO, DATILOGRAFADO, JORNAL, TELEGRAMA, WILMARTH }
 
 const STYLE_FONTS := {
-	Style.MANUSCRITO: ["Segoe Script", "Brush Script MT", "cursive"],
+	Style.MANUSCRITO: ["res://art/fonts/Tangerine-Regular.ttf"],
 	Style.DATILOGRAFADO: ["Courier New", "Courier", "monospace"],
 	Style.JORNAL: ["Georgia", "Times New Roman", "serif"],
 	Style.TELEGRAMA: ["Courier New", "Courier", "monospace"],
+	Style.WILMARTH: ["res://art/fonts/PinyonScript-Regular.ttf"],
+}
+## As letras de mão têm o olho pequeno para o corpo: o tamanho cresce tanto.
+const STYLE_SCALE := {
+	Style.MANUSCRITO: 1.5,
+	Style.WILMARTH: 1.2,
 }
 const FONT_SLOTS: Array[StringName] = [&"normal_font", &"italics_font", &"bold_font", &"bold_italics_font"]
 
@@ -45,14 +55,16 @@ func resolve_variant() -> DocumentVariant:
 
 ## Fonte do estilo em todas as variantes ([i], [b]) de um RichTextLabel. O
 ## itálico e o negrito são a mesma fonte inclinada e engrossada: a letra de mão
-## (Segoe Script) não tem itálico, e [i] sumia. Com `size` > 0, fixa o tamanho.
+## não tem itálico, e [i] sumia. `size` é o tamanho de base (0 = o do tema, na
+## primeira vez); o estilo o aumenta por `STYLE_SCALE`.
 static func apply_fonts(label: RichTextLabel, doc_style: Style, size := 0) -> void:
-	if size > 0:
-		label.add_theme_font_size_override(&"normal_font_size", size)
-	# [i] e [b] usam o mesmo tamanho do texto normal (o tema só define o normal).
-	size = label.get_theme_font_size(&"normal_font_size")
-	for slot in [&"italics_font_size", &"bold_font_size", &"bold_italics_font_size"]:
-		label.add_theme_font_size_override(slot, size)
+	if size <= 0:
+		# O de base fica guardado: aplicar de novo não acumula a escala.
+		size = label.get_meta(&"tamanho_base", label.get_theme_font_size(&"normal_font_size"))
+	label.set_meta(&"tamanho_base", size)
+	var final := roundi(size * float(STYLE_SCALE.get(doc_style, 1.0)))
+	for slot in [&"normal_font_size", &"italics_font_size", &"bold_font_size", &"bold_italics_font_size"]:
+		label.add_theme_font_size_override(slot, final)
 	for slot in FONT_SLOTS:
 		var key := "%d:%s" % [doc_style, slot]
 		if not _font_cache.has(key):
@@ -61,14 +73,28 @@ static func apply_fonts(label: RichTextLabel, doc_style: Style, size := 0) -> vo
 
 
 static func _fonte(doc_style: Style, slot: StringName) -> Font:
-	var base := SystemFont.new()
-	base.font_names = PackedStringArray(STYLE_FONTS[doc_style])
+	var nomes: Array = STYLE_FONTS[doc_style]
+	var base: Font
+	if String(nomes[0]).begins_with("res://"):
+		var arquivo := load(nomes[0]) as FontFile
+		# O que faltar na letra de mão (um sinal raro) vem de uma serifada.
+		var reserva := SystemFont.new()
+		reserva.font_names = PackedStringArray(["Georgia", "Times New Roman", "serif"])
+		var f := arquivo.duplicate() as FontFile
+		f.fallbacks = [reserva]
+		base = f
+	else:
+		var sistema := SystemFont.new()
+		sistema.font_names = PackedStringArray(nomes)
+		base = sistema
 	if slot == &"normal_font":
 		return base
 	var v := FontVariation.new()
 	v.base_font = base
 	if String(slot).contains("italics"):
-		v.variation_transform = Transform2D(Vector2(1, 0), Vector2(0.38 if doc_style == Style.MANUSCRITO else 0.22, 1), Vector2.ZERO)
+		# A letra de mão já é inclinada: o [i] inclina só mais um pouco.
+		var manuscrita := doc_style in [Style.MANUSCRITO, Style.WILMARTH]
+		v.variation_transform = Transform2D(Vector2(1, 0), Vector2(0.2 if manuscrita else 0.22, 1), Vector2.ZERO)
 	if String(slot).begins_with("bold"):
 		v.variation_embolden = 0.7
 	return v

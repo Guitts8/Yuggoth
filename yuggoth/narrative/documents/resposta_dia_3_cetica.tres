@@ -6,7 +6,7 @@
 script = ExtResource("1_doc")
 id = &"resposta_dia_3_cetica"
 title = "Minha resposta a Akeley — 3 de julho"
-style = 0
+style = 4
 pages = PackedStringArray("[right]Rua Saltonstall, 118
 Arkham, Massachusetts
 3 de julho de 1928[/right]

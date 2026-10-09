@@ -294,7 +294,8 @@ func _ready() -> void:
 		reader._show_page()
 		if reader.body.get_content_height() > reader.body.size.y + 1:
 			cabe = false
-	_check(cabe and reader._pages.size() > carta1.pages.size(), "carta longa paginada sem estourar o papel")
+	# Na letra estreita de Akeley (Tangerine) cada página do livro já cabe numa folha.
+	_check(cabe and reader._pages.size() >= carta1.pages.size(), "carta longa paginada sem estourar o papel")
 	reader.close()
 	_check(escrever.can_interact(player), "depois de ler, dá para responder")
 	escrever.interact(player)
@@ -515,6 +516,9 @@ func _ready() -> void:
 	correio_julho.interact(player)
 	await _frames(1)
 	_check(foto10.is_visible_in_tree() and dia4.get_node("CartaJulho").visible, "da carta de julho sai a foto do exército")
+	# A foto sai do envelope num arco até o lugar dela; no meio do caminho, rasante
+	# sobre o mata-borrão, contaria como enterrada.
+	await _seconds(0.8)
 	await _check_alcance(esc, "Dia 4, correio aberto")
 	dia4.get_node("Telegrama/Ler").interact(player)
 	await _frames(2)

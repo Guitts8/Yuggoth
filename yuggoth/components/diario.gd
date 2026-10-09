@@ -836,7 +836,7 @@ func _rotulo(janela: Control) -> RichTextLabel:
 	r.size = Vector2(janela.size.x, janela.size.y * 6.0)
 	r.add_theme_color_override(&"default_color", TINTA)
 	r.add_theme_constant_override(&"line_separation", ENTRELINHA)
-	DocumentData.apply_fonts(r, DocumentData.Style.MANUSCRITO, FONTE)
+	DocumentData.apply_fonts(r, DocumentData.Style.WILMARTH, FONTE)
 	r.install_effect(TremorTextEffect.new())
 	r.install_effect(QuedaTextEffect.new())
 	r.install_effect(IllegibleTextEffect.new())

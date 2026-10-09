@@ -34,7 +34,7 @@ func _ready() -> void:
 		if _tween:
 			_pen.play())
 	add_child(_pen)
-	DocumentData.apply_fonts(body, DocumentData.Style.MANUSCRITO)
+	DocumentData.apply_fonts(body, DocumentData.Style.WILMARTH)
 	Events.reply_requested.connect(open)
 
 

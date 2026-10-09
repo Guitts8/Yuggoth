@@ -6,7 +6,7 @@
 script = ExtResource("1_doc")
 id = &"diario_dia_4"
 title = "Meu diário — 21 de julho"
-style = 0
+style = 4
 pages = PackedStringArray("21 de julho.
 A pedra não chegou. Em Keene, um homem magro e ruivo, de voz grossa e zumbida, discutiu com o funcionário do expresso — que ficou tonto e sonolento ao ouvi-lo.
 [queda]Eu também, agora, tão[/queda]")

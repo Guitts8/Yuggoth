@@ -6,7 +6,7 @@
 script = ExtResource("1_doc")
 id = &"diario_dia_1"
 title = "Meu diário — 9 de maio"
-style = 0
+style = 4
 pages = PackedStringArray("9 de maio.
 Respondi a Akeley. Pelas regras comuns, eu deveria rir dessas extravagâncias; mas algo no tom da carta me faz levá-la a sério.
 Não pode ser como ele pensa. E, no entanto, merece investigação.")

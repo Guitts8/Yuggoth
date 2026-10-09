@@ -444,10 +444,15 @@ arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera
     corrimão, o andar de baixo sumindo na penumbra (luz fraca lá embaixo). Feito: o
     primeiro lanço até o patamar (lambri, uma arandela fraca), o segundo vira para o
     sul e desce ao andar de baixo; o corrimão faz a volta no pilar do patamar.
-12. 🔧 **Caligrafia copperplate.** Decidido: duas mãos — Wilmarth em copperplate
+12. ✅ **Caligrafia copperplate.** Decidido: duas mãos — Wilmarth em copperplate
     legível (fonte livre OFL, p. ex. *Pinyon Script*; respostas, diário); Akeley em
     outra, apertada e arcaica ("cramped, archaic chirography"). Capturas no leitor
-    antes de fechar.
+    antes de fechar. Feito, comparando seis no leitor (Segoe Script, Pinyon, Petit
+    Formal, Tangerine, Mr De Haviland, Cedarville): **Wilmarth em Pinyon Script**
+    (estilo novo `WILMARTH`: as respostas, o diário, o relato, o rascunho; ×1,2) e
+    **Akeley em Tangerine** (estreita, antiga; ×1,5; o tremor de agosto por cima).
+    Mr De Haviland não se lia; Cedarville era moderna demais. ⏳ O usuário confere
+    no playtest.
 13. ✅ **Selos de cera**: em 1928, carta comum nos EUA era fechada pela goma do
     envelope e franqueada com selo postal (2 centavos). Decidido: sem lacre; fica
     goma + selo postal (como já está).
@@ -521,9 +526,8 @@ Fase 4 antes dela.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
 2b. ✅ Playtest 4 (até o começo do Dia 5) → **Fase 3e** (acima).
 2c. ✅ O usuário jogou o **playtest 5** (até a noite 3); a lista virou a **Fase 3f**.
-2d. **← AQUI.** Fase 3f: feitos os itens 1–11 e 13–18; o usuário respondeu os ❓
-   (todas as recomendações); a fazer: 12 (as duas mãos) e 19 (a loucura do sonho do
-   disco).
+2d. **← AQUI.** Fase 3f: feitos os itens 1–18; o usuário respondeu os ❓ (todas as
+   recomendações); a fazer: 19 (a loucura do sonho do disco).
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

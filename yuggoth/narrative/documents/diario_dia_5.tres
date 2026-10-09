@@ -6,7 +6,7 @@
 script = ExtResource("1_doc")
 id = &"diario_dia_5"
 title = "Meu diário — 29 de agosto"
-style = 0
+style = 4
 pages = PackedStringArray("29 de agosto.
 Mandei a resposta mais animadora que pude. O telegrama não foi ele quem mandou: foi um homem ruivo, de voz grossa e zumbida, em Bellows Falls.
 A-K-E-L-Y. Quem erra o próprio nome? Chove. Não vou para casa ainda.")
