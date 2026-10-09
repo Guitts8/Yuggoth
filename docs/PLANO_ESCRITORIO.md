@@ -783,7 +783,9 @@ armário, o cesto, os papéis sob a lâmpada (Dia 2), o vão da escada em Boston
 macaco com o tom forçado.
 
 **Esperando o usuário — o playtest 8** (do Dia 1 ao fim da demo; **F2** pula dias,
-**F3** recarrega). O que olhar:
+**F3** recarrega). A lista completa de conferência, dia a dia, com as decisões
+pendentes, está em **`docs/PLAYTEST.md`** (criado em 2026-10-09, depois da sessão de
+tester 2). Em resumo, o que olhar:
 1. O Necronomicon: a capa abrindo, as páginas, o mouse nas entradas, a folha
    virando para as Opções e de volta, a pausa. É o que se pediu do *Lords of
    Shadow 2*?
