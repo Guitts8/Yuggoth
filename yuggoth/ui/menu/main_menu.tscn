@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://ui/menu/main_menu.gd" id="1_main"]
 [ext_resource type="Script" path="res://ui/menu/livro.gd" id="2_livro"]
 [ext_resource type="Script" path="res://ui/menu/confirm_box.gd" id="3_confirm"]
-[ext_resource type="FontFile" path="res://art/fonts/OldStandard-Italic.ttf" id="4_italico"]
+[ext_resource type="FontFile" path="res://art/fonts/IMFellEnglish-Italic.ttf" id="4_italico"]
+[ext_resource type="FontFile" path="res://art/fonts/IMFellEnglish-SC.ttf" id="5_versalete"]
+[ext_resource type="FontFile" path="res://art/fonts/UnifrakturMaguntia-Book.ttf" id="6_fraktur"]
+[ext_resource type="Script" path="res://ui/menu/gravura.gd" id="7_gravura"]
+[ext_resource type="Script" path="res://ui/menu/regua_ornada.gd" id="8_regua"]
 
 [node name="MainMenu" type="Control"]
 process_mode = 3
@@ -25,50 +29,31 @@ grow_vertical = 2
 script = ExtResource("2_livro")
 numero_esquerda = "i"
 numero_direita = "ii"
+circulo_direita = true
+semente = 3
 
 [node name="Esquerda" type="VBoxContainer" parent="Livro"]
 layout_mode = 0
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="Autor" type="Label" parent="Livro/Esquerda"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.32, 0.24, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.38, 0.25, 0.17, 1)
+theme_override_fonts/font = ExtResource("5_versalete")
+theme_override_font_sizes/font_size = 22
 text = "a partir de H. P. Lovecraft"
 horizontal_alignment = 1
 
-[node name="Title" type="Label" parent="Livro/Esquerda"]
-custom_minimum_size = Vector2(470, 0)
+[node name="Gravura" type="Control" parent="Livro/Esquerda"]
+custom_minimum_size = Vector2(460, 470)
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "Os que Sussurram"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="Regua" type="Label" parent="Livro/Esquerda"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.32, 0.24, 1)
-theme_override_font_sizes/font_size = 22
-text = "— · —"
-horizontal_alignment = 1
-
-[node name="Subtitle" type="Label" parent="Livro/Esquerda"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.21, 0.15, 1)
-theme_override_fonts/font = ExtResource("4_italico")
-theme_override_font_sizes/font_size = 28
-text = "Vermont, 1928"
-horizontal_alignment = 1
-
-[node name="Espaco" type="Control" parent="Livro/Esquerda"]
-custom_minimum_size = Vector2(0, 70)
-layout_mode = 2
+script = ExtResource("7_gravura")
 
 [node name="Epigrafe" type="Label" parent="Livro/Esquerda"]
-custom_minimum_size = Vector2(470, 0)
+custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.21, 0.15, 1)
+theme_override_colors/font_color = Color(0.2, 0.12, 0.08, 1)
 theme_override_fonts/font = ExtResource("4_italico")
 theme_override_font_sizes/font_size = 24
 text = "“Tenham bem em mente que, no fim, eu não vi nenhum horror visual de fato.”"
@@ -77,34 +62,58 @@ autowrap_mode = 3
 
 [node name="Fonte" type="Label" parent="Livro/Esquerda"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.32, 0.24, 1)
-theme_override_font_sizes/font_size = 18
-text = "— The Whisperer in Darkness, 1931"
+theme_override_colors/font_color = Color(0.38, 0.25, 0.17, 1)
+theme_override_fonts/font = ExtResource("5_versalete")
+theme_override_font_sizes/font_size = 17
+text = "— The Whisperer in Darkness, 1931 —"
 horizontal_alignment = 1
 
 [node name="Direita" type="VBoxContainer" parent="Livro"]
 layout_mode = 0
-theme_override_constants/separation = 18
-alignment = 1
+theme_override_constants/separation = 0
 
-[node name="Sumario" type="Label" parent="Livro/Direita"]
+[node name="OsQue" type="Label" parent="Livro/Direita"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.32, 0.24, 1)
-theme_override_font_sizes/font_size = 22
-text = "SUMÁRIO"
+theme_override_colors/font_color = Color(0.12, 0.065, 0.045, 1)
+theme_override_fonts/font = ExtResource("6_fraktur")
+theme_override_font_sizes/font_size = 52
+text = "Os que"
 horizontal_alignment = 1
 
-[node name="Regua" type="Label" parent="Livro/Direita"]
+[node name="Title" type="Label" parent="Livro/Direita"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.32, 0.24, 1)
-theme_override_font_sizes/font_size = 22
-text = "— · —"
+theme_override_colors/font_color = Color(0.44, 0.05, 0.03, 1)
+theme_override_colors/font_outline_color = Color(0.1, 0.04, 0.03, 1)
+theme_override_colors/font_shadow_color = Color(0.2, 0.08, 0.05, 0.35)
+theme_override_constants/outline_size = 3
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("6_fraktur")
+theme_override_font_sizes/font_size = 104
+text = "Sussurram"
 horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Livro/Direita"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.19, 0.12, 1)
+theme_override_fonts/font = ExtResource("4_italico")
+theme_override_font_sizes/font_size = 28
+text = "Vermont, MCMXXVIII"
+horizontal_alignment = 1
+
+[node name="Regua" type="Control" parent="Livro/Direita"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+script = ExtResource("8_regua")
+
+[node name="Espaco" type="Control" parent="Livro/Direita"]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
 
 [node name="Buttons" type="VBoxContainer" parent="Livro/Direita"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 4
 
 [node name="Continuar" type="Button" parent="Livro/Direita/Buttons"]
 unique_name_in_owner = true
@@ -130,3 +139,15 @@ text = "Sair"
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("3_confirm")
+
+[node name="Espaco2" type="Control" parent="Livro/Direita"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Rodape" type="Label" parent="Livro/Direita"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.38, 0.25, 0.17, 1)
+theme_override_fonts/font = ExtResource("5_versalete")
+theme_override_font_sizes/font_size = 17
+text = "edição de demonstração"
+horizontal_alignment = 1

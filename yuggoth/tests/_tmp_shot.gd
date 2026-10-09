@@ -11,8 +11,9 @@ var root: Node
 func _ready() -> void:
 	SaveSystem.save_path = "user://_tmp_shot_save.json"
 	root = load("res://main/game_root.tscn").instantiate()
-	root.boot_to_menu = false
-	root.start_level = load("res://levels/test/test_room.tscn")
+	if OS.get_environment("SHOT_MODO") != "menu":
+		root.boot_to_menu = false
+		root.start_level = load("res://levels/test/test_room.tscn")
 	add_child(root)
 	if SceneDirector.is_busy:
 		await SceneDirector.level_changed
@@ -21,6 +22,10 @@ func _ready() -> void:
 		for n in [2, 3, 4, 5]:
 			if dias.is_empty() or str(n) in dias:
 				await _sonho_fotos(n)
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "menu":
+		await _menu_fotos()
 		get_tree().quit()
 		return
 	if OS.get_environment("SHOT_MODO") == "boston":
@@ -172,6 +177,95 @@ func _boston_fotos() -> void:
 	await _s(1.5)
 	await _olhar(p, (b.get_node("%Folha") as Node3D).global_position)
 	await _shot("%s_boston_porta" % tag)
+
+
+func _menu_fotos() -> void:
+	Necronomicon._pena(64).get_image().save_png("%s/%s_pena.png" % [dir, tag])
+	# A abertura: as velas, a câmera, a capa, a tinta.
+	for i in 16:
+		await _s(0.5)
+		await _shot("%s_0%02d_abrindo" % [tag, i])
+	await _s(1.0)
+	await _shot("%s_1_menu" % tag)
+	var main: MainMenu = root.get_node("Menus/Necronomicon/Paginas/MainMenu")
+	var nec: Necronomicon = root.get_node("Menus/Necronomicon")
+	# O mouse sobre "Opções" (o ponto da página visto pela câmera), e o clique.
+	var alvo := Vector2.ZERO
+	for k in 3:
+		alvo = _na_tela(nec, main.options_button.get_global_rect().get_center())
+		_mouse(alvo, -1)
+		await _s(1.0)
+	await _shot("%s_1b_hover" % tag)
+	main.new_game_button.grab_focus()
+	await _s(0.08)
+	await _shot("%s_1c_foco_andando" % tag)
+	await _s(0.5)
+	await _shot("%s_1d_foco" % tag)
+	_mouse(alvo, 1)
+	await get_tree().process_frame
+	_mouse(alvo, 0)
+	for i in 5:
+		await _s(0.18)
+		await _shot("%s_2_virando_%d" % [tag, i])
+	await _s(0.6)
+	await _shot("%s_3_opcoes" % tag)
+	var opcoes: OptionsMenu = root.get_node("Menus/Necronomicon/Paginas/OptionsMenu")
+	opcoes.close()
+	await _s(0.35)
+	await _shot("%s_4_voltando" % tag)
+	await _s(1.0)
+	await _shot("%s_5_menu_de_volta" % tag)
+	# A pausa, no meio de um dia.
+	main.close()
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 4)
+	GameState.set_value(&"data", Lapso.dia_do_ano(7, 18))
+	GameState.set_flag(&"comecou_dia_4")
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
+	await _s(1.0)
+	Narrator.cancel()
+	var pausa: PauseMenu = root.get_node("Menus/Necronomicon/Paginas/PauseMenu")
+	pausa.open()
+	await _s(0.12)
+	await _shot("%s_6_pausa_chegando" % tag)
+	await _s(0.6)
+	await _shot("%s_6_pausa" % tag)
+	# De volta ao menu e "Continuar": o mergulho na tinta.
+	await root.quit_to_menu()
+	await _s(1.5)
+	await _shot("%s_7_menu_de_novo" % tag)
+	main._on_new_game()
+	await _s(0.6)
+	await _shot("%s_7b_confirmar" % tag)
+	main.confirm._answered.emit(false)
+	await _s(0.4)
+	main._on_continue()
+	for i in 5:
+		await _s(0.25)
+		await _shot("%s_8_mergulho_%d" % [tag, i])
+
+
+## A posição na tela do ponto `p` das páginas (na textura de 1240 × 840).
+func _na_tela(nec: Necronomicon, p: Vector2) -> Vector2:
+	var ponto := nec._livro.global_transform * nec._ponto_da_pagina(p / Vector2(Necronomicon.TINTA))
+	return nec._camera.unproject_position(ponto) * (Vector2(DisplayServer.window_get_size()) / Vector2(nec._mundo.size))
+
+
+## Move o mouse (`botao` -1) ou aperta (1) / solta (0) o botão esquerdo em `p`.
+func _mouse(p: Vector2, botao: int) -> void:
+	if botao < 0:
+		var mov := InputEventMouseMotion.new()
+		mov.position = p
+		mov.global_position = p
+		Input.parse_input_event(mov)
+		return
+	var b := InputEventMouseButton.new()
+	b.button_index = MOUSE_BUTTON_LEFT
+	b.pressed = botao == 1
+	b.position = p
+	b.global_position = p
+	Input.parse_input_event(b)
 
 
 func _olhar(p: Player, ponto: Vector3) -> void:

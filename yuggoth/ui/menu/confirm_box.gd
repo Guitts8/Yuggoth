@@ -20,7 +20,8 @@ func _ready() -> void:
 	add_child(_label)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override(&"separation", 40)
+	# Larga: as pontas do marcador da escolhida não invadem a vizinha.
+	row.add_theme_constant_override(&"separation", 110)
 	add_child(row)
 	_yes = Button.new()
 	_no = Button.new()

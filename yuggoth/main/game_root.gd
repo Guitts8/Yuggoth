@@ -27,6 +27,9 @@ extends Node
 
 ## Quanto o visual está em "sonho" agora (0–1), já combinando exposição e `sonho`.
 var dream_level := 0.0
+## O tremor e o afim que estão nos shaders agora (com as opções de acessibilidade).
+var tremor_atual := 0.0
+var afim_atual := 0.0
 
 var _level: Node
 var _shown_exposure := 0.0
@@ -49,7 +52,8 @@ func _ready() -> void:
 	pause_menu.quit_to_menu_requested.connect(quit_to_menu)
 	Events.quit_to_menu_requested.connect(quit_to_menu)
 	if boot_to_menu:
-		main_menu.open()
+		# O jogo começando: o livro chega fechado e a capa se abre.
+		main_menu.open(true)
 	else:
 		new_game(false)
 
@@ -122,8 +126,11 @@ func _process(delta: float) -> void:
 	# Exposição quadrática: os primeiros dias ficam firmes, a quebra vem no fim.
 	dream_level = maxf(_shown_exposure * _shown_exposure, GameState.get_number(&"sonho"))
 	RenderingServer.global_shader_parameter_set(&"psx_dream", dream_level)
-	RenderingServer.global_shader_parameter_set(&"psx_jitter", lerpf(jitter_range.x, jitter_range.y, dream_level))
-	RenderingServer.global_shader_parameter_set(&"psx_affine", lerpf(affine_range.x, affine_range.y, dream_level))
+	# As opções de acessibilidade diminuem o tremor e a ondulação (Settings).
+	tremor_atual = lerpf(jitter_range.x, jitter_range.y, dream_level) * Settings.get_value(&"tremor")
+	afim_atual = lerpf(affine_range.x, affine_range.y, dream_level) * Settings.get_value(&"distorcao")
+	RenderingServer.global_shader_parameter_set(&"psx_jitter", tremor_atual)
+	RenderingServer.global_shader_parameter_set(&"psx_affine", afim_atual)
 	RenderingServer.global_shader_parameter_set(&"psx_snap", lerpf(snap_range.x, snap_range.y, dream_level))
 	_post.set_shader_parameter(&"vignette", lerpf(vignette_range.x, vignette_range.y, dream_level))
 

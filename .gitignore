@@ -1,2 +1,4 @@
 # Saídas do comandos.ps1 (logs do Godot, capturas)
 .logs/
+# O jogo exportado (comandos.ps1 exportar)
+build/

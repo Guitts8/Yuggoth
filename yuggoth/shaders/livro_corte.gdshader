@@ -6,7 +6,7 @@ render_mode cull_disabled;
 
 uniform float arco = 0.04;
 uniform float largura = 0.5;
-uniform vec3 cor : source_color = vec3(0.72, 0.62, 0.43);
+uniform vec3 cor : source_color = vec3(0.78, 0.6, 0.38);
 
 varying float alto;
 

@@ -62,6 +62,9 @@ Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
                        travamentos, quedas do mapa e erros no log. Com o tom
                        (-1, 0 ou 1), toda resposta a Akeley sai nesse tom
     importar          reimporta o projeto (depois de class_name nova ou asset gerado)
+    exportar           exporta a demo para Windows em build\windows (precisa dos
+                       export templates do Godot 4.7.2 instalados)
+    jogar-exportado    abre o jogo exportado (sem os atalhos de teste)
     captura <tag>      roda tests/_tmp_shot (capturas em .logs\capturas)
 
   GERAR (sobrescrevem arquivos gerados)
@@ -127,6 +130,16 @@ switch ($acao) {
 		exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 2400 "macaco")
 	}
 	"importar" { exit (Godot-Com-Limite @("--headless", "--path", ".", "--import") 300 "importar") }
+	"exportar" {
+		$destino = Join-Path $raiz "build\windows"
+		New-Item -ItemType Directory -Force $destino | Out-Null
+		exit (Godot-Com-Limite @("--headless", "--path", ".", "--export-release", "Windows", (Join-Path $destino "OsQueSussurram.exe")) 900 "exportar")
+	}
+	"jogar-exportado" {
+		$exe = Join-Path $raiz "build\windows\OsQueSussurram.exe"
+		if (-not (Test-Path $exe)) { Write-Host "Ainda não exportado: comandos.ps1 exportar" -ForegroundColor Yellow; exit 1 }
+		Start-Process $exe
+	}
 	"captura" {
 		$env:SHOT_DIR = Join-Path $logs "capturas"
 		$env:SHOT_TAG = if ($arg) { $arg } else { "shot" }

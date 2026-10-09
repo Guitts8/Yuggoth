@@ -1,5 +1,5 @@
 extends Node
-## Preferências do jogador (volume, mouse, tela), separadas do estado
+## Preferências do jogador (volume, mouse, tela, acessibilidade), separadas do estado
 ## narrativo e do save: sobrevivem a "Novo jogo" e a saves inválidos.
 
 signal changed(key: StringName)
@@ -16,6 +16,12 @@ const DEFAULTS: Dictionary[StringName, Variant] = {
 	&"sensibilidade": 1.0,
 	&"inverter_y": false,
 	&"tela_cheia": false,
+	## Acessibilidade (GDD §12): o campo de visão da câmera (graus) e quanto do
+	## visual do PS1 se quer — o tremor das formas (psx_jitter) e a ondulação das
+	## texturas (psx_affine), de 0 (desligado) a 1 (como o jogo foi feito).
+	&"campo_visao": 70.0,
+	&"tremor": 1.0,
+	&"distorcao": 1.0,
 }
 
 ## Trocável em testes para não sobrescrever as preferências do jogador.

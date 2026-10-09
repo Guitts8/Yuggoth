@@ -74,7 +74,8 @@ func _ready() -> void:
 	# O macaco é longo (o jogo inteiro): só quando pedido (CAMINHOS=macaco).
 	for parte: Callable in [_textos, _modais_no_meio_das_cenas, _menu_no_meio_do_dia, _escada_com_a_carta,
 			_diario_vazio, _noite_sem_fogo, _exame_na_ligacao_de_keene, _diario_na_ligacao_de_keene, _continuar_em_boston,
-			_legenda_presa, _depuracao_no_meio_das_cenas, _menu_no_fim_da_demo, _menu_pelo_teclado, _macaco]:
+			_legenda_presa, _depuracao_no_meio_das_cenas, _menu_no_fim_da_demo, _menu_pelo_teclado, _abertura_do_livro,
+			_acessibilidade, _macaco]:
 		var nome := parte.get_method().trim_prefix("_")
 		if (so.is_empty() and nome != "macaco") or nome in so:
 			print("-- %s" % parte.get_method())
@@ -710,6 +711,60 @@ func _menu_pelo_teclado() -> void:
 	await _frames(3)
 	_check(not main_menu.visible and SceneDirector.current_level == ESCRITORIO and GameState.get_value(&"dia") == 2 and not Events.is_modal_open,
 		"Enter em Continuar: de volta ao Dia 2")
+
+
+## O jogo começando (o menu com a abertura): enquanto a capa abre, as teclas não
+## escolhem nada; uma tecla pula a abertura, e o livro responde.
+func _abertura_do_livro() -> void:
+	var nec: Necronomicon = root.get_node("Menus/Necronomicon")
+	await _dia(1)
+	await root.quit_to_menu()
+	await _until(func() -> bool: return main_menu.visible and not SceneDirector.is_busy, 10.0)
+	main_menu.close()
+	await _frames(2)
+	Engine.time_scale = 1.0
+	main_menu.open(true)
+	await _frames(3)
+	_check(nec.visible and not nec.pronto(), "a abertura: o livro ainda fechado não responde")
+	await _tecla(&"ui_down")
+	_check(nec.pronto() and main_menu.get_viewport().gui_get_focus_owner() == main_menu.continue_button,
+		"uma tecla pula a abertura (sem mexer no sumário)")
+	await _tecla(&"ui_down")
+	_check(main_menu.get_viewport().gui_get_focus_owner() == main_menu.new_game_button, "depois, as setas andam no sumário")
+	# Sem tecla nenhuma, a abertura acaba sozinha.
+	main_menu.close()
+	await _frames(2)
+	main_menu.open(true)
+	await _until(func() -> bool: return nec.pronto(), 15.0)
+	_check(nec.pronto(), "a abertura acaba sozinha")
+	Engine.time_scale = 8.0
+
+
+## As opções de acessibilidade: o campo de visão chega à câmera do jogador, ao vivo;
+## o tremor e a ondulação a zero desligam o tremor das formas e o afim.
+func _acessibilidade() -> void:
+	var esc := await _dia(1)
+	Settings.set_value(&"campo_visao", 90.0)
+	await _seconds(1.0)
+	_check(absf(esc.player.camera.fov - 90.0) < 1.0, "campo de visão 90°: a câmera do jogador acompanha (%.1f)" % esc.player.camera.fov)
+	Settings.set_value(&"tremor", 0.0)
+	Settings.set_value(&"distorcao", 0.0)
+	await _quadros(3)
+	_check(is_zero_approx(root.tremor_atual) and is_zero_approx(root.afim_atual), "tremor e ondulação a zero: desligados")
+	GameState.set_value(&"sonho", 1.0)
+	await _quadros(3)
+	_check(is_zero_approx(root.tremor_atual), "nem no sonho o tremor volta")
+	GameState.set_value(&"sonho", 0.0)
+	Settings.reset_to_defaults()
+	await _quadros(3)
+	_check(root.tremor_atual > 0.0, "restaurados os padrões, o tremor volta")
+
+
+## Quadros de processo (o que o GameRoot calcula no _process; com o tempo
+## acelerado, vários quadros de física cabem num de processo).
+func _quadros(n: int) -> void:
+	for i in n:
+		await get_tree().process_frame
 
 
 ## Aperta e solta (os botões agem na soltura, como no teclado de verdade).

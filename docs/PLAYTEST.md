@@ -41,10 +41,25 @@ o que esperava.
 
 ## 1. Prioridade: o que mudou desde o playtest 7
 
+### O menu refeito (sessão do menu, com as imagens de referência)
+- [ ] **A abertura** ao iniciar o jogo: o escuro, as velas acendendo, a câmera se
+      afastando da capa, a capa caindo (o baque, a poeira), a tinta brotando nas
+      páginas. Longa demais? Uma tecla pula — pula bem?
+- [ ] **O livro em si:** a moldura de ferro rebitada, o papel queimado com as
+      manchas cor de ferrugem, a moldura impressa, a gravura da pedra negra, o
+      título em fraktur. Está à altura da referência? Algo a mais (ou a menos)?
+- [ ] **O grão:** o livro agora tem o pontilhado e a resolução do jogo. Ficou bom
+      ou o texto ficou difícil de ler?
+- [ ] **As entradas:** as pontas rubras deslizando, o pulso, o mouse que escolhe, o
+      cursor de pena, a dica embaixo.
+- [ ] **Continuar / Novo jogo:** a tinta tomando a tela antes de o jogo começar.
+- [ ] **Opções:** a seção nova de **acessibilidade** — campo de visão, tremor das
+      formas, ondulação das texturas. Funcionam como se espera no jogo?
+- [ ] **A pausa** chegando deslizando; a folha virando para as Opções (com sombra).
+- [ ] **O jogo exportado:** `comandos.ps1 exportar` e `jogar-exportado` — o mesmo
+      jogo, sem os atalhos de teste (F, F2, F3, C). Algo diferente do editor?
+
 ### Da Fase 3h (os pedidos do playtest 7)
-- [ ] **O Necronomicon** (o menu): a capa abrindo, o papel velho, as velas, o mouse
-      apontando as entradas, a folha virando para as Opções e de volta, a pausa no
-      mesmo livro. É o que se pediu do *Lords of Shadow 2*?
 - [ ] **O corredor e a escada:** as portas 312/308 e a calha sem lambri na frente;
       a escada sem vãos (o "limbo" debaixo dos degraus).
 - [ ] **O diário fechando** sem o salto das páginas; **escrevendo**, a vista mais
@@ -75,7 +90,8 @@ o que esperava.
 
 ### Menu
 - [ ] Mouse: cada entrada acende sob o cursor? O clique responde no lugar certo?
-- [ ] Opções: volumes, sensibilidade, inverter Y, tela cheia — gravam e voltam?
+- [ ] Opções: volumes, sensibilidade, inverter Y, tela cheia, campo de visão, tremor
+      e ondulação — gravam e voltam?
 - [ ] Teclado/controle: setas, Enter, Esc (testado automaticamente, mas confira a sensação).
 
 ### Prólogo (1930)
@@ -140,5 +156,6 @@ o que esperava.
 
 ## 4. Depois do playtest 8 (para não se perder)
 Fase 4 — o mapa de Vermont · Fase 5 — a sala acumula · Fase 6 — estranhezas sutis ·
-Fase 7 — fechamento e o resto do marco Demo (acessibilidade, export, playtest com 5+
-pessoas). Detalhes em `docs/PLANO_ESCRITORIO.md`.
+Fase 7 — fechamento e o resto do marco Demo (a acessibilidade e o export já estão
+feitos; falta o playtest com 5+ pessoas, com o .exe exportado). Detalhes em
+`docs/PLANO_ESCRITORIO.md`.

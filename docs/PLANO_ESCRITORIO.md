@@ -767,6 +767,85 @@ pendurado: pálpebras, sonho, legenda, pausa); durante a tinta do fim a pausa n�
 abre, e no cartão do fim abre — sair para o menu e continuar volta à manhã do Dia 6;
 o Necronomicon só pelo teclado (setas, Enter nas Opções, Esc de volta, Continuar).
 
+## Sessão do menu e do marco Demo (2026-10-09, antes do playtest 8)
+O usuário pediu: *"faça o que disse que pode fazer sem mim [acessibilidade, export,
+testes] e dê MUITA atenção e carinho para o nosso menu, deixe ele fenomenal [...]
+mantendo nosso gráfico característico, mas com boas animações"*, com três imagens
+de *Castlevania: Lords of Shadow* (o livro do menu: moldura de ferro rebitada,
+papel queimado nas bordas com manchas rubras, gravura grande à esquerda, título
+gótico e sumário à direita, setas rubras na entrada escolhida, a dica de controle
+embaixo). Commit: `PENDENTE`.
+
+O Necronomicon refeito (`ui/menu/`):
+1. ✅ **No grão do jogo.** O livro agora é renderizado em ~540 linhas, com o
+   pontilhado e as cores do PS1 (`psx_post`) e uma vinheta funda — antes era a
+   única coisa do jogo em alta resolução, lisa demais.
+2. ✅ **A encadernação** (à maneira da referência): a capa de couro quase negro
+   com uma **moldura de ferro rebitada** dos dois lados das tábuas (barras com
+   rebites de latão, cantoneiras com cravo de diamante), fechos com dobradiça,
+   chapa e argola nas bordas, o medalhão com a estrela e o olho, a lombada com as
+   nervuras de ferro; a fita marcadora de veludo rubro que sai do vinco, dobra no
+   miolo e corre na mesa com a ponta em V.
+3. ✅ **O papel** (`livro_pagina.gdshader`): fibras, a borda gasta e **queimada**
+   em contorno irregular, as **manchas cor de ferrugem** que sobem das bordas em
+   línguas, o vinco fundo; a tinta assenta e se espalha um pouco nas fibras.
+4. ✅ **O que está impresso nas páginas** (`OrnamentoPagina`): a moldura de filete
+   duplo com florões rubros nos cantos e no meio das bordas, os números em
+   versalete rubro, uma escrita de outra mão apagada pelo tempo num canto, e um
+   círculo de invocação desbotado atrás do texto.
+5. ✅ **A gravura** (`Gravura`, como a cruz radiante da referência): a **pedra
+   negra de Round Hill** — a estela quebrada no alto, com os hieróglifos em
+   colunas e uma rachadura — num anel de sinais, com a coroa de raios rubros e
+   negros; embaixo, dois medalhões com a **marca de garra** das fotografias de
+   Akeley. Também na pausa (sem os medalhões).
+6. ✅ **A letra:** o título em fraktur (UnifrakturMaguntia, "Os que" em tinta e
+   **"Sussurram" em rubro**), as entradas do sumário em gótica (Grenze Gotisch), o
+   texto em IM Fell English (a letra de livro do séc. XVII; itálico e versalete).
+   Fontes OFL em `art/fonts`, com as licenças.
+7. ✅ **A entrada escolhida** (`MarcadorFoco`): duas pontas de lança rubras com
+   voluta a ladeiam (como as setas da referência), **deslizam** de uma entrada à
+   outra e respiram; a escolhida avermelha e dá um pulso; a pena risca baixinho.
+   O mouse sobre uma entrada a escolhe (nunca duas grifadas). Nos controles
+   deslizantes, a ponta só à esquerda e a marca rubra.
+8. ✅ **A abertura** (o jogo começando): o escuro; as **velas se acendem** uma e
+   outra (o fósforo); a câmera, perto da capa fechada, se afasta enquanto a
+   **capa pesada se levanta e cai** do outro lado — **o baque**, a câmera estremece,
+   **a poeira sobe** das páginas; as páginas assentam com um tremor, e **a tinta
+   brota** no papel, do meio para fora, com a borda molhada e brilhante. Qualquer
+   tecla ou clique pula. De volta do jogo, o livro já aberto, a tinta brotando.
+9. ✅ **A pausa** chega deslizando, já aberta, e assenta na mesa.
+10. ✅ **A folha que vira** faz **sombra** na página que descobre e na que vai cobrir.
+11. ✅ **Começar ou continuar: o mergulho.** A tinta da entrada escolhida se
+    derrama pela página e toma a tela (borda irregular com debrum rubro,
+    `tinta_espalha.gdshader`) enquanto a câmera desce para dentro dela; o jogo
+    começa no escuro.
+12. ✅ **A vida no livro:** poeira boiando na luz; as velas (fora do quadro, só a
+    luz delas) tremem cada uma no seu ritmo; o canto da página da direita levanta
+    na corrente de ar; a câmera respira e segue um pouco o mouse.
+13. ✅ **O cursor é uma pena** enquanto o livro está à vista.
+14. ✅ **A dica de controle** embaixo, à direita (*Selecionar [Enter]*, *Voltar ao
+    jogo [Esc]*, *Ajustar ◂ ▸*), como na referência.
+15. ✅ As Opções em três seções (o som; a tela e os controles; a acessibilidade),
+    o título em fraktur rubro; a confirmação ("Começar de novo apaga...") com as
+    escolhas afastadas para o marcador não invadir a vizinha.
+
+O resto do marco Demo (o que dava para fazer sem o usuário):
+16. ✅ **Acessibilidade** (GDD §12): em Opções, **campo de visão** (60–95°, ao vivo
+    na câmera do jogador), **tremor das formas** e **ondulação das texturas** (0–100%:
+    multiplicam o `psx_jitter` e o `psx_affine` do GameRoot, inclusive no sonho).
+    `Settings`: `campo_visao`, `tremor`, `distorcao`.
+17. ✅ **Export:** `export_presets.cfg` com o preset **Windows** (sem `tests/`,
+    `tools/` e a sala de teste; o pacote embutido no .exe), `comandos.ps1 exportar`
+    → `build/windows/OsQueSussurram.exe` (fora do git) e `jogar-exportado`.
+    Instalados os templates de export do 4.7.2 (só os de Windows) em
+    `%APPDATA%\Godot\export_templates\4.7.2.stable`. O exportado (release, sem os
+    atalhos de teste) abre no menu sem erro de script.
+18. ✅ **Testes:** `caminhos_test` ganhou a abertura do livro (uma tecla pula; sem
+    tecla, acaba sozinha) e a acessibilidade (o campo de visão chega à câmera; tremor
+    e ondulação a zero desligam, até no sonho). `tests/_tmp_shot` com `SHOT_MODO=menu`
+    captura a abertura, o marcador andando, a folha virando, as Opções, a pausa
+    chegando, a confirmação e o mergulho.
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado
@@ -813,10 +892,9 @@ fora do roteiro (pausa no cartão, andar sentado), Boston pelo macaco com a conv
 inteira em todas as ordens. Quando vier a lista do playtest 8, registrá-la como
 **Fase 3i**, no mesmo formato. Não começar a Fase 4 antes dela.
 
-**A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); depois o resto do marco Demo
-(GDD §12): opções de acessibilidade (tremor, afim, FOV — ainda não há nenhuma em
-`Settings`), presets de export (ainda não há `export_presets.cfg`) e o playtest com
-5+ pessoas. Fora do código e ainda sem dono: arte final (`docs/ARTE.md`, nenhum
+**A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); do marco Demo (GDD §12), a
+acessibilidade e o export já estão feitos (sessão do menu); falta o playtest com
+5+ pessoas (com o .exe de `comandos.ps1 exportar`). Fora do código e ainda sem dono: arte final (`docs/ARTE.md`, nenhum
 `.glb` ainda), som final e a voz de Noyes no disco.
 
 ## Próximos passos (em ordem)
@@ -831,6 +909,8 @@ inteira em todas as ordens. Quando vier a lista do playtest 8, registrá-la como
 2g. ✅ **Sessão de tester** (acima): `caminhos_test` e o macaco; 9 bugs corrigidos.
 2h. ✅ **Sessão de tester 2** (acima): o travamento da tela liberada, a legenda
    presa, o F3; o armário, o cesto, o Dia 2, Boston; o macaco com tom.
+2h2. ✅ **Sessão do menu e do marco Demo** (acima): o Necronomicon refeito à maneira
+   de *Lords of Shadow*, a acessibilidade, o export para Windows.
 2i. **← AQUI.** O usuário joga o **playtest 8** (do Dia 1 ao fim da demo, ou com
    F2): o Necronomicon, o corredor e a escada, o diário, o sonho do disco partido,
    E para pular, a lareira; a lista vira a Fase 3i. Não começar a Fase 4 antes dela.

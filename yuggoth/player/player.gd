@@ -91,7 +91,12 @@ func _ready() -> void:
 	ray.target_position = Vector3(0, 0, -interact_distance)
 	ray.add_exception(self)
 	head.position.y = eye_height
-	_fov_base = camera.fov
+	# O campo de visão é das Opções (acessibilidade); muda ao vivo.
+	_fov_base = Settings.get_value(&"campo_visao")
+	camera.fov = _fov_base
+	Settings.changed.connect(func(chave: StringName) -> void:
+		if chave == &"campo_visao":
+			_fov_base = Settings.get_value(&"campo_visao"))
 	Events.modal_changed.connect(_on_modal_changed)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if not footstep_sounds.is_empty():

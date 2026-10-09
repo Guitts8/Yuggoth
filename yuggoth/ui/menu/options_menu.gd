@@ -1,22 +1,25 @@
 class_name OptionsMenu
 extends Control
-## Opções mínimas do marco E: volumes, mouse e tela — duas páginas do livro dos
-## menus (Livro): o som à esquerda, o mouse e a tela à direita. Muda Settings ao
-## vivo; grava no disco ao fechar. Quem abre passa a foto da página que sai (a
-## folha vira); ao fechar, `foto_saida` é a da página esquerda, para quem abriu
-## virar de volta.
+## As Opções — duas páginas do livro dos menus (Livro): o som à esquerda; à
+## direita, a tela e os controles e a acessibilidade (o campo de visão, o tremor
+## das formas e a ondulação das texturas do PS1). Muda Settings ao vivo; grava no
+## disco ao fechar. Quem abre passa a foto da página que sai (a folha vira); ao
+## fechar, `foto_saida` é a das páginas, para quem abriu virar de volta.
 
 signal closed
 
-## [chave em Settings, rótulo, mínimo, máximo, passo, formato do valor]
-## A última coluna: a página (esquerda = o som).
+## [chave em Settings, rótulo, mínimo, máximo, passo, formato do valor, seção]
+## A seção: "som" (a página da esquerda), "controles" ou "acessibilidade".
 const SLIDERS := [
-	[&"volume_Master", "Volume geral", 0.0, 1.0, 0.05, "%d%%", true],
-	[&"volume_Music", "Música", 0.0, 1.0, 0.05, "%d%%", true],
-	[&"volume_Ambience", "Ambiente", 0.0, 1.0, 0.05, "%d%%", true],
-	[&"volume_SFX", "Efeitos", 0.0, 1.0, 0.05, "%d%%", true],
-	[&"volume_Voice", "Vozes", 0.0, 1.0, 0.05, "%d%%", true],
-	[&"sensibilidade", "Sensibilidade", 0.25, 3.0, 0.05, "%.2f×", false],
+	[&"volume_Master", "Volume geral", 0.0, 1.0, 0.05, "%d%%", "som"],
+	[&"volume_Music", "Música", 0.0, 1.0, 0.05, "%d%%", "som"],
+	[&"volume_Ambience", "Ambiente", 0.0, 1.0, 0.05, "%d%%", "som"],
+	[&"volume_SFX", "Efeitos", 0.0, 1.0, 0.05, "%d%%", "som"],
+	[&"volume_Voice", "Vozes", 0.0, 1.0, 0.05, "%d%%", "som"],
+	[&"sensibilidade", "Sensibilidade", 0.25, 3.0, 0.05, "%.2f×", "controles"],
+	[&"campo_visao", "Campo de visão", 60.0, 95.0, 1.0, "%d°", "acessibilidade"],
+	[&"tremor", "Tremor das formas", 0.0, 1.0, 0.05, "%d%%", "acessibilidade"],
+	[&"distorcao", "Ondulação das texturas", 0.0, 1.0, 0.05, "%d%%", "acessibilidade"],
 ]
 const TOGGLES := [
 	[&"inverter_y", "Inverter eixo vertical"],
@@ -31,6 +34,7 @@ var foto_saida: Texture2D
 @onready var livro: Livro = $Livro
 @onready var rows: VBoxContainer = %Rows
 @onready var rows_esquerda: VBoxContainer = %RowsEsquerda
+@onready var rows_acessibilidade: VBoxContainer = %RowsAcessibilidade
 @onready var back_button: Button = %Voltar
 @onready var reset_button: Button = %Restaurar
 
@@ -38,7 +42,8 @@ var foto_saida: Texture2D
 func _ready() -> void:
 	hide()
 	for s: Array in SLIDERS:
-		_add_slider(s[0], s[1], s[2], s[3], s[4], s[5], rows_esquerda if s[6] else rows)
+		var pagina: VBoxContainer = {"som": rows_esquerda, "controles": rows, "acessibilidade": rows_acessibilidade}[s[6]]
+		_add_slider(s[0], s[1], s[2], s[3], s[4], s[5], pagina)
 	for t: Array in TOGGLES:
 		_add_toggle(t[0], t[1])
 	back_button.pressed.connect(close)
@@ -83,12 +88,13 @@ func _add_slider(key: StringName, label: String, min_value: float, max_value: fl
 	slider.min_value = min_value
 	slider.max_value = max_value
 	slider.step = step
-	slider.custom_minimum_size.x = 180
+	slider.custom_minimum_size.x = 112
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(slider)
 	var readout := Label.new()
-	readout.custom_minimum_size.x = 76
+	readout.custom_minimum_size.x = 62
 	readout.add_theme_font_size_override(&"font_size", 22)
+	readout.add_theme_color_override(&"font_color", Livro.TINTA_CLARA)
 	readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	row.add_child(readout)
 	var percent := format.ends_with("%%")
@@ -103,7 +109,10 @@ func _add_toggle(key: StringName, label: String) -> void:
 	var row := _add_row(label, rows)
 	var toggle := Button.new()
 	toggle.toggle_mode = true
-	toggle.custom_minimum_size.x = 90
+	toggle.custom_minimum_size.x = 80
+	# Na letra do texto (a gótica, mais alta, descia da linha do rótulo).
+	toggle.add_theme_font_override(&"font", load(Livro.FONTE_TEXTO))
+	toggle.add_theme_font_size_override(&"font_size", 25)
 	toggle.toggled.connect(func(on: bool) -> void:
 		Settings.set_value(key, on)
 		toggle.text = "Sim" if on else "Não")
@@ -116,11 +125,13 @@ func _add_toggle(key: StringName, label: String) -> void:
 
 func _add_row(label: String, pagina: VBoxContainer) -> HBoxContainer:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 16)
+	row.add_theme_constant_override(&"separation", 12)
 	var name_label := Label.new()
 	name_label.text = label
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override(&"font_size", 24)
+	name_label.add_theme_font_size_override(&"font_size", 23)
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_label.size_flags_vertical = Control.SIZE_FILL
 	row.add_child(name_label)
 	pagina.add_child(row)
 	return row

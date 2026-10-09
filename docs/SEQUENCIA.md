@@ -127,22 +127,28 @@ da última carta manuscrita enche a tela e a tinta vira o céu de Vermont.
 ---
 
 ## Menu principal ✅
-**O Necronomicon** (playtest 7, como o livro dos menus de *Castlevania: Lords of
-Shadow 2*): um tomo gigante numa mesa escura, entre duas velas grossas cujas
-chamas tremem. O jogo abre com ele **fechado** — a capa pesada de couro quase
-negro, cantoneiras de metal, moldura em relevo, cravos, e no meio um medalhão
-com uma estrela de cinco pontas e um olho — e a capa se levanta e deita do outro
-lado. As páginas são de papel velho, amarelado e manchado, que sobe junto à
-lombada. À esquerda: *a partir de H. P. Lovecraft*, o título **"Os que
-Sussurram"**, *Vermont, 1928*, e a epígrafe — *"Tenham bem em mente que, no fim,
-eu não vi nenhum horror visual de fato."* (The Whisperer in Darkness, 1931). À
-direita, o **Sumário**: Continuar (só se há save), Novo jogo (pede confirmação se
-há save), Opções, Sair — o mouse aponta direto na página. **Opções** são as
-páginas seguintes — uma folha se levanta, se curva e deita do outro lado (o som à
-esquerda; o mouse e a tela à direita) e volta ao fechar. **Esc** durante o jogo
-abre a pausa, no mesmo livro, já aberto: *Pausa* e a data do dia (*Arkham, 18 de
-julho de 1928*), e à direita Continuar, Opções, Menu principal, Sair. **E** (sem
-nada na mira) pula a fala na tela.
+**O Necronomicon** (playtest 7; refeito na sessão do menu à maneira do livro de
+*Castlevania: Lords of Shadow*, no grão do PS1 do jogo). **A abertura:** escuro;
+duas velas se acendem fora do quadro (o fósforo); perto, a capa fechada — couro
+quase negro numa **moldura de ferro rebitada**, o medalhão com a estrela e o olho —
+e a câmera se afasta enquanto a capa pesada se levanta e **cai do outro lado** (o
+baque, a câmera estremece, a poeira sobe das páginas); e **a tinta brota** nas
+páginas de papel queimado nas bordas, manchado de ferrugem. Qualquer tecla pula.
+À esquerda: *a partir de H. P. Lovecraft*, a **gravura da pedra negra de Round
+Hill** numa coroa de raios rubros, os dois medalhões com a marca de garra, e a
+epígrafe — *"Tenham bem em mente que, no fim, eu não vi nenhum horror visual de
+fato."* (The Whisperer in Darkness, 1931). À direita: **"Os que *Sussurram*"** em
+fraktur (a segunda palavra em rubro), *Vermont, MCMXXVIII*, e o sumário em gótica:
+Continuar (só se há save), Novo jogo (pede confirmação se há save), Opções, Sair —
+a escolhida em rubro, entre duas pontas de lança rubras que deslizam até ela; o
+mouse (uma pena) aponta direto na página. **Continuar / Novo jogo:** a tinta da
+entrada se derrama e toma a tela, e o jogo começa no escuro. **Opções** são as
+páginas seguintes (a folha vira, com a sombra): o som à esquerda; a tela e os
+controles e a **acessibilidade** (campo de visão, tremor das formas, ondulação das
+texturas) à direita. **Esc** durante o jogo traz a pausa, no mesmo livro, que chega
+deslizando já aberto: *Pausa* em fraktur e a data do dia (*Arkham, 18 de julho de
+1928*), a pedra, e à direita Continuar, Opções, Menu principal, Sair. Embaixo, a
+dica de controle. **E** (sem nada na mira) pula a fala na tela.
 
 ---
 
