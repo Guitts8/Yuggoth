@@ -419,36 +419,40 @@ arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera
    e só então desliza para o assento.
 5. ✅ **Dia 2: dava para escrever a carta com as fotos ainda no envelope.** "Escrever
    a Akeley" só aparece depois de tiradas as nove (`correio_dia_2_tiradas`).
-6. ❓ **A calha: "a tela deve ficar solta ao colocarmos a carta no correio, talvez,
-   duas ações?"** Proposta: duas ações — "Abrir a porta" (cena curta) e o corredor é
-   dele; anda até a calha e "Pôr a carta na calha"; volta e fecha (ou ela fica aberta
-   até ele sair). Como já é a ida para casa.
-7. 🔧 **A xícara transparente, com o café** dentro (vidro? — a xícara de porcelana
-   não é transparente; um copo de vidro com café, ou a xícara sem tampa com o café à
-   vista). A confirmar no item.
+6. ✅ **A calha: "a tela deve ficar solta ao colocarmos a carta no correio, talvez,
+   duas ações?"** Decidido: duas ações — "Abrir a porta" (cena curta) e o corredor é
+   dele; anda até a calha e "Pôr a carta na calha" (`%PorNaCalha`); volta, e a porta
+   fecha sozinha quando ele entra, fora do arco da folha (`_fechar_atras`). O salto
+   no tempo das cartas do meio do dia espera a porta fechar (`_salto_pendente`).
+7. ✅ **A xícara, com o café à vista**: decidido — a xícara de porcelana fica. Era
+   uma copa fechada: o café ficava escondido dentro. Agora aberta (sem tampa, a parede
+   de dentro, a borda), e o café alarga ao subir, rente à parede (meta `afunila`).
 8. 🔧 **O diário**: o modelo mais agradável (capa de couro com cantos, lombada com
    nervuras, fita marcadora, páginas com bordas); a abertura com sentido — a capa abre,
    as folhas correm até a fita (a página do dia), e não uma página só caindo no meio;
    fechar ao contrário.
-9. 🔧 **Ao clicar na porta, ele dá um girinho** em algumas situações (o `olhar_para`
-   do `conduzir` toma o caminho longo do ângulo ou parte de um desvio do mouse).
-10. ❓ **Voltar ao prédio de manhã**: começar o dia no corredor (o alto da escada) e
-    abrir a porta para entrar no escritório? Proposta: sim — o correio aparece no chão
-    quando a porta abre. Custa uma ação por dia.
+9. ✅ **Ao clicar na porta, ele dá um girinho** em algumas situações. Causa: o
+   `olhar_para` girava o corpo pelo lado curto e desfazia o desvio do mouse à parte;
+   somados, davam a volta longa. Agora o desvio vira a direção do corpo antes do giro.
+10. ✅ **Voltar ao prédio de manhã**: decidido — todo dia (e a volta de Boston) começa
+    no corredor, no alto da escada (a marca `Porta`); "Abrir a porta" (`%EntrarPorta`)
+    e o correio está no chão, caído pela fresta; a fala do correio vem quando a porta
+    abre.
 11. 🔧 **A escada não leva a lugar nenhum**: o vão da escada com patamar, a volta do
     corrimão, o andar de baixo sumindo na penumbra (luz fraca lá embaixo).
-12. ❓ **Caligrafia copperplate em toda a letra de mão.** Fonte livre (OFL), p. ex.
-    *Pinyon Script*. Cuidado: copperplate é difícil de ler em carta longa — testar no
-    leitor; talvez a de Akeley (que o livro chama de "apertada, arcaica") ser outra mão.
-13. ❓ **Selos de cera**: em 1928, carta comum nos EUA era fechada pela goma do
-    envelope e franqueada com selo postal (2 centavos). Lacre já soava antiquado ou
-    cerimonial. Proposta: não usar lacre; manter goma + selo postal.
+12. 🔧 **Caligrafia copperplate.** Decidido: duas mãos — Wilmarth em copperplate
+    legível (fonte livre OFL, p. ex. *Pinyon Script*; respostas, diário); Akeley em
+    outra, apertada e arcaica ("cramped, archaic chirography"). Capturas no leitor
+    antes de fechar.
+13. ✅ **Selos de cera**: em 1928, carta comum nos EUA era fechada pela goma do
+    envelope e franqueada com selo postal (2 centavos). Decidido: sem lacre; fica
+    goma + selo postal (como já está).
 14. 🔧 **O sonho da noite 2: as pegadas pouco visíveis**; mais sinistro (mais marcas,
     frescas, úmidas, em volta do círculo e chegando perto dele; talvez se formando).
-15. ❓ **Pôr as coisas na mesa à mão, em vez de teletransportar** (abrir o pacote e
-    tirar as coisas). Ver a recomendação na conversa: o objeto viaja da mão até o lugar
-    dele na mesa (sem lugar livre), e o pacote do Dia 3 se esvazia peça por peça como
-    o envelope das fotos.
+15. 🔧 **Pôr as coisas na mesa à mão, em vez de teletransportar** (abrir o pacote e
+    tirar as coisas). Decidido: o objeto viaja da mão até o lugar dele na mesa (sem
+    lugar livre), e o pacote do Dia 3 se esvazia peça por peça como o envelope das
+    fotos.
 16. 🔧 **O fonógrafo**: modelo muito melhor (um fonógrafo de cilindro comercial: caixa
     de carvalho, mecanismo à vista, a corneta grande no braço) e um lugar digno (não no
     armário do canto).
@@ -456,7 +460,7 @@ arquivo com os comandos. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera
     à administração da universidade — chega pronta; só falta o cilindro. Sai o caixote
     de peças (e com ele a porta entrando na caixa).
 18. 🔧 **O mi-go mais visível**: mais perto, maior na janela.
-19. ❓ **O sonho do disco: mais estranheza, um efeito de loucura.** Ideias: o escritório
+19. 🔧 **O sonho do disco: mais estranheza, um efeito de loucura.** Decidido: todas — o escritório
     aparecendo em pedaços no bosque; a voz vindo de trás dele e não do fonógrafo; os
     vultos que viram a cabeça quando não olhados; as árvores respirando; a lanterna de
     Akeley andando sozinha; visão dupla nas vozes zumbidas.
@@ -501,8 +505,8 @@ Fase 4 antes dela.
 2. ✅ Playtest 3 → **Fase 3d** (acima). Painel × cidade 3D: decidido pela 3D.
 2b. ✅ Playtest 4 (até o começo do Dia 5) → **Fase 3e** (acima).
 2c. ✅ O usuário jogou o **playtest 5** (até a noite 3); a lista virou a **Fase 3f**.
-2d. **← AQUI.** Fase 3f: feitos os itens 1–5; esperando as respostas dos ❓ (6, 10,
-   12, 13, 15, 19); os 🔧 podem começar (7, 8, 9, 11, 14, 16, 17, 18).
+2d. **← AQUI.** Fase 3f: feitos os itens 1–7, 9, 10 e 13; o usuário respondeu os ❓
+   (todas as recomendações); a fazer: 8, 11, 12, 14, 15, 16, 17, 18, 19.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

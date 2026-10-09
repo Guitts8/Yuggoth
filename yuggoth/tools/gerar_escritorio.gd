@@ -111,7 +111,9 @@ func _ready() -> void:
 	player.position = Vector3(0, 0, -1.3)
 	_add(cena, player)
 	_spawn("Cadeira", Vector3(0, 0, -1.3))
-	_spawn("Porta", Vector3(-1.0, 0, 2.3))
+	# Cada manhã (e a volta de Boston) começa no alto da escada, de frente para o
+	# corredor e a porta do escritório (Fase 3f).
+	_spawn("Porta", Vector3(ESCADA_X - 0.7, 0, D + CORREDOR / 2), 90)
 
 	_salvar(OUT)
 
@@ -991,10 +993,14 @@ func _miskatonic() -> void:
 	por.unique_name_in_owner = true
 	por.prompt = "Pôr na mesa"
 
-	# A porta encerra o dia ("ir para casa"); só no escritório.
+	# A porta: com a carta, abre para a calha; no fim do dia, "ir para casa".
 	var sair := _area(g, Interactable.new(), "SairPorta", Vector3(0.9, 2.0, 0.2), Vector3(-1.0, 1.05, D - 0.12)) as Interactable
 	sair.unique_name_in_owner = true
 	sair.prompt = "Ir para casa"
+	# Do lado do corredor: de manhã, ele chega por ali (Fase 3f).
+	var entrar := _area(g, Interactable.new(), "EntrarPorta", Vector3(0.9, 2.0, 0.15), Vector3(-1.0, 1.05, D + 0.1)) as Interactable
+	entrar.unique_name_in_owner = true
+	entrar.prompt = "Abrir a porta"
 
 	# Canto sudoeste: o armário. A máquina emprestada chega no Dia 3 (_fonografo).
 	var a := _group(g, "Armario", Vector3(-2.15, 0, 2.35), 90)
@@ -1138,8 +1144,14 @@ func _corredor(g: Node3D) -> void:
 	calha.unique_name_in_owner = true
 	calha.folha = _folha_porta
 	calha.corredor = c
-	# Para abrir a porta, ao lado da maçaneta, fora do arco da folha.
+	# A boca: com a carta na mão e a porta aberta, "Pôr a carta na calha".
+	var boca := _area(calha, Interactable.new(), "PorNaCalha", Vector3(0.3, 0.4, 0.16), Vector3(0, 0, 0.04)) as Interactable
+	boca.unique_name_in_owner = true
+	boca.prompt = "Pôr a carta na calha"
+	# Para abrir a porta, ao lado da maçaneta, fora do arco da folha; de fora,
+	# diante da maçaneta (a folha abre para longe dele).
 	calha.diante = Vector3(PORTA_X + 0.65, 0, D - 0.55)
+	calha.diante_fora = Vector3(PORTA_X + 0.45, 0, D + PAREDE_SUL + 0.5)
 	calha.soleira = Vector3(PORTA_X + 0.05, 0, D + PAREDE_SUL / 2)
 	calha.na_calha = Vector3(CALHA_X, 0, fundo - 0.55)
 	calha.queda = Vector2(-0.02, -CALHA_BOCA + 0.08)
@@ -1204,11 +1216,29 @@ func _bebida(g: Node3D) -> void:
 	_cyl(garrafa, "Tampa", 0.044, 0.044, 0.065, Vector3(0, 0.282, 0), "aco", 10)
 	_marca(garrafa, "Boca", Vector3(0, 0.31, 0))
 	_cyl(b, "Pires", 0.062, 0.055, 0.008, Vector3(0.72, MESA + 0.004, -1.87), "porcelana", 12)
+	# A xícara é aberta (playtest 5: o café tem de se ver): a copa sem tampa, a
+	# parede de dentro (a face virada para o centro) e a borda.
 	var xicara := _group(b, "Xicara", Vector3(0.72, MESA + 0.008, -1.87))
-	_cyl(xicara, "Copa", 0.043, 0.03, 0.055, Vector3(0, 0.0275, 0), "porcelana", 12)
+	(_cyl(xicara, "Copa", 0.043, 0.03, 0.055, Vector3(0, 0.0275, 0), "porcelana", 14).mesh as CylinderMesh).cap_top = false
+	var dentro := _cyl(xicara, "Dentro", 0.04, 0.026, 0.05, Vector3(0, 0.03, 0), "porcelana", 14).mesh as CylinderMesh
+	dentro.cap_top = false
+	dentro.flip_faces = true
+	var borda := TorusMesh.new()
+	borda.inner_radius = 0.039
+	borda.outer_radius = 0.044
+	borda.rings = 14
+	borda.ring_segments = 4
+	var aro := MeshInstance3D.new()
+	aro.name = "Borda"
+	aro.mesh = borda
+	aro.material_override = m["porcelana"]
+	aro.position = Vector3(0, 0.055, 0)
+	aro.scale = Vector3(1, 0.5, 1)
+	_add(xicara, aro)
 	var asa := _box(xicara, "Asa", Vector3(0.025, 0.03, 0.008), Vector3(0.05, 0.03, 0), "porcelana")
 	asa.rotation_degrees.z = 10
-	_nivel(xicara, 0.039, 0.042, 0.006, "cafe")
+	# O café: o topo (o que se vê) fica rente à parede de dentro, abaixo da borda.
+	_nivel(xicara, 0.037, 0.04, 0.006, "cafe", 0.026)
 	var copo := _group(b, "Copo", Vector3(0.6, MESA, -2.03))
 	_copo(copo)
 	# O frasco, deitado dentro da gaveta.
@@ -1278,11 +1308,16 @@ func _marca(pai: Node3D, nome: String, pos: Vector3) -> Marker3D:
 	return m
 
 
-## O líquido: um pivô no fundo que cresce para cima (Bebida escala o y).
-func _nivel(recipiente: Node3D, raio: float, altura: float, fundo: float, mat: String) -> void:
+## O líquido: um pivô no fundo que cresce para cima (Bebida escala o y). Num
+## recipiente que afunila (a xícara), `raio_fundo` dá o fundo, e o nível guarda
+## a razão (meta `afunila`): enchendo, ele alarga junto, rente à parede.
+func _nivel(recipiente: Node3D, raio: float, altura: float, fundo: float, mat: String, raio_fundo := -1.0) -> void:
 	var nivel := _group(recipiente, "Nivel", Vector3(0, fundo, 0))
 	nivel.visible = false
-	_cyl(nivel, "Liquido", raio, raio * 0.92, altura, Vector3(0, altura / 2, 0), mat, 10)
+	var baixo := raio * 0.92 if raio_fundo < 0.0 else raio_fundo
+	if raio_fundo >= 0.0:
+		nivel.set_meta(&"afunila", raio_fundo / raio)
+	_cyl(nivel, "Liquido", raio, baixo, altura, Vector3(0, altura / 2, 0), mat, 14)
 
 
 ## A mesinha de apoio ao lado da poltrona (Fase 3e: "uma mesa de apoio para

@@ -121,15 +121,17 @@ func olhos_em(de: Vector3, yaw: float) -> Vector3:
 ## Vira o corpo e a cabeça, devagar, para `ponto` (global), como se visto de `de`
 ## (onde o corpo vai estar quando o tween acabar; por padrão, onde está).
 func olhar_para(ponto: Vector3, segundos: float, de := global_position) -> Tween:
+	# A cena leva o olhar a algo novo: o desvio do mouse vira a direção de agora,
+	# e o giro sai de onde os olhos estão, pelo lado mais curto (playtest 5: com o
+	# desvio desfeito à parte, o corpo e o desvio somados davam a volta longa — um
+	# "girinho" ao clicar na porta).
+	_assumir_olhar()
 	var yaw := atan2(-(ponto.x - de.x), -(ponto.z - de.z))
 	var olho := olhos_em(de, yaw)
 	var pitch := atan2(ponto.y - olho.y, Vector2(ponto.x - olho.x, ponto.z - olho.z).length())
 	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(self, ^"rotation:y", rotation.y + angle_difference(rotation.y, yaw), segundos)
 	t.tween_property(head, ^"rotation:x", clampf(pitch, deg_to_rad(-85.0), deg_to_rad(85.0)), segundos)
-	# A cena leva o olhar a algo novo: o desvio do mouse volta junto.
-	if _olhar_extra != Vector2.ZERO:
-		t.tween_property(self, ^"_olhar_extra", Vector2.ZERO, segundos)
 	return t
 
 

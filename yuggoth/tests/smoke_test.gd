@@ -236,7 +236,11 @@ func _ready() -> void:
 	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn")
 	esc = root.find_child("Escritorio", true, false)
 	_check(esc.miskatonic.visible and not esc.player.seated, "recarregar depois do Prólogo vai direto ao escritório")
+	await _frames(2)
+	_check(esc._fora() and not esc.calha.porta_aberta and esc.calha.corredor.visible and esc.porta_fora.can_interact(esc.player)
+		and not esc.porta.can_interact(esc.player), "o dia começa no corredor, diante da porta fechada")
 	await _check_dia(esc, 1)
+	_check(not esc._fora() and not esc.calha.porta_aberta and not esc.calha.corredor.visible, "entrou: a porta fecha atrás dele")
 
 	# --- Escritório: Dia 1 (GDD §5.1) ---
 	player = esc.player
@@ -252,7 +256,7 @@ func _ready() -> void:
 	var correio1: Correspondencia = dia1.get_node("Envelope/Correio")
 	var mesa: MesaCorreio = esc.get_node(^"%PorNaMesa")
 	var carta_mesa: Node3D = dia1.get_node("Carta")
-	_check(correio1.get_visual().global_position.distance_to(esc.get_node(^"Porta").global_position) < 1.0 \
+	_check(correio1.get_visual().global_position.distance_to(Vector3(-1.0, 0.0, 2.3)) < 1.0 \
 		and not carta_mesa.visible, "Dia 1: a carta chega fechada, no chão junto à porta")
 	_check(correio1.prompt == "Pegar o correio" and not mesa.can_interact(player) and not mesa.visible, "sem nada na mão, a mesa não pede nada")
 	correio1.interact(player)
@@ -315,18 +319,28 @@ func _ready() -> void:
 	var carta_saida := CartaSaida.atual
 	_check(carta_saida != null and carta_saida.global_position.distance_to(player.camera.global_position) < 0.6,
 		"a carta selada vai para a mão")
-	_check(esc.porta.prompt == "Pôr a carta no correio", "a porta é o correio")
+	_check(esc.porta.prompt == "Abrir a porta" and not esc.por_na_calha.can_interact(player), "com a carta na mão, abrir a porta")
 	_check(GameState.get_value(&"crenca") == 1 and GameState.get_value(&"resposta_dia_1") == 1, "resposta crédula: crença +1 e tom gravado")
 	_check(escrever.reply.options[2].document in GameState.dossier, "a resposta escrita vai para o dossiê")
 	_check(not escrever.can_interact(player), "não dá para responder duas vezes")
 	esc.porta.interact(player)
 	await _until(func() -> bool: return esc.calha.folha.rotation_degrees.y > 10.0, 10.0)
-	_check(esc.postando and esc.calha.corredor.visible and not player.input_enabled,
-		"a porta abre para o corredor: a calha de correio")
+	_check(esc.calha.corredor.visible and not player.input_enabled, "a porta abre para o corredor")
+	await _until(func() -> bool: return esc.calha.porta_aberta and player.input_enabled, 20.0)
+	await _frames(2)
+	_check(player.input_enabled and esc.calha.porta_aberta and esc.por_na_calha.can_interact(player) and CartaSaida.atual != null,
+		"aberta, o corredor é dele: \"Pôr a carta na calha\"")
+	await _frames(10)
+	_check(esc.calha.porta_aberta, "a porta não fecha enquanto ele não sai e volta")
+	esc.por_na_calha.interact(player)
+	await _frames(2)
+	_check(esc.postando and not player.input_enabled, "a carta vai à boca da calha")
 	await _until(func() -> bool: return not esc.postando, 30.0)
 	await _frames(2)
+	_check(player.input_enabled and CartaSaida.atual == null and esc._fora() and esc.calha.porta_aberta, "a carta desce pela calha; ele fica no corredor")
+	await _entrar(esc)
 	_check(not esc.calha.corredor.visible and is_zero_approx(esc.calha.folha.rotation_degrees.y) and player.input_enabled,
-		"a carta desce pela calha; a porta fecha")
+		"de volta à sala, a porta fecha sozinha")
 	_check(GameState.get_value(&"dia") == 1 and GameState.get_value(&"diario") == 1 and not esc._saindo and CartaSaida.atual == null,
 		"postada a resposta, o dia não acaba: falta o diário")
 	await _porta(esc)
@@ -974,11 +988,39 @@ func _abrir_correio(esc: Escritorio, correio: Correspondencia) -> void:
 		await _frames(2)
 
 
-## Como o jogador: usar a porta; com a carta na mão, espera ela descer pela calha.
+## Como o jogador: usar a porta. Com a carta na mão (Fase 3f, duas ações): ela
+## abre, ele põe a carta na calha do corredor, volta à sala e a porta fecha atrás.
 func _porta(esc: Escritorio) -> void:
+	await _entrar(esc)
+	var com_carta := CartaSaida.atual != null and not esc.selando
 	esc.porta.interact(esc.player)
 	await _frames(2)
+	if not com_carta:
+		return
+	await _until(func() -> bool: return esc.calha.porta_aberta and esc.player.input_enabled, 20.0)
+	await _frames(2)
+	esc.por_na_calha.interact(esc.player)
+	await _frames(2)
 	await _until(func() -> bool: return not esc.postando, 30.0)
+	await _frames(1)
+	if not esc._saindo:
+		await _entrar(esc)
+
+
+## Do corredor para dentro da sala, como o jogador (de manhã ele chega pela
+## escada; de volta da calha): abre a porta, se fechada, entra, e ela fecha.
+func _entrar(esc: Escritorio) -> void:
+	var player := esc.player
+	if not esc._fora() and not esc.calha.porta_aberta:
+		return
+	if esc._fora() and not esc.calha.porta_aberta:
+		await _until(func() -> bool: return player.input_enabled and not SceneDirector.hold_black, 30.0)
+		esc.porta_fora.interact(player)
+		await _until(func() -> bool: return esc.calha.porta_aberta and player.input_enabled, 20.0)
+	await _frames(2)
+	player.global_position = Vector3(-0.2, player.global_position.y, 1.4)
+	await _until(func() -> bool: return not esc.calha.porta_aberta and not esc.calha.movendo, 20.0)
+	await _frames(2)
 
 
 ## Vira o corpo e a cabeça do player para o ponto e espera a mira atualizar.
@@ -993,6 +1035,7 @@ func _mirar(player: Player, ponto: Vector3) -> void:
 ## Começo de um dia no escritório: tudo ao alcance da mira, e pássaros só no
 ## Dia 1 (a única tarde tranquila; à noite e nos dias tensos eles calam).
 func _check_dia(esc: Escritorio, n: int) -> void:
+	await _entrar(esc)
 	await _check_alcance(esc, "Dia %d" % n)
 	var amb := AudioDirector.get_ambience()
 	var passaros := amb == esc.sons_dia[1]

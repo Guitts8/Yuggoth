@@ -16,10 +16,11 @@ outra** quantas vezes quiser. Só selar decide. Selada, Wilmarth senta à mesa e
 devagar, a folha se dobra em três e entra no envelope (endereçado a Townshend; a
 partir de julho, à Posta-Restante de Brattleboro), a aba fecha, o selo é batido —
 e a carta vai **para a mão**. **A porta é o correio:**
-"Pôr a carta no correio" — ele abre a porta (ao lado da maçaneta), atravessa a
-soleira e, do outro lado do corredor, põe a carta na **calha de correio** de latão
-(frente de vidro, de andar em andar até a caixa do saguão); ela escorrega pela fenda
-e se vê descer atrás do vidro; ele volta e fecha a porta. Em toda cena assim (selar,
+com a carta na mão, **"Abrir a porta"** — ele vai à maçaneta e abre a
+porta; dali o corredor é do jogador: do outro lado dele, **"Pôr a carta na calha"**,
+a **calha de correio** de latão (frente de vidro, de andar em andar até a caixa do
+saguão); a carta escorrega pela fenda e se vê descer atrás do vidro. De volta à
+sala, a porta fecha sozinha atrás dele. Em toda cena assim (selar,
 o diário, a calha, o lapso), **a cabeça é do jogador**: a cena leva o olhar, o mouse
 continua mexendo. As cartas no meio do dia (Dias 5 e 6) saltam no tempo até a volta do correio. Postada a resposta do dia, falta só **o diário** 💭 (Dias 1
 a 5): *"Faltava só anotar o dia no diário, como eu fazia ao fim de cada dia."* — o
@@ -36,6 +37,10 @@ chegar nela é o cartão do dia seguinte. A página do diário que enche vira, e
 escrita continua na seguinte. A porta, sem carta na
 mão, só lembra: *"Antes de ir, anotar o dia no diário."* Fora dessa hora, **"Ler o
 diário"**: o caderno abre no último par e se folheia, folha por folha.
+
+**A manhã**, em todos os dias: ele chega pelo corredor — o dia começa no alto da
+escada, diante da porta fechada do escritório; **"Abrir a porta"**, e o correio da
+noite está no chão (a fala do correio vem aí). Entrando, a porta fecha atrás dele.
 
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no

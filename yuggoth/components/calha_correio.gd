@@ -1,19 +1,18 @@
 class_name CalhaCorreio
 extends Node3D
 ## A calha de correio de latão no corredor, diante da porta do escritório
-## (docs/PLANO_ESCRITORIO.md, Fases 3d e 3e): é por ela que a carta de Wilmarth
-## sai. Como nos prédios dos anos 1920, a calha desce pela parede de andar em
-## andar, com a frente de vidro, até a caixa do correio no saguão; o carteiro a
-## esvazia de manhã ("vai amanhã cedo, com o primeiro correio").
+## (docs/PLANO_ESCRITORIO.md, Fases 3d, 3e e 3f): é por ela que a carta de
+## Wilmarth sai. Como nos prédios dos anos 1920, a calha desce pela parede de
+## andar em andar, com a frente de vidro, até a caixa do correio no saguão; o
+## carteiro a esvazia de manhã ("vai amanhã cedo, com o primeiro correio").
 ##
-## `await postar(carta, player)`: ele vai até a porta (ao lado da maçaneta, fora
-## do arco da folha), abre, atravessa a soleira até a calha, põe a carta na boca
-## (ela escorrega e se vê descer atrás do vidro), volta e fecha a porta. Quem
-## chama solta a carta (`CartaSaida.postar`) depois. Durante tudo, a cena o
-## conduz (`Player.conduzido`), e a cabeça continua dele.
-##
-## `abrir(player)` e `fechar(player)` servem também para sair do escritório no
-## fim do dia (Escritorio, "Ir para casa").
+## Duas ações (playtest 5: "a tela deve ficar solta"): `abrir(player)` o leva à
+## porta (ao lado da maçaneta, fora do arco da folha) e a abre; dali o corredor é
+## dele. `por_na_calha(carta, player)` (a área `PorNaCalha`) põe a carta na boca:
+## ela escorrega e se vê descer atrás do vidro. Quem chama solta a carta
+## (`CartaSaida.postar`) depois. De volta à sala, a porta fecha sozinha
+## (`fechar_sozinha`, quem decide é o Escritorio). De manhã, ele chega pelo
+## corredor: `abrir_de_fora(player)`.
 ##
 ## A origem do nó é a boca da calha, virada para a porta (-Z local aponta para
 ## dentro da calha). O gerador põe a calha, o corredor e a folha da porta.
@@ -21,11 +20,15 @@ extends Node3D
 ## A folha da porta do escritório (gira na dobradiça; aberta = `aberta` graus).
 @export var folha: Node3D
 @export var aberta := 78.0
-## O corredor atrás da porta: só aparece enquanto ela está aberta.
+## A largura da folha: o arco que ela varre ao fechar.
+@export var largura_folha := 0.92
+## O corredor atrás da porta: aparece com a porta aberta ou com ele lá fora.
 @export var corredor: Node3D
 ## Onde Wilmarth para para abrir a porta (global, no chão): ao lado da
 ## maçaneta, fora do arco da folha (playtest 4: a porta o atravessava).
 @export var diante := Vector3.ZERO
+## O mesmo, do lado do corredor (de manhã, chegando).
+@export var diante_fora := Vector3.ZERO
 ## A soleira da porta (global, no chão) e o lugar diante da calha, no corredor.
 @export var soleira := Vector3.ZERO
 @export var na_calha := Vector3.ZERO
@@ -36,15 +39,15 @@ extends Node3D
 @export var queda := Vector2(0.0, -1.0)
 
 var porta_aberta := false
+## A folha está girando (abrindo ou fechando).
+var movendo := false
 
 
-func postar(carta: Node3D, player: Player) -> void:
-	player.conduzido = true
-	await abrir(player)
-	if not is_inside_tree():
-		return
-	# Pela soleira até a calha, olhando a boca dela.
-	await player.conduzir([soleira, na_calha], global_position + Vector3.DOWN * 0.1)
+## Põe a carta na boca da calha (ele está no corredor): a carta escorrega para
+## dentro e desce atrás do vidro; ele a acompanha com os olhos.
+func por_na_calha(carta: Node3D, player: Player) -> void:
+	var estava := player.conduzido
+	await player.conduzir([na_calha], global_position + Vector3.DOWN * 0.1, 0.9)
 	if not is_inside_tree():
 		return
 
@@ -74,26 +77,26 @@ func postar(carta: Node3D, player: Player) -> void:
 	await t.finished
 	desce.queue_free()
 	await _pausa(0.6)
-	if not is_inside_tree():
-		return
-
-	# De volta à sala, e fecha a porta.
-	await player.conduzir([soleira, diante], _macaneta())
-	if not is_inside_tree():
-		return
-	await fechar(player)
-	player.conduzido = false
-	if not is_inside_tree():
-		return
-	await player.olhar_para(diante + Vector3(0.4, 1.0, -3.0), 1.0).finished
+	player.conduzido = estava
 
 
 ## Vai até a porta, de frente para a maçaneta, e a abre para dentro; o corredor
 ## aparece.
 func abrir(player: Player) -> void:
+	await _abrir(player, diante, _macaneta(), soleira + Vector3(0, 1.4, 1.0))
+
+
+## De manhã, chegando pelo corredor: a maçaneta de fora; a folha abre para longe
+## dele, para dentro da sala.
+func abrir_de_fora(player: Player) -> void:
+	await _abrir(player, diante_fora, _macaneta(0.05), soleira + Vector3(0, 1.3, -1.5))
+
+
+func _abrir(player: Player, onde: Vector3, macaneta: Vector3, depois: Vector3) -> void:
+	movendo = true
 	var estava := player.conduzido
 	player.conduzido = true
-	await player.conduzir([diante], _macaneta())
+	await player.conduzir([onde], macaneta)
 	if not is_inside_tree():
 		return
 	if corredor:
@@ -101,25 +104,23 @@ func abrir(player: Player) -> void:
 	_tocar(som_abrir)
 	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(folha, ^"rotation_degrees:y", aberta, 1.3)
-	# Enquanto ela abre, os olhos vão para o corredor.
-	player.olhar_para(soleira + Vector3(0, 1.4, 1.0), 1.3)
+	# Enquanto ela abre, os olhos vão para o outro lado.
+	player.olhar_para(depois, 1.3)
 	await t.finished
 	porta_aberta = true
+	movendo = false
 	player.conduzido = estava
 
 
-## Fecha a porta (ele está diante dela, do lado da sala); o corredor some.
-func fechar(player: Player) -> void:
-	await player.olhar_para(_macaneta(), 0.6).finished
-	if not is_inside_tree():
-		return
+## A porta fecha sozinha atrás dele (a mola do fecho), sem levá-lo a ela.
+func fechar_sozinha() -> void:
+	movendo = true
 	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(folha, ^"rotation_degrees:y", 0.0, 1.0)
+	t.tween_property(folha, ^"rotation_degrees:y", 0.0, 1.4)
 	await t.finished
 	_tocar(som_fechar)
 	porta_aberta = false
-	if corredor:
-		corredor.visible = false
+	movendo = false
 
 
 ## Fechada de uma vez (no escuro da virada do dia).
@@ -127,12 +128,23 @@ func fechar_ja() -> void:
 	if folha:
 		folha.rotation_degrees.y = 0.0
 	porta_aberta = false
-	if corredor:
-		corredor.visible = false
+	movendo = false
 
 
-func _macaneta() -> Vector3:
-	return folha.global_transform * Vector3(0.82, 1.0, 0.0) if folha else global_position
+## Longe o bastante da dobradiça para a folha fechar sem passar por `ponto`.
+func fora_do_arco(ponto: Vector3) -> bool:
+	var dobradica := folha.global_position
+	return Vector2(ponto.x - dobradica.x, ponto.z - dobradica.z).length() > largura_folha + 0.25
+
+
+## Do lado do corredor (passou da soleira).
+func do_lado_de_fora(ponto: Vector3) -> bool:
+	return ponto.z > folha.global_position.z + 0.05 if folha else false
+
+
+## A maçaneta, do lado da sala (`lado` < 0) ou do corredor (> 0).
+func _macaneta(lado := -0.1) -> Vector3:
+	return folha.global_transform * Vector3(0.82, 1.0, lado) if folha else global_position
 
 
 ## Um envelope de pé dentro da calha, atrás do vidro, na altura da boca.

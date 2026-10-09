@@ -120,9 +120,13 @@ func _servir(player: Player, de: Node3D, para: Node3D, cheio: float) -> void:
 	var nivel := para.get_node_or_null(^"Nivel") as Node3D
 	if nivel:
 		nivel.visible = true
-		nivel.scale.y = 0.05
+		# Na xícara, que afunila, o café alarga ao subir (rente à parede de dentro).
+		var afunila: float = nivel.get_meta(&"afunila", 1.0)
+		var encher := func(s: float) -> void:
+			var largo := lerpf(afunila, 1.0, s)
+			nivel.scale = Vector3(largo, s, largo)
 		t = _tween()
-		t.tween_property(nivel, ^"scale:y", cheio, 1.3)
+		t.tween_method(encher, 0.05, cheio, 1.3)
 		await t.finished
 	else:
 		await get_tree().create_timer(1.3).timeout

@@ -204,10 +204,11 @@ func _area(parent: Node, area: Area3D, name: String, size: Vector3, pos := Vecto
 	return area
 
 
-func _spawn(name: String, pos: Vector3) -> void:
+func _spawn(name: String, pos: Vector3, rot_y := 0.0) -> void:
 	var marker := Marker3D.new()
 	marker.name = name
 	marker.position = pos
+	marker.rotation_degrees.y = rot_y
 	_add(cena, marker)
 	marker.add_to_group(&"spawn", true)
 

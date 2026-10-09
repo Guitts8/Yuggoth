@@ -117,9 +117,18 @@ var _sala_escondida: Dictionary[Node3D, Array] = {}
 @onready var bebida: Bebida = %Bebida
 ## O alto da escada, no fim do corredor: chegar lá, na hora de ir, vira o dia.
 @onready var escada: Area3D = %Escada
+## A porta vista do corredor (de manhã, ele chega por ali).
+@onready var porta_fora: Interactable = %EntrarPorta
+## A boca da calha: "Pôr a carta na calha".
+@onready var por_na_calha: Interactable = %PorNaCalha
 
 ## O dia acabou e falta ir para casa (Fase 3e): a porta abre para o corredor.
 var _pode_ir := false
+## Com a porta aberta, ele já esteve no corredor: de volta à sala, ela fecha.
+var _saiu := false
+## O salto no tempo de uma carta postada (Dias 5 e 6): espera ele voltar à sala
+## e a porta fechar.
+var _salto_pendente: NarrationLine
 
 
 func _ready() -> void:
@@ -128,6 +137,8 @@ func _ready() -> void:
 	player.lamp.available = false
 	SceneDirector.tempo = self
 	porta.interacted.connect(_on_porta)
+	porta_fora.interacted.connect(_on_porta_fora)
+	por_na_calha.interacted.connect(_on_por_na_calha)
 	escada.body_entered.connect(_on_escada)
 	diario.get_node(^"Anotar").interacted.connect(_on_anotar)
 	diario.get_node(^"Ler").interacted.connect(_on_ler_diario)
@@ -271,14 +282,28 @@ func _cartao(n: int) -> NarrationLine:
 func _inicio_do_dia() -> void:
 	var n := dia()
 	var comecou := StringName("comecou_dia_%d" % n)
-	if not GameState.has_flag(comecou):
-		GameState.set_flag(comecou)
-		if n < linhas_correio.size() and not _respondeu(n):
-			Narrator.say(linhas_correio[n])
 	for flag in linhas_volta:
 		var linha := linhas_volta[flag]
 		if GameState.has_flag(flag) and not GameState.has_flag(linha.get_said_flag()):
 			Narrator.say(linha)
+	if not GameState.has_flag(comecou):
+		GameState.set_flag(comecou)
+		if n < linhas_correio.size() and not _respondeu(n):
+			_dizer_ao_entrar(linhas_correio[n])
+
+
+## De manhã ele chega pelo corredor (Fase 3f): a fala do correio espera a porta
+## abrir e o correio aparecer no chão.
+func _dizer_ao_entrar(linha: NarrationLine) -> void:
+	while _fora() and not calha.porta_aberta:
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
+	Narrator.say(linha)
+
+
+func _fora() -> bool:
+	return calha.do_lado_de_fora(player.global_position)
 
 
 func _respondeu(n: int) -> bool:
@@ -311,42 +336,106 @@ func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
 
 
 func _process(_delta: float) -> void:
-	porta.prompt = "Pôr a carta no correio" if CartaSaida.atual else "Ir para casa"
-	# Aberta, a porta não se usa: o corredor está ali.
-	porta.enabled = not calha.porta_aberta
+	# Num sonho fora da sala, a sala (a porta, o corredor) é do _esconder_sala.
+	if not _sala_escondida.is_empty():
+		return
+	var fora := _fora()
+	porta.prompt = "Abrir a porta" if CartaSaida.atual else "Ir para casa"
+	# Aberta, a porta não se usa: o corredor está ali. Cada lado tem a sua área.
+	var fechada := not calha.porta_aberta and not calha.movendo
+	_ligar(porta, fechada and not fora)
+	_ligar(porta_fora, fechada and fora)
+	_ligar(por_na_calha, CartaSaida.atual != null and calha.porta_aberta and not postando)
+	calha.corredor.visible = calha.porta_aberta or calha.movendo or fora
+	if not calha.porta_aberta:
+		return
+	if fora:
+		_saiu = true
+	# De volta à sala, fora do arco da folha: a porta fecha sozinha atrás dele.
+	elif _saiu and not calha.movendo and not postando and calha.fora_do_arco(player.global_position):
+		_fechar_atras()
 
 
-## A porta é o correio: com a carta na mão, ele a abre, vai à calha do corredor
-## e põe a carta nela (CalhaCorreio). A resposta do dia deixa só o diário por
-## fazer (a do Dia 6 encerra a demo); as outras (Dias 5 e 6) saltam no tempo até
-## a volta do correio. Sem carta, o dia só acaba pela porta depois do diário (e
-## do sonho, se houver): ela abre, e ele vai para casa pelo corredor.
+## Uma área que só existe quando vale (some da mira e da conferência de alcance).
+static func _ligar(area: Interactable, on: bool) -> void:
+	area.enabled = on
+	area.visible = on
+
+
+func _fechar_atras() -> void:
+	_saiu = false
+	await calha.fechar_sozinha()
+	if not is_inside_tree() or _salto_pendente == null:
+		return
+	# A carta foi; o tempo passa até a volta do correio.
+	var salto := _salto_pendente
+	_salto_pendente = null
+	while _saindo or _saltando or em_lapso or selando:
+		await get_tree().process_frame
+		if not is_inside_tree():
+			return
+	_saltando = true
+	await SceneDirector.time_skip(salto)
+	_saltando = false
+
+
+## A porta é o correio (Fase 3f, duas ações): com a carta na mão, ele a abre, e
+## o corredor é dele; na calha, "Pôr a carta na calha" (_on_por_na_calha). Sem
+## carta, o dia só acaba pela porta depois do diário (e do sonho, se houver):
+## ela abre, e ele vai para casa pelo corredor.
 func _on_porta(_by: Node) -> void:
 	if _saindo or _saltando or em_lapso or selando or postando:
 		return
-	if _pode_ir:
-		_sair_pela_porta()
+	if _pode_ir or CartaSaida.atual:
+		_abrir_porta(false)
 		return
+	if not _respondeu(dia()):
+		Events.notice_requested.emit("Ainda devo uma resposta ao Sr. Akeley.")
+		return
+	var lugar := _lugar_sono(dia())
+	if GameState.has_flag(StringName("anotou_dia_%d" % dia())):
+		# Anotado o dia, a noite continua noutro lugar (LugarSono).
+		if lugar and lugar.linha:
+			Narrator.say(lugar.linha)
+		return
+	# Postada (ou perdida num load, com a mão vazia): falta o diário.
+	GameState.set_value(&"diario", dia())
+	Events.notice_requested.emit("Antes de ir, anotar o dia no diário.")
+
+
+## De manhã, do corredor: ele abre a porta e entra quando quiser.
+func _on_porta_fora(_by: Node) -> void:
+	if _saindo or _saltando or em_lapso or selando or postando:
+		return
+	_abrir_porta(true)
+
+
+## Uma cena curta: ele vai à maçaneta e abre; depois, o corredor (ou a sala) é dele.
+func _abrir_porta(de_fora: bool) -> void:
+	if calha.porta_aberta or calha.movendo:
+		return
+	player.input_enabled = false
+	if de_fora:
+		await calha.abrir_de_fora(player)
+	else:
+		await calha.abrir(player)
+	if not is_inside_tree():
+		return
+	player.input_enabled = not Events.is_modal_open
+
+
+## Na calha do corredor, a carta vai (CalhaCorreio.por_na_calha). A resposta do
+## dia deixa só o diário por fazer (a do Dia 6 encerra a demo); as outras (Dias
+## 5 e 6) saltam no tempo até a volta do correio — quando ele voltar à sala e a
+## porta fechar (_fechar_atras).
+func _on_por_na_calha(_by: Node) -> void:
 	var carta := CartaSaida.atual
-	if carta == null:
-		if not _respondeu(dia()):
-			Events.notice_requested.emit("Ainda devo uma resposta ao Sr. Akeley.")
-			return
-		var lugar := _lugar_sono(dia())
-		if GameState.has_flag(StringName("anotou_dia_%d" % dia())):
-			# Anotado o dia, a noite continua noutro lugar (LugarSono).
-			if lugar and lugar.linha:
-				Narrator.say(lugar.linha)
-			return
-		# Postada (ou perdida num load, com a mão vazia): falta o diário.
-		GameState.set_value(&"diario", dia())
-		Events.notice_requested.emit("Antes de ir, anotar o dia no diário.")
+	if carta == null or postando or _saindo:
 		return
 	var reply := carta.reply
-	# Ele abre a porta e põe a carta na calha de correio do corredor (Fase 3d).
 	postando = true
 	player.input_enabled = false
-	await calha.postar(carta, player)
+	await calha.por_na_calha(carta, player)
 	if not is_inside_tree():
 		return
 	carta.postar()
@@ -359,10 +448,7 @@ func _on_porta(_by: Node) -> void:
 		GameState.set_value(&"diario", dia())
 		Narrator.say(linha_diario)
 	elif reply.cartao_depois:
-		# A carta vai e o tempo passa até a volta do correio.
-		_saltando = true
-		await SceneDirector.time_skip(reply.cartao_depois)
-		_saltando = false
+		_salto_pendente = reply.cartao_depois
 
 
 ## Fim do Dia 6 e da demo: a tinta da última carta, o cartão e o menu.
@@ -604,19 +690,6 @@ func _hora_de_ir() -> void:
 	Events.notice_requested.emit("Hora de ir para casa.")
 
 
-## Ele abre a porta (a cena o leva até ela); depois, o corredor é dele.
-func _sair_pela_porta() -> void:
-	if calha.porta_aberta:
-		return
-	_saindo = true
-	player.input_enabled = false
-	await calha.abrir(player)
-	if not is_inside_tree():
-		return
-	_saindo = false
-	player.input_enabled = not Events.is_modal_open
-
-
 func _on_escada(body: Node3D) -> void:
 	if body == player and _pode_ir and calha.porta_aberta and not _saindo:
 		_pode_ir = false
@@ -632,10 +705,12 @@ func _fim_do_dia() -> void:
 	SceneDirector.hold_black = true
 	Narrator.cancel()
 	# A sala de amanhã: o caderno no lugar, a manhã desfeita, a porta fechada,
-	# Wilmarth de pé.
+	# Wilmarth de pé no alto da escada, chegando (Fase 3f).
 	lapso.desfazer_manha()
 	diario.repor()
 	calha.fechar_ja()
+	_saiu = false
+	_salto_pendente = null
 	player.conduzido = false
 	player.stand()
 	player.debrucado = 0.0
@@ -865,14 +940,7 @@ func _data_inicio() -> int:
 
 ## Vira Wilmarth, devagar, para a janela, de onde o tempo se vê passar.
 func _olhar_a_janela() -> void:
-	var janela := Vector3(0.0, 1.55, -3.0)
-	var de := player.global_position
-	var yaw := atan2(-(janela.x - de.x), -(janela.z - de.z))
-	var olho := player.camera.global_position
-	var pitch := atan2(janela.y - olho.y, Vector2(janela.x - olho.x, janela.z - olho.z).length())
-	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(player, ^"rotation:y", player.rotation.y + angle_difference(player.rotation.y, yaw), 1.6)
-	t.tween_property(player.head, ^"rotation:x", pitch, 1.6)
+	player.olhar_para(Vector3(0.0, 1.55, -3.0), 1.6)
 
 
 ## SceneDirector.time_skip, no escritório: o lapso na própria sala, sem tela
