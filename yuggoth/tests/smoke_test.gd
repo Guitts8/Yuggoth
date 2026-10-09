@@ -621,12 +621,19 @@ func _ready() -> void:
 	_check(dia5.visible and esc.world_env.environment == esc.ambientes_dia[5], "Dia 5: noite no escritório")
 	_check(AudioDirector.get_ambience() == esc.sons_dia[5], "Dia 5: chuva")
 	await _check_dia(esc, 5)
-	var acender: StateInteractable = dia5.get_node("AcenderLareira")
+	var acender: AcenderLareira = dia5.get_node("AcenderLareira")
 	_check(not dia5.get_node("Fogo").visible and acender.can_interact(player), "Dia 5: a lareira apagada, com lenha")
 	acender.interact(player)
 	await _frames(2)
-	_check(dia5.get_node("Fogo").visible and not acender.can_interact(player) and (dia5.get_node("Fogo/Chamas/Crepitar") as AudioStreamPlayer3D).playing,
-		"acender a lareira: fogo, luz e o crepitar")
+	_check(not player.input_enabled and not dia5.get_node("Fogo").visible, "acender a lareira: ele vai até ela e risca o fósforo")
+	var t_fogo := 0.0
+	while not player.input_enabled and t_fogo < 30.0:
+		await get_tree().process_frame
+		t_fogo += get_process_delta_time()
+	var chamas_5: Fogo = dia5.get_node("Fogo/Chamas")
+	_check(dia5.get_node("Fogo").visible and not acender.can_interact(player) and (dia5.get_node("Fogo/Chamas/Crepitar") as AudioStreamPlayer3D).playing
+			and chamas_5.intensidade > 0.2 and player.abaixar == 0.0,
+		"acender a lareira: o fogo pega e cresce, ele se levanta (%.1f s)" % t_fogo)
 	var oferta: WriteReply = dia5.get_node("Oferta/Escrever")
 	var telegrama5: Node3D = dia5.get_node("TelegramaAkely")
 	_check(not oferta.can_interact(player) and not telegrama5.visible, "antes da carta de 15 de agosto, nada a responder")

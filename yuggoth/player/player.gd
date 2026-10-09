@@ -55,6 +55,9 @@ var conduzido := false
 var debrucado := 0.0
 ## Campo de visão imposto por uma cena (a página do diário); 0 = o de sempre.
 var fov_forcado := 0.0
+## Quanto a cabeça desce além da altura de sempre (uma cena: ajoelhado diante da
+## lareira, playtest 7).
+var abaixar := 0.0
 
 var _target: Interactable
 var _target_prompt := ""
@@ -152,6 +155,7 @@ func livre(ponto: Vector3) -> bool:
 ## debruçado o quanto `debrucado` diz, virado para `yaw`.
 func olhos_em(de: Vector3, yaw: float) -> Vector3:
 	var altura := (seated_eye_height - DEBRUCAR_DESCE * debrucado) if seated else eye_height
+	altura -= abaixar
 	var frente := Vector3(-sin(yaw), 0.0, -cos(yaw)) * (DEBRUCAR_AVANCA * debrucado if seated else 0.0)
 	return de + Vector3(0.0, altura, 0.0) + frente
 
@@ -305,6 +309,7 @@ func _update_head(delta: float, crouching: bool) -> void:
 	var target_height := crouch_eye_height if crouching else eye_height
 	if seated:
 		target_height = seated_eye_height - DEBRUCAR_DESCE * debrucado
+	target_height -= abaixar
 	head.position.y = lerpf(head.position.y, target_height, 1.0 - exp(-10.0 * delta))
 	head.position.z = -DEBRUCAR_AVANCA * debrucado if seated else 0.0
 	var zoom := input_enabled and Input.is_action_pressed(&"zoom_visao")

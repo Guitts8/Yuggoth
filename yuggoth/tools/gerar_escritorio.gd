@@ -1050,9 +1050,16 @@ func _corredor(g: Node3D) -> void:
 	_quad(c, "Teto", Vector2(largura, CORREDOR), Vector3(cx, H, meio), Vector3(90, 0, 0), "teto")
 	_quad(c, "ParedeFrente", Vector2(largura, H), Vector3(cx, H / 2, fundo), Vector3(0, 180, 0), "parede_corredor")
 	_quad(c, "PontaO", Vector2(CORREDOR, H), Vector3(x0, H / 2, meio), Vector3(0, 90, 0), "parede_corredor")
-	_box(c, "Lambri", Vector3(largura, 1.0, 0.02), Vector3(cx, 0.5, fundo - 0.01), "lambri")
-	_box(c, "LambriMoldura", Vector3(largura, 0.04, 0.04), Vector3(cx, 1.02, fundo - 0.02), "madeira_escura")
-	_box(c, "Rodape", Vector3(largura, 0.12, 0.045), Vector3(cx, 0.06, fundo - 0.0225), "madeira_escura")
+	# O lambri, a moldura e o rodapé param nas portas e na calha (playtest 7:
+	# passavam por cima da porta 312, rentes à folha).
+	var trechos_frente := _trechos(x0, x1, [Vector2(-2.9 - 0.54, -2.9 + 0.54), Vector2(CALHA_X - 0.1, CALHA_X + 0.1)])
+	for i in trechos_frente.size():
+		var a: float = trechos_frente[i].x
+		var b: float = trechos_frente[i].y
+		_box(c, "Lambri%d" % i, Vector3(b - a, 1.0, 0.02), Vector3((a + b) / 2, 0.5, fundo - 0.01), "lambri")
+		_box(c, "LambriMoldura%d" % i, Vector3(b - a, 0.04, 0.04), Vector3((a + b) / 2, 1.02, fundo - 0.02), "madeira_escura")
+		_box(c, "Rodape%d" % i, Vector3(b - a, 0.12, 0.045), Vector3((a + b) / 2, 0.06, fundo - 0.0225), "madeira_escura")
+		_almofadas(c, "AlmofadasFrente%d" % i, a, b, fundo - 0.025, -1.0)
 	_box(c, "LambriPonta", Vector3(0.02, 1.0, CORREDOR), Vector3(x0 + 0.01, 0.5, meio), "lambri")
 	_box(c, "MolduraPonta", Vector3(0.04, 0.04, CORREDOR), Vector3(x0 + 0.02, 1.02, meio), "madeira_escura")
 
@@ -1062,12 +1069,23 @@ func _corredor(g: Node3D) -> void:
 	var vao_o := PORTA_X - PORTA_L / 2
 	var vao_l := PORTA_X + PORTA_L / 2
 	for t: Array in [["O", x0, vao_o], ["L", vao_l, x1]]:
-		var a: float = t[1]
-		var b: float = t[2]
-		_quad(c, "ParedeSala" + t[0], Vector2(b - a, H), Vector3((a + b) / 2, H / 2, perto), Vector3.ZERO, "parede_corredor")
-		_box(c, "LambriSala" + t[0], Vector3(b - a, 1.0, 0.02), Vector3((a + b) / 2, 0.5, perto + 0.01), "lambri")
-		_box(c, "MolduraSala" + t[0], Vector3(b - a, 0.04, 0.04), Vector3((a + b) / 2, 1.02, perto + 0.02), "madeira_escura")
-		_box(c, "RodapeSala" + t[0], Vector3(b - a, 0.12, 0.045), Vector3((a + b) / 2, 0.06, perto + 0.0225), "madeira_escura")
+		_quad(c, "ParedeSala" + t[0], Vector2(t[2] - t[1], H), Vector3((t[1] + t[2]) / 2, H / 2, perto), Vector3.ZERO, "parede_corredor")
+		# Do lado oeste, a porta 308: o lambri para nela.
+		var trechos := _trechos(t[1], t[2], [Vector2(-3.25 - 0.54, -3.25 + 0.54)])
+		for i in trechos.size():
+			var a: float = trechos[i].x
+			var b: float = trechos[i].y
+			_box(c, "LambriSala%s%d" % [t[0], i], Vector3(b - a, 1.0, 0.02), Vector3((a + b) / 2, 0.5, perto + 0.01), "lambri")
+			_box(c, "MolduraSala%s%d" % [t[0], i], Vector3(b - a, 0.04, 0.04), Vector3((a + b) / 2, 1.02, perto + 0.02), "madeira_escura")
+			_box(c, "RodapeSala%s%d" % [t[0], i], Vector3(b - a, 0.12, 0.045), Vector3((a + b) / 2, 0.06, perto + 0.0225), "madeira_escura")
+			# As almofadas: do lado da porta dele, afastadas do alizar.
+			var aa := a
+			var bb := b
+			if is_equal_approx(b, vao_o):
+				bb -= 0.12
+			if is_equal_approx(a, vao_l):
+				aa += 0.12
+			_almofadas(c, "AlmofadasSala%s%d" % [t[0], i], aa, bb, perto + 0.025, 1.0)
 	_quad(c, "ParedeSalaAlto", Vector2(PORTA_L, H - PORTA_H), Vector3(PORTA_X, (H + PORTA_H) / 2, perto), Vector3.ZERO, "parede_corredor")
 	for s in [-1, 1]:
 		_box(c, "Montante%d" % (s + 1), Vector3(0.03, PORTA_H, PAREDE_SUL), Vector3(PORTA_X + s * (PORTA_L / 2 + 0.015), PORTA_H / 2, D + PAREDE_SUL / 2), "madeira_clara")
@@ -1086,9 +1104,6 @@ func _corredor(g: Node3D) -> void:
 	# cimalha no alto das duas paredes, a passadeira, a segunda luz, a janela com
 	# o radiador no fim, o quadro de avisos, o banco, a outra porta do lado da sala
 	# e o cinzeiro de pé no alto da escada.
-	_almofadas(c, "AlmofadasSalaO", x0, vao_o - 0.12, perto + 0.025, 1.0)
-	_almofadas(c, "AlmofadasSalaL", vao_l + 0.12, x1, perto + 0.025, 1.0)
-	_almofadas(c, "AlmofadasFrente", x0, x1, fundo - 0.025, -1.0)
 	for t: Array in [["Fundo", fundo - 0.04, -1.0], ["Perto", perto + 0.04, 1.0]]:
 		_box(c, "Cimalha" + t[0], Vector3(largura, 0.1, 0.08), Vector3(cx, H - 0.05, t[1]), "madeira_escura")
 		_box(c, "CimalhaFilete" + t[0], Vector3(largura, 0.025, 0.11), Vector3(cx, H - 0.11, t[1] + t[2] * 0.015), "madeira_escura")
@@ -1175,6 +1190,23 @@ func _corredor(g: Node3D) -> void:
 
 	# Quem anima: fora do grupo escondido (o envelope que desce é filho dela).
 	_calha(g, c, fundo)
+
+
+## Os trechos de a a b (x) fora dos `buracos` (as portas, a calha).
+func _trechos(a: float, b: float, buracos: Array) -> Array[Vector2]:
+	var r: Array[Vector2] = [Vector2(a, b)]
+	for h: Vector2 in buracos:
+		var novos: Array[Vector2] = []
+		for t in r:
+			if h.y <= t.x or h.x >= t.y:
+				novos.append(t)
+				continue
+			if h.x - t.x > 0.05:
+				novos.append(Vector2(t.x, h.x))
+			if t.y - h.y > 0.05:
+				novos.append(Vector2(h.y, t.y))
+		r = novos
+	return r
 
 
 ## Os montantes que dividem o lambri em almofadas, a cada ~0,6 m entre `a` e `b`
@@ -1283,8 +1315,11 @@ func _escada(c: Node3D, x: float, perto: float, fundo: float) -> void:
 	for k in n:
 		var topo := -(k + 1) * DEGRAU.y
 		_box(e, "Degrau%d" % k, Vector3(DEGRAU.x, DEGRAU.y, largura), Vector3(x + (k + 0.5) * DEGRAU.x, topo - DEGRAU.y / 2, meio), "madeira_escura")
-		# O nariz do degrau, um pouco à frente.
-		_box(e, "Nariz%d" % k, Vector3(0.03, 0.025, largura), Vector3(x + k * DEGRAU.x + 0.005, topo - 0.0125, meio), "madeira_clara")
+		# O nariz do degrau, na borda da frente (a de baixo), um pouco saliente.
+		_box(e, "Nariz%d" % k, Vector3(0.03, 0.025, largura), Vector3(x + (k + 1) * DEGRAU.x + 0.005, topo - 0.0125, meio), "madeira_clara")
+	# O espelho do primeiro degrau, do piso do corredor até ele (playtest 7: o
+	# vão de 18 cm mostrava o vazio por baixo do piso).
+	_box(e, "Espelho", Vector3(0.03, DEGRAU.y + 0.04, largura), Vector3(x + 0.015, -DEGRAU.y / 2 + 0.01, meio), "madeira_escura")
 	var x2 := x + n * DEGRAU.x
 	var xe := x2 + largura
 	var xm := (x2 + xe) / 2
@@ -1295,13 +1330,15 @@ func _escada(c: Node3D, x: float, perto: float, fundo: float) -> void:
 	var baixo := y2 - 0.3
 	var alto := H - baixo
 	var cy := (H + baixo) / 2
-	_box(e, "Patamar", Vector3(largura, 0.12, largura), Vector3(xm, y1 - 0.06, meio), "madeira_escura")
+	# Grosso até o primeiro degrau do segundo lanço (com 12 cm, o vão de baixo
+	# mostrava o vazio — playtest 7).
+	_box(e, "Patamar", Vector3(largura, DEGRAU.y + 0.12, largura), Vector3(xm, y1 - (DEGRAU.y + 0.12) / 2, meio), "madeira_escura")
 	_box(e, "PatamarNariz", Vector3(largura, 0.025, 0.03), Vector3(xm, y1 - 0.0125, fundo - 0.005), "madeira_clara")
 	for k in n:
 		var topo := y1 - (k + 1) * DEGRAU.y
 		var zk := fundo + (k + 0.5) * DEGRAU.x
 		_box(e, "Degrau2_%d" % k, Vector3(largura, DEGRAU.y, DEGRAU.x), Vector3(xm, topo - DEGRAU.y / 2, zk), "madeira_escura")
-		_box(e, "Nariz2_%d" % k, Vector3(largura, 0.025, 0.03), Vector3(xm, topo - 0.0125, fundo + k * DEGRAU.x + 0.005), "madeira_clara")
+		_box(e, "Nariz2_%d" % k, Vector3(largura, 0.025, 0.03), Vector3(xm, topo - 0.0125, fundo + (k + 1) * DEGRAU.x + 0.005), "madeira_clara")
 	_quad(e, "PisoBaixo", Vector2(largura, zb - zf), Vector3(xm, y2, (zf + zb) / 2), Vector3(-90, 0, 0), "piso_corredor")
 	# As paredes do vão: a de perto corre os dois lanços; a de trás, só o primeiro.
 	_quad(e, "ParedePerto", Vector2(xe - x, alto), Vector3((x + xe) / 2, cy, perto), Vector3.ZERO, "parede_corredor")
@@ -2254,9 +2291,16 @@ func _lareira_noite(parent: Node, n: int) -> void:
 	for k in 3:
 		var tora := _cyl(lenha, "Tora%d" % k, 0.035, 0.04, 0.42, Vector3([-0.05, 0.05, 0.0][k], [0.035, 0.035, 0.09][k], 0), "madeira_escura", 7)
 		tora.rotation_degrees = Vector3(90, [4.0, -6.0, 25.0][k], 0)
+	# O jornal amassado sob as toras, onde o fósforo encosta (playtest 7).
+	for k in 4:
+		var bola := _box(lenha, "Jornal%d" % k, Vector3(0.07, 0.035, 0.06), Vector3(-0.07 + (k % 2) * 0.05, 0.005, -0.12 + k * 0.08), "papel")
+		bola.rotation_degrees = Vector3(17.0 * k, 33.0 * k + 10.0, -12.0 * k)
 	var chave := StringName("lareira_dia_%d" % n)
-	var acender := _area(parent, StateInteractable.new(), "AcenderLareira", Vector3(0.5, 0.8, 0.9), Vector3(W - 0.3, 0.45, -0.6)) as StateInteractable
+	var acender := _area(parent, AcenderLareira.new(), "AcenderLareira", Vector3(0.5, 0.8, 0.9), Vector3(W - 0.3, 0.45, -0.6)) as AcenderLareira
 	acender.prompt = "Acender a lareira"
+	acender.ajoelhar = Vector3(W - 1.0, 0, -0.6)
+	acender.lenha = fogo_pos
+	acender.chama = load(TEX_DIR + "chama.png")
 	acender.changes = {chave: 1.0}
 	acender.additive = false
 	acender.condition = _flag(chave, true)
@@ -2290,6 +2334,7 @@ func _lareira_noite(parent: Node, n: int) -> void:
 		_add(fogo, mi)
 		chamas.append(mi)
 	fogo.chamas = chamas
+	acender.fogo = fogo
 	var luz := _omni(fogo, "Luz", Vector3(-0.3, 0.3, 0), Color(1.0, 0.58, 0.28), 2.0, 5.5)
 	luz.shadow_enabled = true
 	luz.omni_attenuation = 1.2
