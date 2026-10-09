@@ -1,12 +1,15 @@
 class_name MainMenu
 extends Control
-## Tela de título. Só pede; quem começa o jogo (com fade) é o GameRoot.
+## Tela de título, um livro aberto (playtest 6): à esquerda o título e a epígrafe
+## do conto, à direita o sumário. Só pede; quem começa o jogo (com fade) é o
+## GameRoot. As Opções são as páginas seguintes: a folha vira.
 
 signal new_game_requested
 signal continue_requested
 
 @export var options_menu: OptionsMenu
 
+@onready var livro: Livro = $Livro
 @onready var buttons: VBoxContainer = %Buttons
 @onready var confirm: ConfirmBox = %Confirm
 @onready var continue_button: Button = %Continuar
@@ -47,8 +50,10 @@ func _on_new_game() -> void:
 
 
 func _on_options() -> void:
+	var foto := Livro.foto_da_pagina(livro, false)
 	buttons.hide()
-	options_menu.open()
+	options_menu.open(foto)
 	await options_menu.closed
 	buttons.show()
 	options_button.grab_focus()
+	await livro.folhear(options_menu.foto_saida, true)

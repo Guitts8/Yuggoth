@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://ui/menu/pause_menu.gd" id="1_pause"]
-[ext_resource type="Theme" path="res://ui/menu/menu_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://ui/menu/livro.gd" id="2_livro"]
 [ext_resource type="Script" path="res://ui/menu/confirm_box.gd" id="3_confirm"]
+[ext_resource type="FontFile" path="res://art/fonts/OldStandard-Italic.ttf" id="4_italico"]
 
 [node name="PauseMenu" type="Control"]
 process_mode = 3
@@ -12,7 +13,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("2_theme")
 script = ExtResource("1_pause")
 
 [node name="Dim" type="ColorRect" parent="."]
@@ -24,51 +24,81 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.72)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Livro" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_livro")
 
-[node name="VBox" type="VBoxContainer" parent="Center"]
-layout_mode = 2
-theme_override_constants/separation = 40
+[node name="Esquerda" type="VBoxContainer" parent="Livro"]
+layout_mode = 0
+theme_override_constants/separation = 14
+alignment = 1
 
-[node name="Title" type="Label" parent="Center/VBox"]
+[node name="Obra" type="Label" parent="Livro/Esquerda"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(0.42, 0.32, 0.24, 1)
+theme_override_font_sizes/font_size = 22
+text = "Os que Sussurram"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Livro/Esquerda"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
 text = "Pausa"
 horizontal_alignment = 1
-uppercase = true
 
-[node name="Buttons" type="VBoxContainer" parent="Center/VBox"]
+[node name="Regua" type="Label" parent="Livro/Esquerda"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.42, 0.32, 0.24, 1)
+theme_override_font_sizes/font_size = 22
+text = "— · —"
+horizontal_alignment = 1
+
+[node name="Data" type="Label" parent="Livro/Esquerda"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(470, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.21, 0.15, 1)
+theme_override_fonts/font = ExtResource("4_italico")
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Direita" type="VBoxContainer" parent="Livro"]
+layout_mode = 0
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="Livro/Direita"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 10
 
-[node name="Continuar" type="Button" parent="Center/VBox/Buttons"]
+[node name="Continuar" type="Button" parent="Livro/Direita/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Continuar"
 
-[node name="Opcoes" type="Button" parent="Center/VBox/Buttons"]
+[node name="Opcoes" type="Button" parent="Livro/Direita/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Opções"
 
-[node name="MenuPrincipal" type="Button" parent="Center/VBox/Buttons"]
+[node name="MenuPrincipal" type="Button" parent="Livro/Direita/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Menu principal"
 
-[node name="Sair" type="Button" parent="Center/VBox/Buttons"]
+[node name="Sair" type="Button" parent="Livro/Direita/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Sair"
 
-[node name="Confirm" type="VBoxContainer" parent="Center/VBox"]
+[node name="Confirm" type="VBoxContainer" parent="Livro/Direita"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("3_confirm")
