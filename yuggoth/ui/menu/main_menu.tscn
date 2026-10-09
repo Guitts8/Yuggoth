@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://ui/menu/main_menu.gd" id="1_main"]
 [ext_resource type="Script" path="res://ui/menu/livro.gd" id="2_livro"]
@@ -8,6 +8,7 @@
 [ext_resource type="FontFile" path="res://art/fonts/UnifrakturMaguntia-Book.ttf" id="6_fraktur"]
 [ext_resource type="Script" path="res://ui/menu/gravura.gd" id="7_gravura"]
 [ext_resource type="Script" path="res://ui/menu/regua_ornada.gd" id="8_regua"]
+[ext_resource type="FontFile" path="res://art/fonts/GrenzeGotisch.ttf" id="9_gotica"]
 
 [node name="MainMenu" type="Control"]
 process_mode = 3
@@ -72,14 +73,6 @@ horizontal_alignment = 1
 layout_mode = 0
 theme_override_constants/separation = 0
 
-[node name="OsQue" type="Label" parent="Livro/Direita"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.12, 0.065, 0.045, 1)
-theme_override_fonts/font = ExtResource("6_fraktur")
-theme_override_font_sizes/font_size = 52
-text = "Os que"
-horizontal_alignment = 1
-
 [node name="Title" type="Label" parent="Livro/Direita"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.44, 0.05, 0.03, 1)
@@ -88,9 +81,9 @@ theme_override_colors/font_shadow_color = Color(0.2, 0.08, 0.05, 0.35)
 theme_override_constants/outline_size = 3
 theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 3
-theme_override_fonts/font = ExtResource("6_fraktur")
-theme_override_font_sizes/font_size = 104
-text = "Sussurram"
+theme_override_fonts/font = ExtResource("9_gotica")
+theme_override_font_sizes/font_size = 124
+text = "Yuggoth"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="Livro/Direita"]

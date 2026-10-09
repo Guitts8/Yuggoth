@@ -6,7 +6,7 @@ signal line_started(text: String, style: Style)
 signal line_finished
 ## A linha atual foi interrompida (troca de fase, volta ao menu).
 signal line_cancelled
-## O jogador pediu para pular a fala na tela (E sem nada na mira — playtest 7):
+## O jogador pediu para pular a fala na tela (Espaço, `pular_fala` — playtest 8):
 ## a linha do narrador e as falas de uma conversa ou ligação.
 signal pular_pedido
 

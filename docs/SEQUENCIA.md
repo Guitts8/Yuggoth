@@ -137,8 +137,8 @@ páginas de papel queimado nas bordas, manchado de ferrugem. Qualquer tecla pula
 À esquerda: *a partir de H. P. Lovecraft*, a **gravura da pedra negra de Round
 Hill** numa coroa de raios rubros, os dois medalhões com a marca de garra, e a
 epígrafe — *"Tenham bem em mente que, no fim, eu não vi nenhum horror visual de
-fato."* (The Whisperer in Darkness, 1931). À direita: **"Os que *Sussurram*"** em
-fraktur (a segunda palavra em rubro), *Vermont, MCMXXVIII*, e o sumário em gótica:
+fato."* (The Whisperer in Darkness, 1931). À direita: **"Yuggoth"** em
+gótica rubra (o nome do jogo, desde o playtest 8), *Vermont, MCMXXVIII*, e o sumário em gótica:
 Continuar (só se há save), Novo jogo (pede confirmação se há save), Opções, Sair —
 a escolhida em rubro, entre duas pontas de lança rubras que deslizam até ela; o
 mouse (uma pena) aponta direto na página. **Continuar / Novo jogo:** a tinta da

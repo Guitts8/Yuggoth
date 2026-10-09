@@ -30,7 +30,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if Events.is_modal_open or (condition and not condition.is_met()):
+	if Events.is_modal_open or Lapso.em_curso or (condition and not condition.is_met()):
 		return
 	var cam := get_viewport().get_camera_3d()
 	if cam == null:

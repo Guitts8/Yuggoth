@@ -54,6 +54,9 @@ const COR_TARDE := Color(1.0, 0.55, 0.25)
 @export var ciclo := 9.0
 
 var passando := false
+## Algum lapso correndo agora: as aparições do céu esperam (playtest 8 — um mi-go
+## cruzava a cidade em pleno sol, no meio de uma passada de dia).
+static var em_curso := false
 var _ambiente_base := -1.0
 ## A manhã de depois de um sonho (amanhecer): as luzes como estavam.
 var _manha: Dictionary[Light3D, float] = {}
@@ -66,6 +69,8 @@ var _deriva := 0.0
 ## O Environment é um recurso da cena, compartilhado: saindo no meio, não pode
 ## ficar escuro para a próxima vez.
 func _exit_tree() -> void:
+	if passando:
+		em_curso = false
 	if passando and _ambiente_base >= 0.0:
 		ambiente.environment.ambient_light_energy = _ambiente_base
 	desfazer_manha()
@@ -96,6 +101,7 @@ func mostrar(data: int) -> void:
 ## a cor da hora. Vários dias de uma vez passam mais depressa, cada um inteiro.
 func passar(de: int, ate: int, no_escuro: Callable) -> void:
 	passando = true
+	em_curso = true
 	var luzes: Dictionary[Light3D, float] = {}
 	for l: Light3D in sala.find_children("*", "Light3D", true, false):
 		if l != sol and l.is_visible_in_tree():
@@ -148,6 +154,7 @@ func passar(de: int, ate: int, no_escuro: Callable) -> void:
 		l.light_energy = luzes[l]
 	env.ambient_light_energy = ambiente_base
 	passando = false
+	em_curso = false
 
 
 ## Põe (ou tira) a cidade viva na janela, escondendo as vistas do dia que estão

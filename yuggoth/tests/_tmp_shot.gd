@@ -145,6 +145,15 @@ func _sonho_fotos(n: int) -> void:
 		p.head.rotation.x = -0.05
 		await _s(0.6)
 		await _shot("%s_noite%d_%d" % [tag, n, i])
+	var pedra := esc.find_child("Pedra", true, false) as Node3D
+	if n == 4 and pedra:
+		for k in 3:
+			var ang := -0.6 + k * 0.6
+			p.global_position = pedra.global_position + Vector3(sin(ang) * 0.9, 0, cos(ang) * 0.9)
+			await _olhar(p, pedra.global_position + Vector3(0, 0.3, 0))
+			p.head.rotation.x = -0.55
+			await _s(0.5)
+			await _shot("%s_pedra_%d" % [tag, k])
 
 
 func _boston_fotos() -> void:

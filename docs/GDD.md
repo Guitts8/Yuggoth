@@ -588,7 +588,7 @@ func resolve_pages() -> Array[String]:
 ---
 
 ## 13. Questões em aberto
-- [ ] Nome final do jogo (*Os que Sussurram* / *Vermont, 1928* / *A Voz no Disco*).
+- [x] Nome final do jogo: **Yuggoth** (playtest 8; antes *Os que Sussurram*).
 - [x] ~~Pedido do cilindro de Akeley~~ → depende de `crenca` (§7.5).
 - [x] ~~Yuggoth voluntário~~ → dois finais separados, 2a e 2b (§7.3–7.4).
 - [ ] Texto da inscrição da pedra negra revelada no Final 2b.

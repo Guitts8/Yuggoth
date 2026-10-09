@@ -12,8 +12,6 @@ const FADE_PULO := 0.2
 
 var _label: RichTextLabel
 var _tween: Tween
-## O que está na mira do jogador: com algo ali, E interage em vez de pular.
-var _alvo: Interactable
 
 @onready var caption: RichTextLabel = %Caption
 @onready var card: RichTextLabel = %Card
@@ -26,7 +24,6 @@ func _ready() -> void:
 	Narrator.line_started.connect(_show_line)
 	Narrator.line_cancelled.connect(_cancel)
 	Narrator.pular_pedido.connect(_pular)
-	Events.interaction_target_changed.connect(func(alvo: Interactable) -> void: _alvo = alvo)
 	Events.modal_changed.connect(_on_modal_changed)
 
 
@@ -56,11 +53,12 @@ func _cancel() -> void:
 		_label = null
 
 
-## E sem nada na mira pula a fala (playtest 7). Com um modal aberto, o E é dele.
+## Espaço pula a fala (`pular_fala`). Era o E sem nada na mira (playtest 7), mas
+## o E da ação pulava falas sem querer (playtest 8): agora é um botão só dele.
 func _unhandled_input(event: InputEvent) -> void:
-	if not event.is_action_pressed(&"interagir") or event.is_echo():
+	if not event.is_action_pressed(&"pular_fala") or event.is_echo():
 		return
-	if Events.is_modal_open or is_instance_valid(_alvo):
+	if Events.is_modal_open:
 		return
 	Narrator.pular()
 

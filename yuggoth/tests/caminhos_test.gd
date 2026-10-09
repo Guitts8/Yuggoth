@@ -784,7 +784,7 @@ func _tecla(action: StringName) -> void:
 ## repetir): a cada passo escolhe uma das interações disponíveis (as menos usadas
 ## primeiro), vai para perto dela, mira de verdade e aperta E; nas telas, escolhe
 ## qualquer abertura, às vezes amassa a carta, folheia, fecha; no meio das cenas,
-## às vezes abre a pausa ou o dossiê, ou aperta E para pular a fala. Acusa: um dia
+## às vezes abre a pausa ou o dossiê, ou aperta Espaço para pular a fala. Acusa: um dia
 ## que não acaba (travou), o corpo fora do mapa, a mira que não alcança o alvo,
 ## erros no log.
 func _macaco() -> void:
@@ -928,7 +928,7 @@ func _macaco_passo(usos: Dictionary[String, int], mira_falhou: PackedStringArray
 		await _seconds(0.25)
 		return
 	if randf() < 0.15 and Narrator.is_speaking():
-		await _press(&"interagir")  # sem nada na mira, pula a fala
+		await _press(&"pular_fala")
 	if esc and esc._fora() and player.global_position.y < -0.1:
 		_anotar_acao("sobe a escada")
 		await _subir_a_escada(esc)

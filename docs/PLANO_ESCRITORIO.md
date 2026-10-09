@@ -846,6 +846,56 @@ O resto do marco Demo (o que dava para fazer sem o usuário):
     captura a abertura, o marcador andando, a folha virando, as Opções, a pausa
     chegando, a confirmação e o mergulho.
 
+## Fase 3i — Ajustes do playtest 8 (2026-10-09)
+O usuário jogou o playtest 8 (do Dia 1 ao fim da demo). Legenda: ✅ feito · 🔧 claro,
+a fazer · ❓ espera resposta. Aprovado: *"o cuidado que tivemos com o livro do menu
+[...] está muito bom"* — e o pedido é **esse cuidado em tudo** (item 12). Decisões
+tomadas na hora (o usuário escolheu entre opções): o nome **Yuggoth**; **sem corpo**
+visível; os sons com **gravações CC0 tratadas**; os últimos dias com **o sonho logo
+depois da farsa e uma noite em claro** (item 13).
+
+1. ✅ **O nome.** *"temos que escolher um nome melhor do que 'Os que sussurram'"*.
+   Decidido: **Yuggoth** (já é o nome do projeto; uma palavra, PT e EN, em fraktur no
+   Necronomicon). Feito: no menu, "Yuggoth" em gótica rubra (a Grenze Gotisch — na
+   fraktur o Y se lia N); na pausa, *yuggoth*; o export sai em `build/windows/Yuggoth.exe`.
+2. 🔧 **Os sons do menu "muito toscos"** e **os efeitos como um todo "bastante
+   genéricos"**. Decidido: trocar a síntese por **gravações CC0** (licença livre
+   para o repositório público), tratadas — a reverberação de cada lugar, variações
+   a cada toque —; a síntese fica só para o sobrenatural (o zumbido, as vozes do disco).
+3. 🔧 **"O modelo da janela do epílogo está bastante diferente."** A conferir em
+   captura (o gabinete de 1930, no Prólogo, contra a janela dos Dias).
+4. 🔧 **Os certificados na parede legíveis.**
+5. ✅ **Um corpo visível ao olhar para baixo?** O usuário pediu ajuda para decidir;
+   escolheu **sem corpo** (como os jogos de PS1): nada muda.
+6. 🔧 **Os papéis do mural do corredor com algo para ler.**
+7. ✅ **Pular falas não pode ser o E** (*"acabei pulando algumas mensagens que não
+   deveria"*): um botão próprio, longe da ação. Feito: **Espaço** (Y no controle), a
+   ação `pular_fala`; o E só interage.
+8. 🔧 **O estojo do cilindro** (Dia 3): um modelo melhor.
+9. 🔧 **O mi-go do sonho do disco "muito expositivo"** (o usuário não tinha certeza).
+   Recomendado e adotado: mais sugestão — longe, na névoa, por trás das árvores, só a
+   silhueta e o som das asas. No livro, Wilmarth nunca vê uma delas viva; a única
+   vista clara do jogo continua sendo o relance na janela, no Dia 5.
+10. 🔧 **Boston: a saída é uma parede lisa** com "Voltar a Arkham". Uma escada de verdade.
+11. 🔧 **A pedra de Round Hill (noite 4) com o modelo quebrado.**
+12. 🔧 **"O cuidado que tivemos com o livro do menu em tudo."** A diretriz da fase: cada
+    peça mexida aqui sai no nível do Necronomicon (forma, material, desgaste,
+    animação, som), a começar pelo que o jogador mais vê de perto.
+13. 🔧 **Os últimos dias: "só carta e ler carta"**, as passadas de dia (*"sempre a mesma
+    animação, e ela demora"*) e o sonho do A-K-E-L-Y que *"demora para acontecer
+    depois de ele perceber a farsa"*. Decidido:
+    - o **Dia 5 se parte no bilhete**: comparada a assinatura e posta a renovação da
+      oferta, o diário e **o sonho AKELY nessa mesma noite** (22 de agosto); de manhã,
+      a carta de 28 de agosto no correio, a resposta, o diário (sem sonho);
+    - no **Dia 6**, depois da carta de terça (*"Não dormi nada naquela noite"*), **uma
+      noite em claro jogável** na sala, com as estranhezas da Fase 6 (o telefone que dá
+      meio toque e só zumbe na linha, a janela entreaberta, a criatura no céu sem lua),
+      no lugar de um lapso;
+    - **o lapso mais curto e diferente a cada vez**: os 7 lapsos dos Dias 4–6 viram 4.
+14. ✅ **Um mi-go passa em pleno sol** numa passada de dia: a criatura do céu (Dias 3
+    e 6) valia durante o lapso, com a cidade de dia. Feito: nenhuma `Aparicao` passa
+    enquanto um lapso corre (`Lapso.em_curso`).
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado

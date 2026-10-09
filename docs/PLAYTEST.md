@@ -24,7 +24,7 @@ powershell -ExecutionPolicy Bypass -File .\comandos.ps1 jogar-log  # com o conso
 | **F2** | pula para o dia seguinte |
 | **F3** | recarrega o dia (destrava; uma carta selada volta à mão) |
 | **C** | troca a janela entre a cidade 3D e o painel antigo |
-| **E** sem nada na mira | pula a fala |
+| **Espaço** | pula a fala |
 
 Saves: `comandos.ps1 save-guardar <nome>` guarda o ponto atual, e `save-usar <nome>`
 volta a ele.

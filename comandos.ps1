@@ -133,10 +133,10 @@ switch ($acao) {
 	"exportar" {
 		$destino = Join-Path $raiz "build\windows"
 		New-Item -ItemType Directory -Force $destino | Out-Null
-		exit (Godot-Com-Limite @("--headless", "--path", ".", "--export-release", "Windows", (Join-Path $destino "OsQueSussurram.exe")) 900 "exportar")
+		exit (Godot-Com-Limite @("--headless", "--path", ".", "--export-release", "Windows", (Join-Path $destino "Yuggoth.exe")) 900 "exportar")
 	}
 	"jogar-exportado" {
-		$exe = Join-Path $raiz "build\windows\OsQueSussurram.exe"
+		$exe = Join-Path $raiz "build\windows\Yuggoth.exe"
 		if (-not (Test-Path $exe)) { Write-Host "Ainda não exportado: comandos.ps1 exportar" -ForegroundColor Yellow; exit 1 }
 		Start-Process $exe
 	}
