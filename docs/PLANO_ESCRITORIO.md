@@ -858,10 +858,24 @@ depois da farsa e uma noite em claro** (item 13).
    Decidido: **Yuggoth** (já é o nome do projeto; uma palavra, PT e EN, em fraktur no
    Necronomicon). Feito: no menu, "Yuggoth" em gótica rubra (a Grenze Gotisch — na
    fraktur o Y se lia N); na pausa, *yuggoth*; o export sai em `build/windows/Yuggoth.exe`.
-2. 🔧 **Os sons do menu "muito toscos"** e **os efeitos como um todo "bastante
+2. ✅ **Os sons do menu "muito toscos"** e **os efeitos como um todo "bastante
    genéricos"**. Decidido: trocar a síntese por **gravações CC0** (licença livre
    para o repositório público), tratadas — a reverberação de cada lugar, variações
    a cada toque —; a síntese fica só para o sobrenatural (o zumbido, as vozes do disco).
+   Feito: 19 fontes CC0 do OpenGameArt (Kenney — o kenney.nl está bloqueado nesta
+   rede, mas os pacotes dele estão espelhados lá —, Voltiment555, Ylmir, PagDev,
+   Luckius, TinyWorlds e outros; lista em `audio/foley/FONTES.md`), tratadas por
+   `tools/tratar_sons.py` (num venv com numpy/scipy/soundfile: corte, nível, uma
+   reverberação curta de sala por convolução, laços sem emenda, mudanças de altura)
+   em `audio/foley/`, 29 sons: os passos no assoalho, as portas, a gaveta, a janela,
+   bater à porta, o fósforo, a lareira, a chuva na janela, a noite (grilos e vento),
+   o vento, o relógio, a campainha do telefone e o gancho, o papel, a carta pela
+   fresta, o pacote, o selo, a pena, a lama; e os do **Necronomicon** (a folha grossa
+   virando, a capa de couro rangendo, o baque grave na mesa, o fósforo das velas, o
+   risco da pena ao passar e ao escolher). Os geradores preferem `audio/foley/`
+   (`gerador_base._sfx`); `AudioDirector.play_sfx` varia a altura de cada toque
+   (±4%). Ficaram sintetizados: o disco, o zumbido, as vozes, o sonho, a tarde com
+   pássaros, o dia quieto, a manivela, a linha do telefone, a calha, servir.
 3. 🔧 **"O modelo da janela do epílogo está bastante diferente."** A conferir em
    captura (o gabinete de 1930, no Prólogo, contra a janela dos Dias).
 4. ✅ **Os certificados na parede legíveis.** Feito: os dois diplomas têm o texto de

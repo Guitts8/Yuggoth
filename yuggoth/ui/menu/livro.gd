@@ -71,7 +71,7 @@ func _ready() -> void:
 	_marcador = MarcadorFoco.new()
 	_marcador.livro = self
 	add_child(_marcador, false, Node.INTERNAL_MODE_BACK)
-	_som_foco = load("res://audio/placeholder/pena.wav")
+	_som_foco = load("res://audio/foley/menu_pena.wav")
 	resized.connect(_posicionar)
 	_posicionar()
 	# Depois do primeiro layout (um rótulo com quebra de linha mede alto demais
@@ -114,7 +114,7 @@ func _ao_escolher(c: Control) -> void:
 	c.scale = Vector2.ONE * 1.1
 	t.tween_property(c, ^"scale", Vector2.ONE, 0.28)
 	if _som_foco and Necronomicon.atual and Necronomicon.atual.pronto():
-		AudioDirector.play_sfx(_som_foco, -24.0)
+		AudioDirector.play_sfx(_som_foco, -18.0)
 
 
 func _posicionar() -> void:

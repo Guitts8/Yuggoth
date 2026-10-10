@@ -127,6 +127,8 @@ func play_sfx(stream: AudioStream, volume_db := 0.0, bus: StringName = &"SFX") -
 	var player := _make_player(bus)
 	player.stream = stream
 	player.volume_db = volume_db
+	# Cada toque um pouco diferente (playtest 8: "genéricos"): a altura varia um fio.
+	player.pitch_scale = randf_range(0.96, 1.04)
 	player.finished.connect(player.queue_free)
 	player.play()
 	return player

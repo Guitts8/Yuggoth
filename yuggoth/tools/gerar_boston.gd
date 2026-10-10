@@ -36,8 +36,8 @@ func _ready() -> void:
 	cena.name = "Boston"
 	cena.set_script(load("res://levels/boston/boston.gd"))
 	cena.set("linha_chegada", load("res://narrative/narration/boston_chegada.tres"))
-	cena.set("som", load(SFX_DIR + "noite.wav"))
-	cena.set("som_rangido", load(SFX_DIR + "porta_rangendo.wav"))
+	cena.set("som", _sfx("noite.wav"))
+	cena.set("som_rangido", _sfx("porta_rangendo.wav"))
 	cena.set("fresta", FRESTA)
 
 	var env := WorldEnvironment.new()
@@ -308,7 +308,7 @@ func _porta_do_quarto() -> void:
 	bater.changes = {&"bateu_boston": 1.0}
 	bater.additive = false
 	bater.condition = _flag(&"bateu_boston", true)
-	bater.som = load(SFX_DIR + "batidas_porta.wav")
+	bater.som = _sfx("batidas_porta.wav")
 
 
 ## O quarto, atrás da porta: só se vê pela fresta — a parede do fundo, a cabeceira
@@ -368,7 +368,7 @@ func _funcionario() -> void:
 	for id in ["boston_apresentar", "boston_homem", "boston_voz", "boston_reconhecer"]:
 		conversas.append(load("res://narrative/ligacoes/%s.tres" % id))
 	fala.conversas = conversas
-	fala.voz = load(SFX_DIR + "voz_sala.wav")
+	fala.voz = _sfx("voz_sala.wav")
 	fala.voz_db = -12.0
 	# Em pessoa: as perguntas aparecem embaixo, para escolher (Fase 3e).
 	fala.com_opcoes = true

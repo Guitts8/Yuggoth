@@ -6,6 +6,9 @@ extends Node
 const MAT_DIR := "res://art/materials/"
 const TEX_DIR := "res://art/textures/"
 const SFX_DIR := "res://audio/placeholder/"
+## As gravações CC0 tratadas (tools/tratar_sons.py; playtest 8): quando há uma
+## com o nome do som provisório, ela vale no lugar dele.
+const FOLEY_DIR := "res://audio/foley/"
 
 var cena: Node3D
 var m: Dictionary[String, Material] = {}
@@ -255,3 +258,11 @@ func _composta(modo: CompositeCondition.Mode, conds: Array) -> CompositeConditio
 
 func _flag(chave: StringName, negar := false) -> ValueCondition:
 	return _cond_valor(chave, ValueCondition.Op.MAIOR_OU_IGUAL, 1, negar)
+
+
+## O som `nome` (ex.: "chuva.wav"): a gravação tratada de audio/foley/, se houver;
+## senão o provisório sintetizado de audio/placeholder/.
+func _sfx(nome: String) -> AudioStream:
+	if ResourceLoader.exists(FOLEY_DIR + nome):
+		return load(FOLEY_DIR + nome)
+	return load(SFX_DIR + nome)

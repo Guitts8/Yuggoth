@@ -107,11 +107,13 @@ func _ready() -> void:
 	for c in paginas.get_children():
 		if c is Control:
 			_menus.append(c)
-	_som_folha = load("res://audio/placeholder/papel_pegar.wav")
-	_som_capa = load("res://audio/placeholder/porta_rangendo.wav")
-	_som_baque = load("res://audio/placeholder/pacote_chao.wav")
-	_som_fosforo = load("res://audio/placeholder/fosforo.wav")
-	_som_pena = load("res://audio/placeholder/pena.wav")
+	# Playtest 8 ("os efeitos sonoros do menu estão muito toscos"): gravações
+	# CC0 tratadas para o livro (tools/tratar_sons.py, audio/foley/FONTES.md).
+	_som_folha = load("res://audio/foley/menu_folha.wav")
+	_som_capa = load("res://audio/foley/menu_capa.wav")
+	_som_baque = load("res://audio/foley/menu_baque.wav")
+	_som_fosforo = load("res://audio/foley/menu_fosforo.wav")
+	_som_pena = load("res://audio/foley/menu_risco.wav")
 	_montar_mundo()
 	_tinta = ColorRect.new()
 	_tinta.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -284,7 +286,7 @@ func _abertura() -> void:
 	for i in _velas.size():
 		_abrindo.tween_callback(_acender.bind(i)).set_delay(0.3 + 0.55 * i)
 	_abrindo.tween_property(self, ^"_viagem", 1.0, 3.6).set_delay(0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_abrindo.tween_callback(func() -> void: AudioDirector.play_sfx(_som_capa, -14.0)).set_delay(capa)
+	_abrindo.tween_callback(func() -> void: AudioDirector.play_sfx(_som_capa, -9.0)).set_delay(capa)
 	_abrindo.tween_property(_esquerda, ^"rotation:z", 0.0, ABRIR).set_delay(capa).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_abrindo.tween_callback(func() -> void: _lombada.visible = false).set_delay(capa + ABRIR * 0.35)
 	_abrindo.tween_callback(_baque).set_delay(assenta)
@@ -336,7 +338,7 @@ func _acender(i: int) -> void:
 
 ## A capa cai do outro lado: o baque, a câmera estremece, a poeira sobe das páginas.
 func _baque() -> void:
-	AudioDirector.play_sfx(_som_baque, -6.0)
+	AudioDirector.play_sfx(_som_baque, -3.0)
 	_tremor = 1.0
 	if _poeira_baque:
 		_poeira_baque.restart()
@@ -379,7 +381,7 @@ func virar(para_tras := false) -> void:
 	_mat_folha.set_shader_parameter(&"lado", lado)
 	_mat_folha.set_shader_parameter(&"progresso", 0.0)
 	_folha.visible = true
-	AudioDirector.play_sfx(_som_folha, -6.0)
+	AudioDirector.play_sfx(_som_folha, -5.0)
 	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_method(func(p: float) -> void:
 		_mat_folha.set_shader_parameter(&"progresso", p)

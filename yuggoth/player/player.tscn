@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://player/lamp.gd" id="2_lamp"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_1.wav" id="3_passo1"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_2.wav" id="4_passo2"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/passo_madeira_3.wav" id="5_passo3"]
+[ext_resource type="AudioStream" path="res://audio/foley/passo_madeira_1.wav" id="3_passo1"]
+[ext_resource type="AudioStream" path="res://audio/foley/passo_madeira_2.wav" id="4_passo2"]
+[ext_resource type="AudioStream" path="res://audio/foley/passo_madeira_3.wav" id="5_passo3"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.3

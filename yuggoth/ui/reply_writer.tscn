@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://ui/reply_writer.gd" id="1_writer"]
-[ext_resource type="AudioStream" path="res://audio/placeholder/pena.wav" id="2_pena"]
+[ext_resource type="AudioStream" path="res://audio/foley/pena.wav" id="2_pena"]
 [ext_resource type="Theme" path="res://ui/menu/menu_theme.tres" id="3_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]

@@ -46,15 +46,15 @@ func _ready() -> void:
 	cena.set("env_dia", _env_dia())
 	var ambientes: Array[Environment] = [null, cena.get("env_dia"), _env_entardecer(), _env_noite(), cena.get("env_dia"), _env_chuva(), _env_noite()]
 	cena.set("ambientes_dia", ambientes)
-	cena.set("som_chuva", load(SFX_DIR + "chuva.wav"))
+	cena.set("som_chuva", _sfx("chuva.wav"))
 	# Pássaros só no Dia 1 (tarde tranquila); à noite e nos dias tensos, não.
-	cena.set("som_padrao", load(SFX_DIR + "dia_quieto.wav"))
-	var sons: Array[AudioStream] = [null, load(SFX_DIR + "tarde.wav"), null,
-		load(SFX_DIR + "noite.wav"), null, load(SFX_DIR + "chuva.wav"), load(SFX_DIR + "noite.wav")]
+	cena.set("som_padrao", _sfx("dia_quieto.wav"))
+	var sons: Array[AudioStream] = [null, _sfx("tarde.wav"), null,
+		_sfx("noite.wav"), null, _sfx("chuva.wav"), _sfx("noite.wav")]
 	cena.set("sons_dia", sons)
 	# O Dia 4 vira noite sem acabar: a volta de Boston, para as cartas da madrugada.
 	cena.set("env_noite", _env_noite())
-	cena.set("som_noite", load(SFX_DIR + "noite.wav"))
+	cena.set("som_noite", _sfx("noite.wav"))
 	var volta: Dictionary[StringName, NarrationLine] = {&"voltou_de_boston": load("res://narrative/narration/depois_relato.tres")}
 	cena.set("linhas_volta", volta)
 	# Os sonhos (Escritorio._sonhar; o conteúdo vem de _sonhos).
@@ -64,10 +64,10 @@ func _ready() -> void:
 	cena.set("sonhos_fora", fora)
 	var ambientes_sonho: Dictionary[int, Environment] = {3: _env_bosque()}
 	cena.set("ambientes_sonho", ambientes_sonho)
-	cena.set("som_sonho", load(SFX_DIR + "sonho.wav"))
-	cena.set("som_pena", load(SFX_DIR + "pena.wav"))
-	cena.set("som_papel", load(SFX_DIR + "papel_pegar.wav"))
-	cena.set("som_selo", load(SFX_DIR + "selo_batido.wav"))
+	cena.set("som_sonho", _sfx("sonho.wav"))
+	cena.set("som_pena", _sfx("pena.wav"))
+	cena.set("som_papel", _sfx("papel_pegar.wav"))
+	cena.set("som_selo", _sfx("selo_batido.wav"))
 	cena.set("linha_abertura", load("res://narrative/narration/prologo_abertura.tres"))
 	cena.set("linha_cartas", load("res://narrative/narration/prologo_cartas.tres"))
 	var cartoes: Array[NarrationLine] = [null,
@@ -408,7 +408,7 @@ func _estrutura() -> void:
 	_box(rel, "Pendulo", Vector3(0.05, 0.05, 0.01), Vector3(0, -0.2, -0.13), "latao")
 	var tique := AudioStreamPlayer3D.new()
 	tique.name = "Tique"
-	tique.stream = load(SFX_DIR + "relogio.wav")
+	tique.stream = _sfx("relogio.wav")
 	tique.autoplay = true
 	tique.bus = &"SFX"
 	tique.volume_db = -12.0
@@ -1433,9 +1433,9 @@ func _calha(g: Node3D, c: Node3D, fundo: float) -> void:
 	calha.soleira = Vector3(PORTA_X + 0.05, 0, D + PAREDE_SUL / 2)
 	calha.na_calha = Vector3(CALHA_X, 0, fundo - 0.55)
 	calha.queda = Vector2(-0.02, -CALHA_BOCA + 0.08)
-	calha.som_abrir = load(SFX_DIR + "porta_rangendo.wav")
-	calha.som_fechar = load(SFX_DIR + "porta_trinco.wav")
-	calha.som_calha = load(SFX_DIR + "calha_correio.wav")
+	calha.som_abrir = _sfx("porta_rangendo.wav")
+	calha.som_fechar = _sfx("porta_trinco.wav")
+	calha.som_calha = _sfx("calha_correio.wav")
 
 
 ## A escada no fim do corredor (Fase 3e; Fase 3f; playtest 6, andável): o
@@ -1631,8 +1631,8 @@ func _bebida(g: Node3D) -> void:
 	# No espaço da escrivaninha (o pai da gaveta): em pé, junto ao copo, só
 	# enquanto serve (depois volta para a gaveta).
 	b.frasco_servindo = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(-25.0), 0)), Vector3(0.74, MESA, -0.1))
-	b.som_servir = load(SFX_DIR + "servir.wav")
-	b.som_gaveta = load(SFX_DIR + "gaveta.wav")
+	b.som_servir = _sfx("servir.wav")
+	b.som_gaveta = _sfx("gaveta.wav")
 	var bebidas: Dictionary[int, int] = {1: 1, 2: 1, 3: 1, 4: 2}
 	cena.set("bebidas", bebidas)
 
@@ -1732,8 +1732,8 @@ func _diario(g: Node3D, pena: Node3D) -> void:
 	_add(g, d)
 	d.unique_name_in_owner = true
 	d.pena = pena
-	d.som_pena = load(SFX_DIR + "pena.wav")
-	d.som_papel = load(SFX_DIR + "papel_pegar.wav")
+	d.som_pena = _sfx("pena.wav")
+	d.som_papel = _sfx("papel_pegar.wav")
 	d.lugar_aberto = Transform3D(Basis.IDENTITY, Vector3(-0.02, MESA + 0.003, -2.02))
 	var anotar := _area(d, Interactable.new(), "Anotar", Vector3(Diario.LARGURA + 0.02, 0.06, Diario.FUNDO + 0.02), Vector3(Diario.LARGURA * 0.5, 0.03, 0)) as Interactable
 	anotar.prompt = "Anotar o dia"
@@ -1782,7 +1782,7 @@ func _lapso(g: Node3D) -> void:
 	_add(g, lapso)
 	lapso.sala = g
 	lapso.ambiente = cena.get_node("WorldEnvironment")
-	lapso.som_folha = load(SFX_DIR + "papel_pegar.wav")
+	lapso.som_folha = _sfx("papel_pegar.wav")
 
 	var sol := SpotLight3D.new()
 	sol.name = "Sol"
@@ -1976,9 +1976,9 @@ func _correio(parent: Node, nome: String, id: StringName, chao: Vector3, mesa: V
 	if props.get("selos", 1) == 0:
 		c.prompt_abrir = "Abrir o telegrama"
 		c.prompt_examinar = "Examinar o envelope do telegrama"
-	c.som_chegada = load(SFX_DIR + "correio_fresta.wav")
-	c.som_mao = load(SFX_DIR + "papel_pegar.wav")
-	c.som_abrir = load(SFX_DIR + "papel_rasgando.wav")
+	c.som_chegada = _sfx("correio_fresta.wav")
+	c.som_mao = _sfx("papel_pegar.wav")
+	c.som_abrir = _sfx("papel_rasgando.wav")
 	return c
 
 
@@ -2000,9 +2000,9 @@ func _amarradas(parent: Node, id: StringName, chao: Vector3, mesa: Vector3, cart
 	c.prompt_abrir = "Desamarrar o maço"
 	c.some_ao_abrir = true
 	c.soltar = cartas
-	c.som_chegada = load(SFX_DIR + "correio_fresta.wav")
-	c.som_mao = load(SFX_DIR + "papel_pegar.wav")
-	c.som_abrir = load(SFX_DIR + "papel_pegar.wav")
+	c.som_chegada = _sfx("correio_fresta.wav")
+	c.som_mao = _sfx("papel_pegar.wav")
+	c.som_abrir = _sfx("papel_pegar.wav")
 	for carta in cartas:
 		_dentro(carta.get_parent(), id)
 	return c
@@ -2167,9 +2167,9 @@ func _vigilia(g: Node3D) -> void:
 	v.linha_inicio = load("res://narrative/narration/vigilia_inicio.tres")
 	v.linha_fim = load("res://narrative/narration/cartao_7_setembro.tres")
 	v.data_fim = Lapso.dia_do_ano(9, 7)
-	v.campainha = load(SFX_DIR + "campainha.wav")
-	v.som_janela = load(SFX_DIR + "gaveta.wav")
-	v.som_vento = load(SFX_DIR + "noite.wav")
+	v.campainha = _sfx("campainha.wav")
+	v.som_janela = _sfx("janela.wav")
+	v.som_vento = _sfx("vento.wav")
 	var fechar := _area(v, Interactable.new(), "FecharJanela", Vector3(1.5, 1.1, 0.2), Vector3(0, 1.35, -D + 0.3)) as Interactable
 	fechar.prompt = "Fechar a janela"
 	v.fechar = fechar
@@ -2356,11 +2356,11 @@ func _telefone(parent: Node, ids: Array = ["agencia_arkham", "boston", "telegram
 	_box(g, "Manivela", Vector3(0.012, 0.08, 0.012), Vector3(0.14, 0.02, -0.03), "ferro")
 	var tel := _area(g, Telefone.new(), nome, Vector3(0.36, 0.45, 0.3), Vector3(0, 0, -0.08)) as Telefone
 	tel.unique_name_in_owner = nome == "Telefone"
-	tel.campainha = load(SFX_DIR + "campainha.wav")
-	tel.gancho = load(SFX_DIR + "telefone_gancho.wav")
-	tel.manivela = load(SFX_DIR + "telefone_manivela.wav")
-	tel.linha = load(SFX_DIR + "telefone_linha.wav")
-	tel.voz = load(SFX_DIR + "telefone_voz.wav")
+	tel.campainha = _sfx("campainha.wav")
+	tel.gancho = _sfx("telefone_gancho.wav")
+	tel.manivela = _sfx("telefone_manivela.wav")
+	tel.linha = _sfx("telefone_linha.wav")
+	tel.voz = _sfx("telefone_voz.wav")
 	var ligs: Array[Ligacao] = []
 	for id in ids:
 		ligs.append(load("res://narrative/ligacoes/%s.tres" % id))
@@ -2438,9 +2438,9 @@ func _dia_3(parent: Node) -> Node3D:
 	pac.abas = abas
 	pac.mao_posicao = Vector3(0.19, -0.26, -0.56)
 	pac.mao_rotacao = Vector3(22, -24, 0)
-	pac.som_chegada = load(SFX_DIR + "pacote_chao.wav")
-	pac.som_mao = load(SFX_DIR + "papel_pegar.wav")
-	pac.som_abrir = load(SFX_DIR + "papel_rasgando.wav")
+	pac.som_chegada = _sfx("pacote_chao.wav")
+	pac.som_mao = _sfx("papel_pegar.wav")
+	pac.som_abrir = _sfx("papel_rasgando.wav")
 	var etiqueta := Label3D.new()
 	etiqueta.name = "EtiquetaTexto"
 	etiqueta.text = "AMERICAN RAILWAY EXPRESS\nFrom H. W. Akeley, Brattleboro, Vt.\nTo A. N. Wilmarth, Arkham, Mass."
@@ -2566,13 +2566,13 @@ func _lareira_noite(parent: Node, n: int) -> void:
 	fogo.energia = 2.0
 	var crepitar := AudioStreamPlayer3D.new()
 	crepitar.name = "Crepitar"
-	crepitar.stream = load(SFX_DIR + "lareira.wav")
+	crepitar.stream = _sfx("lareira.wav")
 	crepitar.autoplay = true
 	crepitar.bus = &"Ambience"
 	crepitar.volume_db = -6.0
 	crepitar.unit_size = 2.5
 	_add(fogo, crepitar)
-	acender.som = load(SFX_DIR + "fosforo.wav")
+	acender.som = _sfx("fosforo.wav")
 
 
 ## Os sonhos da noite depois de cada dia (Escritorio._sonhar): cada um num grupo
@@ -2651,7 +2651,7 @@ func _sonho_garras(g: Node3D) -> void:
 	# volta larga e outra mais fechada, chegando perto dele.
 	var rastro := Rastro.new()
 	rastro.name = "Rastro"
-	rastro.som = load(SFX_DIR + "lama.wav")
+	rastro.som = _sfx("lama.wav")
 	_add(g, rastro)
 	var centro := Vector2(0.05, -1.4)
 	var voltas: Array[Vector3] = []
@@ -2917,7 +2917,7 @@ func _sonho_pedra(g: Node3D) -> void:
 	luz.shadow_enabled = true
 	var voz := AudioStreamPlayer3D.new()
 	voz.name = "Voz"
-	voz.stream = load(SFX_DIR + "zumbido.wav")
+	voz.stream = _sfx("zumbido.wav")
 	voz.autoplay = true
 	voz.bus = &"Whisper"
 	voz.volume_db = -4.0
@@ -3011,14 +3011,14 @@ func _sonho_telefone(g: Node3D) -> void:
 	chuva.name = "ChuvaDentro"
 	var som := AudioStreamPlayer3D.new()
 	som.name = "Chuva"
-	som.stream = load(SFX_DIR + "chuva.wav")
+	som.stream = _sfx("chuva.wav")
 	som.autoplay = true
 	som.bus = &"Ambience"
 	som.position = Vector3(0, 2.0, 0)
 	som.unit_size = 6.0
 	_add(g, som)
 	var tel := _telefone(g, ["sonho_telefone"], "TelefoneSonho")
-	tel.voz = load(SFX_DIR + "zumbido.wav")
+	tel.voz = _sfx("zumbido.wav")
 	tel.voz_db = -6.0
 
 
@@ -3207,7 +3207,7 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 	f.unique_name_in_owner = true
 	f.gravacao = load("res://narrative/gravacoes/disco_1915.tres")
 	f.gravacao_longa = load("res://narrative/gravacoes/disco_1915_longo.tres")
-	f.zumbido = load(SFX_DIR + "zumbido.wav")
+	f.zumbido = _sfx("zumbido.wav")
 	f.narracao_depois = load("res://narrative/narration/depois_do_disco.tres")
 	f.luz = dia3.get_node("Abajur/Luz")
 	# O cilindro está à mão quando o estojo sai do pacote (a última peça).
