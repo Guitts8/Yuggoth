@@ -147,6 +147,16 @@ func _materiais() -> void:
 	_mat("alfinete", "grao", {world = 6.0, cor = Color(0.78, 0.07, 0.05)})
 	_mat("fio", "barbante", {world = 8.0, cor = Color(1.6, 0.25, 0.2)})
 	_mat("alfinete_preto", "grao", {world = 6.0, cor = Color(0.12, 0.1, 0.1)})
+	# A sala acumula (Fase 5): os livros de folclore da biblioteca, a planta da janela.
+	_mat("livro_rubro", "capa_livro", {world = 6.0, cor = Color(1.15, 0.7, 0.65)})
+	_mat("livro_verde", "capa_livro", {world = 6.0, cor = Color(0.55, 0.85, 0.6)})
+	_mat("livro_pardo", "capa_livro", {world = 6.0, cor = Color(0.95, 0.85, 0.65)})
+	_mat("terracota", "grao", {world = 6.0, cor = Color(0.66, 0.36, 0.24)})
+	_mat("terra", "cinzas", {world = 6.0, cor = Color(0.5, 0.38, 0.3)})
+	_mat("folha_verde", "grao", {world = 8.0, cor = Color(0.32, 0.55, 0.26)})
+	_mat("folha_amarela", "grao", {world = 8.0, cor = Color(0.72, 0.66, 0.28)})
+	_mat("folha_seca", "grao", {world = 8.0, cor = Color(0.55, 0.42, 0.24)})
+	_mat("folha_morta", "grao", {world = 8.0, cor = Color(0.36, 0.27, 0.18)})
 	_mat("esmalte_verde", "aco", {world = 6.0, cor = Color(0.24, 0.36, 0.27)})
 	_mat("porcelana", "grao", {world = 6.0, cor = Color(1.02, 1.0, 0.95)})
 	# Os líquidos sobre o grão neutro (playtest 6: no papel, em coordenadas de
@@ -1995,6 +2005,130 @@ func _cesto(parent: Node) -> void:
 	_colisao(c, "Colisao", [[Vector3(0.3, 0.34, 0.3), Vector3(0, 0.17, 0)]])
 
 
+## A sala acumula (Fase 5), dia a dia, sem que ninguém comente: os livros de
+## folclore da biblioteca (dois no armário no Dia 2; pilhas no chão depois; por
+## toda parte no Dia 6), as xícaras que ninguém leva embora (a última caída), a
+## planta da janela que amarela, seca e morre, e no cesto as bolas de papel das
+## cartas amassadas (`folhas_amassadas`, uma por Esc ao escrever).
+func _acumula(parent: Node) -> void:
+	var g := _group(parent, "Acumula")
+	var desde := func(n: int) -> Condition: return _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, n)
+	var so := func(n: int) -> Condition: return _cond_valor(&"dia", ValueCondition.Op.IGUAL, n)
+
+	# Os livros.
+	var d2 := _grupo_se(g, "LivrosDia2", desde.call(2))
+	_pilha(d2, "Armario", Vector3(-2.2, 0.905, 2.2), 2, 11)
+	var d3 := _grupo_se(g, "LivrosDia3", desde.call(3))
+	_pilha(d3, "ChaoNoroeste", Vector3(-1.62, 0, -2.62), 5, 12)
+	var d4 := _grupo_se(g, "LivrosDia4", desde.call(4))
+	_pilha(d4, "ChaoMesa", Vector3(1.05, 0, -2.55), 6, 13)
+	_livro_aberto(d4, "AbertoArmario", Vector3(-2.12, 0.905, 2.55), 70.0, "livro_verde")
+	var d5 := _grupo_se(g, "LivrosDia5", desde.call(5))
+	_pilha(d5, "ChaoOeste", Vector3(-2.22, 0, 1.15), 7, 14)
+	_pilha(d5, "ChaoOeste2", Vector3(-2.2, 0, 0.82), 4, 15)
+	var d6 := _grupo_se(g, "LivrosDia6", desde.call(6))
+	_livro_aberto(d6, "AbertoChao", Vector3(0.55, 0.0, 1.55), -20.0, "livro_rubro")
+	_livro_aberto(d6, "AbertoPeitoril", Vector3(-0.3, JANELA_Y.x + 0.02, -D + 0.12), 8.0, "livro_pardo")
+	_pilha(d6, "ChaoPorta", Vector3(-1.75, 0, 2.62), 5, 16)
+	_pilha(d6, "Arquivo", Vector3(W - 0.31, 1.32, -D + 0.42), 3, 17)
+
+	# As xícaras com o fundo de café.
+	_xicara_suja(_grupo_se(g, "XicaraDia2", desde.call(2)), "Peitoril", Vector3(0.18, JANELA_Y.x + 0.02, -D + 0.12), 0.0)
+	_xicara_suja(_grupo_se(g, "XicaraDia4", desde.call(4)), "Armario", Vector3(-2.0, 0.905, 1.98), 40.0)
+	_xicara_suja(_grupo_se(g, "XicaraDia5", desde.call(5)), "Chao", Vector3(-1.4, 0.0, -2.45), -15.0)
+	var caida := _grupo_se(g, "XicaraCaida", desde.call(6))
+	_xicara_suja(caida, "Caida", Vector3(-0.98, 0.0, -1.62), 120.0, true)
+
+	# A planta da janela, no peitoril, à esquerda.
+	var vaso := _group(g, "Planta", Vector3(-0.62, JANELA_Y.x + 0.02, -D + 0.12))
+	_cyl(vaso, "Vaso", 0.055, 0.042, 0.1, Vector3(0, 0.05, 0), "terracota", 9)
+	_cyl(vaso, "Borda", 0.062, 0.062, 0.018, Vector3(0, 0.1, 0), "terracota", 9)
+	_cyl(vaso, "Terra", 0.05, 0.05, 0.004, Vector3(0, 0.095, 0), "terra", 9)
+	_cyl(vaso, "Pratinho", 0.065, 0.06, 0.01, Vector3(0, 0.005, 0), "terracota", 9)
+	# [dia de, dia até, material, quanto as folhas caem (graus), folhas caídas no peitoril]
+	for e: Array in [[1, 3, "folha_verde", 0.0, 0], [4, 4, "folha_amarela", 18.0, 1], [5, 5, "folha_seca", 40.0, 3], [6, 9, "folha_morta", 72.0, 6]]:
+		var cond := _composta(CompositeCondition.Mode.TODAS, [desde.call(e[0]), _cond_valor(&"dia", ValueCondition.Op.MENOR_OU_IGUAL, e[1])])
+		var est := _grupo_se(vaso, "Folhas%d" % e[0], cond)
+		_folhagem(est, e[2], e[3], e[4])
+
+	# O cesto: as cartas amassadas (até dez; as duas últimas no chão, ao lado).
+	var cesto := _group(g, "Amassadas", Vector3(1.0, 0, -1.95))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 71
+	for k in 10:
+		var bola := _grupo_se(cesto, "Bola%d" % k, _cond_valor(&"folhas_amassadas", ValueCondition.Op.MAIOR_OU_IGUAL, k + 1))
+		var dentro := k < 8
+		var a := rng.randf_range(0.0, TAU)
+		var r := rng.randf_range(0.0, 0.07) if dentro else 0.24 + k * 0.05
+		bola.position = Vector3(cos(a) * r, (0.06 + k * 0.03) if dentro else 0.035, sin(a) * r)
+		var b := _cyl(bola, "Papel", 0.035, 0.035, 0.06, Vector3.ZERO, "papel", 5)
+		b.rotation_degrees = Vector3(rng.randf_range(0, 180), rng.randf_range(0, 180), rng.randf_range(0, 180))
+		var b2 := _box(bola, "Dobra", Vector3(0.055, 0.05, 0.055), Vector3.ZERO, "papel")
+		b2.rotation_degrees = Vector3(rng.randf_range(0, 90), rng.randf_range(0, 90), rng.randf_range(0, 90))
+
+
+## Uma pilha de `n` livros da biblioteca, deitados, cada um um pouco torto.
+func _pilha(pai: Node3D, nome: String, pos: Vector3, n: int, semente: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = semente
+	var p := _group(pai, "Pilha" + nome, pos)
+	var y := 0.0
+	var mats := ["livro_rubro", "livro_verde", "livro_pardo"]
+	for k in n:
+		var tam := Vector3(rng.randf_range(0.15, 0.2), rng.randf_range(0.025, 0.05), rng.randf_range(0.21, 0.27))
+		var l := _box(p, "Livro%d" % k, tam, Vector3(rng.randf_range(-0.015, 0.015), y + tam.y / 2.0, rng.randf_range(-0.015, 0.015)), mats[rng.randi() % 3])
+		l.rotation_degrees.y = rng.randf_range(-25.0, 25.0)
+		# As páginas: o corte claro de um lado.
+		_box(l, "Corte", Vector3(0.006, tam.y * 0.8, tam.z * 0.94), Vector3(tam.x / 2.0, 0, 0), "papel")
+		y += tam.y
+
+
+## Um livro aberto, as páginas para cima (lido e largado).
+func _livro_aberto(pai: Node3D, nome: String, pos: Vector3, rot_y: float, mat: String) -> void:
+	var l := _group(pai, "Livro" + nome, pos, rot_y)
+	for s in [-1, 1]:
+		var capa := _box(l, "Capa%d" % (s + 1), Vector3(0.16, 0.006, 0.23), Vector3(s * 0.08, 0.003, 0), mat)
+		capa.rotation_degrees.z = s * -4.0
+		var folhas := _box(l, "Folhas%d" % (s + 1), Vector3(0.15, 0.018, 0.22), Vector3(s * 0.078, 0.014, 0), "papel")
+		folhas.rotation_degrees.z = s * -6.0
+
+
+## Uma xícara usada no pires, com o fundo de café seco; `caida`, tombada no chão,
+## com a mancha.
+func _xicara_suja(pai: Node3D, nome: String, pos: Vector3, rot_y: float, caida := false) -> void:
+	var x := _group(pai, "Xicara" + nome, pos, rot_y)
+	var pires := _cyl(x, "Pires", 0.07, 0.055, 0.01, Vector3(0, 0.005, 0), "porcelana", 10)
+	var copo := _group(x, "Copo", Vector3(0, 0.01, 0))
+	_cyl(copo, "Corpo", 0.042, 0.032, 0.055, Vector3(0, 0.0275, 0), "porcelana", 10)
+	_cyl(copo, "Fundo", 0.036, 0.036, 0.003, Vector3(0, 0.046, 0), "cafe", 10)
+	_box(copo, "Asa", Vector3(0.025, 0.03, 0.008), Vector3(0.048, 0.03, 0), "porcelana")
+	if caida:
+		pires.position = Vector3(0.12, 0.005, 0.04)
+		copo.position = Vector3(0, 0.04, 0)
+		copo.rotation_degrees = Vector3(0, 0, 90)
+		var mancha := _quad(x, "Mancha", Vector2(0.16, 0.1), Vector3(-0.09, 0.002, 0), Vector3(-90, 0, 0), "cafe")
+		mancha.rotation_degrees.y = 25.0
+
+
+## As folhas da planta: hastes que sobem e se abrem; `cai` as dobra para baixo;
+## `caidas` folhas soltas no peitoril.
+func _folhagem(pai: Node3D, mat: String, cai: float, caidas: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 81
+	for k in 9:
+		var a := TAU * k / 9.0 + rng.randf_range(-0.2, 0.2)
+		var haste := _group(pai, "Haste%d" % k, Vector3(cos(a) * 0.015, 0.1, sin(a) * 0.015))
+		haste.rotation = Vector3(0, -a, 0)
+		var inclina := rng.randf_range(15.0, 40.0) + cai * (0.6 + 0.4 * rng.randf())
+		var comprido := rng.randf_range(0.12, 0.2)
+		var folha := _box(haste, "Folha", Vector3(0.012, comprido, 0.035), Vector3.ZERO, mat)
+		folha.rotation_degrees.z = -inclina
+		folha.position = Vector3(sin(deg_to_rad(inclina)), cos(deg_to_rad(inclina)), 0) * comprido / 2.0
+	for k in caidas:
+		var solta := _box(pai, "Caida%d" % k, Vector3(0.03, 0.003, 0.11), Vector3(rng.randf_range(-0.16, 0.16), 0.0015, rng.randf_range(-0.05, 0.06)), mat)
+		solta.rotation_degrees.y = rng.randf_range(0, 180)
+
+
 ## Cortinas de veludo, abertas, uma de cada lado da janela; pregas de verdade
 ## (faixas em zigue-zague), para a luz facetada mostrar o caimento.
 func _cortinas(parent: Node) -> void:
@@ -2007,7 +2141,24 @@ func _cortinas(parent: Node) -> void:
 		for k in 6:
 			var ang := 28.0 if k % 2 else -28.0
 			pecas.append([Vector3(0.085, alt, 0.012), Vector3(s * (1.06 + k * 0.075), 0.04 + alt / 2, 0), Vector3(0, ang, 0), Color.WHITE])
-		_lote(g, "Cortina%s" % ("O" if s < 0 else "L"), pecas, "cortina")
+		var c := _lote(g, "Cortina%s" % ("O" if s < 0 else "L"), pecas, "cortina")
+		if s > 0:
+			# A da direita, aberta até o Dia 5 (Fase 5: no Dia 6, meio fechada).
+			var cn := ConditionalNode.new()
+			cn.name = "AteODia6"
+			cn.condition = _cond_valor(&"dia", ValueCondition.Op.MENOR, 6)
+			_add(c, cn)
+	# A da direita meio fechada (Dia 6, depois do vulto na janela): as pregas
+	# avançam sobre a folha da direita.
+	var meia := []
+	for k in 7:
+		var ang := 28.0 if k % 2 else -28.0
+		meia.append([Vector3(0.085, 2.52, 0.012), Vector3(0.5 + k * 0.075, 0.04 + 1.26, 0), Vector3(0, ang, 0), Color.WHITE])
+	var c6 := _lote(g, "CortinaLMeia", meia, "cortina")
+	var cn6 := ConditionalNode.new()
+	cn6.name = "NoDia6"
+	cn6.condition = _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, 6)
+	_add(c6, cn6)
 
 
 # --- Os dias --------------------------------------------------------------------
@@ -2188,6 +2339,7 @@ func _dias(parent: Node) -> void:
 	_telefone(parent)
 	_dia_5(parent)
 	_dia_6(parent)
+	_acumula(parent)
 
 
 ## Dia 6 (cap. IV): de 28 de agosto às três últimas cartas manuscritas. Abre com
@@ -2290,7 +2442,7 @@ func _ligar_vigilia() -> void:
 	var v := cena.find_child("Vigilia", true, false) as Vigilia
 	v.lapso = cena.get("lapso")
 	v.folha = cena.get_node("Estrutura/Janela/FolhaBaixoL") as Node3D
-	v.cortinas.assign([cena.find_child("CortinaO", true, false), cena.find_child("CortinaL", true, false)])
+	v.cortinas.assign([cena.find_child("CortinaO", true, false), cena.find_child("CortinaL", true, false), cena.find_child("CortinaLMeia", true, false)])
 	v.aparelho = cena.find_child("TelefoneParede", true, false) as Node3D
 	cena.set("vigilia", v)
 

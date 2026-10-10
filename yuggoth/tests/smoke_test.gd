@@ -318,6 +318,9 @@ func _ready() -> void:
 	await _press(&"ui_cancel")
 	_check(writer.visible and writer._chosen == null and writer.choices.visible, "Esc amassa a folha: de volta às aberturas")
 	_check(GameState.get_value(&"resposta_dia_1") == null and not escrever.reply.is_done(), "recomeçar não decide nada")
+	var bola: Node3D = esc.find_child("Bola0", true, false)
+	_check(GameState.get_value(&"folhas_amassadas") == 1 and bola.visible and not esc.find_child("Bola1", true, false).visible,
+		"a folha amassada vai para o cesto (Fase 5)")
 	writer._choose(escrever.reply.options[2])
 	writer._finish_writing()
 	writer._seal()

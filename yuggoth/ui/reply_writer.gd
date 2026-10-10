@@ -15,6 +15,8 @@ var _tween: Tween
 var _pen: AudioStreamPlayer
 var _opened_frame := -1
 var _selando := false
+## A folha amassada (CC0, audio/foley/FONTES.md).
+var _som_amassar: AudioStream = preload("res://audio/foley/papel_amassado.wav")
 
 @onready var title_label: Label = %Title
 @onready var choices: VBoxContainer = %Choices
@@ -82,6 +84,10 @@ func _focar_primeira() -> void:
 
 ## Amassa a folha: de volta às aberturas, nada decidido.
 func _recomecar() -> void:
+	# A folha amassada vai para o cesto (Fase 5: as bolas de papel acumulam lá).
+	if _chosen:
+		GameState.add(&"folhas_amassadas", 1)
+		AudioDirector.play_sfx(_som_amassar, -6.0)
 	if _tween:
 		_tween.kill()
 		_tween = null

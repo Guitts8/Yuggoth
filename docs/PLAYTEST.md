@@ -68,6 +68,10 @@ o que esperava.
 - [ ] **O mapa do condado** (parede oeste, acima do armário): lida uma carta que cita
       lugares, "Marcar no mapa" — os alfinetes, o fio vermelho, os nomes à mão. Examine
       e aproxime (roda): lê-se? O fio ajuda a ver a história no mapa?
+- [ ] **A sala acumula** (dia a dia): os livros de folclore no armário e no chão, as
+      xícaras usadas, a planta do peitoril que amarela e morre, a cortina meio fechada
+      no Dia 6, as bolas de papel no cesto (amasse uma carta com Esc). Nota-se sem
+      ninguém dizer? Algo atrapalha o caminho?
 
 ### O resto da lista do playtest 8
 - [ ] **O nome:** *Yuggoth*, no menu (em gótica rubra) e no .exe.

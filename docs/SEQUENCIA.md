@@ -57,6 +57,13 @@ enchentes do recorte, em alfinetes pretos); Dia 2: a caverna; Dia 3: o Pântano 
 Brattleboro; Dia 4: Bellows Falls, Keene; Dia 5: o fio cortado ao norte de Newfane.
 Nada obriga; sem o que marcar, "Examinar o mapa".
 
+**A sala acumula** (Fase 5), sem que ninguém comente: os livros de folclore da
+biblioteca se espalham (dois no armário no Dia 2; pilhas no chão; abertos por toda
+parte no Dia 6); as xícaras usadas ficam pela sala (no Dia 6, uma caída no chão, com
+a mancha); a planta do peitoril amarela (Dia 4), seca (5) e morre (6); a cortina da
+direita está meio fechada no Dia 6; e cada carta amassada (Esc ao escrever) vira uma
+bola de papel no cesto.
+
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
 chão, junto à porta, iluminados pela luz do corredor que entra por baixo dela.

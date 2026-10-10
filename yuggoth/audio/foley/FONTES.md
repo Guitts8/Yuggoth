@@ -15,7 +15,7 @@ sobrenatural — o zumbido, o disco, as vozes, o sonho — continua sintetizado 
 | [Rain (loopable)](https://opengameart.org/content/rain-loopable) | Ylmir | chuva |
 | [Fireplace Sound loop](https://opengameart.org/content/fireplace-sound-loop) | PagDev | lareira |
 | [Fire Crackling](https://opengameart.org/node/16327) | AntumDeluge | lareira (os estalos) |
-| [Various Paper Sound Effects](https://opengameart.org/node/127323) | Luckius | papel_pegar, papel_rasgando, correio_fresta |
+| [Various Paper Sound Effects](https://opengameart.org/node/127323) | Luckius | papel_pegar, papel_amassado, papel_rasgando, correio_fresta |
 | [Different steps on wood, stone, leaves, gravel and mud](https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud) | TinyWorlds | passo_madeira_1–3, lama |
 | [Doorbell ring](https://opengameart.org/content/doorbell-ring) (Doorbell-old-tring, Wikimedia Commons) | — | campainha (o telefone de parede) |
 | [Crickets Ambient Noise (loopable)](https://opengameart.org/content/crickets-ambient-noise-loopable) | Wolfgang_ | noite |

@@ -220,6 +220,8 @@ def telefone():
 
 def papel():
     salvar("papel_pegar", sala(aparar(ler("x/sounds_6/WAV/Paper Sound - 1.wav")), 0.25, 0.08, semente=13), alvo=0.7)
+    # A folha amassada (Esc ao escrever: vai para o cesto).
+    salvar("papel_amassado", sala(aparar(ler("x/sounds_6/WAV/Paper Crushed - 2.wav")), 0.25, 0.08, semente=27), alvo=0.75)
     salvar("papel_rasgando", sala(aparar(ler("x/sounds_6/WAV/Paper Ripped - 1.wav")), 0.25, 0.08, semente=14), alvo=0.8)
     # A carta pela fresta: o papel que escorrega e o tapa no chão.
     desliza = aparar(ler("x/sounds_6/WAV/Paper Sound - 3.wav"))

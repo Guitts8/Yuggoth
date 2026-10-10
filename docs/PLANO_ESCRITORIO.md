@@ -1080,7 +1080,19 @@ Dia 1.
 | 5 | o fio cortado ao norte de Newfane (a carta de 15 de agosto) |
 | 6 | — |
 
-## Fase 5 — A sala acumula (por dia, `dia >= N`)
+## Fase 5 — A sala acumula (por dia, `dia >= N`) ✅ (2026-10-09, antes do playtest 9)
+Feito (`gerar_escritorio._acumula`), sem fala nenhuma: os livros de folclore da
+biblioteca (dois no armário no Dia 2; uma pilha no chão a noroeste no 3; outra junto à
+mesa e um aberto no armário no 4; duas junto à parede oeste no 5; no 6, abertos no chão
+e no peitoril, pilhas junto à porta e em cima do arquivo); as xícaras usadas, com o
+fundo de café (no peitoril no 2; no armário no 4; no chão no 5; no 6, uma caída com a
+mancha); a planta no peitoril, à esquerda (verde até o 3, amarelando no 4, seca no 5,
+morta no 6, com as folhas caídas); a cortina da direita meio fechada no Dia 6 (a vigília
+balança também ela); e no cesto as bolas de papel: cada Esc ao escrever amassa a folha
+(`folhas_amassadas`, com o som de papel amassado, CC0) e uma bola aparece no cesto (até
+oito; mais duas no chão). Diferenças da tabela: os livros do Dia 2 ficam no armário, não
+na mesa (a mesa já está cheia de correio); a cortina fecha na troca de dia (no Dia 5 ela
+pularia de lugar diante do jogador).
 | | Dia 1 | Dia 2 | Dia 3 | Dia 4 | Dia 5 | Dia 6 |
 |---|---|---|---|---|---|---|
 | Livros de folclore da biblioteca | — | 2 na mesa | pilha | pilha no chão | duas pilhas | por toda parte |
