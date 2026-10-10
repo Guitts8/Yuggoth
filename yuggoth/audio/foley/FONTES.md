@@ -10,7 +10,7 @@ sobrenatural — o zumbido, o disco, as vozes, o sonho — continua sintetizado 
 
 | Fonte (CC0) | Autor | Usado em |
 |---|---|---|
-| [50 RPG sound effects](https://opengameart.org/content/50-rpg-sound-effects) | Kenney (kenney.nl) | passos (o estalo grave), porta_trinco, telefone_gancho, correio_fresta, pacote_chao, selo_batido, menu_capa, menu_baque |
+| [50 RPG sound effects](https://opengameart.org/content/50-rpg-sound-effects) | Kenney (kenney.nl) | passos (o estalo grave), alfinete, porta_trinco, telefone_gancho, correio_fresta, pacote_chao, selo_batido, menu_capa, menu_baque |
 | [Book Flip Sounds](https://opengameart.org/content/book-flip-sounds) | Voltiment555 | menu_folha |
 | [Rain (loopable)](https://opengameart.org/content/rain-loopable) | Ylmir | chuva |
 | [Fireplace Sound loop](https://opengameart.org/content/fireplace-sound-loop) | PagDev | lareira |

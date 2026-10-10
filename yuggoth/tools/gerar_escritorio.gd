@@ -142,6 +142,11 @@ func _materiais() -> void:
 	_mat("porta", "porta", {})
 	_mat("quadro", "quadro", {})
 	_mat("diploma", "diploma", {})
+	_mat("mapa_vermont", "mapa_vermont", {})
+	# Os alfinetes de cabeça vermelha e o fio vermelho do mapa (Fase 4).
+	_mat("alfinete", "grao", {world = 6.0, cor = Color(0.78, 0.07, 0.05)})
+	_mat("fio", "barbante", {world = 8.0, cor = Color(1.6, 0.25, 0.2)})
+	_mat("alfinete_preto", "grao", {world = 6.0, cor = Color(0.12, 0.1, 0.1)})
 	_mat("esmalte_verde", "aco", {world = 6.0, cor = Color(0.24, 0.36, 0.27)})
 	_mat("porcelana", "grao", {world = 6.0, cor = Color(1.02, 1.0, 0.95)})
 	# Os líquidos sobre o grão neutro (playtest 6: no papel, em coordenadas de
@@ -997,6 +1002,7 @@ func _miskatonic() -> void:
 	_arquivo(g)
 	_cesto(g)
 	_quadros(g)
+	_mapa(g)
 	_cortinas(g)
 
 	# Os dias somem enquanto se sonha (Escritorio._sonhar).
@@ -1044,6 +1050,107 @@ func _miskatonic() -> void:
 	for mi: MeshInstance3D in a.find_children("*", "MeshInstance3D", false, false):
 		mi.layers = CAMADA_SEM_FRESTA
 	_colisao(a, "Colisao", [[Vector3(0.8, 0.9, 0.5), Vector3(0, 0.45, 0)]])
+
+
+## O mapa da parede (Fase 4): o condado de Windham (onde quase tudo acontece), com
+## o estado inteiro num quadro no alto; na parede oeste, acima do armário, ao lado
+## do quadro de recortes — os dois juntos viram o quadro da investigação. O papel
+## (gerar_assets._mapa_vermont), a moldura, os nomes impressos (inglês) e o
+## MapaInvestigacao com os lugares do livro: cada um aparece para marcar quando a
+## carta que o cita foi lida.
+const VT := preload("res://tools/vermont.gd")
+
+func _mapa(g: Node3D) -> void:
+	var larg := 1.12
+	var tam := Vector2(larg, larg / VT.proporcao())
+	var quadro := _group(g, "MapaVermont", Vector3(-W, 0.98 + tam.y / 2.0, 2.08), 90)
+	_box(quadro, "Moldura", Vector3(tam.x + 0.07, tam.y + 0.07, 0.025), Vector3(0, 0, 0.0125), "madeira_escura")
+	var papel := _group(quadro, "Papel", Vector3(0, 0, 0.0265))
+	_quad(papel, "Folha", tam, Vector3.ZERO, Vector3.ZERO, "mapa_vermont")
+	var no_papel := func(uv: Vector2) -> Vector3:
+		return Vector3((uv.x - 0.5) * tam.x, (0.5 - uv.y) * tam.y, 0.0012)
+	var pos := func(lat: float, lon: float) -> Vector3:
+		return no_papel.call(VT.uv(lat, lon))
+	# As cidades impressas, à direita do ponto.
+	for c: Array in VT.CIDADES:
+		var l := _rotulo_mapa(papel, "Cidade_" + String(c[0]).replace(" ", "").replace(".", ""), c[0], pos.call(c[1], c[2]), 0.00015, FONTE_MAPA, Color(0.2, 0.14, 0.1))
+		l.position.x += 0.007 + _largura(c[0], FONTE_MAPA, l.pixel_size) / 2.0
+	# Os vizinhos, os rios e o título.
+	for t: Array in [["N E W   H A M P S H I R E", 42.99, 72.25, 0.00016, VERSALETE], ["M A S S A C H U S E T T S", 42.713, 72.78, 0.00014, VERSALETE],
+			["West River", 43.165, 72.82, 0.00014, ITALICO], ["Connecticut River", 42.97, 72.47, 0.00014, ITALICO]]:
+		var l := _rotulo_mapa(papel, "Rotulo_" + String(t[0]).replace(" ", ""), t[0], pos.call(t[1], t[2]), t[3], t[4], Color(0.3, 0.3, 0.32) if t[4] == ITALICO else Color(0.35, 0.27, 0.2))
+		if t[0] == "Connecticut River":
+			l.rotation_degrees.z = 62.0
+		elif t[0] == "West River":
+			l.rotation_degrees.z = -55.0
+	_rotulo_mapa(papel, "Titulo", "Windham County", pos.call(42.81, 72.27), 0.00048, FRAKTUR, Color(0.18, 0.1, 0.08))
+	_rotulo_mapa(papel, "Subtitulo", "STATE OF VERMONT\nfrom the latest surveys · 1925", pos.call(42.762, 72.27), 0.00013, VERSALETE, Color(0.3, 0.22, 0.16))
+	var q := VT.QUADRO
+	_rotulo_mapa(papel, "QuadroTitulo", "Vermont", no_papel.call(Vector2(q.position.x + q.size.x * 0.5, q.end.y - 0.025)), 0.0002, FRAKTUR, Color(0.2, 0.12, 0.08))
+
+	# Os lugares do livro: [id, nome à mão ("" = impresso), uv, a carta que o cita,
+	# rótulo (m), no fio vermelho?]. As enchentes do recorte ficam fora do fio, de
+	# alfinete preto (duas no quadro do estado).
+	var lugares := [
+		["townshend", "Akeley", VT.uv(43.025, 72.68), &"leu_carta_akeley_1", Vector2(0.012, -0.016), true],
+		["montanha_escura", "Montanha Escura", VT.uv(43.002, 72.712), &"leu_carta_akeley_1", Vector2(-0.012, 0.006), true],
+		["round_hill", "Round Hill", VT.uv(43.062, 72.625), &"leu_carta_akeley_1", Vector2(0.012, 0.004), true],
+		["winooski", "", VT.uv_quadro(44.3, 72.66), &"leu_recorte_reformer_enchentes", Vector2.ZERO, false],
+		["west", "", VT.uv(43.12, 72.772), &"leu_recorte_reformer_enchentes", Vector2.ZERO, false],
+		["passumpsic", "", VT.uv_quadro(44.6, 72.02), &"leu_recorte_reformer_enchentes", Vector2.ZERO, false],
+		["caverna", "a caverna", VT.uv(42.993, 72.735), &"leu_carta_akeley_2", Vector2(-0.012, -0.008), true],
+		["lee", "Pântano de Lee", VT.uv(42.978, 72.758), &"leu_transcricao_disco", Vector2(-0.012, -0.012), true],
+		["brattleboro", "", VT.uv(42.851, 72.558), &"leu_bilhete_disco", Vector2.ZERO, true],
+		["bellows_falls", "", VT.uv(43.134, 72.444), &"leu_telegrama_pedra", Vector2.ZERO, true],
+		["keene", "", VT.uv(42.934, 72.278), &"leu_carta_akeley_julho", Vector2.ZERO, true],
+		["newfane", "o fio cortado", VT.uv(43.012, 72.643), &"leu_carta_akeley_15_agosto", Vector2(0.012, -0.012), true],
+	]
+	var mapa := _area(papel, MapaInvestigacao.new(), "Mapa", Vector3(tam.x, tam.y, 0.08), Vector3(0, 0, 0.04)) as MapaInvestigacao
+	mapa.unique_name_in_owner = true
+	mapa.visual = quadro
+	mapa.papel = papel
+	mapa.tamanho = tam
+	mapa.title = "O mapa do condado"
+	mapa.description = "O condado de Windham, da biblioteca, e o estado num canto. Os alfinetes, o fio e os nomes à mão são meus."
+	mapa.initial_rotation = Vector3.ZERO
+	mapa.mat_alfinete = m["alfinete"]
+	mapa.mat_alfinete_preto = m["alfinete_preto"]
+	mapa.mat_fio = m["fio"]
+	mapa.fonte_mao = load(CALIGRAFIA)
+	mapa.som_alfinete = _sfx("alfinete.wav")
+	var conds: Array[Condition] = []
+	for l: Array in lugares:
+		mapa.ids.append(l[0])
+		mapa.nomes.append(l[1])
+		mapa.uvs.append(l[2])
+		mapa.rotulos.append(l[4])
+		mapa.trilha.append(1 if l[5] else 0)
+		conds.append(_flag(l[3]))
+	mapa.condicoes = conds
+
+
+const FONTE_MAPA := "res://art/fonts/OldStandard-Italic.ttf"
+
+
+func _rotulo_mapa(pai: Node3D, nome: String, texto: String, pos: Vector3, tamanho: float, fonte: String, cor: Color) -> Label3D:
+	var l := Label3D.new()
+	l.name = nome
+	l.text = texto
+	l.font = load(fonte)
+	l.font_size = 64
+	l.pixel_size = tamanho
+	l.modulate = cor
+	l.outline_size = 0
+	l.line_spacing = -8.0
+	l.position = pos
+	l.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+	l.double_sided = false
+	_add(pai, l)
+	return l
+
+
+func _largura(texto: String, fonte: String, pixel: float) -> float:
+	return (load(fonte) as Font).get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 64).x * pixel
 
 
 ## O que pende nas paredes do escritório (Fase 3d): uma paisagem a óleo sobre a

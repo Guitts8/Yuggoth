@@ -289,6 +289,14 @@ func _ready() -> void:
 	_check(AudioDirector._duck.volume_db < -10.0, "lendo, o ambiente (os pássaros) abaixa")
 	reader.close()
 	_check(carta1 in GameState.dossier and GameState.has_flag(&"leu_carta_akeley_1"), "carta do Dia 1 lida e no dossiê")
+	# O mapa da parede (Fase 4): a carta cita Townshend, a Montanha Escura e Round Hill.
+	var mapa: MapaInvestigacao = esc.find_child("Mapa", true, false)
+	_check(mapa.pendentes().size() == 3 and mapa.prompt == "Marcar no mapa", "lida a carta, três lugares para marcar no mapa (%s)" % [mapa.pendentes()])
+	mapa.interact(player)
+	await _until(func() -> bool: return not mapa._marcando, 10.0)
+	_check(GameState.has_flag(&"mapa_townshend") and GameState.has_flag(&"mapa_round_hill") and mapa.pendentes().is_empty()
+		and mapa.papel.find_children("_Fio*", "", true, false).size() == 2 and mapa.prompt == "Examinar o mapa",
+		"marcados: três alfinetes, o fio vermelho entre eles; o mapa volta a ser só de examinar")
 	reader.open(carta1)
 	for i in 3:  # a paginação roda no quadro de processo seguinte
 		await get_tree().process_frame

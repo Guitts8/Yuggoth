@@ -1045,24 +1045,40 @@ acessibilidade e o export já estão feitos (sessão do menu); falta o playtest 
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 
-## Fase 4 — O mapa de Vermont
-Um mapa grande na parede oeste, junto ao quadro de recortes (vira o **quadro da
-investigação**, como na referência). Textura gerada: contorno de Vermont, o
-Connecticut, o West River, as cidades do livro.
+## Fase 4 — O mapa de Vermont ✅ (2026-10-09, antes do playtest 9)
+Feito a pedido do usuário enquanto o playtest 9 não vinha. O mapa do estado inteiro
+encolhia a região da história (Townshend, Newfane, Brattleboro, Bellows Falls cabem
+em poucos centímetros) e ficava ilegível a 540 linhas; virou um **mapa de condado
+de época, o de Windham** (1925), com **o estado inteiro num quadro** no alto à
+direita (o condado em destaque, e o Winooski e o Passumpsic do recorte). Na parede
+oeste, acima do armário, ao lado do quadro de recortes. A geografia está em
+`tools/vermont.gd` (o contorno, o condado, os rios — o West, o Saxtons, o Williams,
+o Rock, o Green, o Deerfield —, 27 cidades, os morros), lida pela textura
+(`gerar_assets._mapa_vermont`: papel velho, Vermont mais quente que New Hampshire, a
+borda do condado tracejada, a grade a cada dez minutos, os morros em hachura) e pelo
+gerador (`_mapa`: os nomes impressos em Label3D, em inglês; o título *Windham
+County*). O `MapaInvestigacao` (`components/`, um Examinable): lida uma carta que
+cita lugares, "Marcar no mapa" — os alfinetes entram um a um (o clique do
+`alfinete.wav`), o fio vermelho corre do anterior, e os lugares que o mapa não
+imprime ganham o nome na letra de Wilmarth (*Akeley*, *Montanha Escura*, *Round
+Hill*, *a caverna*, *Pântano de Lee*, *o fio cortado*); as enchentes do recorte são
+alfinetes pretos, fora do fio. Sem nada a marcar, "Examinar o mapa" (de perto, lê-se
+tudo). Não trava nada. Marcado fica `mapa_<id>`. O teste de fumaça marca os três do
+Dia 1.
 
 - Lida uma carta que cita lugares novos, aparece **"Marcar no mapa"**: um alfinete
   por lugar e o **fio vermelho** liga o novo ao anterior. Não trava a porta.
 - 💭 As **fotografias** podem ser presas no mapa, no lugar onde foram tiradas
   ("Prender no quadro"); continuam examináveis lá.
 
-| Dia | Lugares (o que a carta/o dia cita) |
+| Dia | Lugares (a carta que os cita) |
 |---|---|
-| 1 | Townshend (a fazenda), Montanha Escura, West River; dos recortes: Winooski, Passumpsic |
-| 2 | Round Hill (as fotos), a caverna na Montanha Escura |
-| 3 | Pântano de Lee (o disco), Brattleboro (de onde ele despacha) |
-| 4 | Bellows Falls (o telegrama), Keene (Stanley Adams) |
-| 5 | Newfane (o cabo cortado), Bellows Falls de novo (o telegrama "AKELY") |
-| 6 | — (os fios convergem em Townshend; nenhuma marca nova) |
+| 1 | a fazenda de Akeley, a Montanha Escura, Round Hill (a 1ª carta); o West, o Winooski, o Passumpsic (o recorte das enchentes) |
+| 2 | a caverna (a 2ª carta) |
+| 3 | o Pântano de Lee (a transcrição do disco), Brattleboro (o bilhete) |
+| 4 | Bellows Falls (o telegrama), Keene (a carta de julho) |
+| 5 | o fio cortado ao norte de Newfane (a carta de 15 de agosto) |
+| 6 | — |
 
 ## Fase 5 — A sala acumula (por dia, `dia >= N`)
 | | Dia 1 | Dia 2 | Dia 3 | Dia 4 | Dia 5 | Dia 6 |

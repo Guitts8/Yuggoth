@@ -48,6 +48,15 @@ ele sobe os dois lanços e anda pelo corredor até a porta fechada do escritóri
 **"Abrir a porta"**, e o correio da noite está no chão (a fala do correio vem aí).
 Entrando, a porta fecha atrás dele.
 
+**O mapa** (Fase 4), em todos os dias: na parede oeste, acima do armário, o mapa do
+condado de Windham (1925), com o estado inteiro num quadro no canto. Lida uma carta
+que cita lugares novos, **"Marcar no mapa"**: um alfinete por lugar, o fio vermelho
+ligando ao anterior e, nos lugares que o mapa não imprime, o nome na letra de
+Wilmarth — Dia 1: a fazenda de Akeley, a Montanha Escura, Round Hill (e os rios das
+enchentes do recorte, em alfinetes pretos); Dia 2: a caverna; Dia 3: o Pântano de Lee,
+Brattleboro; Dia 4: Bellows Falls, Keene; Dia 5: o fio cortado ao norte de Newfane.
+Nada obriga; sem o que marcar, "Examinar o mapa".
+
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
 chão, junto à porta, iluminados pela luz do corredor que entra por baixo dela.

@@ -64,6 +64,11 @@ o que esperava.
       (Ainda sintetizados: o disco, o zumbido, as vozes, o sonho, a tarde com
       pássaros, a manivela, a linha, a calha e o café.)
 
+### Feito enquanto você não jogava (as Fases 4 a 6)
+- [ ] **O mapa do condado** (parede oeste, acima do armário): lida uma carta que cita
+      lugares, "Marcar no mapa" — os alfinetes, o fio vermelho, os nomes à mão. Examine
+      e aproxime (roda): lê-se? O fio ajuda a ver a história no mapa?
+
 ### O resto da lista do playtest 8
 - [ ] **O nome:** *Yuggoth*, no menu (em gótica rubra) e no .exe.
 - [ ] **Espaço pula as falas** (o E só interage). Y no controle.

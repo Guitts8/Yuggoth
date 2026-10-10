@@ -349,6 +349,10 @@ func _olhar_fotos() -> void:
 	if p.seated:
 		p.stand()
 	(esc.get_node("%Corredor") as Node3D).visible = true
+	for n: Node in esc.find_children("_Nome*", "Label3D", true, false):
+		print("NOME ", n.name, " ", (n as Label3D).text, " ", (n as Node3D).global_position, " vis ", (n as Node3D).is_visible_in_tree(), " ps ", (n as Label3D).pixel_size)
+		var l := n as Label3D
+		print("   font ", l.font, " ", l.font.get_font_name() if l.font else "-", " mod ", l.modulate, " basis ", l.global_basis.z, " fs ", l.font_size, " aabb ", l.get_aabb())
 	var i := 0
 	for olho in partes[2].split("|", false):
 		if olho.begins_with("exame:"):

@@ -238,6 +238,12 @@ def papel():
     salvar("pena", sala(pena, 0.25, 0.06, semente=18), alvo=0.6)
 
 
+def alfinete():
+    # O alfinete entrando no mapa (Fase 4): um clique de metal pequeno, seco.
+    a = passa_alta(aparar(ler("x/RPGsounds_Kenney/OGG/metalClick.ogg")), 1500)
+    salvar("alfinete", sala(a[: seg(0.25)], 0.25, 0.08, semente=26), alvo=0.6)
+
+
 def lama():
     m = pico(aparar(ler("x/[kdd]DifferentSteps_0/mud02.ogg")))
     salvar("lama", sala(passa_baixa(tom(m, 0.75), 2500), 0.4, 0.12, semente=19), alvo=0.8)
@@ -277,6 +283,7 @@ def main():
     telefone()
     papel()
     lama()
+    alfinete()
     menu()
 
 

@@ -8,6 +8,7 @@ extends SceneTree
 const TEX_DIR := "res://art/textures/"
 const SFX_DIR := "res://audio/placeholder/"
 const RATE := 22050
+const VT := preload("res://tools/vermont.gd")
 
 
 func _init() -> void:
@@ -27,6 +28,7 @@ func _texturas() -> void:
 	_save(_porta(), "porta")
 	_save(_quadro(), "quadro")
 	_save(_diploma(), "diploma")
+	_save(_mapa_vermont(), "mapa_vermont")
 	_save(_assoalho(), "assoalho")
 	_save(_papel_parede(), "papel_parede")
 	_save(_reboco(), "reboco")
@@ -199,6 +201,171 @@ func _diploma() -> Image:
 				c = Color(0.62, 0.12, 0.1) if sv.length() < 6.0 else Color(0.5, 0.08, 0.07)
 			img.set_pixel(x, y, _shade(c, f))
 	return img
+
+
+## O mapa da parede (Fase 4): o condado de Windham num mapa de condado de época, em
+## papel velho — Vermont num creme mais quente que New Hampshire, o condado com a
+## borda tracejada, o Connecticut e os rios em azul desbotado, os morros em hachura,
+## a grade dos graus, as cidades em pontos (os nomes são Label3D, no gerador do
+## escritório); no alto à direita, o quadro com o estado inteiro (o condado em
+## destaque, o Winooski e o Passumpsic). Os dados vêm de tools/vermont.gd.
+func _mapa_vermont() -> Image:
+	var w := 320
+	var h := roundi(w / VT.proporcao())
+	var img := _img(w, h)
+	var fibra := _noise(91, 0.09)
+	var mancha := _noise(92, 0.012)
+	var tamanho := Vector2(w, h)
+	var estado := _poligono_px(VT.CONTORNO, tamanho, false)
+	var condado := _poligono_px(VT.CONDADO, tamanho, false)
+	var q0 := VT.QUADRO.position * tamanho
+	var q1 := VT.QUADRO.end * tamanho
+	var estado_q := _poligono_px(VT.CONTORNO, tamanho, true)
+	var condado_q := _poligono_px(VT.CONDADO, tamanho, true)
+	for y in h:
+		for x in w:
+			var pt := Vector2(x + 0.5, y + 0.5)
+			var f := 0.96 + fibra.get_noise_2d(x, y) * 0.035 - maxf(0.0, mancha.get_noise_2d(x, y)) * 0.16
+			var c := Color(0.83, 0.79, 0.68)  # New Hampshire, Massachusetts
+			var no_quadro := pt.x > q0.x and pt.x < q1.x and pt.y > q0.y and pt.y < q1.y
+			if no_quadro:
+				c = Color(0.86, 0.82, 0.71)
+				if Geometry2D.is_point_in_polygon(pt, estado_q):
+					c = Color(0.86, 0.77, 0.58)
+				if Geometry2D.is_point_in_polygon(pt, condado_q):
+					c = Color(0.8, 0.62, 0.45)
+			elif Geometry2D.is_point_in_polygon(pt, estado):
+				c = Color(0.87, 0.78, 0.59)  # Vermont
+				if Geometry2D.is_point_in_polygon(pt, condado):
+					c = Color(0.88, 0.76, 0.56)
+			var borda := mini(mini(x, w - 1 - x), mini(y, h - 1 - y))
+			if borda < 6:
+				f *= 0.78 + borda * 0.035
+			img.set_pixel(x, y, _shade(c, f))
+	var tinta := Color(0.24, 0.17, 0.12)
+	var azul := Color(0.3, 0.42, 0.5)
+	# A grade dos graus (a cada dez minutos), fina e clara.
+	var grade := Color(0.55, 0.47, 0.36)
+	var lat := ceilf(VT.LAT.x * 6.0) / 6.0
+	while lat < VT.LAT.y:
+		var yy := roundi(VT.uv(lat, VT.LON.x).y * h)
+		for x in range(0, w, 2):
+			if not _no_quadro(Vector2(x, yy), q0, q1):
+				_misturar_px(img, x, yy, grade, 0.3)
+		lat += 1.0 / 6.0
+	var lon := ceilf(VT.LON.y * 6.0) / 6.0
+	while lon < VT.LON.x:
+		var xx := roundi(VT.uv(VT.LAT.x, lon).x * w)
+		for y in range(0, h, 2):
+			if not _no_quadro(Vector2(xx, y), q0, q1):
+				_misturar_px(img, xx, y, grade, 0.3)
+		lon += 1.0 / 6.0
+	# Os morros.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 93
+	for g: Vector2 in VT.MORROS:
+		var c := VT.uv(g.x, g.y) * tamanho
+		for k in 3:
+			_monte(img, c + Vector2(rng.randf_range(-6.0, 6.0), rng.randf_range(-3.0, 3.0)), rng.randf_range(3.0, 5.0), Color(0.45, 0.36, 0.25))
+	# Os rios e o Connecticut.
+	for nome: String in VT.RIOS:
+		_linha_px(img, _poligono_px(VT.RIOS[nome], tamanho, false), azul, nome == "West", q0, q1)
+	var leste := PackedVector2Array()
+	for i in range(VT.CONNECTICUT.x, VT.CONNECTICUT.y + 1):
+		leste.append(estado[i])
+	_linha_px(img, leste, azul, true, q0, q1)
+	# A divisa do estado (a do sul) e a do condado, tracejada.
+	var sul := PackedVector2Array([estado[VT.CONNECTICUT.y], estado[VT.CONNECTICUT.y + 1]])
+	_linha_px(img, sul, tinta, false, q0, q1)
+	_tracejado(img, condado, tinta, q0, q1)
+	# As cidades: um ponto com um aro.
+	for cidade: Array in VT.CIDADES:
+		var c := VT.uv(cidade[1], cidade[2]) * tamanho
+		for dy in range(-1, 2):
+			for dx in range(-1, 2):
+				_misturar_px(img, roundi(c.x) + dx, roundi(c.y) + dy, tinta, 0.9 if dx == 0 or dy == 0 else 0.4)
+	# O quadro do estado: a moldura, o contorno, os rios do norte.
+	for x in range(roundi(q0.x), roundi(q1.x) + 1):
+		_misturar_px(img, x, roundi(q0.y), tinta, 0.8)
+		_misturar_px(img, x, roundi(q1.y), tinta, 0.8)
+	for y in range(roundi(q0.y), roundi(q1.y) + 1):
+		_misturar_px(img, roundi(q0.x), y, tinta, 0.8)
+		_misturar_px(img, roundi(q1.x), y, tinta, 0.8)
+	for nome: String in VT.RIOS_ESTADO:
+		_linha_px(img, _poligono_px(VT.RIOS_ESTADO[nome], tamanho, true), azul, false)
+	var fechado := estado_q.duplicate()
+	fechado.append(estado_q[0])
+	_linha_px(img, fechado, tinta, false)
+	# A moldura impressa: filete duplo.
+	for k: int in [8, 10]:
+		for x in range(k, w - k):
+			_misturar_px(img, x, k, tinta, 0.7)
+			_misturar_px(img, x, h - 1 - k, tinta, 0.7)
+		for y in range(k, h - k):
+			_misturar_px(img, k, y, tinta, 0.7)
+			_misturar_px(img, w - 1 - k, y, tinta, 0.7)
+	return img
+
+
+static func _no_quadro(p: Vector2, q0: Vector2, q1: Vector2) -> bool:
+	return p.x >= q0.x and p.x <= q1.x and p.y >= q0.y and p.y <= q1.y
+
+
+func _tracejado(img: Image, pontos: PackedVector2Array, cor: Color, q0: Vector2, q1: Vector2) -> void:
+	var fechado := pontos.duplicate()
+	fechado.append(pontos[0])
+	var passo := 0
+	for i in fechado.size() - 1:
+		var a := fechado[i]
+		var b := fechado[i + 1]
+		var n := maxi(1, ceili(a.distance_to(b) * 2.0))
+		for k in n + 1:
+			passo += 1
+			if (passo / 6) % 2 == 1:
+				continue
+			var p := a.lerp(b, float(k) / n)
+			if not _no_quadro(p, q0, q1):
+				_misturar_px(img, roundi(p.x), roundi(p.y), cor, 0.6)
+
+
+func _poligono_px(pontos: Array, tamanho: Vector2, quadro: bool) -> PackedVector2Array:
+	var r := PackedVector2Array()
+	for g: Vector2 in pontos:
+		r.append((VT.uv_quadro(g.x, g.y) if quadro else VT.uv(g.x, g.y)) * tamanho)
+	return r
+
+
+func _misturar_px(img: Image, x: int, y: int, cor: Color, k: float) -> void:
+	if x < 0 or y < 0 or x >= img.get_width() or y >= img.get_height():
+		return
+	img.set_pixel(x, y, img.get_pixel(x, y).lerp(cor, k))
+
+
+## Uma linha de tinta de ponto a ponto; `grossa` dobra o traço (o Connecticut).
+func _linha_px(img: Image, pontos: PackedVector2Array, cor: Color, grossa: bool, q0 := Vector2(-1, -1), q1 := Vector2(-1, -1)) -> void:
+	for i in pontos.size() - 1:
+		var a := pontos[i]
+		var b := pontos[i + 1]
+		var n := maxi(1, ceili(a.distance_to(b) * 2.0))
+		for k in n + 1:
+			var p := a.lerp(b, float(k) / n)
+			if _no_quadro(p, q0, q1):
+				continue
+			_misturar_px(img, roundi(p.x), roundi(p.y), cor, 0.85)
+			if grossa:
+				_misturar_px(img, roundi(p.x) + 1, roundi(p.y), cor, 0.6)
+
+
+## Um montinho de hachura (o "^" dos mapas antigos), com a sombra à direita.
+func _monte(img: Image, c: Vector2, r: float, cor: Color) -> void:
+	for k in ceili(r * 2.0) + 1:
+		var t := float(k) / ceili(r * 2.0)
+		var x := c.x - r + t * r * 2.0
+		var y := c.y + absf(t - 0.5) * r * 1.6 - r * 0.4
+		_misturar_px(img, roundi(x), roundi(y), cor, 0.7)
+		if t > 0.5:
+			for dy in range(1, 3):
+				_misturar_px(img, roundi(x) - 1, roundi(y) + dy, cor, 0.25)
 
 
 func _mul(img: Image, x: int, y: int, f: float) -> void:
