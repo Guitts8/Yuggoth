@@ -1,11 +1,11 @@
 # Playtest — o que verificar
 
-Lista de conferência do **playtest 8** (do Prólogo ao fim da demo). Os testes
+Lista de conferência do **playtest 9** (do Prólogo ao fim da demo). Os testes
 automáticos (`smoke_test`, `caminhos_test`, o macaco) garantem que **tudo se joga
 até o fim sem travar**. Eles não julgam se está **bonito, claro, assustador ou fiel
 ao livro**, e não usam o mouse no menu. Esta lista é para isso.
 
-O que o playtest encontrar vira a **Fase 3i** em `docs/PLANO_ESCRITORIO.md`
+O que o playtest encontrar vira a **Fase 3j** em `docs/PLANO_ESCRITORIO.md`
 (✅ feito · 🔧 claro, a fazer · ❓ espera resposta). Atualize este arquivo a cada
 playtest: o que foi conferido sai, e entra o que mudou.
 
@@ -39,52 +39,43 @@ o que esperava.
 
 ---
 
-## 1. Prioridade: o que mudou desde o playtest 7
+## 1. Prioridade: o que mudou desde o playtest 8 (a Fase 3i)
 
-### O menu refeito (sessão do menu, com as imagens de referência)
-- [ ] **A abertura** ao iniciar o jogo: o escuro, as velas acendendo, a câmera se
-      afastando da capa, a capa caindo (o baque, a poeira), a tinta brotando nas
-      páginas. Longa demais? Uma tecla pula — pula bem?
-- [ ] **O livro em si:** a moldura de ferro rebitada, o papel queimado com as
-      manchas cor de ferrugem, a moldura impressa, a gravura da pedra negra, o
-      título em fraktur. Está à altura da referência? Algo a mais (ou a menos)?
-- [ ] **O grão:** o livro agora tem o pontilhado e a resolução do jogo. Ficou bom
-      ou o texto ficou difícil de ler?
-- [ ] **As entradas:** as pontas rubras deslizando, o pulso, o mouse que escolhe, o
-      cursor de pena, a dica embaixo.
-- [ ] **Continuar / Novo jogo:** a tinta tomando a tela antes de o jogo começar.
-- [ ] **Opções:** a seção nova de **acessibilidade** — campo de visão, tremor das
-      formas, ondulação das texturas. Funcionam como se espera no jogo?
-- [ ] **A pausa** chegando deslizando; a folha virando para as Opções (com sombra).
-- [ ] **O jogo exportado:** `comandos.ps1 exportar` e `jogar-exportado` — o mesmo
-      jogo, sem os atalhos de teste (F, F2, F3, C). Algo diferente do editor?
+### Os últimos dias (o maior pedido)
+- [ ] **Dia 5:** depois de **comparar a assinatura** e renovar a oferta, o dia acaba:
+      o diário (a entrada nova, de 22 de agosto), o fogo, a poltrona e **o sonho do
+      A-K-E-L-Y na mesma noite** da farsa. Vem cedo o bastante agora?
+- [ ] **Dia 6:** começa com a carta de **28 de agosto** no chão (a "saída digna") e a
+      resposta animadora; depois a carta calma, o ânimo, segunda e terça.
+- [ ] **A noite em claro** (lida a carta de terça): o **meio toque** do telefone
+      ("Tirar o fone do gancho": só um zumbido), **a janela que se abre sozinha** sem
+      você ver (o vento, a cortina) — "Fechar a janela" —, a criatura no céu se você
+      olhar, e **"Sentar e esperar o dia"**: a aurora, a carta de quarta pela fresta.
+      Assusta o suficiente? Longa ou curta demais? Ficou claro o que fazer?
+- [ ] **As passadas de dia:** metade do tempo e três jeitos — **dias de chuva** (Dia
+      5), **de dia em dia** e **uma noite só** (a carta de terça). Ainda cansa?
 
-### Da Fase 3h (os pedidos do playtest 7)
-- [ ] **O corredor e a escada:** as portas 312/308 e a calha sem lambri na frente;
-      a escada sem vãos (o "limbo" debaixo dos degraus).
-- [ ] **O diário fechando** sem o salto das páginas; **escrevendo**, a vista mais
-      solta (os olhos na linha, só um pouco na pena).
-- [ ] **O sonho do disco (noite 3)** partido em ilhas que boiam; os das noites 2, 4 e 5.
-- [ ] **E para pular** falas (narrador, telefone, conversa).
-- [ ] **Acender a lareira** (Dias 5 e 6): ajoelhar, o fósforo, o fogo crescendo.
+### Os sons (gravações reais, CC0)
+- [ ] **O menu:** a folha grossa virando, a capa de couro rangendo, o baque na mesa,
+      o fósforo das velas, o risco da pena ao passar pelas entradas.
+- [ ] **No jogo:** os passos no assoalho, as portas, a gaveta, a lareira, a chuva na
+      janela, a noite (grilos e vento), o relógio, a campainha do telefone, o papel,
+      a carta pela fresta, o selo, a pena. Algum ficou alto, baixo ou estranho?
+      (Ainda sintetizados: o disco, o zumbido, as vozes, o sonho, a tarde com
+      pássaros, a manivela, a linha, a calha e o café.)
 
-### Das sessões de tester (o jogador nota sem saber)
-- [ ] **O armário do canto sudoeste** (junto à porta) agora tem portas e puxadores;
-      à noite, não brilha mais de laranja com a luz da fresta. Ficou escuro demais?
-- [ ] **O cesto de papéis** (ao lado da mesa) agora é aberto (tinha tampa).
-- [ ] **Dia 2, à direita do mata-borrão:** a carta do leitor e os três envelopes dos
-      opositores não atravessam mais a base da lâmpada. Ainda se lê o que é cada coisa?
-- [ ] **Boston, virado para a escada:** o corrimão agora aparece numa luz fraca de baixo.
-- [ ] **Sair para o menu e continuar** no meio de qualquer coisa (o disco tocando, o
-      telefone, um sonho): a legenda não fica na tela; nada fica "lembrado" errado
-      (luz, cor do céu, o sonho). As fases agora ficam na memória entre trocas: se
-      algo voltar diferente do que era depois do menu ou de Boston, anote.
-- [ ] **A volta de Boston** ("Voltar a Arkham"): sem congelar. Era intermitente; se
-      congelar, anote.
-- [ ] **Ler o diário durante a ligação de Keene** (Dia 4): ao ir a Boston, o controle
-      continua normal (antes, o jogo travava para sempre).
-
----
+### O resto da lista do playtest 8
+- [ ] **O nome:** *Yuggoth*, no menu (em gótica rubra) e no .exe.
+- [ ] **Espaço pula as falas** (o E só interage). Y no controle.
+- [ ] **Os diplomas** na parede leste e **os avisos do mural** do corredor:
+      "Examinar"/"Ler o aviso", e de perto (roda do mouse) lê-se o inglês; a tradução
+      vem embaixo.
+- [ ] **O estojo do cilindro** (Dia 3): tampa, cintas, a etiqueta *Dictaphone*, a
+      letra de Akeley na tampa.
+- [ ] **A pedra de Round Hill** (noite 4): a estela de faces planas, o alto partido.
+- [ ] **Boston:** a escada de verdade; descer até o patamar volta a Arkham.
+- [ ] **O mi-go do sonho do disco:** agora só uma silhueta no alto da encosta, na névoa.
+- [ ] **Nenhum mi-go em pleno sol** nas passadas de dia.
 
 ## 2. Roteiro, do começo ao fim
 
@@ -123,19 +114,25 @@ o que esperava.
 - [ ] O relato de Keene → **Boston**: bater, a fresta, a conversa com opções, a sala amolecendo na pergunta da voz.
 - [ ] A volta: o escritório já de noite, as cartas da noite; a noite 4 (a pedra).
 
-### Dia 5 — o telegrama "AKELY"
+### Dia 5 — o telegrama "AKELY" (15–22 de agosto)
 - [ ] O maço amarrado; desamarrar; as cartas que cruzam o correio (oferta, renovação).
 - [ ] O bilhete e comparar a assinatura; o mi-go rente à janela (de relance).
 - [ ] O uísque escondido na gaveta (Lei Seca); a lareira; a noite 5 (o telefone do sonho).
 - [ ] Sem acender a lareira: a fala lembra que falta o fogo.
 
-### Dia 6 — as três últimas cartas
+### Dia 6 — de 28 de agosto às três últimas cartas
 - [ ] Cada carta lida traz a seguinte (os saltos no tempo); a criatura no céu.
 - [ ] A última carta → a tinta enchendo a tela, o céu de Vermont, o cartão do fim, o menu.
 
 ---
 
 ## 3. Decisões pendentes (respostas que só você pode dar)
+
+**Do playtest 8**
+- [ ] **"O modelo da janela do epílogo está bastante diferente."** Não achei a
+      diferença: a janela do gabinete de 1930 (o Prólogo) é o mesmo modelo da de
+      1928; mudam a vista (noite de chuva) e a falta das cortinas. Era o Prólogo? Ou
+      o fim da demo (a tinta e o céu de Vermont)? O que estava diferente?
 
 **Textos esperando aprovação**
 - [ ] As **entradas do diário** dos Dias 1–5 (`narrative/documents/diario_dia_N`; a 3 e a 5 mudaram na Fase 3d).
@@ -154,7 +151,7 @@ o que esperava.
 
 ---
 
-## 4. Depois do playtest 8 (para não se perder)
+## 4. Depois do playtest 9 (para não se perder)
 Fase 4 — o mapa de Vermont · Fase 5 — a sala acumula · Fase 6 — estranhezas sutis ·
 Fase 7 — fechamento e o resto do marco Demo (a acessibilidade e o export já estão
 feitos; falta o playtest com 5+ pessoas, com o .exe exportado). Detalhes em

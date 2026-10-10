@@ -852,7 +852,8 @@ a fazer · ❓ espera resposta. Aprovado: *"o cuidado que tivemos com o livro do
 [...] está muito bom"* — e o pedido é **esse cuidado em tudo** (item 12). Decisões
 tomadas na hora (o usuário escolheu entre opções): o nome **Yuggoth**; **sem corpo**
 visível; os sons com **gravações CC0 tratadas**; os últimos dias com **o sonho logo
-depois da farsa e uma noite em claro** (item 13).
+depois da farsa e uma noite em claro** (item 13). Commits: `b755e51` (1, 7, 14),
+`1c6019c` (4, 6, 8, 9, 10, 11), `2dc3625` (13), `252b161` (2).
 
 1. ✅ **O nome.** *"temos que escolher um nome melhor do que 'Os que sussurram'"*.
    Decidido: **Yuggoth** (já é o nome do projeto; uma palavra, PT e EN, em fraktur no
@@ -876,8 +877,11 @@ depois da farsa e uma noite em claro** (item 13).
    (`gerador_base._sfx`); `AudioDirector.play_sfx` varia a altura de cada toque
    (±4%). Ficaram sintetizados: o disco, o zumbido, as vozes, o sonho, a tarde com
    pássaros, o dia quieto, a manivela, a linha do telefone, a calha, servir.
-3. 🔧 **"O modelo da janela do epílogo está bastante diferente."** A conferir em
-   captura (o gabinete de 1930, no Prólogo, contra a janela dos Dias).
+3. ❓ **"O modelo da janela do epílogo está bastante diferente."** Conferido em
+   captura: a janela do gabinete de 1930 (o Prólogo) é o mesmo modelo da de 1928
+   (`_janela`, na `Estrutura`); mudam só a vista (noite de chuva) e as cortinas (que
+   o gabinete não tem). Perguntado ao usuário o que estava diferente (e se
+   "epílogo" é o Prólogo ou o fim da demo) — em `docs/PLAYTEST.md` §3.
 4. ✅ **Os certificados na parede legíveis.** Feito: os dois diplomas têm o texto de
    verdade (Label3D, em inglês como tudo o que é impresso: *Miskatonic University*
    em fraktur, o nome dele em caligrafia, *Bachelor of Arts* 1911 e *Master of Arts*
@@ -920,9 +924,11 @@ depois da farsa e uma noite em claro** (item 13).
     espalhavam a textura como pano. Agora uma estela como a gravura do menu: a laje
     de faces planas, mais larga embaixo, o alto partido em dentes, as arestas
     chanfradas; os hieróglifos com a borda de baixo mais clara (pegam a luz).
-12. 🔧 **"O cuidado que tivemos com o livro do menu em tudo."** A diretriz da fase: cada
+12. 🔧 **"O cuidado que tivemos com o livro do menu em tudo."** (contínuo) A diretriz da fase: cada
     peça mexida aqui sai no nível do Necronomicon (forma, material, desgaste,
-    animação, som), a começar pelo que o jogador mais vê de perto.
+    animação, som), a começar pelo que o jogador mais vê de perto. Nesta fase: a
+    pedra, o estojo, os diplomas e os avisos, a escada de Boston, os sons. Fica
+    como regra para as próximas.
 13. ✅ **Os últimos dias: "só carta e ler carta"**, as passadas de dia (*"sempre a mesma
     animação, e ela demora"*) e o sonho do A-K-E-L-Y que *"demora para acontecer
     depois de ele perceber a farsa"*. Decidido:
@@ -981,18 +987,14 @@ diário na ida a Boston), a legenda presa, o F3 que perdia a carta; no visual, o
 armário, o cesto, os papéis sob a lâmpada (Dia 2), o vão da escada em Boston; o
 macaco com o tom forçado.
 
-**Esperando o usuário — o playtest 8** (do Dia 1 ao fim da demo; **F2** pula dias,
-**F3** recarrega). A lista completa de conferência, dia a dia, com as decisões
-pendentes, está em **`docs/PLAYTEST.md`** (criado em 2026-10-09, depois da sessão de
-tester 2). Em resumo, o que olhar:
-1. O Necronomicon: a capa abrindo, as páginas, o mouse nas entradas, a folha
-   virando para as Opções e de volta, a pausa. É o que se pediu do *Lords of
-   Shadow 2*?
-2. O corredor e a escada (as portas sem lambri na frente, a escada sem vãos).
-3. O diário fechando; a vista escrevendo, mais solta.
-4. O sonho do disco partido em ilhas; os das noites 2, 4 e 5.
-5. E para pular falas.
-6. Acender a lareira (Dias 5 e 6).
+**Fase 3i feita** (o playtest 8, acima): menos o item 3 (❓ a janela do
+"epílogo", perguntado). Testes: fumaça e caminhos com 0 falhas, e o macaco (semente
+3) jogou a demo inteira sem falha, depois da reestruturação dos Dias 5 e 6.
+
+**Esperando o usuário — o playtest 9.** A lista de conferência está em
+**`docs/PLAYTEST.md`**: os últimos dias (o sonho do AKELY na noite da farsa, o Dia 6
+desde 28 de agosto, a noite em claro, os lapsos), os sons gravados, e o resto da
+lista do playtest 8.
 
 **Decisões de texto pendentes:** as entradas do diário (as 3 e 5 mudaram na 3d) e as
 falas `sono_disco`/`sono_fogo`; o visual do sonho (pendência antiga); "Deixar sem
@@ -1002,15 +1004,15 @@ olhar o painel Debugger do editor. `art/textures/grao.png.import` aparece
 modificado no git desde antes da 3g (reimportação do Godot); deixado de fora dos
 commits.
 
-**Como retomar numa sessão nova:** ler este arquivo (a 3h, as duas sessões de
-tester e esta seção). Se o usuário pedir mais testes: `comandos.ps1 caminhos`,
+**Como retomar numa sessão nova:** ler este arquivo (a 3i, as sessões de tester e
+esta seção). Se o usuário pedir mais testes: `comandos.ps1 caminhos`,
 `comandos.ps1 macaco <semente> [tom]` (as sementes 1 a 13 já passam; o tom -1/0/1
 força as respostas), capturas com `tests/_tmp_shot` (`SHOT_MODO`, `SHOT_DIAS`), e
 cada bug achado vira um item novo de uma sessão de tester, com o commit. Ainda não
 testado: o menu e as Opções pelo mouse (o raio da câmera até a página), o Prólogo
 fora do roteiro (pausa no cartão, andar sentado), Boston pelo macaco com a conversa
-inteira em todas as ordens. Quando vier a lista do playtest 8, registrá-la como
-**Fase 3i**, no mesmo formato. Não começar a Fase 4 antes dela.
+inteira em todas as ordens. Quando vier a lista do playtest 9, registrá-la como
+**Fase 3j**, no mesmo formato. Não começar a Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); do marco Demo (GDD §12), a
 acessibilidade e o export já estão feitos (sessão do menu); falta o playtest com
@@ -1031,9 +1033,10 @@ acessibilidade e o export já estão feitos (sessão do menu); falta o playtest 
    presa, o F3; o armário, o cesto, o Dia 2, Boston; o macaco com tom.
 2h2. ✅ **Sessão do menu e do marco Demo** (acima): o Necronomicon refeito à maneira
    de *Lords of Shadow*, a acessibilidade, o export para Windows.
-2i. **← AQUI.** O usuário joga o **playtest 8** (do Dia 1 ao fim da demo, ou com
-   F2): o Necronomicon, o corredor e a escada, o diário, o sonho do disco partido,
-   E para pular, a lareira; a lista vira a Fase 3i. Não começar a Fase 4 antes dela.
+2i. ✅ O usuário jogou o **playtest 8**; a lista virou a **Fase 3i** (acima), feita
+   menos o item 3 (❓).
+2j. **← AQUI.** O usuário joga o **playtest 9** (`docs/PLAYTEST.md`); a lista vira a
+   Fase 3j. Não começar a Fase 4 antes dela.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 
