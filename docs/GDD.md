@@ -550,25 +550,26 @@ func resolve_pages() -> Array[String]:
 
 ## 12. Plano de produção
 
-**Estratégia: por lugar, em ordem.** Cada bloco é terminado (jogabilidade, arte, som) antes de começar o próximo. A ordem da *história* não muda (§4); só a ordem de *construção*. A fazenda é um mapa só, então Interlúdio e Ato III são construídos juntos, já sabendo tudo o que ela precisa.
+**Estratégia: por lugar, em ordem.** Cada bloco é terminado (jogabilidade, arte, som) antes de começar o próximo. **Mudança de 2026-10-09 (depois do playtest 8):** um recorte do Interlúdio entra na demo, então a fazenda vem logo depois do escritório (escritório → fazenda → Ato II); plano e diário de bordo em `docs/PLANO_FAZENDA.md`. A ordem da *história* não muda (§4); só a ordem de *construção*. A fazenda é um mapa só, então Interlúdio e Ato III são construídos juntos, já sabendo tudo o que ela precisa.
 
 | Marco | Conteúdo | Critério de pronto |
 |---|---|---|
 | **M0 — Protótipo** ✅ | Player, interação, leitor de documentos com variantes, `GameState`, shader PSX, pipeline de SubViewport | Andar numa sala cinza, ler uma carta que muda após um flag |
 | **E — Escritório** | Fundação (`SaveSystem`, `SceneDirector`, `AudioDirector`, `Narrator`, `Examinable`, menu e opções mínimas); Prólogo, Dias 1–6, fonógrafo, telefone, respostas; arte e som finais do escritório; voz de Noyes no disco | Prólogo → Dia 6 jogável com aparência e som de lançamento |
-| **Demo** | Tela final "continua" na transição do Dia 6 (tinta → céu de Vermont); acessibilidade (jitter/afim/FOV), legendas, export, playtest 5+ pessoas | Build publicada |
+| **F0 — A fazenda para a demo** | A planta inteira da fazenda em bloco (serve ao Ato III); o recorte do Interlúdio: os beats 1–3 de §5.1a (o entardecer, a preparação, a noite do telhado), os cães (4 com nome), Akeley | A tinta do Dia 6 cai no quintal; a noite do telhado jogável até o "continua" |
+| **Demo** | Tela final "continua" depois da noite do telhado; acessibilidade (jitter/afim/FOV), legendas, export, playtest 5+ pessoas | Build publicada |
 | **E2 — Escritório (resto)** | Dia 7 e a valise (§6.4), Molduras I e II, epílogo de 1930 (base comum aos finais) | Todo o conteúdo do escritório pronto |
 | **B — Ato II** | Trem, estação, estrada, Noyes 3D | Dia 7 → Ato II contínuos |
-| **F — Fazenda** | Planta única; Interlúdio (habitada, cães, rifle, carta verdadeira); Ato III (abandonada, cenas A–F, lamparina, furtividade, cilindros); finais 1, 2a, 2b, 3 e Yuggoth | Jogo completo |
+| **F — Fazenda** | Planta única (já em bloco desde F0); o resto do Interlúdio (a manhã da gosma, "falaram comigo", a coisa morta, a carta verdadeira, o mensageiro); Ato III (abandonada, cenas A–F, lamparina, furtividade, cilindros); finais 1, 2a, 2b, 3 e Yuggoth | Jogo completo |
 | **F.5 — Final Cinzas** | Arremesso da lamparina, incêndio, epílogo | Só entra se F fechar no prazo; senão vira atualização pós-lançamento |
 | **D — Polimento** | Localização EN, performance, ajuste de ritmo | Playtest do jogo completo |
 
 **Regras da demo:**
-- Termina no Dia 6, ao ler a última carta manuscrita. O Interlúdio (e os cães) ficam para o jogo completo.
+- ~~Termina no Dia 6, ao ler a última carta manuscrita. O Interlúdio (e os cães) ficam para o jogo completo.~~ Desde 2026-10-09: termina **no meio do Interlúdio**, depois da noite do telhado (os beats 1–3 de §5.1a). O resto do Interlúdio fica para o jogo completo. A escolha do esconderijo da carta verdadeira (`esconderijo_carta`) não entra na demo.
 - Saves da demo **não** são garantidos no jogo completo. Nenhum flag precisa ser congelado.
 - A voz de Noyes entra na demo (disco do Dia 3); a mesma pessoa é reaproveitada no Interlúdio e nos Atos II e III.
 
-**Risco aceito:** o Ato III, maior risco de design, é validado por último. Como nada da demo depende da fazenda, mudanças nele não afetam o que já foi lançado.
+**Risco (revisto em 2026-10-09):** a fazenda, o mapa mais caro e o do Ato III, é construída cedo e validada no playtest da demo. O Ato III em si (a casa abandonada, as cenas A–F) continua sendo validado por último; a planta já nasce sabendo o que ele pede.
 
 **Estado (2026-10-08):** M0 ✅. Marco E em andamento — fundação ✅; Prólogo e Dias 1–6 jogáveis com o fim da demo (a tinta → o céu de Vermont → menu). O **escritório v2** (`docs/PLANO_ESCRITORIO.md`, o diário de bordo) já fez o look-dev (luz por pixel, facetas, lâmpada de banqueiro, 480 linhas), a sala nova, o correio pela fresta, a selagem em 3D, a carta postada na calha de correio do corredor, o telefone com som, a lareira, o lapso na própria sala, a vinheta de Boston, a criatura no céu, os sonhos entre os dias, o diário que leva a eles (e que se folheia), café e uísque antes de escrever, o sono em lugares diferentes, e uma primeira passada de acabamento (Arkham em 3D pela janela, texturas, móveis). Tudo ainda com arte e som provisórios (gerados por script). Falta no marco E: o playtest 4 do v2 (o que ainda parece tosco), o mapa de Vermont, a sala que acumula, as estranhezas, a arte e o som finais (`docs/ARTE.md`) e a voz de Noyes no disco. Falta no marco Demo: opções de acessibilidade (jitter/afim/FOV — ainda não existem em `Settings`), presets de export (ainda não há `export_presets.cfg`) e o playtest com 5+ pessoas. O que cada parte já tem: `docs/SEQUENCIA.md`.
 

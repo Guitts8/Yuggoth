@@ -1037,6 +1037,11 @@ acessibilidade e o export já estão feitos (sessão do menu); falta o playtest 
    menos o item 3 (❓).
 2j. **← AQUI.** O usuário joga o **playtest 9** (`docs/PLAYTEST.md`); a lista vira a
    Fase 3j. Não começar a Fase 4 antes dela.
+2k. **Decidido em 2026-10-09: o recorte do Interlúdio entra na demo** (os beats 1–3:
+   o entardecer, a preparação, a noite do telhado; o "continua" depois dos tiros).
+   A fazenda tem diário de bordo próprio: **`docs/PLANO_FAZENDA.md`** (o que o livro
+   diz da casa, as fases F1–F8, as perguntas). A ordem entre ela e as Fases 4–6
+   daqui se decide depois do playtest 9.
 3. **Fase 4** — o mapa de Vermont. **Fase 5** — a sala acumula. **Fase 6** — estranhezas.
 4. **Fase 7** — fechamento (docs) e o resto do marco Demo (acessibilidade, export).
 

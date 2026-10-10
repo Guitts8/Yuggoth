@@ -128,7 +128,10 @@ claro** jogável (Dia 6).
 | — | Epílogo e finais | 1930 | ⏳ | cap. VIII (desfecho) |
 
 A **demo** vai do Prólogo ao Dia 6 e termina na entrada do Interlúdio: a letra
-da última carta manuscrita enche a tela e a tinta vira o céu de Vermont.
+da última carta manuscrita enche a tela e a tinta vira o céu de Vermont. **Decidido
+em 2026-10-09:** a demo vai passar a incluir o começo do Interlúdio (o entardecer,
+a preparação e a noite do telhado, como Akeley) e termina depois dos tiros no
+escuro — plano em `docs/PLANO_FAZENDA.md`, ainda não começado.
 
 ---
 
@@ -512,6 +515,9 @@ continua."* → menu principal. (`TintaTransicao`; no jogo completo, aqui entra 
 fazenda.) O save continua no começo do Dia 6.
 
 ## Interlúdio — "O Cerco" ⏳ (como Akeley, 2–6 de setembro)
+**Na demo (decidido em 2026-10-09; `docs/PLANO_FAZENDA.md`):** os beats 1–3 — a
+rotina do entardecer, a preparação e a noite do telhado (2 de setembro) —, e o
+"continua" depois dos tiros. O resto, no jogo completo.
 As noites das três cartas, vividas na fazenda (mesmo mapa do Ato III, habitado):
 a rotina com os **doze cães** (quatro com nome), a noite do telhado (atirar das
 janelas no escuro), a manhã do sangue e da gosma verde, "falaram comigo", a coisa

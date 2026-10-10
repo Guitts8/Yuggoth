@@ -152,6 +152,9 @@ o que esperava.
 ---
 
 ## 4. Depois do playtest 9 (para não se perder)
+**Decidido:** a demo vai ganhar o começo do Interlúdio (como Akeley: o entardecer, a
+preparação e a noite do telhado) — `docs/PLANO_FAZENDA.md`, com três perguntas para
+você antes de começar (as mãos, os nomes dos cães, onde a demo corta).
 Fase 4 — o mapa de Vermont · Fase 5 — a sala acumula · Fase 6 — estranhezas sutis ·
 Fase 7 — fechamento e o resto do marco Demo (a acessibilidade e o export já estão
 feitos; falta o playtest com 5+ pessoas, com o .exe exportado). Detalhes em
