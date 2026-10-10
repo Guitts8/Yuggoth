@@ -88,13 +88,19 @@ usa ganha o acabamento primeiro.
    demonstração. A história continua."* (sai do fim do Dia 6 e vem para cá); o
    checkpoint no começo do Interlúdio; o teste de fumaça joga o recorte inteiro.
 
-## Perguntas para o usuário (antes da F3)
-- ❓ **As mãos.** O GDD previa as mãos de Akeley (balde, lenha, rifle); no playtest 8
-  o usuário escolheu **sem corpo**. Recomendação: os objetos seguram-se diante da
-  câmera, como a carta no escritório, sem mãos — coerente com a escolha. O rifle é o
-  caso mais difícil (apontar pela janela).
-- ❓ **Os nomes dos cães** (provisórios no GDD: Brutus, Nell, Sargento, Rolo) e se o
-  💭 de Rolo sumindo na mata entra no recorte.
-- ❓ **Onde a demo corta:** no escuro depois dos tiros (recomendado) ou na manhã
-  seguinte, com o sangue e a gosma verde no quintal (mais um minuto, e um fecho mais
-  claro)?
+## Perguntas para o usuário (respondidas em 2026-10-10)
+- ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
+  escritório, sem mãos (a recomendação, aceita). O rifle é o caso mais difícil
+  (apontar pela janela).
+- ✅ **Os nomes dos cães.** O livro não dá nome a nenhum: são só *"my great police
+  dogs"* (pastores-alemães, "cães policiais" na época), doze no começo, três mortos
+  a tiro no começo de agosto, quatro novos comprados em Brattleboro, cinco mortos
+  na noite do telhado, mais seis depois. O usuário pediu nomes de cães de proteção
+  com referências: **Brutus, Conan, Hércules e Rambo** são os quatro com nome e
+  comportamento (seguir, deitar junto ao fogo, latir para a mata, rosnar para a
+  janela); os outros oito, nas plaquinhas do canil: **Yautja, Dutch, Kull, Kurgan,
+  Ripley, Snake, Riddick e Sansão**. 💭 O que dispara para a mata e não volta (era
+  Rolo no GDD) passa a ser **Yautja** — o caçador que some no mato. Anacronismo de
+  propósito (piscadela), pedido do usuário: os nomes só aparecem nas plaquinhas e
+  nas falas de Akeley.
+- ✅ **Onde a demo corta: no escuro depois dos tiros.**

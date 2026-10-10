@@ -75,7 +75,7 @@ func _ready() -> void:
 	for parte: Callable in [_textos, _modais_no_meio_das_cenas, _menu_no_meio_do_dia, _escada_com_a_carta,
 			_diario_vazio, _noite_sem_fogo, _estranhezas, _exame_na_ligacao_de_keene, _diario_na_ligacao_de_keene, _continuar_em_boston,
 			_legenda_presa, _depuracao_no_meio_das_cenas, _menu_no_fim_da_demo, _menu_pelo_teclado, _abertura_do_livro,
-			_acessibilidade, _macaco]:
+			_acessibilidade, _menu_pelo_mouse, _prologo_fora_do_roteiro, _boston_em_todas_as_ordens, _macaco]:
 		var nome := parte.get_method().trim_prefix("_")
 		if (so.is_empty() and nome != "macaco") or nome in so:
 			print("-- %s" % parte.get_method())
@@ -799,6 +799,202 @@ func _tecla(action: StringName) -> void:
 	Input.parse_input_event(solta)
 	for i in 3:
 		await get_tree().process_frame
+
+
+# --- 7f. O menu pelo mouse ---------------------------------------------------------------------
+
+## O Necronomicon pelo mouse (sessão de tester 3): o ponteiro sobre uma entrada,
+## projetada da página ao livro 3D e à tela, a escolhe (o raio da câmera até a
+## página devolve o mesmo ponto); o clique abre as Opções; um clique fora do
+## livro não faz nada; o clique em Voltar e depois em Continuar volta ao jogo.
+func _menu_pelo_mouse() -> void:
+	var nec: Necronomicon = root.get_node("Menus/Necronomicon")
+	await _dia(3)
+	await root.quit_to_menu()
+	await _until(func() -> bool: return main_menu.visible and nec.pronto() and not SceneDirector.is_busy, 15.0)
+	Engine.time_scale = 1.0
+	await _seconds(1.5)
+	var foco := func() -> Control: return main_menu.get_viewport().gui_get_focus_owner()
+	# O raio de volta: a tela de cada entrada cai na mesma entrada.
+	var ida_e_volta := true
+	for b: Control in [main_menu.continue_button, main_menu.new_game_button, main_menu.options_button]:
+		var uv := b.get_global_rect().get_center() / Vector2(Necronomicon.TINTA)
+		var volta: Variant = nec._na_pagina(_tela_da_pagina(nec, uv))
+		if volta == null or (volta as Vector2).distance_to(uv) > 0.01:
+			ida_e_volta = false
+			print("   %s: uv %s, de volta %s" % [b.name, uv, volta])
+	_check(ida_e_volta, "menu pelo mouse: o ponto da tela de cada entrada volta à mesma entrada")
+	await _mouse_em(nec, main_menu.options_button)
+	_check(foco.call() == main_menu.options_button, "o ponteiro sobre Opções a escolhe")
+	await _clique(nec, main_menu.options_button)
+	await _seconds(1.5)
+	var opcoes: OptionsMenu = main_menu.options_menu
+	_check(opcoes.visible, "o clique em Opções vira a folha")
+	# Fora do livro (o canto da tela, a mesa): nada muda.
+	await _clique_na_tela(Vector2(4, 4))
+	await _seconds(0.5)
+	_check(nec._na_pagina(Vector2(4, 4)) == null and opcoes.visible, "o clique fora do livro não faz nada")
+	await _clique(nec, opcoes.back_button)
+	await _seconds(1.5)
+	_check(main_menu.visible and not opcoes.visible, "o clique em Voltar volta ao sumário")
+	await _clique(nec, main_menu.continue_button)
+	await _until(func() -> bool: return not main_menu.visible and not SceneDirector.is_busy and SceneDirector.current_level == ESCRITORIO, 20.0)
+	Engine.time_scale = 8.0
+	await _frames(3)
+	_check(not main_menu.visible and GameState.get_value(&"dia") == 3 and not Events.is_modal_open, "o clique em Continuar volta ao Dia 3")
+
+
+## A posição na tela do ponto `uv` (0..1 nas duas páginas) do livro 3D.
+func _tela_da_pagina(nec: Necronomicon, uv: Vector2) -> Vector2:
+	var p := nec._livro.global_transform * nec._ponto_da_pagina(uv)
+	var local := nec._camera.unproject_position(p)
+	return local * nec._container.size / Vector2(nec._mundo.size) + nec._container.global_position
+
+
+func _mouse_em(nec: Necronomicon, c: Control) -> void:
+	var ev := InputEventMouseMotion.new()
+	ev.position = _tela_da_pagina(nec, c.get_global_rect().get_center() / Vector2(Necronomicon.TINTA))
+	ev.global_position = ev.position
+	# Direto no viewport raiz, em coordenadas dele (no headless, a janela do sistema
+	# reescala a posição de um evento posto por Input.parse_input_event).
+	get_tree().root.push_input(ev, true)
+	for i in 3:
+		await get_tree().process_frame
+
+
+func _clique(nec: Necronomicon, c: Control) -> void:
+	await _mouse_em(nec, c)
+	await _clique_na_tela(_tela_da_pagina(nec, c.get_global_rect().get_center() / Vector2(Necronomicon.TINTA)))
+
+
+func _clique_na_tela(pos: Vector2) -> void:
+	for apertado in [true, false]:
+		var ev := InputEventMouseButton.new()
+		ev.button_index = MOUSE_BUTTON_LEFT
+		ev.pressed = apertado
+		ev.position = pos
+		ev.global_position = pos
+		get_tree().root.push_input(ev, true)
+		for i in 3:
+			await get_tree().process_frame
+
+
+# --- 7g. O Prólogo fora do roteiro ------------------------------------------------------------
+
+## O Prólogo como o jogador o faz sem seguir o roteiro (sessão de tester 3): a
+## pausa e o dossiê no cartão em tela preta; andar sentado (levanta e anda); sair
+## para o menu no meio e continuar (o Prólogo recomeça inteiro); a pausa no meio
+## da lembrança (o sonho sobe) — e maio chega do mesmo jeito.
+func _prologo_fora_do_roteiro() -> void:
+	GameState.reset()
+	await SceneDirector.change_level(ESCRITORIO, &"", false)
+	await _frames(2)
+	var esc: Escritorio = root.find_child("Escritorio", true, false)
+	_check(SceneDirector.hold_black and esc.player.seated, "Prólogo: o cartão em tela preta, ele sentado")
+	await _abrir_e_fechar_telas()
+	await _until(func() -> bool: return not SceneDirector.hold_black, 40.0)
+	_check(not SceneDirector.hold_black and not get_tree().paused, "a pausa e o dossiê no cartão: o cartão acaba e a sala aparece")
+	# Para trás: à frente da cadeira está a escrivaninha.
+	var antes := esc.player.global_position
+	Input.action_press(&"mover_tras")
+	await _seconds(1.5)
+	Input.action_release(&"mover_tras")
+	_check(not esc.player.seated and esc.player.global_position.distance_to(antes) > 0.5, "andar sentado: ele levanta e anda (%.2f m)" % esc.player.global_position.distance_to(antes))
+	# Sair no meio e continuar: o checkpoint é o começo do Prólogo.
+	await root.quit_to_menu()
+	await _frames(2)
+	await root.continue_game()
+	await _until(func() -> bool: return not SceneDirector.is_busy and SceneDirector.current_level == ESCRITORIO, 20.0)
+	await _frames(2)
+	esc = root.find_child("Escritorio", true, false)
+	_check(esc.gabinete.visible and esc.player.seated and SceneDirector.hold_black, "continuar no meio: o Prólogo recomeça (o cartão, sentado)")
+	await _until(func() -> bool: return not SceneDirector.hold_black, 40.0)
+	esc.gabinete.get_node("Folha/Ler").interact(esc.player)
+	await _frames(2)
+	reader.close()
+	await _frames(2)
+	_check(esc.caixa.can_interact(esc.player), "lido o relato, a caixa abre")
+	Events.examine_closed.emit(esc.caixa)
+	# No meio da lembrança (o sonho subindo), a pausa e o dossiê.
+	await _seconds(1.0)
+	await _abrir_e_fechar_telas()
+	await _until(func() -> bool: return GameState.has_flag(&"prologo_concluido") and not SceneDirector.hold_black \
+		and is_zero_approx(GameState.get_number(&"sonho")), 60.0)
+	_check(GameState.get_value(&"dia") == 1 and esc.miskatonic.visible and not SceneDirector.hold_black and is_zero_approx(GameState.get_number(&"sonho")),
+		"a pausa na lembrança: maio chega, sem tela preta nem sonho presos")
+	await _frames(2)
+	_check(esc.player.input_enabled and not Events.is_modal_open, "no fim do Prólogo, o controle volta")
+
+
+# --- 7h. Boston em todas as ordens ---------------------------------------------------------------
+
+## A conversa com o rapaz da pensão (sessão de tester 3) em toda ordem possível
+## das perguntas, com despedidas no meio (ir embora antes do homem de Keene,
+## voltar a falar): em toda ordem a conversa acaba, nada fica preso, e a escada
+## leva de volta só depois do homem de Keene.
+func _boston_em_todas_as_ordens() -> void:
+	# Cada ordem: a sequência de escolhas pelo texto ("despedida" = a despedida).
+	var ordens := [
+		["Apresentar-se", "Perguntar pelo homem de Keene", "Perguntar pela voz dele", "Perguntar se o reconheceria"],
+		["Apresentar-se", "Perguntar pelo homem de Keene", "Perguntar se o reconheceria", "Perguntar pela voz dele"],
+		["Apresentar-se", "despedida", "Perguntar pelo homem de Keene", "despedida", "Perguntar pela voz dele", "Perguntar se o reconheceria"],
+		["Apresentar-se", "Perguntar pelo homem de Keene", "despedida"],
+		["despedida", "Apresentar-se", "Perguntar pelo homem de Keene", "Perguntar se o reconheceria", "despedida"],
+	]
+	for ordem: Array in ordens:
+		GameState.reset()
+		GameState.set_flag(&"prologo_concluido")
+		GameState.set_value(&"dia", 4)
+		for f: StringName in [&"comecou_dia_4", &"ligou_agencia_arkham", &"ligou_boston", &"ligou_telegrama_noturno", &"ligou_relato_keene",
+				&"narrou_cartao_sexta", &"leu_telegrama_pedra"]:
+			GameState.set_flag(f)
+		await SceneDirector.change_level("res://levels/boston/boston.tscn", &"", false)
+		await _frames(2)
+		var boston: Boston = root.find_child("Boston", true, false)
+		boston.bater.interact(boston.player)
+		await _until(func() -> bool: return GameState.has_flag(&"porta_aberta_boston"), 20.0)
+		var rapaz: Interlocutor = boston.get_node("%Conversa")
+		var nome := " → ".join(ordem)
+		var ok := true
+		for escolha: String in ordem:
+			if not rapaz.em_conversa():
+				if not rapaz.can_interact(boston.player):
+					ok = false
+					print("   %s: não dá para voltar a falar antes de \"%s\"" % [nome, escolha])
+					break
+				rapaz.interact(boston.player)
+			await _until(func() -> bool: return OpcoesConversa.atual != null and OpcoesConversa.atual.is_inside_tree(), 30.0)
+			var op := OpcoesConversa.atual
+			if op == null:
+				ok = false
+				print("   %s: as opções não vieram para \"%s\"" % [nome, escolha])
+				break
+			var i := op._frases.size() - 1 if escolha == "despedida" else op._frases.find(escolha)
+			if i < 0:
+				ok = false
+				print("   %s: \"%s\" não está entre %s" % [nome, escolha, op._frases])
+				break
+			if escolha == "despedida" and not GameState.has_flag(&"ligou_boston_homem"):
+				_check(not boston.saida.can_interact(boston.player), "%s: antes do homem de Keene, a escada não leva embora" % nome)
+			op.confirmar(i)
+			await _frames(2)
+			# A fala acaba (ou a despedida fecha a conversa).
+			await _until(func() -> bool: return not rapaz.em_conversa() or (OpcoesConversa.atual != null and OpcoesConversa.atual.is_inside_tree()), 60.0)
+		# O que restou: despede-se, se ainda estiver na conversa.
+		if rapaz.em_conversa():
+			await _until(func() -> bool: return OpcoesConversa.atual != null and OpcoesConversa.atual.is_inside_tree(), 30.0)
+			if OpcoesConversa.atual:
+				OpcoesConversa.atual.confirmar(OpcoesConversa.atual._frases.size() - 1)
+			await _until(func() -> bool: return not rapaz.em_conversa(), 30.0)
+		await _until(func() -> bool: return not Narrator.is_speaking(), 30.0)
+		_check(ok and not rapaz.em_conversa() and boston.player.input_enabled and not Events.is_modal_open and is_zero_approx(GameState.get_number(&"sonho")),
+			"Boston (%s): a conversa acaba sem nada preso" % nome)
+		_check(boston.saida.can_interact(boston.player), "Boston (%s): depois do homem de Keene, a escada leva de volta" % nome)
+	# A última ordem volta a Arkham pela escada a pé.
+	var b: Boston = root.find_child("Boston", true, false)
+	await _andar(b.player, [Vector3(0, 0, 2.6), b.descida.global_position], 20.0)
+	await _until(func() -> bool: return SceneDirector.current_level == ESCRITORIO and not SceneDirector.is_busy, 30.0)
+	_check(SceneDirector.current_level == ESCRITORIO and GameState.has_flag(&"anoiteceu_dia_4"), "descendo a escada a pé: de volta a Arkham, de noite")
 
 
 # --- 8. O macaco ----------------------------------------------------------------------

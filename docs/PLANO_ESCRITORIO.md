@@ -1029,6 +1029,30 @@ O usuário jogou o playtest 9. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ 
    noite toda, com a lâmpada acesa — o único lapso em que ele não fecha. É o que
    diferencia a noite virada das outras.
 
+## Sessão de tester 3 (2026-10-10, antes do playtest 10)
+O usuário ainda não pôde jogar o playtest 10 e pediu o que desse para fazer antes.
+Os três caminhos que a revisão anterior listava como "ainda não testados" viraram
+partes do `caminhos_test`:
+
+1. ✅ **O menu pelo mouse** (`_menu_pelo_mouse`): a posição de cada entrada, levada
+   da página ao livro 3D e à tela, volta pelo raio da câmera (`_na_pagina`) à mesma
+   entrada; o ponteiro sobre Opções a escolhe; o clique vira a folha; um clique fora
+   do livro não faz nada; Voltar e Continuar pelo clique voltam ao Dia 3. (No
+   headless o evento vai direto ao viewport raiz: a janela do sistema reescala o de
+   `Input.parse_input_event`.) Nenhum bug.
+2. ✅ **O Prólogo fora do roteiro** (`_prologo_fora_do_roteiro`): a pausa e o dossiê
+   no cartão em tela preta; andar sentado (ele levanta e anda); sair para o menu no
+   meio e continuar (o Prólogo recomeça inteiro, sentado, com o cartão); a pausa no
+   meio da lembrança (o sonho subindo) — maio chega sem tela preta nem sonho presos.
+   Nenhum bug.
+3. ✅ **Boston em todas as ordens** (`_boston_em_todas_as_ordens`): cinco ordens das
+   perguntas, com despedidas no meio (antes do homem de Keene, e voltar a falar);
+   em todas a conversa acaba sem nada preso, a escada só leva embora depois do homem
+   de Keene, e descer a escada a pé volta a Arkham de noite. Nenhum bug.
+
+Também rodados: o `caminhos_test` inteiro (0 falhas) e o macaco na semente 14 (a
+demo inteira, 0 falhas).
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado
@@ -1066,9 +1090,8 @@ esta seção). Se o usuário pedir mais testes: `comandos.ps1 caminhos`,
 `comandos.ps1 macaco <semente> [tom]` (as sementes 1 a 13 já passam; o tom -1/0/1
 força as respostas), capturas com `tests/_tmp_shot` (`SHOT_MODO`, `SHOT_DIAS`), e
 cada bug achado vira um item novo de uma sessão de tester, com o commit. Ainda não
-testado: o menu e as Opções pelo mouse (o raio da câmera até a página), o Prólogo
-fora do roteiro (pausa no cartão, andar sentado), Boston pelo macaco com a conversa
-inteira em todas as ordens. Quando vier a lista do playtest 9, registrá-la como
+testado até a sessão de tester 3 — feitos nela: o menu pelo mouse, o Prólogo fora do
+roteiro, Boston em todas as ordens. Quando vier a lista do playtest 9, registrá-la como
 **Fase 3j**, no mesmo formato. Não começar a Fase 4 antes dela.
 
 **A fazer, no código:** fases 4, 5, 6 e 7 (abaixo); do marco Demo (GDD §12), a
@@ -1100,6 +1123,8 @@ acessibilidade e o export já estão feitos (sessão do menu); falta o playtest 
 2j3. ✅ O usuário jogou o **playtest 9**; a lista virou a **Fase 3j**, toda feita.
 2j4. **← AQUI.** O usuário joga o **playtest 10** (`docs/PLAYTEST.md`); a lista vira a
    Fase 3k.
+2j5. ✅ Enquanto isso (2026-10-10): a **sessão de tester 3** (acima) e a **F1 da
+   fazenda** (`docs/PLANO_FAZENDA.md`).
 2k. **Decidido em 2026-10-09: o recorte do Interlúdio entra na demo** (os beats 1–3:
    o entardecer, a preparação, a noite do telhado; o "continua" depois dos tiros).
    A fazenda tem diário de bordo próprio: **`docs/PLANO_FAZENDA.md`** (o que o livro
