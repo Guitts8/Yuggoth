@@ -73,7 +73,7 @@ func _ready() -> void:
 	# CAMINHOS=escada_com_a_carta,... roda só esses (depuração do próprio teste).
 	# O macaco é longo (o jogo inteiro): só quando pedido (CAMINHOS=macaco).
 	for parte: Callable in [_textos, _modais_no_meio_das_cenas, _menu_no_meio_do_dia, _escada_com_a_carta,
-			_diario_vazio, _noite_sem_fogo, _exame_na_ligacao_de_keene, _diario_na_ligacao_de_keene, _continuar_em_boston,
+			_diario_vazio, _noite_sem_fogo, _estranhezas, _exame_na_ligacao_de_keene, _diario_na_ligacao_de_keene, _continuar_em_boston,
 			_legenda_presa, _depuracao_no_meio_das_cenas, _menu_no_fim_da_demo, _menu_pelo_teclado, _abertura_do_livro,
 			_acessibilidade, _macaco]:
 		var nome := parte.get_method().trim_prefix("_")
@@ -402,6 +402,29 @@ func _noite_sem_fogo() -> void:
 	await _ir_para_casa(esc)
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 6 and not SceneDirector.hold_black and not esc._saindo, 45.0)
 	_check(GameState.get_value(&"dia") == 6, "e a noite segue até o fim de agosto")
+
+
+# --- 6a. As estranhezas (Fase 6) ------------------------------------------------------
+
+## Com a exposição alta, no Dia 4: o relógio parado mostra outra hora e o cilindro
+## sai da máquina — só fora da vista (ele está no corredor). Tocar o disco põe o
+## cilindro de volta, e não acontece mais. Com a exposição baixa, nada muda.
+func _estranhezas() -> void:
+	var esc := await _dia(4, {&"comecou_dia_4": true, &"exposicao": 0.1, &"fono_cilindro": true, &"tocou_disco": true})
+	await _seconds(5.0)
+	_check(not GameState.has_flag(&"estranheza_relogio") and not GameState.has_flag(&"estranheza_cilindro"), "exposição baixa: nada estranho")
+	esc = await _dia(4, {&"comecou_dia_4": true, &"exposicao": 0.8, &"fono_cilindro": true, &"tocou_disco": true})
+	var cera: Node3D = esc.find_child("MaquinaFonografo", true, false).get_node("Cilindro/Cera")
+	var no_mandril := cera.transform
+	await _until(func() -> bool: return GameState.has_flag(&"estranheza_relogio") and GameState.has_flag(&"estranheza_cilindro"), 20.0)
+	_check(GameState.has_flag(&"estranheza_relogio") and GameState.has_flag(&"estranheza_cilindro") and not cera.transform.is_equal_approx(no_mandril),
+		"exposição alta, fora da vista: o relógio noutra hora, o cilindro fora da máquina")
+	await _entrar(esc)
+	var fono: Fonografo = esc.find_child("MaquinaFonografo", true, false).get_node("Fonografo")
+	fono.interact(esc.player)
+	await _frames(2)
+	_check(cera.transform.is_equal_approx(no_mandril) and GameState.has_flag(&"estranheza_cilindro_desfeita"), "tocar o disco põe o cilindro de volta")
+	fono.parar()
 
 
 # --- 6b. Examinando quando a ligação leva a Boston ---------------------------------

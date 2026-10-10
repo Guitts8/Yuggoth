@@ -124,6 +124,7 @@ func _ready() -> void:
 	_add(cena, player)
 	_spawn("Cadeira", Vector3(0, 0, -1.3))
 	_ligar_vigilia()
+	_estranhezas()
 	# Cada manhã (e a volta de Boston) começa no pé da escada, junto à porta da
 	# rua, de frente para os degraus (playtest 6; na Fase 3f era no alto dela).
 	_spawn("Porta", ESCADA_PE, 0)
@@ -2435,6 +2436,62 @@ func _vigilia(g: Node3D) -> void:
 	var esperar := _area(v, Interactable.new(), "Esperar", Vector3(0.6, 0.6, 0.6), Vector3(0, 0.6, -1.3)) as Interactable
 	esperar.prompt = "Sentar e esperar o dia"
 	v.esperar = esperar
+
+
+## As estranhezas sutis (Fase 6; Estranheza): uma vez cada, sem som nem fala,
+## quando ninguém está olhando, e só com a exposição alta (quem leu e olhou menos,
+## vê menos). As outras duas da lista (o meio toque do telefone, a janela
+## entreaberta) estão na noite em claro (Vigilia). Os limiares partem do mínimo de
+## `exposicao` de quem joga só o necessário (as cartas e o disco somam ~0,45 no Dia
+## 4 e ~0,6 depois do bilhete do Dia 5).
+func _estranhezas() -> void:
+	var dias := cena.get_node("Miskatonic/Dias") as Node3D
+	var dia := func(n: int) -> Condition: return _cond_valor(&"dia", ValueCondition.Op.IGUAL, n)
+
+	# Dia 4, ao entrar: o cilindro de cera fora da máquina, de pé ao lado dela —
+	# ninguém o tirou. Tocar o disco o põe de volta.
+	var cera := dias.get_node("MaquinaFonografo/Cilindro/Cera") as Node3D
+	var e1 := Estranheza.new()
+	e1.name = "EstranhezaCilindro"
+	e1.condition = dia.call(4)
+	e1.limiar = 0.55
+	e1.flag = &"estranheza_cilindro"
+	e1.alvos.assign([cera])
+	# De pé no canto do tampo da mesinha, ao lado da caixa (na placa preta, sumia).
+	e1.transformacoes.assign([Transform3D(Basis.IDENTITY, Vector3(0.21, 0.7 + 0.056, 0.17))])
+	e1.desfazer_com = dias.get_node("MaquinaFonografo/Fonografo") as Interactable
+	_add(dias, e1)
+
+	# Dia 4: o relógio parado mostra outra hora, não a de quando parou.
+	var rel := cena.get_node("Estrutura/Relogio") as Node3D
+	var hora := rel.get_node("PonteiroHora") as Node3D
+	var minuto := rel.get_node("PonteiroMinuto") as Node3D
+	var ponteiro := func(no: Node3D, graus: float, comprimento: float) -> Transform3D:
+		var a := deg_to_rad(graus)
+		var centro := Vector3(0, 0.12, no.position.z)
+		return Transform3D(Basis(Vector3.BACK, a), centro + Vector3(-sin(a), cos(a), 0) * comprimento / 2.0)
+	var e2 := Estranheza.new()
+	e2.name = "EstranhezaRelogio"
+	e2.condition = dia.call(4)
+	e2.limiar = 0.55
+	e2.flag = &"estranheza_relogio"
+	e2.alvos.assign([hora, minuto])
+	e2.transformacoes.assign([ponteiro.call(hora, -100.0, 0.07), ponteiro.call(minuto, 150.0, 0.1)])
+	_add(dias, e2)
+
+	# Dia 5, depois do bilhete: uma das fotografias virada para baixo na mesa.
+	var foto := dias.get_node("Fotografias/Foto5") as Node3D
+	var e3 := Estranheza.new()
+	e3.name = "EstranhezaFoto"
+	e3.condition = _composta(CompositeCondition.Mode.TODAS, [dia.call(5), _flag(&"leu_bilhete_akeley_agosto")])
+	e3.limiar = 0.68
+	e3.flag = &"estranheza_foto"
+	e3.alvos.assign([foto])
+	var virada := foto.transform
+	virada.basis = Basis(Vector3.UP, deg_to_rad(23.0)) * Basis(Vector3.RIGHT, PI)
+	virada.origin.y += 0.001
+	e3.transformacoes.assign([virada])
+	_add(dias, e3)
 
 
 ## Os nós que a vigília mexe e que nascem fora do Dia 6.

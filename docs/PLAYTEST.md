@@ -72,6 +72,10 @@ o que esperava.
       xícaras usadas, a planta do peitoril que amarela e morre, a cortina meio fechada
       no Dia 6, as bolas de papel no cesto (amasse uma carta com Esc). Nota-se sem
       ninguém dizer? Algo atrapalha o caminho?
+- [ ] **As estranhezas** (só com a exposição alta: examine os detalhes das fotos,
+      ouça o disco de novo): no Dia 4, o cilindro fora da máquina e o relógio noutra
+      hora; no Dia 5, depois do bilhete, uma foto virada para baixo. Percebeu? Ficou
+      sutil demais, ou de menos?
 
 ### O resto da lista do playtest 8
 - [ ] **O nome:** *Yuggoth*, no menu (em gótica rubra) e no .exe.

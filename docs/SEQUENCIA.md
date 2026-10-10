@@ -64,6 +64,12 @@ a mancha); a planta do peitoril amarela (Dia 4), seca (5) e morre (6); a cortina
 direita está meio fechada no Dia 6; e cada carta amassada (Esc ao escrever) vira uma
 bola de papel no cesto.
 
+**Estranhezas** 💭 (Fase 6), uma vez cada, sem som e sem fala, só para quem leu e
+olhou bastante (exposição alta) e só quando ninguém está olhando: no **Dia 4**, o
+cilindro de cera aparece fora da máquina, de pé ao lado dela (tocar o disco o devolve),
+e o relógio parado mostra outra hora; no **Dia 5**, depois do bilhete, uma das
+fotografias está virada para baixo na mesa.
+
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
 chão, junto à porta, iluminados pela luz do corredor que entra por baixo dela.

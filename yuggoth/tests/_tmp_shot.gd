@@ -329,7 +329,7 @@ func _olhar_fotos() -> void:
 	var estado := {}
 	for par in partes[1].split(",", false):
 		var kv := par.split("=")
-		estado[StringName(kv[0])] = int(kv[1]) if kv[1].is_valid_int() else (kv[1] == "true")
+		estado[StringName(kv[0])] = int(kv[1]) if kv[1].is_valid_int() else (float(kv[1]) if kv[1].is_valid_float() else kv[1] == "true")
 	GameState.reset()
 	GameState.set_flag(&"prologo_concluido")
 	if int(partes[0]) == 0:

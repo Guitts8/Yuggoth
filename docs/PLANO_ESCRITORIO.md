@@ -1037,6 +1037,9 @@ acessibilidade e o export já estão feitos (sessão do menu); falta o playtest 
    menos o item 3 (❓).
 2j. **← AQUI.** O usuário joga o **playtest 9** (`docs/PLAYTEST.md`); a lista vira a
    Fase 3j. Não começar a Fase 4 antes dela.
+2j2. ✅ **As Fases 4, 5 e 6 feitas antes do playtest 9** (a pedido do usuário: "o que
+   você pode fazer enquanto eu não consigo jogar"): o mapa do condado, a sala que
+   acumula, as estranhezas. Entram na lista do playtest 9.
 2k. **Decidido em 2026-10-09: o recorte do Interlúdio entra na demo** (os beats 1–3:
    o entardecer, a preparação, a noite do telhado; o "continua" depois dos tiros).
    A fazenda tem diário de bordo próprio: **`docs/PLANO_FAZENDA.md`** (o que o livro
@@ -1104,7 +1107,19 @@ pularia de lugar diante do jogador).
 A vista da janela já muda por dia (maio verde, entardecer, noite, julho, chuva,
 noite sem lua); na Fase 2 ela ganha a torre da Miskatonic.
 
-## Fase 6 — Estranhezas sutis 💭
+## Fase 6 — Estranhezas sutis 💭 ✅ (2026-10-09, antes do playtest 9)
+Feito: `components/estranheza.gd` (`Estranheza`) — com a `condition` (o dia) valendo
+e `exposicao` acima do `limiar`, os alvos mudam **só fora da vista** (longe do centro
+da tela, ou com parede no meio: um raio na camada `mundo`), uma vez, sem som nem fala;
+marca a flag; o dia acabando, tudo volta; usar `desfazer_com` também põe de volta (e
+não acontece mais). Três, montadas no fim do gerador (`_estranhezas`): **Dia 4** — o
+cilindro de cera fora da máquina, de pé no canto da mesinha (tocar o disco o põe de
+volta) e **o relógio parado noutra hora** (limiar 0,55); **Dia 5, depois do bilhete** —
+**uma das fotografias virada para baixo** na mesa (0,68). Os limiares partem do mínimo
+de quem joga só o necessário (as cartas e o disco somam ~0,45 no Dia 4 e ~0,6 depois
+do bilhete): quem examina detalhes, reouve o disco e vê o que passa na janela as vê.
+As duas do Dia 6 (o meio toque do telefone, a janela entreaberta) viraram a noite em
+claro (Fase 3i) e acontecem para todos. O `caminhos_test` tem o caso `_estranhezas`.
 Uma vez cada, sem som de susto, sem narração que confirme. Só acontecem com
 exposição acima de um limiar — quem acreditou menos vê menos. Nenhuma contradiz o livro.
 
