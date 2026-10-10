@@ -57,7 +57,7 @@ usa ganha o acabamento primeiro.
 
 ## As fases (em ordem)
 1. ✅ **F1 — A planta em bloco** (2026-10-10, enquanto o usuário não podia jogar o
-   playtest 10). `tools/gerar_fazenda.gd` (+ `.tscn`; `comandos.ps1 gerar-fazenda`)
+   playtest 10; commit `3e1c666`). `tools/gerar_fazenda.gd` (+ `.tscn`; `comandos.ps1 gerar-fazenda`)
    monta `levels/fazenda/fazenda.tscn` (script `Fazenda`, `levels/fazenda/fazenda.gd`);
    as malhas grandes vão em `levels/fazenda/malhas/*.res` (binárias: em texto a cena
    passava de 19 MB). Tudo o que é fixo vira **uma malha por material** (`_bloco`,
@@ -105,7 +105,9 @@ usa ganha o acabamento primeiro.
    - **Para ver:** a fazenda ainda não está no roteiro. No build de teste, **F4** vai
      ao quintal e volta ao escritório (`Depuracao.fazenda()`).
    - **Teste:** o de fumaça anda do quintal pelos degraus ao vestíbulo, sobe a escada
-     até o quarto de hóspedes, desce, sai pelos fundos e entra no celeiro.
+     até o quarto de hóspedes, desce, sai pelos fundos e entra no celeiro (0 falhas).
+   - **Próximo: a F2** (o entardecer de setembro, e a tinta da última carta caindo no
+     quintal). O usuário confere a planta no playtest 10 (`docs/PLAYTEST.md` §0b).
 2. 🔧 **F2 — O entardecer de setembro.** A luz, o céu e a névoa do vale (reusar
    `tools/vistas.gd` e o céu da `TintaTransicao`, que já seca num fim de tarde sobre
    os morros): a tinta da última carta passa a cair no quintal, com Akeley parado,
