@@ -44,6 +44,10 @@ func _ready() -> void:
 		await _olhar_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "fazenda":
+		await _fazenda_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "boston":
 		await _boston_fotos()
 		get_tree().quit()
@@ -494,3 +498,51 @@ func _alcance_sonda() -> void:
 				if c:
 					vistos[esc.get_path_to(c)] = vistos.get(esc.get_path_to(c), 0) + 1
 	print("COLISORES ", vistos)
+
+
+## SHOT_MODO=fazenda: a planta da fazenda (F1) de vários pontos. SHOT_EXTRA
+## ("ox,oy,oz>ax,ay,az|...") troca a lista padrão.
+func _fazenda_fotos() -> void:
+	GameState.reset()
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Quintal", false)
+	await _s(1.0)
+	var faz := root.find_child("Fazenda", true, false) as Node3D
+	var p := faz.find_child("Player", true, false) as Player
+	var pontos := [
+		["estrada", Vector3(30.5, 0, 6.0), Vector3(2, 4, 0)],
+		["caminho", Vector3(16.0, 0, 1.5), Vector3(5, 2.5, 0)],
+		["nordeste", Vector3(26.0, 0, -32.0), Vector3(-8, 3, -6)],
+		["fundos", Vector3(-38.0, 0, -4.0), Vector3(-6, 4, -6)],
+		["montanha", Vector3(-20.0, 0, 10.0), Vector3(-120, 30, 0)],
+		["vale", Vector3(20.0, 0, -4.0), Vector3(120, -10, 0)],
+		["vestibulo", Vector3(5.4, 0.6, 0.6), Vector3(-2, 1.8, 0.2)],
+		["escritorio", Vector3(5.0, 0.6, 2.2), Vector3(1.5, 1.0, 5.2)],
+		["sala_estar", Vector3(5.0, 0.6, -2.0), Vector3(2, 1.0, -5.5)],
+		["jantar", Vector3(0.6, 0.6, 2.0), Vector3(-2.5, 1.0, 5.5)],
+		["cozinha", Vector3(-3.6, 0.6, 2.0), Vector3(-8, 1.2, 5)],
+		["andar_de_cima", Vector3(-0.4, 3.75, 0.8), Vector3(5.5, 4.6, 0.5)],
+		["quarto_hospedes", Vector3(3.0, 3.75, 1.9), Vector3(4, 4.2, 5.5)],
+		["canil", Vector3(6.0, 0, -7.0), Vector3(-2.5, 0.8, -12)],
+		["ford", Vector3(18.0, 0, -15.0), Vector3(12, 1, -15)],
+		["celeiro", Vector3(-12.0, 0, 0.5), Vector3(-15, 3, -12)],
+	]
+	var extra := OS.get_environment("SHOT_EXTRA")
+	if extra:
+		pontos.clear()
+		var i := 0
+		for par in extra.split("|"):
+			var oa := par.split(">")
+			var o := oa[0].split_floats(",")
+			var a := oa[1].split_floats(",")
+			pontos.append(["x%d" % i, Vector3(o[0], o[1], o[2]), Vector3(a[0], a[1], a[2])])
+			i += 1
+	for pt: Array in pontos:
+		p.global_position = pt[1]
+		p.velocity = Vector3.ZERO
+		await _s(0.3)
+		var alvo: Vector3 = pt[2]
+		p.look_at(Vector3(alvo.x, p.global_position.y, alvo.z))
+		var olho := p.camera.global_position
+		p.head.rotation.x = atan2(alvo.y - olho.y, Vector2(alvo.x - olho.x, alvo.z - olho.z).length())
+		await _s(0.5)
+		await _shot("%s_%s" % [tag, pt[0]])

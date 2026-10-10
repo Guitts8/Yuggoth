@@ -8,12 +8,15 @@ extends Node
 ## manhã seguinte. No Prólogo, pula para o Dia 1. F3 recarrega o escritório no
 ## mesmo dia, do jeito que o estado está (destrava sem avançar). Longe de F5–F12:
 ## rodando pelo editor, o jogo repassa essas ao Godot (playtest 6: F8 é o "parar
-## o projeto", e fechava o jogo).
+## o projeto", e fechava o jogo). F4 vai à fazenda de Akeley (docs/PLANO_FAZENDA.md,
+## ainda fora do roteiro: a planta para andar) e, de lá, volta ao escritório.
 
 const VELOCIDADE := 8.0
 const TECLA := KEY_F
 const TECLA_PULAR := KEY_F2
 const TECLA_RECARREGAR := KEY_F3
+const TECLA_FAZENDA := KEY_F4
+const FAZENDA := "res://levels/fazenda/fazenda.tscn"
 const ESCRITORIO := "res://levels/escritorio/escritorio.tscn"
 ## O último dia da demo (Escritorio.dia_do_interludio): dali não se pula.
 const ULTIMO_DIA := 6
@@ -54,6 +57,8 @@ func _input(event: InputEvent) -> void:
 			pular_dia()
 		TECLA_RECARREGAR:
 			recarregar_dia()
+		TECLA_FAZENDA:
+			fazenda()
 
 
 func _process(_delta: float) -> void:
@@ -139,6 +144,19 @@ func recarregar_dia() -> void:
 	if carta and not escritorio.is_empty():
 		escritorio[0].carta_por_postar = carta
 		CartaSaida.criar(escritorio[0].miskatonic, carta)
+
+
+## Vai à fazenda (o quintal) ou, estando nela, volta ao escritório no mesmo dia.
+func fazenda() -> void:
+	if not _pode_mexer():
+		return
+	if SceneDirector.current_level == FAZENDA:
+		await _abrir_escritorio("(teste) De volta ao escritório")
+		return
+	Engine.time_scale = 1.0
+	_acelerando = false
+	await SceneDirector.change_level(FAZENDA, &"Quintal")
+	Events.notice_requested.emit("(teste) A fazenda de Akeley (F4 volta)")
 
 
 func _abrir(c: Correspondencia) -> void:

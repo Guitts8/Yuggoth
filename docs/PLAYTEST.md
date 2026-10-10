@@ -54,6 +54,22 @@ o que esperava.
       à noite (foi para casa) e abre de manhã. E a noite em claro: "Reler as notas até o
       dia", o livro aberto a noite toda. Agora fica claro quando ele não dormiu?
 
+## 0b. Novo, fora do roteiro: a fazenda de Akeley (F1, para andar)
+A planta da fazenda (`docs/PLANO_FAZENDA.md`), ainda sem os beats do Interlúdio e com
+uma luz de tarde provisória. No build de teste, **F4** leva ao quintal e, de lá, F4
+volta ao escritório (se sair do jogo na fazenda, Continuar volta a ela).
+- [ ] **A escala:** a casa (dois andares e meio, o tabuado branco, as venezianas
+      verdes), o gramado até a estrada com a borda de pedras caiadas, o caminho até a
+      porta georgiana, a caixa de correio com o nome. Parece a casa da fotografia do
+      Dia 2?
+- [ ] **Por dentro:** o vestíbulo e a escada, o escritório à esquerda (a poltrona no
+      canto escuro), a sala de jantar, o puxado da cozinha; em cima, o quarto de
+      hóspedes sobre o escritório e o banheiro no alto da escada. Algo apertado, largo
+      demais, ou faltando?
+- [ ] **Atrás e à direita:** o galpão de lenha, a arcada, o celeiro, o moinho, o canil
+      com os nomes dos doze cães nas plaquinhas, o abrigo do Ford; o pântano e a
+      encosta da Dark Mountain.
+
 ## 1. O que mudou desde o playtest 8 (a Fase 3i)
 
 ### Os últimos dias (o maior pedido)
@@ -181,8 +197,9 @@ o que esperava.
 
 ## 4. Depois do playtest 9 (para não se perder)
 **Decidido:** a demo vai ganhar o começo do Interlúdio (como Akeley: o entardecer, a
-preparação e a noite do telhado) — `docs/PLANO_FAZENDA.md`, com três perguntas para
-você antes de começar (as mãos, os nomes dos cães, onde a demo corta).
+preparação e a noite do telhado) — `docs/PLANO_FAZENDA.md`. As três perguntas foram
+respondidas (sem mãos; Brutus, Conan, Hércules, Rambo e mais oito; corta no escuro
+depois dos tiros), e a F1 (a planta) está feita — ver a seção 0b.
 Fase 4 — o mapa de Vermont · Fase 5 — a sala acumula · Fase 6 — estranhezas sutis ·
 Fase 7 — fechamento e o resto do marco Demo (a acessibilidade e o export já estão
 feitos; falta o playtest com 5+ pessoas, com o .exe exportado). Detalhes em

@@ -49,7 +49,8 @@ function Ajuda {
 Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
 
   JOGAR
-    jogar              abre o jogo (janela própria; F2 pula o dia, F3 recarrega)
+    jogar              abre o jogo (janela própria; F2 pula o dia, F3 recarrega,
+                       F4 vai à fazenda e volta)
     jogar-log          abre o jogo e mostra o console (erros aparecem aqui)
     editor             abre o projeto no editor do Godot
 
@@ -71,7 +72,8 @@ Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
     gerar-assets       texturas e sons provisórios (+ importar)
     gerar-escritorio   materiais + levels/escritorio/escritorio.tscn
     gerar-boston       levels/boston/boston.tscn
-    gerar-tudo         assets, importar, escritório e Boston, nessa ordem
+    gerar-fazenda      levels/fazenda/fazenda.tscn (+ as malhas em levels/fazenda/malhas)
+    gerar-tudo         assets, importar, escritório, Boston e fazenda, nessa ordem
 
   SAVE (user://save.json)
     save-ver           mostra dia, data e as principais flags do save atual
@@ -153,11 +155,13 @@ switch ($acao) {
 	}
 	"gerar-escritorio" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tools/gerar_escritorio.tscn") 300 "gerar_escritorio") }
 	"gerar-boston" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tools/gerar_boston.tscn") 300 "gerar_boston") }
+	"gerar-fazenda" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tools/gerar_fazenda.tscn") 300 "gerar_fazenda") }
 	"gerar-tudo" {
 		Godot-Com-Limite @("--headless", "--path", ".", "--script", "res://tools/gerar_assets.gd") 300 "gerar_assets" | Out-Null
 		Godot-Com-Limite @("--headless", "--path", ".", "--import") 300 "importar" | Out-Null
 		Godot-Com-Limite @("--headless", "--path", ".", "res://tools/gerar_escritorio.tscn") 300 "gerar_escritorio" | Out-Null
-		exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tools/gerar_boston.tscn") 300 "gerar_boston")
+		Godot-Com-Limite @("--headless", "--path", ".", "res://tools/gerar_boston.tscn") 300 "gerar_boston" | Out-Null
+		exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tools/gerar_fazenda.tscn") 300 "gerar_fazenda")
 	}
 	"save-ver" { Save-Ver }
 	"save-guardar" {

@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_ofo7u"]
+[ext_resource type="Texture2D" path="res://art/textures/papel_pardo.png" id="2_p1git"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ofo7u")
+shader_parameter/albedo_tex = ExtResource("2_p1git")
+shader_parameter/albedo_color = Color(1.1, 0.95, 0.6, 1)
+shader_parameter/uv_scale = null
+shader_parameter/world_uv = true
+shader_parameter/tiles_per_meter = 1.5
+shader_parameter/snap_scale = null
+shader_parameter/affine_near = null
+shader_parameter/affine_far = null
+shader_parameter/affine_max_error = null
+shader_parameter/alpha_cut = null
+shader_parameter/facetado = null

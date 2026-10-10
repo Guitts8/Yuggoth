@@ -55,13 +55,57 @@ escuro com a poltrona, a sala de estar com o sofá de Noyes, as tábuas que rang
 corredor de cima, o quarto de hóspedes, o abrigo do Ford, a estrada). O que a demo
 usa ganha o acabamento primeiro.
 
-## As fases (em ordem; nenhuma começou)
-1. 🔧 **F1 — A planta em bloco.** Um gerador (`tools/gerar_fazenda.gd`, no feitio dos
-   outros) com a casa, o puxado baixo, o gramado e a borda de pedras caiadas, o
-   caminho, a porta georgiana, a estrada e a caixa de correio, os celeiros/galpões
-   ligados por arcadas, o moinho, o abrigo do Ford, o galpão de lenha, o canil, o
-   terreno pantanoso atrás e a encosta da Dark Mountain (terreno subdividido, mata
-   em lote). Por dentro, os cômodos do térreo e do primeiro andar. Conferir em captura.
+## As fases (em ordem)
+1. ✅ **F1 — A planta em bloco** (2026-10-10, enquanto o usuário não podia jogar o
+   playtest 10). `tools/gerar_fazenda.gd` (+ `.tscn`; `comandos.ps1 gerar-fazenda`)
+   monta `levels/fazenda/fazenda.tscn` (script `Fazenda`, `levels/fazenda/fazenda.gd`);
+   as malhas grandes vão em `levels/fazenda/malhas/*.res` (binárias: em texto a cena
+   passava de 19 MB). Tudo o que é fixo vira **uma malha por material** (`_bloco`,
+   `_parede`, com as faces partidas em células de até 0,75 m, cor por vértice); só o
+   que vai se mexer é nó à parte (as folhas das portas, as venezianas — com a meta
+   `aberta`, para a F6 fechar). A colisão é uma lista de caixas (`_col`) e, no chão,
+   a malha do terreno.
+   - **Onde fica cada coisa** (o livro: a casa à esquerda de quem sobe a estrada para
+     o norte; os celeiros "atrás e à direita"): a estrada de terra corre de norte a
+     sul a leste (x 28..33); a casa, de frente para ela, em x −3..6, z −6..6. O
+     gramado até a estrada com a **borda de pedras caiadas** e o **caminho de lajes
+     margeado de pedras** até a **porta georgiana** (as pilastras, o frontão, a
+     bandeira em leque; a folha branca de seis almofadas). A **caixa de correio de
+     ferro galvanizado** com "H. W. AKELEY" junto à estrada. Atrás e à direita
+     (noroeste): o **puxado baixo** da cozinha (de um andar, com a despensa), o
+     **galpão de lenha** encostado nele (a lenha empilhada, o cepo, o machado), a
+     **arcada** coberta até o **celeiro** grande de tábuas vermelhas (o portão de
+     correr aberto, o palheiro, as baias, a carroça), o galinheiro e o chiqueiro, o
+     **moinho** de torre de madeira; o **canil** comprido de doze baias com as
+     plaquinhas dos nomes e o cercado de tela; ao norte da casa, o **abrigo grande e
+     aberto do Ford** (o Modelo T), com a entrada de carro. Atrás (oeste), o
+     **pântano** de mata rala (as poças, as bétulas, os troncos mortos, os juncos) e,
+     além de um muro de pedra, a **encosta da Dark Mountain**, de mata fechada até a
+     crista; a leste, depois da estrada, o vale e os morros do outro lado. A área de
+     andar é cercada por **muros de pedra seca**.
+   - **A casa por dentro** (centro-hall georgiano, de frente para o leste): o
+     **vestíbulo** de ponta a ponta, com a **escada** subindo para oeste rente à
+     parede norte (andável, com o corrimão e o pilar no pé) e a porta dos fundos
+     para o pântano; à esquerda de quem entra (sul) o **escritório** — a mesa grande
+     do meio, a **poltrona no canto mais escuro** (sudoeste), as estantes, o suporte
+     no canto, a lareira; a **sala de jantar** logo depois dele (a porta entre os
+     dois), e o **puxado da cozinha** mais além na mesma direção (o livro); ao norte,
+     a **sala de estar** (o sofá de Noyes, as poltronas) e a sala dos fundos (o
+     armário dos rifles, a bancada). Duas chaminés de tijolo na parede do meio, com
+     as lareiras costas com costas. Em cima: o **quarto de hóspedes sobre o
+     escritório**, o quarto de Akeley, os dois de trás, e o **banheiro no alto da
+     escada**, no fim do corredor; o sótão (a "meia" casa) fica fechado. O telhado
+     de duas águas, a cumeeira de norte a sul, mais alto que o do puxado — de onde o
+     cão pula para ele.
+   - **Janelas** de guilhotina, seis por seis, **sem vidro** (o vidro opaco do PSX
+     não deixava ver lá fora; na noite do telhado elas são seteiras); as venezianas
+     verdes abertas contra a parede.
+   - **Provisório:** a luz (uma tarde qualquer; a de verdade é a F2), as cores do
+     interior (reboco claro em tudo), os móveis em bloco.
+   - **Para ver:** a fazenda ainda não está no roteiro. No build de teste, **F4** vai
+     ao quintal e volta ao escritório (`Depuracao.fazenda()`).
+   - **Teste:** o de fumaça anda do quintal pelos degraus ao vestíbulo, sobe a escada
+     até o quarto de hóspedes, desce, sai pelos fundos e entra no celeiro.
 2. 🔧 **F2 — O entardecer de setembro.** A luz, o céu e a névoa do vale (reusar
    `tools/vistas.gd` e o céu da `TintaTransicao`, que já seca num fim de tarde sobre
    os morros): a tinta da última carta passa a cair no quintal, com Akeley parado,

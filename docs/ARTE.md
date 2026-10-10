@@ -112,6 +112,8 @@ visto só de relance, nunca nítido.
 ## Mais adiante (não precisa agora)
 Fica registrado para não esquecer; detalhes quando chegarmos lá.
 - **Ato II:** vagão de trem, plataforma da estação de Brattleboro, Ford modelo T, Noyes.
-- **Fazenda:** casa de dois andares, cão pastor (o asset animado mais caro, GDD §11.4),
-  rifle, cilindros e aparelhos, "Akeley" na poltrona, pedra negra.
+- **Fazenda:** a planta em bloco já existe (`tools/gerar_fazenda.gd`, F1); o que mais
+  ganharia com modelo: a porta georgiana, o Ford Modelo T, o moinho, a poltrona; o
+  cão pastor (o asset animado mais caro, GDD §11.4), o rifle, os cilindros e
+  aparelhos, "Akeley" na poltrona, a pedra negra.
 - **Yuggoth:** Mi-Go completo, torres e pontes.

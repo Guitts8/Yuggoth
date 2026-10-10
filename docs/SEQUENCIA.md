@@ -161,7 +161,8 @@ A **demo** vai do Prólogo ao Dia 6 e termina na entrada do Interlúdio: a letra
 da última carta manuscrita enche a tela e a tinta vira o céu de Vermont. **Decidido
 em 2026-10-09:** a demo vai passar a incluir o começo do Interlúdio (o entardecer,
 a preparação e a noite do telhado, como Akeley) e termina depois dos tiros no
-escuro — plano em `docs/PLANO_FAZENDA.md`, ainda não começado.
+escuro — plano em `docs/PLANO_FAZENDA.md`; a F1 (a planta da fazenda, andável, sem
+os beats) está feita, e por enquanto só se chega a ela pelo F4 de teste.
 
 ---
 

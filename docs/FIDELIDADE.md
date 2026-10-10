@@ -81,7 +81,7 @@ Legenda: ✅ jogável · 📄 no GDD, ainda não construído · ➕ falta, entra
 | O rio Connecticut; o condutor manda **atrasar o relógio uma hora** ("como voltar o calendário um século"); o monte Wantastiquet | 📄 Cena A (o jogador gira o relógio de bolso) |
 | Estação de Brattleboro; **Noyes** em vez de Akeley ("crise de asma"); voz cultivada, vagamente familiar; carro novo com placa de Massachusetts | 📄 Cena B |
 | Estrada: o **West River** ("foi aqui que viram uma das coisas"), pontes cobertas, Newfane como último elo; Noyes sonda o que Wilmarth sabe | 📄 Cena C |
-| Chegada: casa branca, caixa de correio com o nome de Akeley; Noyes entra para avisar | 📄 Cena C |
+| Chegada: casa branca, caixa de correio com o nome de Akeley; Noyes entra para avisar | 📄 Cena C (a casa, o gramado com as pedras caiadas, a porta georgiana e a caixa de correio já existem: F1 da fazenda) |
 | Na poeira da estrada, junto ao caminho da casa: **pegadas-garra frescas** | 📄 Cena C |
 | Nenhum cão; **silêncio total** — nem galinhas, nem porcos; o Ford velho de Akeley no galpão; cheiro estranho no vestíbulo | 📄 Cena C e Ato III, Cena A |
 

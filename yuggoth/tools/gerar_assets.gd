@@ -81,6 +81,13 @@ func _texturas() -> void:
 	_save(_foto_marca(), "foto_marca")
 	_save(_foto_casa(), "foto_casa")
 	_save(_foto_exercito(), "foto_exercito")
+	# A fazenda de Akeley (docs/PLANO_FAZENDA.md, F1).
+	_save(_tabuado(), "tabuado")
+	_save(_telhas(), "telhas")
+	_save(_grama(), "grama")
+	_save(_estrada(), "estrada")
+	_save(_pedra_campo(), "pedra_campo")
+	_save(_madeira(Color(0.44, 0.17, 0.12), 61, 16), "celeiro")
 
 
 func _save(img: Image, name: String) -> void:
@@ -2097,6 +2104,127 @@ func _glifo(img: Image, o: Vector2i, forma: int, largo: int, fundo: float) -> vo
 			if b.x < img.get_width() and b.y < img.get_height() and not (b - d) in pontos:
 				var c2 := img.get_pixel(b.x, b.y)
 				img.set_pixel(b.x, b.y, c2.lerp(Color(0.42, 0.42, 0.46), fundo * 0.85))
+
+
+# --- A fazenda (F1) -----------------------------------------------------------
+
+## Tabuado branco da casa (clapboard): tábuas horizontais sobrepostas, cada uma
+## com a sombra do lábio da de cima e clareando para baixo; a tinta gasta, com o
+## veio aparecendo. 8 tábuas por repetição (com world_uv a 1/m, ~12 cm cada).
+func _tabuado() -> Image:
+	var img := _img()
+	var n := _noise(41, 0.06)
+	var veio := _noise(141, 0.7)
+	var base := Color(0.86, 0.85, 0.8)
+	for y in 64:
+		var k := y % 8
+		for x in 64:
+			var f := 0.86 + k * 0.022 + n.get_noise_2d(x, y) * 0.05 + veio.get_noise_2d(x * 0.25, y * 3.0) * 0.035
+			if k == 0:
+				f = 0.52
+			elif k == 1:
+				f *= 0.8
+			img.set_pixel(x, y, _shade(base, f))
+	return img
+
+
+## Telhas de madeira (cedro) envelhecidas: fileiras de 8 px, juntas verticais
+## desencontradas, cada telha num tom de cinza-pardo, a borda de baixo escura.
+func _telhas() -> Image:
+	var img := _img()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 42
+	var n := _noise(42, 0.2)
+	for row in 8:
+		var x := rng.randi_range(0, 5)
+		while x < 64 + 8:
+			var w := rng.randi_range(6, 12)
+			var tom := Color(0.36, 0.33, 0.3).lerp(Color(0.3, 0.25, 0.2), rng.randf()) * rng.randf_range(0.85, 1.1)
+			for yy in 8:
+				for xx in w:
+					var px := posmod(x + xx, 64)
+					var y := row * 8 + yy
+					var f := 0.92 + n.get_noise_2d(px, y * 2.0) * 0.12 + yy * 0.012
+					if xx == 0:
+						f *= 0.6
+					if yy == 7:
+						f *= 0.55
+					img.set_pixel(px, y, _shade(tom, f))
+			x += w
+	return img
+
+
+## Grama de setembro: verde com fios mais claros e mais escuros e manchas
+## amareladas (a cor fica no vértice: o gramado tratado, o pasto, o pântano).
+func _grama() -> Image:
+	var img := _img()
+	var n := _noise(43, 0.08)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 43
+	for y in 64:
+		for x in 64:
+			var v := 0.8 + n.get_noise_2d(x, y) * 0.14 + rng.randf_range(-0.12, 0.12)
+			var c := Color(0.82, 0.95, 0.7).lerp(Color(1.0, 0.95, 0.7), clampf(n.get_noise_2d(x * 0.5 + 99, y * 0.5) * 2.0, 0.0, 1.0))
+			img.set_pixel(x, y, _shade(c, v))
+	return img
+
+
+## A terra batida da estrada: pó pardo-acinzentado, sulcos e pedriscos.
+func _estrada() -> Image:
+	var img := _img()
+	var n := _noise(44, 0.1)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 44
+	for y in 64:
+		for x in 64:
+			var v := 0.88 + n.get_noise_2d(x, y) * 0.1 + rng.randf_range(-0.05, 0.05)
+			var c := Color(0.55, 0.48, 0.38)
+			if rng.randf() < 0.025:
+				c = Color(0.68, 0.66, 0.6)
+			elif rng.randf() < 0.02:
+				c = Color(0.3, 0.26, 0.22)
+			img.set_pixel(x, y, _shade(c, v))
+	return img
+
+
+## Pedra de campo (os muros de pedra seca, a fundação): pedras irregulares
+## (células de Voronoi que repetem), cada uma num tom de cinza, com as frestas
+## escuras entre elas.
+func _pedra_campo() -> Image:
+	var img := _img()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 45
+	var n := _noise(45, 0.15)
+	var centros: Array[Vector2] = []
+	var tons: Array[Color] = []
+	for i in 16:
+		centros.append(Vector2(rng.randf_range(0, 64), rng.randf_range(0, 64)))
+		tons.append(Color(0.5, 0.5, 0.47).lerp(Color(0.42, 0.4, 0.36), rng.randf()) * rng.randf_range(0.85, 1.15))
+	for y in 64:
+		for x in 64:
+			var d1 := INF
+			var d2 := INF
+			var mais := 0
+			for i in centros.size():
+				var d := Vector2(x, y) - centros[i]
+				d.x = absf(d.x)
+				d.y = absf(d.y)
+				d = Vector2(minf(d.x, 64 - d.x), minf(d.y, 64 - d.y))
+				var l := d.length()
+				if l < d1:
+					d2 = d1
+					d1 = l
+					mais = i
+				elif l < d2:
+					d2 = l
+			var f := 0.9 + n.get_noise_2d(x, y) * 0.12
+			var borda := d2 - d1
+			if borda < 1.2:
+				f = 0.28
+			elif borda < 2.4:
+				f *= 0.75
+			img.set_pixel(x, y, _shade(tons[mais], f))
+	return img
 
 
 ## Chama (para billboards): gota com borda irregular, amarela embaixo, vermelha na ponta.

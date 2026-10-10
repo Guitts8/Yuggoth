@@ -896,6 +896,8 @@ func _ready() -> void:
 		_check(GameState.has_flag(&"tocou_disco") and GameState.has_flag(&"fono_cilindro"), "F2: pulado o Dia 3, o fonógrafo já tocou")
 		SceneDirector.clear_level()
 
+	await _fazenda()
+
 	# Paginar sem abrir (abrir marcaria `leu_<id>`); no fim, porque é um quadro longo.
 	var sozinhas := PackedStringArray()
 	for arquivo in DirAccess.get_files_at("res://narrative/documents"):
@@ -1133,6 +1135,26 @@ func _subir_a_escada(esc: Escritorio) -> void:
 
 
 ## Anda pelos `pontos` (só x/z contam), como o jogador, com a física.
+## A fazenda (docs/PLANO_FAZENDA.md, F1: a planta em bloco) se anda: do quintal,
+## pelos degraus da frente, ao vestíbulo; a escada até o primeiro andar e o
+## quarto de hóspedes; de volta, pela porta dos fundos, ao celeiro.
+func _fazenda() -> void:
+	GameState.reset()
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Quintal", false)
+	var faz := get_tree().root.find_child("Fazenda", true, false) as Fazenda
+	var p := faz.player
+	await _seconds(0.5)
+	_check(absf(p.global_position.y) < 0.1 and p.is_on_floor(), "fazenda: de pé no chão do quintal")
+	await _andar(p, [Vector3(9.0, 0, 0), Vector3(5.0, 0, 0)], 30.0)
+	_check(absf(p.global_position.y - 0.6) < 0.15 and p.global_position.x < 5.5, "fazenda: os degraus da frente, o vestíbulo %s" % p.global_position)
+	await _andar(p, [Vector3(4.9, 0, -0.9), Vector3(-0.3, 0, -0.9), Vector3(-0.3, 0, 0.6), Vector3(3.0, 0, 0.6), Vector3(3.0, 0, 3.0)], 60.0)
+	_check(absf(p.global_position.y - 3.75) < 0.15 and p.global_position.z > 2.0, "fazenda: a escada, o quarto de hóspedes %s" % p.global_position)
+	await _andar(p, [Vector3(3.0, 0, 0.6), Vector3(-0.3, 0, 0.6), Vector3(-0.3, 0, -0.9), Vector3(5.0, 0, -0.9), Vector3(5.0, 0, 0.2),
+		Vector3(-2.0, 0, 0.2), Vector3(-5.0, 0, 0.0), Vector3(-15.0, 0, -6.0), Vector3(-15.0, 0, -12.0)], 120.0)
+	_check(p.global_position.y < 0.3 and p.global_position.z < -10.0, "fazenda: a escada abaixo, a porta dos fundos, o celeiro %s" % p.global_position)
+	SceneDirector.clear_level()
+
+
 func _andar(player: Player, pontos: Array, limite := 30.0) -> void:
 	var t := 0.0
 	for alvo: Vector3 in pontos:

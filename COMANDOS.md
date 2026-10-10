@@ -22,7 +22,7 @@ só para aquele comando. A saída do Godot de cada ação fica em `.logs\` (fora
 | `jogar-log` | Abre o jogo com o console junto (os erros aparecem nele) |
 | `editor` | Abre o projeto no editor do Godot |
 | `teste` | Teste de fumaça (~5 min). O código de saída é o número de falhas |
-| `caminhos` | Os caminhos fora do roteiro (~5 min): a pausa e o dossiê no meio das cenas, sair para o menu e continuar no meio do dia e do sonho, descer a escada com a carta, o diário vazio, a noite do Dia 5 sem fogo, continuar em Boston, os textos em todo tom; a legenda que ficava na tela ao trocar de fase, F2/F3 no meio das cenas, sair para o menu no cartão do fim, o menu só pelo teclado, o diário aberto na ida a Boston (~10 min) |
+| `caminhos` | Os caminhos fora do roteiro (~5 min): a pausa e o dossiê no meio das cenas, sair para o menu e continuar no meio do dia e do sonho, descer a escada com a carta, o diário vazio, a noite do Dia 5 sem fogo, continuar em Boston, os textos em todo tom; a legenda que ficava na tela ao trocar de fase, F2/F3 no meio das cenas, sair para o menu no cartão do fim, o menu só pelo teclado, o diário aberto na ida a Boston; o menu pelo mouse, o Prólogo fora do roteiro, Boston em todas as ordens (~10 min) |
 | `macaco [semente] [tom]` | Um jogador ao acaso joga a demo inteira (~15 min): ações em qualquer ordem, telas no meio das cenas, cartas amassadas. Acusa travamentos (com as últimas ações), quedas do mapa e erros no log. Com a semente, repete (quase sempre) as mesmas escolhas; com o tom (-1, 0 ou 1), toda resposta a Akeley sai nesse tom |
 | `exportar` | Exporta a demo para Windows em `build\windows\Yuggoth.exe` (o preset `Windows`; sem os atalhos de teste) |
 | `jogar-exportado` | Abre o jogo exportado |
@@ -31,7 +31,8 @@ só para aquele comando. A saída do Godot de cada ação fica em `.logs\` (fora
 | `gerar-assets` | Texturas e sons provisórios, e importa |
 | `gerar-escritorio` | Materiais e `levels/escritorio/escritorio.tscn` (sobrescreve) |
 | `gerar-boston` | `levels/boston/boston.tscn` (sobrescreve) |
-| `gerar-tudo` | Assets → importar → escritório → Boston |
+| `gerar-fazenda` | `levels/fazenda/fazenda.tscn` e as malhas em `levels/fazenda/malhas/` (sobrescreve) |
+| `gerar-tudo` | Assets → importar → escritório → Boston → fazenda |
 | `save-ver` | Mostra o dia, a data e o que já foi feito no save atual |
 | `save-guardar <nome>` | Copia o save atual para `saves_guardados\<nome>.json` |
 | `save-listar` | Lista os saves guardados |
@@ -66,6 +67,7 @@ exportado):
 | **F** (segurar) | Acelera tudo 8× (falas, lapsos, sonhos, animações) |
 | **F2** | **Pula para o dia seguinte**: dá o dia corrente por feito (correio aberto, resposta escrita, dia anotado) e abre o escritório na manhã seguinte. No Prólogo, pula para o Dia 1. Não passa do Dia 6 (o último da demo). Feche janelas abertas antes |
 | **F3** | **Recarrega o dia**: abre o escritório de novo no mesmo dia, com o que já foi feito. Serve para destravar sem pular |
+| **F4** | **A fazenda de Akeley** (ainda fora do roteiro: a planta para andar, F1): vai ao quintal; de lá, F4 volta ao escritório no mesmo dia. A troca de fase salva: se sair do jogo na fazenda, Continuar volta a ela (F4 volta) |
 | C | Troca a vista da janela entre a cidade 3D e o painel antigo |
 
 ## Os comandos crus
