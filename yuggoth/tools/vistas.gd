@@ -220,10 +220,7 @@ func bosque(mat: Material, clareira: Vector3, boca: Vector3, raio_chao := 0.0) -
 		var a := Vector3(x0, 0, boca.z - 0.5 + absf(x0 - boca.x) * 0.08)
 		var b := Vector3(x0 + 3.5, 0, boca.z - 0.5 + absf(x0 + 3.5 - boca.x) * 0.08)
 		m.quad(a, b, b + Vector3(0, 9.0, -6.0), a + Vector3(0, 9.0, -6.0), Vector3(0, 0.55, 1).normalized(), Color(0.2, 0.2, 0.17) * rng.randf_range(0.85, 1.1))
-	m.caixa(Vector3(2.6, 2.2, 1.0), boca + Vector3(0, 1.1, -0.2), Color(0.06, 0.06, 0.06))
-	_bola(m, boca + Vector3(0, 1.0, 0.35), Vector3(1.15, 1.05, 0.7), Color(0.4, 0.4, 0.38), rng)
-	for s in [-1.0, 1.0]:
-		m.caixa(Vector3(1.0, 2.6, 1.2), boca + Vector3(s * 1.7, 1.2, 0.0), Color(0.3, 0.3, 0.28))
+	_caverna(m, boca, rng)
 	# Vultos parados na névoa, diante da caverna, de mantos escuros: quem os põe
 	# é o gerador (`vulto()`, cada um à parte: viram a cabeça quando ninguém olha).
 	var vultos := PackedVector3Array()
@@ -277,6 +274,50 @@ func bosque(mat: Material, clareira: Vector3, boca: Vector3, raio_chao := 0.0) -
 	if raio_chao > 0.0:
 		raiz.add_child(_ilhas(mat, clareira, boca, raio_chao, rng))
 	return raiz
+
+
+## A boca da caverna (playtest 9: era um matacão entre dois blocos): um
+## afloramento de rocha na encosta, de pedras grandes e tortas empilhadas em arco
+## em volta de uma abertura escura que entra na montanha; o matacão "de uma
+## regularidade arredondada" (a fotografia do Dia 2) quase a fecha, deixando uma
+## fresta preta em meia-lua; musgo e samambaias ao pé, raízes caindo do alto.
+func _caverna(m: Cidade.Malha, boca: Vector3, rng: RandomNumberGenerator) -> void:
+	var rocha := Color(0.31, 0.32, 0.28)
+	var musgo := Color(0.17, 0.23, 0.13)
+	# O fundo: a escuridão que entra na encosta (escondida nela, menos a frente).
+	m.caixa(Vector3(2.0, 2.3, 3.2), boca + Vector3(0.0, 1.05, -1.75), Color(0.012, 0.012, 0.014))
+	# As pedras em arco: [onde (relativo à boca), raios].
+	var pedras := [
+		[Vector3(-1.3, 0.55, 0.05), Vector3(0.7, 0.62, 0.6)], [Vector3(-1.22, 1.35, -0.02), Vector3(0.52, 0.58, 0.5)],
+		[Vector3(-0.98, 2.02, -0.08), Vector3(0.6, 0.45, 0.5)], [Vector3(1.35, 0.58, 0.05), Vector3(0.75, 0.66, 0.6)],
+		[Vector3(1.22, 1.38, -0.02), Vector3(0.55, 0.55, 0.5)], [Vector3(0.95, 2.08, -0.08), Vector3(0.62, 0.46, 0.5)],
+		[Vector3(0.0, 2.42, -0.12), Vector3(1.35, 0.5, 0.62)],
+		[Vector3(-2.45, 1.0, -0.35), Vector3(1.05, 1.25, 0.85)], [Vector3(2.55, 1.15, -0.35), Vector3(1.05, 1.35, 0.85)],
+		[Vector3(0.0, 3.25, -0.65), Vector3(2.2, 0.85, 0.95)], [Vector3(-1.9, 2.6, -0.5), Vector3(0.9, 0.7, 0.7)],
+		[Vector3(2.0, 2.7, -0.5), Vector3(0.95, 0.7, 0.7)],
+	]
+	for pd: Array in pedras:
+		var cor := rocha * rng.randf_range(0.82, 1.12)
+		if rng.randf() < 0.35:
+			cor = cor.lerp(musgo, 0.55)
+		_bola(m, boca + pd[0], pd[1], cor, rng)
+	# O matacão arredondado, mais claro, rente à abertura: a fresta escura em cima
+	# e à esquerda.
+	_bola(m, boca + Vector3(0.3, 0.55, 0.34), Vector3(0.58, 0.56, 0.48), Color(0.42, 0.42, 0.39), rng)
+	# A frente da escuridão, na boca: o que se vê pela fresta (antes do fundo).
+	m.quad_v(boca + Vector3(-0.1, 1.05, 0.12), Vector2(1.5, 1.9), Color(0.008, 0.008, 0.01))
+	# O musgo e as samambaias ao pé da rocha.
+	for k in 22:
+		var x := rng.randf_range(-3.2, 3.2)
+		var c := boca + Vector3(x, 0.0, rng.randf_range(0.35, 1.2))
+		if absf(x) < 0.8 and c.z < boca.z + 0.9:
+			continue
+		m.piramide(rng.randf_range(0.12, 0.3), rng.randf_range(0.2, 0.55), c, 5, musgo * rng.randf_range(0.8, 1.25))
+	# As raízes que caem do alto da rocha sobre a boca.
+	for k in 7:
+		var x := rng.randf_range(-1.0, 1.0)
+		var comprido := rng.randf_range(0.4, 1.0)
+		m.caixa(Vector3(0.03, comprido, 0.03), boca + Vector3(x, 2.05 - comprido / 2.0, 0.42), Color(0.12, 0.1, 0.07))
 
 
 ## Até onde o chão do bosque partido fica firme: o raio em volta da clareira e a

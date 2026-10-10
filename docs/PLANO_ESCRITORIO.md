@@ -972,6 +972,43 @@ depois da farsa e uma noite em claro** (item 13). Commits: `b755e51` (1, 7, 14),
     e 6) valia durante o lapso, com a cidade de dia. Feito: nenhuma `Aparicao` passa
     enquanto um lapso corre (`Lapso.em_curso`).
 
+## Fase 3j — Ajustes do playtest 9 (2026-10-09)
+O usuário jogou o playtest 9. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera resposta.
+
+1. ✅ **Sons bobos:** pôr o café, tomar o café, pôr a carta na calha, pôr e tomar o
+   uísque (ainda sintetizados). Feito, com gravações CC0 (MoreSounds de OwlishMedia,
+   Tinysized SFX, 100 CC0 SFX): o jorro do café e o fio do uísque no copo, a tampa
+   da garrafa térmica e a rolha do frasco, um gole, a xícara pousada; a calha é o
+   papel na fenda e o deslizar no tubo, com um tique de metal no fim.
+2. ✅ **O sonho do disco (noite 3): a entrada da caverna** onde hoje estão o matacão
+   (a "bola") e os dois blocos (os "pilares") — uma boca de caverna de verdade na
+   encosta, entupida pelo matacão arredondado (como na fotografia do Dia 2). Feito
+   (`vistas._caverna`): um afloramento de pedras tortas empilhadas em arco em volta
+   de uma abertura negra que entra na encosta, o matacão quase a fechando (a fresta
+   em meia-lua), raízes caindo do alto, musgo e samambaias ao pé.
+3. ✅ **Entre as árvores distantes, a silhueta de um mi-go observando** — de pé, no
+   chão, não voando. Feito: a `Vigia` (uma `Espreita` que aparece fora da vista, depois
+   de 14 s de sonho), um `Migo` em silhueta, de pé, as asas recolhidas ao longo do
+   corpo (`Migo.recolhidas`), a uns dez metros, meio atrás de um tronco, na névoa.
+4. ✅ **Os livros espalhados** (Fase 5): mais claramente de ocultismo e folclore, ou
+   examináveis com essa informação. O livro dá os nomes: as autoridades que Akeley
+   cita (*"Tylor, Lubbock, Frazer, Quatrefages, Murray, Osborn, Keith, Boule, G.
+   Elliot Smith"*) e o *Necronomicon*, que a biblioteca guarda a sete chaves. Feito
+   (`LIVROS` no gerador): o título dourado na capa de cima de cada pilha, e cada
+   pilha examinável ("Ver os livros": os títulos e o que ele tira do de cima); os
+   abertos têm o cabeçalho e as linhas impressas, e se leem ("Ler o livro aberto").
+   O aberto no chão do Dia 6 são as notas de Wilmarth do *Necronomicon*, copiadas na
+   sala do Dr. Armitage (o livro não sai do armário trancado — o aviso do corredor).
+   As descrições são nossas e só afirmam o que os livros de fato tratam.
+5. ✅ **Uma luz sobre o mapa**, para ele se ver à noite. Feito: uma luminária de
+   quadro, de latão, presa no alto da moldura, com a luz quente sobre o papel.
+6. ❓ **A folha principal do dia sempre no meio** da mesa, as outras perto, e as dos
+   dias anteriores ficando nas extremidades.
+7. ❓ **A passagem do tempo ligada aos livros lidos** (*"para justificar? o take
+   talvez?"*), e **"Sentar e esperar o dia" não faz sentido**: se só a noite em claro
+   for assim, todos os outros saltos parecem noites sem dormir. Achar uma solução
+   para a passagem do tempo que sirva também à noite virada.
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado

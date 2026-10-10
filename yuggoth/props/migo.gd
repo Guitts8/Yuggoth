@@ -24,6 +24,8 @@ const ANTENA := Color(0.66, 0.4, 0.42)
 		batida = v
 ## Quanto as asas sobem e descem (graus).
 @export var amplitude := 38.0
+## Asas recolhidas ao longo do corpo (de pé no chão, parado: playtest 9).
+@export var recolhidas := false
 ## Silhueta: sem luz, quase preta (visto contra o céu, de noite).
 @export var silhueta := false:
 	set(v):
@@ -46,6 +48,9 @@ func _process(delta: float) -> void:
 	var fase := sin(_t * TAU / batida) if batida > 0.0 else 0.0
 	for i in _asas.size():
 		var lado := -1.0 if i == 0 else 1.0
+		if recolhidas:
+			_asas[i].rotation = Vector3(deg_to_rad(8.0), lado * deg_to_rad(-20.0), lado * deg_to_rad(-78.0))
+			continue
 		_asas[i].rotation.z = lado * deg_to_rad(10.0 + amplitude * fase)
 	for i in _pernas.size():
 		_pernas[i].rotation.x = sin(_t * 5.3 + i * 1.7) * 0.12

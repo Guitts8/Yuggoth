@@ -1076,6 +1076,25 @@ func _mapa(g: Node3D) -> void:
 	var tam := Vector2(larg, larg / VT.proporcao())
 	var quadro := _group(g, "MapaVermont", Vector3(-W, 0.98 + tam.y / 2.0, 2.08), 90)
 	_box(quadro, "Moldura", Vector3(tam.x + 0.07, tam.y + 0.07, 0.025), Vector3(0, 0, 0.0125), "madeira_escura")
+	# A luminária de quadro, de latão, presa no alto da moldura (playtest 9: o mapa
+	# sumia à noite): o braço, a cúpula comprida e a luz quente sobre o papel.
+	var lum := _group(quadro, "Luminaria", Vector3(0, tam.y / 2.0 + 0.06, 0.0))
+	_box(lum, "Base", Vector3(0.08, 0.04, 0.02), Vector3(0, -0.02, 0.01), "latao")
+	var braco := _box(lum, "Braco", Vector3(0.012, 0.012, 0.16), Vector3(0, 0.0, 0.085), "latao")
+	braco.rotation_degrees.x = -12.0
+	var cupula := _cyl(lum, "Cupula", 0.03, 0.04, tam.x * 0.55, Vector3(0, 0.015, 0.17), "latao", 8)
+	cupula.rotation_degrees.z = 90.0
+	var luz_mapa := SpotLight3D.new()
+	luz_mapa.name = "Luz"
+	luz_mapa.position = Vector3(0, 0.0, 0.17)
+	luz_mapa.light_color = Color(1.0, 0.82, 0.58)
+	luz_mapa.light_energy = 1.6
+	luz_mapa.spot_range = 2.2
+	luz_mapa.spot_angle = 52.0
+	luz_mapa.spot_attenuation = 0.9
+	luz_mapa.shadow_enabled = false
+	_add(lum, luz_mapa)
+	luz_mapa.basis = Basis.looking_at(Vector3(0, -tam.y * 0.55, 0.0) - luz_mapa.position)
 	var papel := _group(quadro, "Papel", Vector3(0, 0, 0.0265))
 	_quad(papel, "Folha", tam, Vector3.ZERO, Vector3.ZERO, "mapa_vermont")
 	var no_papel := func(uv: Vector2) -> Vector3:
@@ -1751,6 +1770,11 @@ func _bebida(g: Node3D) -> void:
 	b.frasco_servindo = Transform3D(Basis.from_euler(Vector3(0, deg_to_rad(-25.0), 0)), Vector3(0.74, MESA, -0.1))
 	b.som_servir = _sfx("servir.wav")
 	b.som_gaveta = _sfx("gaveta.wav")
+	b.som_servir_uisque = _sfx("servir_uisque.wav")
+	b.som_destampar = _sfx("destampar_garrafa.wav")
+	b.som_destampar_frasco = _sfx("destampar_frasco.wav")
+	b.som_gole = _sfx("gole.wav")
+	b.som_pousar = _sfx("pousar_xicara.wav")
 	var bebidas: Dictionary[int, int] = {1: 1, 2: 1, 3: 1, 4: 2}
 	cena.set("bebidas", bebidas)
 
@@ -2016,22 +2040,26 @@ func _acumula(parent: Node) -> void:
 	var desde := func(n: int) -> Condition: return _cond_valor(&"dia", ValueCondition.Op.MAIOR_OU_IGUAL, n)
 	var so := func(n: int) -> Condition: return _cond_valor(&"dia", ValueCondition.Op.IGUAL, n)
 
-	# Os livros.
+	# Os livros (playtest 9: "mais claramente de ocultismo, ou interagir e receber
+	# essa informação"): as autoridades que Akeley cita na 1ª carta ("Tylor,
+	# Lubbock, Frazer, Quatrefages, Murray, Osborn, Keith, Boule, G. Elliot Smith"),
+	# as lendas da Nova Inglaterra e, no fim, as notas de Wilmarth do Necronomicon.
+	# O título dourado na capa de cima; cada pilha se examina.
 	var d2 := _grupo_se(g, "LivrosDia2", desde.call(2))
-	_pilha(d2, "Armario", Vector3(-2.2, 0.905, 2.2), 2, 11)
+	_pilha(d2, "Armario", Vector3(-2.2, 0.905, 2.2), 2, 11, ["frazer", "murray"])
 	var d3 := _grupo_se(g, "LivrosDia3", desde.call(3))
-	_pilha(d3, "ChaoNoroeste", Vector3(-1.62, 0, -2.62), 5, 12)
+	_pilha(d3, "ChaoNoroeste", Vector3(-1.62, 0, -2.62), 5, 12, ["skinner", "tylor", "lubbock", "quatrefages", "frazer_balder"])
 	var d4 := _grupo_se(g, "LivrosDia4", desde.call(4))
-	_pilha(d4, "ChaoMesa", Vector3(1.05, 0, -2.55), 6, 13)
-	_livro_aberto(d4, "AbertoArmario", Vector3(-2.12, 0.905, 2.55), 70.0, "livro_verde")
+	_pilha(d4, "ChaoMesa", Vector3(1.05, 0, -2.55), 6, 13, ["elliot_smith", "osborn", "keith", "boule"])
+	_livro_aberto(d4, "AbertoArmario", Vector3(-2.12, 0.905, 2.55), 70.0, "livro_verde", "murray_aberto")
 	var d5 := _grupo_se(g, "LivrosDia5", desde.call(5))
-	_pilha(d5, "ChaoOeste", Vector3(-2.22, 0, 1.15), 7, 14)
-	_pilha(d5, "ChaoOeste2", Vector3(-2.2, 0, 0.82), 4, 15)
+	_pilha(d5, "ChaoOeste", Vector3(-2.22, 0, 1.15), 7, 14, ["thompson", "skinner", "frazer_magia"])
+	_pilha(d5, "ChaoOeste2", Vector3(-2.2, 0, 0.82), 4, 15, ["quatrefages", "tylor"])
 	var d6 := _grupo_se(g, "LivrosDia6", desde.call(6))
-	_livro_aberto(d6, "AbertoChao", Vector3(0.55, 0.0, 1.55), -20.0, "livro_rubro")
-	_livro_aberto(d6, "AbertoPeitoril", Vector3(-0.3, JANELA_Y.x + 0.02, -D + 0.12), 8.0, "livro_pardo")
-	_pilha(d6, "ChaoPorta", Vector3(-1.75, 0, 2.62), 5, 16)
-	_pilha(d6, "Arquivo", Vector3(W - 0.31, 1.32, -D + 0.42), 3, 17)
+	_livro_aberto(d6, "AbertoChao", Vector3(0.55, 0.0, 1.55), -20.0, "livro_rubro", "notas_necronomicon")
+	_livro_aberto(d6, "AbertoPeitoril", Vector3(-0.3, JANELA_Y.x + 0.02, -D + 0.12), 8.0, "livro_pardo", "skinner_aberto")
+	_pilha(d6, "ChaoPorta", Vector3(-1.75, 0, 2.62), 5, 16, ["murray", "elliot_smith", "lubbock"])
+	_pilha(d6, "Arquivo", Vector3(W - 0.31, 1.32, -D + 0.42), 3, 17, ["thompson", "boule"])
 
 	# As xícaras com o fundo de café.
 	_xicara_suja(_grupo_se(g, "XicaraDia2", desde.call(2)), "Peitoril", Vector3(0.18, JANELA_Y.x + 0.02, -D + 0.12), 0.0)
@@ -2068,8 +2096,48 @@ func _acumula(parent: Node) -> void:
 		b2.rotation_degrees = Vector3(rng.randf_range(0, 90), rng.randf_range(0, 90), rng.randf_range(0, 90))
 
 
-## Uma pilha de `n` livros da biblioteca, deitados, cada um um pouco torto.
-func _pilha(pai: Node3D, nome: String, pos: Vector3, n: int, semente: int) -> void:
+## Os livros da biblioteca: [título na lombada (inglês), autor e ano, o que ele
+## tira dele (tradução nossa, na voz de Wilmarth)].
+const LIVROS := {
+	"frazer": ["THE GOLDEN BOUGH", "J. G. Frazer, 1890–1915",
+		"O Ramo de Ouro, de Frazer: os reis-sacerdotes que morriam para a terra renascer, os ritos das colinas, os deuses que morrem. Explica tanto — e nada do que Akeley descreve."],
+	"frazer_balder": ["BALDER THE BEAUTIFUL", "J. G. Frazer, 1913",
+		"O último volume de Frazer: as fogueiras dos montes no verão e no outono. As noites de 1º de maio e de Todos os Santos, as mesmas do disco."],
+	"frazer_magia": ["THE MAGIC ART", "J. G. Frazer, 1911",
+		"Frazer, A Arte Mágica: o semelhante produz o semelhante. Copiar a voz de um homem para chamá-lo."],
+	"murray": ["THE WITCH-CULT IN WESTERN EUROPE", "M. A. Murray, 1921",
+		"Miss Murray: os sabás como sobrevivência de um culto mais velho que a Igreja, reunido nos morros em certas noites do ano. Uma raça antiga escondida entre os camponeses."],
+	"murray_aberto": ["THE WITCH-CULT IN WESTERN EUROPE", "M. A. Murray, 1921",
+		"Aberto no capítulo das assembleias: os fiéis se reuniam nos morros nas noites de festa, diante do “Diabo” — um homem disfarçado, diz ela."],
+	"tylor": ["PRIMITIVE CULTURE", "E. B. Tylor, 1871",
+		"Tylor, A Cultura Primitiva: as sobrevivências — costumes que duram muito depois de esquecido o motivo. Os lampiões nos morros de Vermont seriam uma delas?"],
+	"lubbock": ["PREHISTORIC TIMES", "J. Lubbock, 1865",
+		"Lubbock, Os Tempos Pré-Históricos: os monumentos de pedra, os túmulos, os povos que vieram antes dos que conhecemos."],
+	"quatrefages": ["THE PYGMIES", "A. de Quatrefages, 1895",
+		"Quatrefages, Os Pigmeus: as raças pequenas que a lenda fez anões e gente das colinas — a explicação que eu dava aos jornais."],
+	"osborn": ["MEN OF THE OLD STONE AGE", "H. F. Osborn, 1915",
+		"Osborn, Os Homens da Idade da Pedra: dezenas de milhares de anos antes de nós, nas mesmas cavernas."],
+	"keith": ["THE ANTIQUITY OF MAN", "A. Keith, 1915",
+		"Keith, A Antiguidade do Homem. Quanto tempo a terra esteve aqui antes de nós — e quem estava nela."],
+	"boule": ["FOSSIL MEN", "M. Boule, 1923",
+		"Boule, Os Homens Fósseis: os crânios das grutas da França, de raças que não deixaram descendentes."],
+	"elliot_smith": ["THE EVOLUTION OF THE DRAGON", "G. Elliot Smith, 1919",
+		"Elliot Smith: os monstros dos mitos nascidos de memórias muito antigas, espalhados pelo mundo a partir de um só lugar."],
+	"skinner": ["MYTHS AND LEGENDS OF OUR OWN LAND", "C. M. Skinner, 1896",
+		"Skinner, Mitos e Lendas da Nossa Terra: as histórias da Nova Inglaterra. Os seres das colinas de Vermont mal aparecem — o folclore de lá nunca foi recolhido direito."],
+	"skinner_aberto": ["MYTHS AND LEGENDS OF OUR OWN LAND", "C. M. Skinner, 1896",
+		"Aberto nas lendas das montanhas: luzes que andam nos morros, e gente que subiu e não voltou."],
+	"thompson": ["HISTORY OF VERMONT", "Z. Thompson, 1842",
+		"A História de Vermont, de Thompson: os primeiros colonos, as concessões do governador Wentworth, os condados. Nem uma palavra sobre o que os índios contavam dos montes."],
+	"notas_necronomicon": ["NOTAS — NECRONOMICON", "A. N. W., Biblioteca da Miskatonic, armário trancado",
+		"As minhas notas, copiadas à mão na sala do Dr. Armitage: o Necronomicon do árabe louco Abdul Alhazred, na versão latina. Os ciclos de Yog-Sothoth e de Cthulhu, e os que vieram das estrelas antes do homem. Eu não queria ter copiado isto."],
+}
+
+
+## Uma pilha de `n` livros da biblioteca, deitados, cada um um pouco torto; os
+## `titulos` (chaves de LIVROS) vão de cima para baixo: o de cima com o título
+## dourado na capa, e a pilha se examina.
+func _pilha(pai: Node3D, nome: String, pos: Vector3, n: int, semente: int, titulos: Array = []) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = semente
 	var p := _group(pai, "Pilha" + nome, pos)
@@ -2082,16 +2150,50 @@ func _pilha(pai: Node3D, nome: String, pos: Vector3, n: int, semente: int) -> vo
 		# As páginas: o corte claro de um lado.
 		_box(l, "Corte", Vector3(0.006, tam.y * 0.8, tam.z * 0.94), Vector3(tam.x / 2.0, 0, 0), "papel")
 		y += tam.y
+		if k == n - 1 and not titulos.is_empty():
+			var t := _letreiro(l, "Titulo", String(LIVROS[titulos[0]][0]).replace(" ", "\n"), Vector3(0, tam.y / 2.0 + 0.0008, 0), 0.00011, Color(0.95, 0.78, 0.35))
+			t.rotation_degrees.x = -90.0
+			t.font = load(VERSALETE)
+			t.font_size = 64
+			t.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+	if not titulos.is_empty():
+		var ex := _area(p, Examinable.new(), "Examinar", Vector3(0.3, y + 0.04, 0.32), Vector3(0, y / 2.0, 0)) as Examinable
+		ex.prompt = "Ver os livros"
+		var nomes := []
+		for chave: String in titulos:
+			nomes.append("%s — %s" % [String(LIVROS[chave][0]).capitalize(), LIVROS[chave][1]])
+		ex.title = "Livros da biblioteca"
+		ex.description = "%s\n\n%s" % [" · ".join(nomes), LIVROS[titulos[0]][2]]
+		ex.initial_rotation = Vector3(35, 0, 0)
 
 
-## Um livro aberto, as páginas para cima (lido e largado).
-func _livro_aberto(pai: Node3D, nome: String, pos: Vector3, rot_y: float, mat: String) -> void:
+## Um livro aberto, as páginas para cima (lido e largado); `chave` em LIVROS dá
+## o cabeçalho impresso na página e o que se lê nele.
+func _livro_aberto(pai: Node3D, nome: String, pos: Vector3, rot_y: float, mat: String, chave := "") -> void:
 	var l := _group(pai, "Livro" + nome, pos, rot_y)
 	for s in [-1, 1]:
 		var capa := _box(l, "Capa%d" % (s + 1), Vector3(0.16, 0.006, 0.23), Vector3(s * 0.08, 0.003, 0), mat)
 		capa.rotation_degrees.z = s * -4.0
 		var folhas := _box(l, "Folhas%d" % (s + 1), Vector3(0.15, 0.018, 0.22), Vector3(s * 0.078, 0.014, 0), "papel")
 		folhas.rotation_degrees.z = s * -6.0
+	if chave.is_empty():
+		return
+	var livro: Array = LIVROS[chave]
+	var mao := chave == "notas_necronomicon"
+	var cab := _letreiro(l, "Cabecalho", livro[0], Vector3(-0.078, 0.0245, -0.08), 0.00007, Color(0.15, 0.1, 0.08))
+	cab.rotation_degrees.x = -90.0
+	cab.font = load(CALIGRAFIA if mao else VERSALETE)
+	cab.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+	# As linhas da página: riscos de texto (de mão, nas notas), e um sinal nas notas.
+	for k in 9:
+		for s in [-1, 1]:
+			var risco := _box(l, "Linha%d_%d" % [k, s + 1], Vector3(0.11 - (k % 3) * 0.012, 0.0006, 0.004), Vector3(s * 0.078, 0.0236, -0.055 + k * 0.016), "carimbo" if mao else "esmalte_preto")
+			risco.rotation_degrees.z = s * -6.0
+	var ex := _area(l, Examinable.new(), "Examinar", Vector3(0.34, 0.06, 0.26), Vector3(0, 0.02, 0)) as Examinable
+	ex.prompt = "Ler o livro aberto" if not mao else "Ler as minhas notas"
+	ex.title = String(livro[0]).capitalize() if not mao else "As minhas notas do Necronomicon"
+	ex.description = "%s\n\n%s" % [livro[1], livro[2]]
+	ex.initial_rotation = Vector3(60, 0, 0)
 
 
 ## Uma xícara usada no pires, com o fundo de café seco; `caida`, tombada no chão,
@@ -3123,6 +3225,29 @@ func _sonho_disco(g: Node3D) -> void:
 	migo.batida = 0.4
 	migo.rotation_degrees = Vector3(0, -90, -8)
 	_add(passa, migo)
+
+	# Playtest 9: entre as árvores distantes, uma delas de pé no chão, olhando —
+	# só a silhueta na névoa. Aparece quando ninguém está olhando para lá (Espreita),
+	# depois de um tempo no sonho, e fica.
+	var vigia := Espreita.new()
+	vigia.name = "Vigia"
+	vigia.aparecer = true
+	vigia.intervalo = 4.0
+	vigia.espera = 14.0
+	vigia.altura = 1.4
+	vigia.position = clareira + Vector3(-8.6, 0.0, -5.2)
+	_add(g, vigia)
+	var de_pe := Migo.new()
+	de_pe.name = "Migo"
+	de_pe.silhueta = true
+	de_pe.batida = 0.0
+	de_pe.recolhidas = true
+	# De pé: o corpo em pé (como o da janela, Dia 5), virado para a clareira.
+	var para := (clareira - vigia.position)
+	de_pe.rotation_degrees = Vector3(-78, rad_to_deg(atan2(para.x, para.z)) - 90.0, 0)
+	de_pe.position = Vector3(0, 0.78, 0)
+	de_pe.scale = Vector3.ONE * 1.6
+	_add(vigia, de_pe)
 
 	_loucura_do_disco(g, mat, bosque, clareira)
 

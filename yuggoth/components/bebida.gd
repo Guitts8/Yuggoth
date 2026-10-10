@@ -22,6 +22,13 @@ extends Node3D
 @export var frasco_servindo := Transform3D.IDENTITY
 @export var som_servir: AudioStream
 @export var som_gaveta: AudioStream
+## Playtest 9 ("efeitos sonoros bobos ao colocar café, ao tomar café, [...] ao
+## tomar e colocar whisky"): gravações CC0 (audio/foley/FONTES.md).
+@export var som_servir_uisque: AudioStream
+@export var som_destampar: AudioStream
+@export var som_destampar_frasco: AudioStream
+@export var som_gole: AudioStream
+@export var som_pousar: AudioStream
 
 
 func _ready() -> void:
@@ -37,7 +44,8 @@ func _repor() -> void:
 
 ## Café da garrafa térmica na xícara, e um gole.
 func cafe(player: Player) -> void:
-	await _servir(player, garrafa, xicara, 1.0)
+	_tocar(som_destampar)
+	await _servir(player, garrafa, xicara, 1.0, som_servir)
 	await gole(player, xicara)
 
 
@@ -56,7 +64,8 @@ func uisque(player: Player) -> void:
 	frasco.reparent(gaveta.get_parent(), true)
 	var de := frasco.transform
 	await _arco(de, frasco_servindo, 1.1)
-	await _servir(player, frasco, copo, 0.45)
+	_tocar(som_destampar_frasco)
+	await _servir(player, frasco, copo, 0.45, som_servir_uisque if som_servir_uisque else som_servir)
 	await player.olhar_para(gaveta.global_position + Vector3.UP * 0.25, 0.7).finished
 	await _arco(frasco_servindo, de, 0.9)
 	frasco.reparent(gaveta, true)
@@ -90,16 +99,18 @@ func gole(player: Player, recipiente: Node3D) -> void:
 	await t.finished
 	t = _tween()
 	t.tween_method(func(k: float) -> void: recipiente.global_transform = boca.call(10.0 + 45.0 * sin(k * PI)), 0.0, 1.0, 1.6)
+	get_tree().create_timer(0.55).timeout.connect(_tocar.bind(som_gole))
 	await t.finished
 	var de := recipiente.global_transform
 	t = _tween()
 	t.tween_method(func(k: float) -> void: recipiente.global_transform = de.interpolate_with(casa, k), 0.0, 1.0, 1.1)
 	await t.finished
+	_tocar(som_pousar)
 
 
 ## O que serve vai sobre o recipiente, inclina, o líquido sobe até `cheio`, e
 ## o que serve volta ao lugar.
-func _servir(player: Player, de: Node3D, para: Node3D, cheio: float) -> void:
+func _servir(player: Player, de: Node3D, para: Node3D, cheio: float, som: AudioStream) -> void:
 	await player.olhar_para(para.global_position, 0.8).finished
 	var casa := de.global_transform
 	# Inclina de lado para quem olha, com a boca (o filho "Boca") sobre o
@@ -116,7 +127,7 @@ func _servir(player: Player, de: Node3D, para: Node3D, cheio: float) -> void:
 	t.tween_property(de, ^"global_transform", sobre, 0.8)
 	t.tween_property(de, ^"global_transform", inclinado, 0.5)
 	await t.finished
-	_tocar(som_servir)
+	_tocar(som)
 	var nivel := para.get_node_or_null(^"Nivel") as Node3D
 	if nivel:
 		nivel.visible = true

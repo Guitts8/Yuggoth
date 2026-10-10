@@ -246,6 +246,32 @@ def alfinete():
     salvar("alfinete", sala(a[: seg(0.25)], 0.25, 0.08, semente=26), alvo=0.6)
 
 
+def bebida():
+    """Playtest 9: o café e o uísque (MoreSounds de OwlishMedia, Tinysized SFX, 100 CC0 SFX)."""
+    # O café da garrafa térmica na xícara: um jorro grosso, curto.
+    cafe = passa_baixa(aparar(ler("x/tinysized/sfx-cc0/water-pour-01.wav")), 5000)
+    salvar("servir", sala(cafe, 0.3, 0.08, semente=30), alvo=0.6)
+    # O uísque no copo: fino, de vidro, mais curto.
+    uisque = aparar(ler("x/tinysized/sfx-cc0/water-vial-fill-01.wav"))[: seg(1.4)]
+    salvar("servir_uisque", sala(uisque, 0.3, 0.08, semente=31), alvo=0.55)
+    # A tampa da garrafa térmica; a rolha do frasco.
+    salvar("destampar_garrafa", sala(aparar(ler("x/tinysized/sfx-cc0/bottle-clay-uncork-01.wav")), 0.3, 0.08, semente=32), alvo=0.5)
+    salvar("destampar_frasco", sala(aparar(ler("x/tinysized/sfx-cc0/bottle-glass-uncork-01.wav")), 0.3, 0.08, semente=33), alvo=0.5)
+    # Um gole (baixo, perto da boca).
+    salvar("gole", passa_baixa(aparar(ler("x/MoreSounds/Drink/Drink_06.wav")), 6000), alvo=0.5)
+    # A xícara (ou o copo) pousada de volta: um tilintar de louça, abafado.
+    salvar("pousar_xicara", sala(passa_baixa(aparar(ler("x/100-CC0-SFX_0/dishes_04.ogg")), 5000), 0.3, 0.08, semente=34), alvo=0.45)
+
+
+def calha():
+    """A carta descendo a calha de correio de latão: o papel na fenda e o deslizar no tubo."""
+    fenda = pico(aparar(ler("x/sounds_6/WAV/Paper Sound - 2.wav")))
+    tubo = pico(passa_baixa(tom(aparar(ler("x/tinysized/sfx-cc0/tube-plastic-whoosh-02.wav")), 0.55), 2500))
+    tique = pico(passa_alta(aparar(ler("x/RPGsounds_Kenney/OGG/metalClick.ogg")), 800))
+    y = misturar((fenda, 0.0, 0.8), (tubo, 0.25, 0.7), (tique, 0.9, 0.25))
+    salvar("calha_correio", sala(y, 0.6, 0.18, semente=35), alvo=0.6)
+
+
 def lama():
     m = pico(aparar(ler("x/[kdd]DifferentSteps_0/mud02.ogg")))
     salvar("lama", sala(passa_baixa(tom(m, 0.75), 2500), 0.4, 0.12, semente=19), alvo=0.8)
@@ -286,6 +312,8 @@ def main():
     papel()
     lama()
     alfinete()
+    bebida()
+    calha()
     menu()
 
 

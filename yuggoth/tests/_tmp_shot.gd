@@ -153,6 +153,26 @@ func _sonho_fotos(n: int) -> void:
 		p.head.rotation.x = -0.05
 		await _s(0.6)
 		await _shot("%s_noite%d_%d" % [tag, n, i])
+	if n == 3:
+		var vigia := esc.find_child("Vigia", true, false) as Node3D
+		var caverna := vigia.global_position
+		# De costas para a vigia por um tempo (ela aparece fora da vista).
+		await _olhar(p, p.global_position - (vigia.global_position - p.global_position))
+		await _s(20.0)
+		await _olhar(p, vigia.global_position)
+		p.head.rotation.x = 0.05
+		await _s(0.6)
+		await _shot("%s_vigia" % tag)
+		for c: Node3D in esc.find_children("Respira*", "", true, false):
+			pass
+		await _olhar(p, p.global_position + Vector3(0.9, 0, -7.2))
+		p.head.rotation.x = 0.0
+		await _s(0.6)
+		await _shot("%s_caverna" % tag)
+		p.global_position += Vector3(0.4, 0, -3.5)
+		await _olhar(p, p.global_position + Vector3(0.5, 0, -3.0))
+		await _s(0.6)
+		await _shot("%s_caverna_perto" % tag)
 	var pedra := esc.find_child("Pedra", true, false) as Node3D
 	if n == 4 and pedra:
 		for k in 3:

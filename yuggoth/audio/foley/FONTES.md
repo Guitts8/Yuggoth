@@ -10,12 +10,12 @@ sobrenatural — o zumbido, o disco, as vozes, o sonho — continua sintetizado 
 
 | Fonte (CC0) | Autor | Usado em |
 |---|---|---|
-| [50 RPG sound effects](https://opengameart.org/content/50-rpg-sound-effects) | Kenney (kenney.nl) | passos (o estalo grave), alfinete, porta_trinco, telefone_gancho, correio_fresta, pacote_chao, selo_batido, menu_capa, menu_baque |
+| [50 RPG sound effects](https://opengameart.org/content/50-rpg-sound-effects) | Kenney (kenney.nl) | passos (o estalo grave), alfinete, calha_correio, porta_trinco, telefone_gancho, correio_fresta, pacote_chao, selo_batido, menu_capa, menu_baque |
 | [Book Flip Sounds](https://opengameart.org/content/book-flip-sounds) | Voltiment555 | menu_folha |
 | [Rain (loopable)](https://opengameart.org/content/rain-loopable) | Ylmir | chuva |
 | [Fireplace Sound loop](https://opengameart.org/content/fireplace-sound-loop) | PagDev | lareira |
 | [Fire Crackling](https://opengameart.org/node/16327) | AntumDeluge | lareira (os estalos) |
-| [Various Paper Sound Effects](https://opengameart.org/node/127323) | Luckius | papel_pegar, papel_amassado, papel_rasgando, correio_fresta |
+| [Various Paper Sound Effects](https://opengameart.org/node/127323) | Luckius | papel_pegar, papel_amassado, papel_rasgando, correio_fresta, calha_correio |
 | [Different steps on wood, stone, leaves, gravel and mud](https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud) | TinyWorlds | passo_madeira_1–3, lama |
 | [Doorbell ring](https://opengameart.org/content/doorbell-ring) (Doorbell-old-tring, Wikimedia Commons) | — | campainha (o telefone de parede) |
 | [Crickets Ambient Noise (loopable)](https://opengameart.org/content/crickets-ambient-noise-loopable) | Wolfgang_ | noite |
@@ -24,6 +24,9 @@ sobrenatural — o zumbido, o disco, as vozes, o sonho — continua sintetizado 
 | [Pencil Sounds](https://opengameart.org/node/132692) | NachtmahrTV (pencil_write) | pena, menu_pena, menu_risco |
 | [100 CC0 metal and wood SFX](https://opengameart.org/content/100-cc0-metal-and-wood-sfx) | rubberduck | batidas_porta, pacote_chao, janela, menu_baque |
 | [Various sound effects](https://opengameart.org/content/various-sound-effects) | laleksic | porta_rangendo, gaveta, fosforo, menu_fosforo |
+| [202 More Sound Effects](https://opengameart.org/content/202-more-sound-effects) | OwlishMedia | gole |
+| [Fantasy Sound Effects (Tinysized SFX)](https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx) | Vehicle | servir, servir_uisque, destampar_garrafa, destampar_frasco, calha_correio |
+| [100 CC0 SFX](https://opengameart.org/content/100-cc0-sfx) | rubberduck | pousar_xicara |
 
 Para refazer: baixe as fontes acima, extraia cada zip numa pasta `x/<nome do zip>/`
 (os arquivos soltos em `zip/`) e rode `python -I tools/tratar_sons.py <pasta>` com
