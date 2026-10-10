@@ -108,7 +108,7 @@ usa ganha o acabamento primeiro.
      até o quarto de hóspedes, desce, sai pelos fundos e entra no celeiro (0 falhas).
    - O usuário confere a planta no playtest 10 (`docs/PLAYTEST.md` §0b).
 2. ✅ **F2 — O entardecer de setembro** (2026-10-10, a pedido do usuário logo depois
-   da F1: *"perfeito, faça isso"*).
+   da F1: *"perfeito, faça isso"*; commit `a295ed3`).
    - **A luz** (`Fazenda.entardecer`, 0 → 1 em `duracao_entardecer` = 180 s, o tempo
      do beat 1): começa com o sol baixo a oeste-sudoeste, alaranjado, as sombras
      compridas atravessando o quintal para leste, e a casa rosada; o sol se apaga aos
@@ -133,8 +133,11 @@ usa ganha o acabamento primeiro.
      (sem a flag), a fazenda continua só para andar: sem o balde, sem o fim.
    - Vidro: o do Ford e o das janelas do sótão passaram a um material iluminado
      (`vidro_fazenda`): o `vidro_janela` sem luz brilhava no crepúsculo.
+   - **O balde:** de zinco, a alça de arame, o monte de ração por cima, com uma luz
+     fraca própria do lado da câmera (contra o sol baixo, era uma mancha preta).
    - **Testes:** o de fumaça leva a última carta até o quintal (2 de setembro, o balde,
-     o sol ainda baixo) e ao cartão do fim; o `caminhos_test` (`_menu_no_fim_da_demo`)
+     o sol ainda baixo) e ao cartão do fim (0 falhas; o macaco, semente 5, joga a demo
+     até o fim na fazenda); o `caminhos_test` (`_menu_no_fim_da_demo`)
      sai no cartão do fim e continua no começo do Interlúdio; o macaco não acusa
      "fora do mapa" na fazenda (que é maior que o escritório).
    - **Próximo: a F3** (Akeley: o corpo mais lento, a respiração, sem dossiê, o
