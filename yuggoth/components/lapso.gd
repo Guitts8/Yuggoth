@@ -17,8 +17,10 @@ const SEMANA := ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY
 ## 1928 é bissexto.
 const DIAS_NO_MES := [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-const DURACAO_TOTAL := 18.0
-const CICLO_MIN := 3.5
+## Playtest 8 ("sempre a mesma animação, e ela demora"): metade do tempo de
+## antes (eram 18 s, 9 s por dia), e cada lapso no seu ESTILO.
+const DURACAO_TOTAL := 9.0
+const CICLO_MIN := 2.2
 const COR_AURORA := Color(1.0, 0.62, 0.55)
 const COR_DIA := Color(0.95, 0.95, 1.0)
 const COR_TARDE := Color(1.0, 0.55, 0.25)
@@ -51,7 +53,15 @@ const COR_TARDE := Color(1.0, 0.55, 0.25)
 @export_group("")
 ## Segundos de um dia que passa sozinho; vários dias dividem DURACAO_TOTAL, sem
 ## ficar mais curtos que CICLO_MIN cada.
-@export var ciclo := 9.0
+@export var ciclo := 5.5
+
+## Os jeitos de o tempo passar (Escritorio.estilos_lapso, por cartão):
+## "dias" — o ciclo inteiro, de dia em dia (o de sempre, mais curto);
+## "chuva" — dias cinzentos: a cidade na chuva o tempo todo, a luz da sala sobe e
+##   desce sem sol, a chuva não para (Dia 5);
+## "noite" — uma noite só: a cidade apaga janela por janela, um fio de aurora, e a
+##   noite seguinte já (a carta que chega "na manhã seguinte").
+const ESTILOS := ["dias", "chuva", "noite"]
 
 var passando := false
 ## Algum lapso correndo agora: as aparições do céu esperam (playtest 8 — um mi-go
@@ -99,7 +109,7 @@ func mostrar(data: int) -> void:
 ## Cada dia que passa: a noite (a sala apaga, cai uma folha), a aurora rosada, o
 ## dia claro, a tarde alaranjada e o anoitecer — o sol entrando pela janela com
 ## a cor da hora. Vários dias de uma vez passam mais depressa, cada um inteiro.
-func passar(de: int, ate: int, no_escuro: Callable) -> void:
+func passar(de: int, ate: int, no_escuro: Callable, estilo := "dias") -> void:
 	passando = true
 	em_curso = true
 	var luzes: Dictionary[Light3D, float] = {}
@@ -112,16 +122,12 @@ func passar(de: int, ate: int, no_escuro: Callable) -> void:
 	var dias := maxi(1, ate - de)
 	var dur := clampf(DURACAO_TOTAL / dias, CICLO_MIN, ciclo)
 	# A janela viva: a cidade do lapso no lugar da vista do dia, na mesma hora.
-	var hora_do_dia := _cidade_viva(true)
+	var hora_do_dia := _cidade_viva(true, estilo == "chuva")
 	# [fração do dia, energia do sol, cor do sol, hora da cidade, luz da sala,
 	# ambiente, onde o sol está (0 manhã .. 1 tarde)]
-	var segmentos := [
-		[0.16, 0.0, COR_AURORA, "noite", 0.06, 0.25, 0.0],
-		[0.2, sol_energia * 0.45, COR_AURORA, "aurora", 0.1, 0.8, 0.15],
-		[0.24, sol_energia, COR_DIA, "dia", 0.08, 1.6, 0.55],
-		[0.24, sol_energia * 0.6, COR_TARDE, "entardecer", 0.1, 1.0, 1.0],
-		[0.16, 0.0, COR_TARDE, "noite", 1.0, 1.0, 1.0],
-	]
+	var segmentos := _segmentos(estilo, hora_do_dia)
+	if estilo == "noite":
+		dur = clampf(DURACAO_TOTAL * 0.6, CICLO_MIN, ciclo)
 	var hora_atual := hora_do_dia
 	var onde_sol := 0.0
 	for k in dias:
@@ -130,6 +136,8 @@ func passar(de: int, ate: int, no_escuro: Callable) -> void:
 			var segundos: float = dur * seg[0]
 			# O último anoitecer volta à hora do dia corrente (a noite de chuva...).
 			var para: String = hora_do_dia if k == dias - 1 and h == segmentos.size() - 1 else seg[3]
+			if not horas.has(para):
+				para = hora_atual
 			var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
 			t.tween_property(sol, ^"light_energy", seg[1], segundos)
 			t.tween_property(sol, ^"light_color", seg[2], segundos)
@@ -157,9 +165,67 @@ func passar(de: int, ate: int, no_escuro: Callable) -> void:
 	em_curso = false
 
 
+## [fração do lapso, energia do sol, cor do sol, hora da cidade, luz da sala,
+## ambiente, onde o sol está (0 manhã .. 1 tarde)] de cada trecho do dia, por estilo.
+func _segmentos(estilo: String, hora_do_dia: String) -> Array:
+	match estilo:
+		"chuva":
+			return [
+				[0.22, 0.0, COR_DIA, "chuva", 0.08, 0.3, 0.0],
+				[0.3, 0.0, COR_DIA, "chuva", 0.35, 1.25, 0.5],
+				[0.26, 0.0, COR_DIA, "chuva", 0.2, 0.9, 1.0],
+				[0.22, 0.0, COR_DIA, hora_do_dia, 1.0, 1.0, 1.0],
+			]
+		"noite":
+			return [
+				[0.4, 0.0, COR_AURORA, "noite", 0.04, 0.2, 0.0],
+				[0.25, sol_energia * 0.25, COR_AURORA, "aurora", 0.06, 0.5, 0.1],
+				[0.35, 0.0, COR_TARDE, "noite", 1.0, 1.0, 1.0],
+			]
+	return [
+		[0.16, 0.0, COR_AURORA, "noite", 0.06, 0.25, 0.0],
+		[0.2, sol_energia * 0.45, COR_AURORA, "aurora", 0.1, 0.8, 0.15],
+		[0.24, sol_energia, COR_DIA, "dia", 0.08, 1.6, 0.55],
+		[0.24, sol_energia * 0.6, COR_TARDE, "entardecer", 0.1, 1.0, 1.0],
+		[0.16, 0.0, COR_TARDE, "noite", 1.0, 1.0, 1.0],
+	]
+
+
+## O dia raiando devagar, de onde a noite estiver (a noite em claro, Vigilia): a
+## lâmpada que ardeu a noite toda empalidece, a aurora entra pela janela e a
+## cidade clareia. `na_metade` é chamado no meio (a folhinha). Fica como manhã
+## até `desfazer_manha()`.
+func raiar(segundos: float, na_metade := Callable()) -> void:
+	desfazer_manha()
+	passando = true
+	em_curso = true
+	var hora := _cidade_viva(true)
+	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
+	for l: Light3D in sala.find_children("*", "Light3D", true, false):
+		if l != sol and l.is_visible_in_tree():
+			_manha[l] = l.light_energy
+			t.tween_property(l, ^"light_energy", l.light_energy * 0.15, segundos)
+	sol.light_color = COR_AURORA
+	sol.light_energy = 0.0
+	_sol_em(0.15)
+	t.tween_property(sol, ^"light_energy", sol_energia * 0.5, segundos)
+	t.tween_method(_cidade_entre.bind(hora, "aurora"), 0.0, 1.0, segundos)
+	t.tween_method(_nuvens, _deriva, _deriva + segundos * 0.02, segundos).set_trans(Tween.TRANS_LINEAR)
+	await get_tree().create_timer(segundos * 0.5, false).timeout
+	if not is_inside_tree():
+		return
+	if na_metade.is_valid():
+		na_metade.call()
+	if t.is_running():
+		await t.finished
+	passando = false
+	em_curso = false
+
+
 ## Põe (ou tira) a cidade viva na janela, escondendo as vistas do dia que estão
 ## nela; devolve a hora da vista escondida (por onde o lapso começa e termina).
-func _cidade_viva(sim: bool) -> String:
+## Com `chuva`, a chuva da janela continua (os dias cinzentos do Dia 5).
+func _cidade_viva(sim: bool, chuva := false) -> String:
 	if not sim:
 		if cidade:
 			cidade.visible = false
@@ -174,9 +240,9 @@ func _cidade_viva(sim: bool) -> String:
 			hora = String(v.get_meta(&"hora", hora))
 			v.visible = false
 			_vistas_escondidas.append(v)
-	# A chuva da noite não atravessa os dias que passam.
+	# A chuva da noite não atravessa os dias que passam (menos nos dias de chuva).
 	for c: Node3D in sala.find_children("Chuva", "GPUParticles3D", true, false):
-		if c.is_visible_in_tree():
+		if c.is_visible_in_tree() and not chuva:
 			c.visible = false
 			_vistas_escondidas.append(c)
 	if not horas.has(hora):

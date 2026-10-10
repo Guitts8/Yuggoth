@@ -95,6 +95,18 @@ func _ready() -> void:
 		entradas.append(load("res://narrative/documents/diario_dia_%d.tres" % n))
 	cena.set("diario_entradas", entradas)
 	cena.set("linha_diario", load("res://narrative/narration/diario_lembrete.tres"))
+	# Playtest 8: o Dia 5 acaba na renovação da oferta (a noite do AKELY logo
+	# depois da farsa); a resposta de 28 de agosto passou para o Dia 6.
+	var respostas: Dictionary[int, StringName] = {5: &"renovacao_dia_5"}
+	cena.set("respostas_do_dia", respostas)
+	# Cada lapso do seu jeito (Lapso.ESTILOS): os dias de chuva de agosto; os dias
+	# do começo de setembro; a noite que traz a carta "na manhã seguinte".
+	var estilos: Dictionary[StringName, String] = {
+		&"cartao_telegrama_akely": "chuva", &"cartao_aprofundava": "chuva",
+		&"cartao_31_agosto": "dias", &"cartao_5_setembro": "dias", &"cartao_6_setembro": "noite",
+	}
+	cena.set("estilos_lapso", estilos)
+	cena.set("vigilia_depois_de", &"carta_akeley_terca")
 
 	var env := WorldEnvironment.new()
 	env.name = "WorldEnvironment"
@@ -111,6 +123,7 @@ func _ready() -> void:
 	player.position = Vector3(0, 0, -1.3)
 	_add(cena, player)
 	_spawn("Cadeira", Vector3(0, 0, -1.3))
+	_ligar_vigilia()
 	# Cada manhã (e a volta de Boston) começa no pé da escada, junto à porta da
 	# rua, de frente para os degraus (playtest 6; na Fase 3f era no alto dela).
 	_spawn("Porta", ESCADA_PE, 0)
@@ -1823,13 +1836,13 @@ func _lapso(g: Node3D) -> void:
 
 	cena.set("lapso", lapso)
 	# Datas (1928): a chegada do correio de cada dia; o dia depois de cada salto.
-	var datas: Array[int] = [0, Lapso.dia_do_ano(5, 8), Lapso.dia_do_ano(5, 24), Lapso.dia_do_ano(7, 2), Lapso.dia_do_ano(7, 18), Lapso.dia_do_ano(8, 15), Lapso.dia_do_ano(8, 31)]
+	var datas: Array[int] = [0, Lapso.dia_do_ano(5, 8), Lapso.dia_do_ano(5, 24), Lapso.dia_do_ano(7, 2), Lapso.dia_do_ano(7, 18), Lapso.dia_do_ano(8, 15), Lapso.dia_do_ano(8, 28)]
 	cena.set("datas_dia", datas)
 	var depois: Dictionary[StringName, int] = {
 		&"cartao_sexta": Lapso.dia_do_ano(7, 20),
 		&"cartao_telegrama_akely": Lapso.dia_do_ano(8, 17), &"cartao_aprofundava": Lapso.dia_do_ano(8, 23),
-		&"cartao_28_agosto": Lapso.dia_do_ano(8, 28), &"cartao_5_setembro": Lapso.dia_do_ano(9, 5),
-		&"cartao_6_setembro": Lapso.dia_do_ano(9, 6), &"cartao_7_setembro": Lapso.dia_do_ano(9, 7),
+		&"cartao_31_agosto": Lapso.dia_do_ano(8, 31), &"cartao_5_setembro": Lapso.dia_do_ano(9, 5),
+		&"cartao_6_setembro": Lapso.dia_do_ano(9, 6),
 	}
 	cena.set("datas_cartao", depois)
 
@@ -2070,12 +2083,14 @@ func _dias(parent: Node) -> void:
 	_dia_6(parent)
 
 
-## Dia 6 (cap. IV): as três últimas cartas manuscritas. Abre com a resposta
-## mais calma de Akeley; o ânimo de Wilmarth cruza no correio com a carta de
-## segunda, e cada carta lida traz a seguinte no dia seguinte
-## (DocumentData.cartao_depois). Selada a carta registrada, a letra da última
-## enche a tela e a tinta vira o céu de Vermont (Escritorio._para_o_interludio).
-## Noite sem lua.
+## Dia 6 (cap. IV): de 28 de agosto às três últimas cartas manuscritas. Abre com
+## a carta da "saída digna" (playtest 8: era o fim do Dia 5) e a resposta
+## animadora; depois, a resposta mais calma de Akeley; o ânimo de Wilmarth cruza
+## no correio com a carta de segunda, que traz a de terça no dia seguinte
+## (DocumentData.cartao_depois); lida a de terça, a noite em claro (Vigilia), e a
+## de quarta cai pela fresta ao raiar o dia. Selada a carta registrada, a letra da
+## última enche a tela e a tinta vira o céu de Vermont
+## (Escritorio._para_o_interludio). Noite sem lua.
 func _dia_6(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 6)
 	_vista(g, "noite", "vista_noite")
@@ -2087,16 +2102,31 @@ func _dia_6(parent: Node) -> void:
 	janela.prompt = "Olhar"
 	janela.notice = "Nenhuma lua. Só as nuvens, baixas e espessas."
 
-	# Fim de agosto: menos terrores. Wilmarth o anima de novo.
-	var setembro := _folha(g, "CartaSetembro", Vector3(-0.1, MESA + 0.003, -2.1), -6, "carta_akeley_setembro", "Ler a carta", false)
+	# 28 de agosto, de manhã: "uma saída digna". A resposta animadora cruza o
+	# correio até a carta calma de 31 de agosto (ReplyData.cartao_depois).
+	var c28 := _group(g, "Carta28")
+	var folha28 := _folha(c28, "Folha", Vector3(0.45, MESA + 0.003, -2.12), 8, "carta_akeley_28_agosto", "Ler a carta de 28 de agosto", false)
+	_dentro(folha28.get_parent(), &"28_agosto")
+	_correio(c28, "Envelope", &"28_agosto", CHAO_C, Vector3(-0.05, -1.86, 4), {
+		remetente = REMETENTE_BRATTLEBORO,
+		carimbo_cidade = "BRATTLEBORO",
+		carimbo_data = "AUG 27\n1928",
+	}, "Envelope de Brattleboro",
+		"A letra continua trêmula, mas o envelope veio fechado com cuidado. Carimbo de Brattleboro, 27 de agosto.")
+	_escrever(c28, "resposta_dia_5", &"leu_carta_akeley_28_agosto")
+
+	# 31 de agosto: menos terrores. Wilmarth o anima de novo.
+	var calma := _grupo_se(g, "Setembro", _flag(&"narrou_cartao_31_agosto"))
+	var setembro := _folha(calma, "CartaSetembro", Vector3(-0.1, MESA + 0.003, -2.1), -6, "carta_akeley_setembro", "Ler a carta", false)
 	_dentro(setembro.get_parent(), &"setembro")
-	_correio(g, "Envelope", &"setembro", CHAO_A, Vector3(-0.15, -2.47, -4), {
+	_correio(calma, "Envelope", &"setembro", CHAO_A, Vector3(-0.15, -2.47, -4), {
 		remetente = REMETENTE_BRATTLEBORO,
 		carimbo_cidade = "BRATTLEBORO",
 		carimbo_data = "AUG 31\n1928",
 	}, "Envelope de Brattleboro",
 		"A letra ainda treme, mas está mais firme do que em agosto. Carimbo de Brattleboro, 31 de agosto.")
-	var animo := _grupo_se(g, "Animo", _flag(&"narrou_cartao_5_setembro", true))
+	var animo := _grupo_se(g, "Animo", _composta(CompositeCondition.Mode.TODAS,
+		[_flag(&"narrou_cartao_31_agosto"), _flag(&"narrou_cartao_5_setembro", true)]))
 	_escrever(animo, "animo_dia_6", &"leu_carta_akeley_setembro")
 
 	# Segunda, terça e quarta: uma por dia, cada uma caindo pela fresta no escuro
@@ -2124,10 +2154,43 @@ func _dia_6(parent: Node) -> void:
 		}, "Envelope de Brattleboro", c[10])
 		quarta = grupo
 	_escrever(quarta, "resposta_dia_6", &"leu_carta_akeley_quarta")
+	_vigilia(g)
+
+
+## A noite em claro do Dia 6 (Vigilia; playtest 8), depois da carta de terça: as
+## áreas aqui; os nós de fora (a janela, as cortinas, o telefone, o lapso), em
+## _ligar_vigilia, com a cena montada.
+func _vigilia(g: Node3D) -> void:
+	var v := Vigilia.new()
+	v.name = "Vigilia"
+	_add(g, v)
+	v.linha_inicio = load("res://narrative/narration/vigilia_inicio.tres")
+	v.linha_fim = load("res://narrative/narration/cartao_7_setembro.tres")
+	v.data_fim = Lapso.dia_do_ano(9, 7)
+	v.campainha = load(SFX_DIR + "campainha.wav")
+	v.som_janela = load(SFX_DIR + "gaveta.wav")
+	v.som_vento = load(SFX_DIR + "noite.wav")
+	var fechar := _area(v, Interactable.new(), "FecharJanela", Vector3(1.5, 1.1, 0.2), Vector3(0, 1.35, -D + 0.3)) as Interactable
+	fechar.prompt = "Fechar a janela"
+	v.fechar = fechar
+	var esperar := _area(v, Interactable.new(), "Esperar", Vector3(0.6, 0.6, 0.6), Vector3(0, 0.6, -1.3)) as Interactable
+	esperar.prompt = "Sentar e esperar o dia"
+	v.esperar = esperar
+
+
+## Os nós que a vigília mexe e que nascem fora do Dia 6.
+func _ligar_vigilia() -> void:
+	var v := cena.find_child("Vigilia", true, false) as Vigilia
+	v.lapso = cena.get("lapso")
+	v.folha = cena.get_node("Estrutura/Janela/FolhaBaixoL") as Node3D
+	v.cortinas.assign([cena.find_child("CortinaO", true, false), cena.find_child("CortinaL", true, false)])
+	v.aparelho = cena.find_child("TelefoneParede", true, false) as Node3D
+	cena.set("vigilia", v)
 
 
 ## Dia 5 (cap. IV): agosto. A carta frenética, a oferta de ajuda, o telegrama
-## "AKELY", o bilhete que o desmente e a carta da "saída digna". As cartas
+## "AKELY", o bilhete que o desmente e a renovação da oferta; a noite (o fogo, o
+## sonho do AKELY) vem logo depois da farsa (playtest 8). As cartas
 ## cruzam o correio: cada carta selada salta no tempo (ReplyData.cartao_depois,
 ## Ligacao.cartao_depois), e o que chega depois aparece no escuro, pela flag
 ## `narrou_<cartão>`. Noite de chuva; um vulto passa pela janela (não confirmado).
@@ -2194,21 +2257,10 @@ func _dia_5(parent: Node) -> void:
 		carimbo_data = "AUG 22\n1928",
 	}, "Envelope de Brattleboro",
 		"Um envelope fino, endereçado às pressas. Carimbo de Brattleboro, 22 de agosto.")
-	var renovacao := _grupo_se(g, "Renovacao", _composta(CompositeCondition.Mode.TODAS,
-		[_flag(&"narrou_cartao_aprofundava"), _flag(&"narrou_cartao_28_agosto", true)]))
+	# A renovação da oferta fecha o dia (playtest 8): depois dela, o diário, o fogo
+	# e o sonho do AKELY, na mesma noite em que ele percebeu a farsa.
+	var renovacao := _grupo_se(g, "Renovacao", _flag(&"narrou_cartao_aprofundava"))
 	_escrever(renovacao, "renovacao_dia_5", &"comparou_assinatura")
-
-	# 28 de agosto: "uma saída digna". A resposta do dia (a que leva para casa).
-	var c28 := _grupo_se(g, "Carta28", _flag(&"narrou_cartao_28_agosto"))
-	var folha28 := _folha(c28, "Folha", Vector3(0.22, MESA + 0.007, -1.96), 6, "carta_akeley_28_agosto", "Ler a carta de 28 de agosto", false)
-	_dentro(folha28.get_parent(), &"28_agosto")
-	_correio(c28, "Envelope", &"28_agosto", CHAO_C, Vector3(-0.05, -1.86, 4), {
-		remetente = REMETENTE_BRATTLEBORO,
-		carimbo_cidade = "BRATTLEBORO",
-		carimbo_data = "AUG 27\n1928",
-	}, "Envelope de Brattleboro",
-		"A letra continua trêmula, mas o envelope veio fechado com cuidado. Carimbo de Brattleboro, 27 de agosto.")
-	_escrever(c28, "resposta_dia_5", &"leu_carta_akeley_28_agosto")
 
 	# Depois do bilhete, quem olhar para a janela vê algo passar lá fora, na
 	# chuva, rente ao vidro: uma delas, em 3D (Fase 3e). Uma vez. Playtest 5 ("o
@@ -2292,7 +2344,7 @@ func _dia_4(parent: Node) -> void:
 ## Telefone de parede (caixa de madeira, manivela, fone no gancho), na parede
 ## leste, ao lado da escrivaninha. Só se usa quando há ligação disponível.
 ## O do sonho da noite do Dia 5 é outro, com a sua ligação (`ids`).
-func _telefone(parent: Node, ids: Array = ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene", "resposta_telegrama"], nome := "Telefone") -> Telefone:
+func _telefone(parent: Node, ids: Array = ["agencia_arkham", "boston", "telegrama_noturno", "relato_keene", "resposta_telegrama", "vigilia_linha"], nome := "Telefone") -> Telefone:
 	var g := _group(parent, "TelefoneParede", Vector3(W - 0.07, 1.45, -2.25), 90)
 	_box(g, "Caixa", Vector3(0.24, 0.38, 0.12), Vector3.ZERO, "madeira_clara")
 	for s in [-1, 1]:

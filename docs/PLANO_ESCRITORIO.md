@@ -909,7 +909,7 @@ depois da farsa e uma noite em claro** (item 13).
 12. 🔧 **"O cuidado que tivemos com o livro do menu em tudo."** A diretriz da fase: cada
     peça mexida aqui sai no nível do Necronomicon (forma, material, desgaste,
     animação, som), a começar pelo que o jogador mais vê de perto.
-13. 🔧 **Os últimos dias: "só carta e ler carta"**, as passadas de dia (*"sempre a mesma
+13. ✅ **Os últimos dias: "só carta e ler carta"**, as passadas de dia (*"sempre a mesma
     animação, e ela demora"*) e o sonho do A-K-E-L-Y que *"demora para acontecer
     depois de ele perceber a farsa"*. Decidido:
     - o **Dia 5 se parte no bilhete**: comparada a assinatura e posta a renovação da
@@ -919,7 +919,35 @@ depois da farsa e uma noite em claro** (item 13).
       noite em claro jogável** na sala, com as estranhezas da Fase 6 (o telefone que dá
       meio toque e só zumbe na linha, a janela entreaberta, a criatura no céu sem lua),
       no lugar de um lapso;
-    - **o lapso mais curto e diferente a cada vez**: os 7 lapsos dos Dias 4–6 viram 4.
+    - **o lapso mais curto e diferente a cada vez**.
+
+    Feito:
+    - **Dia 5 (15–22 de agosto)** acaba na renovação da oferta: `Escritorio.respostas_do_dia`
+      (`{5: renovacao_dia_5}`, `id_resposta()`) diz qual resposta fecha o dia; postada,
+      não há salto — o diário (a entrada nova, de 22 de agosto), o fogo, a poltrona e
+      o sonho do AKELY, na noite da farsa.
+    - **Dia 6 (28 de agosto – 7 de setembro)** abre com a carta de 28 de agosto no chão
+      (*"A resposta dele chegou a 28 de agosto."*, o cartão do dia *"Fim de agosto de
+      1928."*); a resposta animadora (com tom; `resposta_dia_5`, o mesmo id) cruza o
+      correio até a carta calma (`cartao_31_agosto`, o que era a fala do correio).
+    - **A noite em claro** (`components/vigilia.gd`, `Vigilia`): fechada a carta de
+      terça (`Escritorio.vigilia_depois_de`), *"Não dormi nada naquela noite..."*, e a
+      noite é jogável: o telefone dá meio toque e cala (a `Ligacao` `vigilia_linha`,
+      "Tirar o fone do gancho", sem manivela — `com_manivela`: só um zumbido); sem
+      ninguém ver, a janela que estava fechada aparece entreaberta (a folha sobe um
+      palmo, o vento, as cortinas balançam presas no varão) — "Fechar a janela"; a
+      criatura no céu para quem olhar; então "Sentar e esperar o dia": a aurora entra
+      devagar (`Lapso.raiar`), a folhinha cai para 7 de setembro, *"A resposta veio,
+      de fato, no dia seguinte."* e a carta de quarta cai pela fresta.
+    - **O lapso** dura metade (`DURACAO_TOTAL` 9 s, ~5 s por dia) e tem estilos
+      (`Lapso.ESTILOS`, `Escritorio.estilos_lapso` por cartão): "chuva" (os dois do
+      Dia 5: a cidade na chuva o tempo todo, sem sol, a chuva não para), "dias" e
+      "noite" (a carta de terça, *"na manhã seguinte"*: a cidade apaga, um fio de
+      aurora, e já é a noite seguinte). Nos Dias 4–6, de 7 lapsos de 18 s para 6 de
+      ~5–9 s, e a noite em claro no lugar do sétimo (a contagem de 4, prevista ao
+      registrar, não fechou: tirar mais um pularia uma carta que o livro manda).
+    - O F2 (depuração) usa o `respostas_do_dia`; o teste de fumaça joga a noite em
+      claro inteira e mede o lapso (< 14 s).
 14. ✅ **Um mi-go passa em pleno sol** numa passada de dia: a criatura do céu (Dias 3
     e 6) valia durante o lapso, com a cidade de dia. Feito: nenhuma `Aparicao` passa
     enquanto um lapso corre (`Lapso.em_curso`).

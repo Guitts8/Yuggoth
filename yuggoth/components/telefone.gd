@@ -56,7 +56,7 @@ func _comecar(l: Ligacao) -> void:
 	for f: Fonografo in get_tree().get_nodes_in_group(&"fonografo"):
 		f.parar()
 	AudioDirector.play_sfx(gancho, -6.0)
-	if not l.recebida and manivela:
+	if not l.recebida and l.com_manivela and manivela:
 		# Dar manivela: a sineta da telefonista toca do outro lado.
 		AudioDirector.play_sfx(manivela, -8.0)
 		await get_tree().create_timer(manivela.get_length()).timeout

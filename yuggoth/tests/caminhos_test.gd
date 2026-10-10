@@ -373,7 +373,7 @@ func _diario_vazio() -> void:
 ## diante do fogo" só existe com o fogo: a fala diz o que falta, e acendê-la abre a
 ## noite (antes, ele ficava sem saber o que fazer).
 func _noite_sem_fogo() -> void:
-	var esc := await _dia(5, {&"escreveu_resposta_dia_5": true, &"resposta_dia_5": 0, &"diario": 5, &"comecou_dia_5": true})
+	var esc := await _dia(5, {&"escreveu_renovacao_dia_5": true, &"diario": 5, &"comecou_dia_5": true})
 	await _entrar(esc)
 	var dia5 := esc.find_child("Dia5", true, false)
 	var sentar: LugarSono = esc._lugar_sono(5)
@@ -401,7 +401,7 @@ func _noite_sem_fogo() -> void:
 	await _until(func() -> bool: return GameState.get_value(&"sonhando") == 0 and not SceneDirector.hold_black, 90.0)
 	await _ir_para_casa(esc)
 	await _until(func() -> bool: return GameState.get_value(&"dia") == 6 and not SceneDirector.hold_black and not esc._saindo, 45.0)
-	_check(GameState.get_value(&"dia") == 6, "e a noite segue até setembro")
+	_check(GameState.get_value(&"dia") == 6, "e a noite segue até o fim de agosto")
 
 
 # --- 6b. Examinando quando a ligação leva a Boston ---------------------------------

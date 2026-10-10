@@ -102,10 +102,13 @@ func pular_dia() -> void:
 			_abrir(c)
 			for solta in c.soltar:
 				_abrir(solta)
-	var resposta := StringName("resposta_dia_%d" % n)
+	# A resposta que fecha o dia (a renovação, no Dia 5 — playtest 8).
+	var respostas: Dictionary = _propriedade(&"respostas_do_dia", {})
+	var resposta: StringName = respostas.get(n, StringName("resposta_dia_%d" % n))
 	if GameState.get_value(resposta) == null:
 		GameState.set_value(resposta, 0)
-	for flag: String in ["comecou_dia_%d", "escreveu_resposta_dia_%d", "anotou_dia_%d"]:
+	GameState.set_flag(StringName("escreveu_%s" % resposta))
+	for flag: String in ["comecou_dia_%d", "anotou_dia_%d"]:
 		GameState.set_flag(StringName(flag % n))
 	if n == 3:
 		for flag: StringName in [&"fono_corneta", &"fono_manivela", &"fono_agulha", &"fono_cilindro", &"tocou_disco"]:
@@ -114,7 +117,7 @@ func pular_dia() -> void:
 		GameState.set_value(chave, 0)
 	GameState.set_value(&"sonho", 0.0)
 	GameState.set_value(&"dia", n + 1)
-	var datas := _datas_dia()
+	var datas: Array = _propriedade(&"datas_dia", [])
 	if n + 1 < datas.size():
 		GameState.set_value(&"data", datas[n + 1])
 	_abrir_escritorio("(teste) Pulado para o Dia %d" % (n + 1))
@@ -151,11 +154,11 @@ func _abrir_escritorio(aviso: String) -> void:
 	Events.notice_requested.emit(aviso)
 
 
-## `datas_dia` do Escritorio, lido da cena sem instanciá-la (pode-se pular de
-## outra fase, como Boston).
-func _datas_dia() -> Array:
+## Uma propriedade do Escritorio (`datas_dia`, `respostas_do_dia`), lida da cena
+## sem instanciá-la (pode-se pular de outra fase, como Boston).
+func _propriedade(nome: StringName, padrao: Variant) -> Variant:
 	var estado := (load(ESCRITORIO) as PackedScene).get_state()
 	for i in estado.get_node_property_count(0):
-		if estado.get_node_property_name(0, i) == &"datas_dia":
+		if estado.get_node_property_name(0, i) == nome:
 			return estado.get_node_property_value(0, i)
-	return []
+	return padrao

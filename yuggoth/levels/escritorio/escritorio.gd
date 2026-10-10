@@ -73,6 +73,15 @@ const BEBIDA_UISQUE := 2
 ## Dia em que, selada a resposta, a última carta manuscrita leva ao Interlúdio
 ## (GDD §5.1a): a letra enche a tela e a tinta vira o céu de Vermont.
 @export var dia_do_interludio := 6
+## A resposta que fecha o dia, quando não é a `resposta_dia_<N>` (playtest 8: o
+## Dia 5 acaba na renovação da oferta, e a noite do AKELY vem logo depois da
+## farsa; a resposta de 28 de agosto passou para a manhã do Dia 6).
+@export var respostas_do_dia: Dictionary[int, StringName] = {}
+## O jeito de cada lapso (Lapso.ESTILOS), pelo id do cartão; sem, "dias".
+@export var estilos_lapso: Dictionary[StringName, String] = {}
+## A noite em claro (Vigilia) e a carta que, fechada, a começa.
+@export var vigilia: Vigilia
+@export var vigilia_depois_de: StringName
 ## A carta que enche a tela nessa transição.
 @export var ultima_carta: DocumentData
 ## Cartão depois da tinta. Na demo o jogo acaba aí e volta ao menu; no jogo
@@ -310,7 +319,12 @@ func _fora() -> bool:
 
 
 func _respondeu(n: int) -> bool:
-	return GameState.has_flag(StringName("escreveu_resposta_dia_%d" % n))
+	return GameState.has_flag(StringName("escreveu_%s" % id_resposta(n)))
+
+
+## O id da resposta que fecha o dia `n` (normalmente `resposta_dia_<n>`).
+func id_resposta(n: int) -> StringName:
+	return respostas_do_dia.get(n, StringName("resposta_dia_%d" % n))
 
 
 func _entrar_pela_porta() -> void:
@@ -450,7 +464,7 @@ func _on_por_na_calha(_by: Node) -> void:
 		_para_o_interludio()
 		return
 	player.input_enabled = true
-	if reply.id == StringName("resposta_dia_%d" % dia()):
+	if reply.id == id_resposta(dia()):
 		GameState.set_value(&"diario", dia())
 		Narrator.say(linha_diario)
 	elif reply.cartao_depois:
@@ -966,7 +980,7 @@ func passar_tempo(cartao: NarrationLine) -> void:
 	_cartao_no_lapso = true
 	await lapso.passar(de, ate, func() -> void:
 		await Narrator.say(cartao, Narrator.Style.CARTAO)
-		_cartao_no_lapso = false)
+		_cartao_no_lapso = false, estilos_lapso.get(cartao.id, "dias"))
 	if not is_inside_tree():
 		return
 	GameState.set_value(&"data", ate)
@@ -1002,6 +1016,9 @@ func _som_do_dia() -> AudioStream:
 func _on_document_closed(doc: DocumentData) -> void:
 	if doc == null:
 		return
+	# A carta de terça: a noite em claro, em vez de um salto (playtest 8).
+	if vigilia and doc.id == vigilia_depois_de and vigilia.is_visible_in_tree():
+		vigilia.comecar(self)
 	var line: NarrationLine = null
 	var path := "res://narrative/narration/ao_ler_%s.tres" % doc.id
 	if ResourceLoader.exists(path):

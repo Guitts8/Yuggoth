@@ -11,6 +11,9 @@ extends Resource
 @export var condition: Condition
 ## O telefone toca e a ação é atender.
 @export var recebida := false
+## Feita por Wilmarth, chama a telefonista na manivela do magneto. Sem ela, ele
+## só tira o fone do gancho (a noite em claro: o meio toque, Vigilia).
+@export var com_manivela := true
 ## "Quem: o que diz", em ordem.
 @export var falas: PackedStringArray = []
 ## A cena amolece enquanto dura (GameState.sonho até este valor, e volta): a voz

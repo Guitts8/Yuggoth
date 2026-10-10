@@ -102,6 +102,12 @@ da cidade acendendo, as nuvens correndo, o sol cruzando e a sombra do caixilho
 varrendo a mesa —, a **folhinha** no peitoril perde uma folha por dia (com som), e
 o cartão aparece sobre a cena — o que chega cai pela fresta no primeiro escuro. A
 folhinha mostra a data o tempo todo (em inglês, como tudo o que é impresso na sala).
+Desde o playtest 8, cada lapso dura metade do que durava (~5 s por dia, no máximo
+~9 s) e tem o seu jeito: **de dia em dia** (o ciclo inteiro), **dias de chuva** (Dia 5:
+a cidade cinzenta na chuva o tempo todo, a luz da sala sobe e desce sem sol, a chuva
+não para) ou **uma noite só** (a cidade apaga, um fio de aurora, e já é a noite
+seguinte). Nos Dias 4–6 são seis, e a noite de terça para quarta virou a **noite em
+claro** jogável (Dia 6).
 
 | # | Parte | Data na história | Estado | Livro |
 |---|---|---|---|---|
@@ -111,8 +117,8 @@ folhinha mostra a data o tempo todo (em inglês, como tudo o que é impresso na 
 | 2 | Dia 2 — As fotografias | 22–28 de maio | ✅ | cap. II |
 | 3 | Dia 3 — O disco | fim de junho – 3 de julho | ✅ | cap. III |
 | 4 | Dia 4 — A pedra que não chega | 18–21 de julho | ✅ | cap. III |
-| 5 | Dia 5 — O telegrama "AKELY" | 15–29 de agosto | ✅ | cap. IV |
-| 6 | Dia 6 — As três últimas cartas | 31 de agosto – 7 de setembro | ✅ | cap. IV |
+| 5 | Dia 5 — O telegrama "AKELY" | 15–22 de agosto | ✅ | cap. IV |
+| 6 | Dia 6 — As três últimas cartas | 28 de agosto – 7 de setembro | ✅ | cap. IV |
 | — | Interlúdio — "O Cerco" (como Akeley) | 2–6 de setembro | ⏳ | cap. IV (as cartas, vividas) |
 | 7 | Dia 7 — A carta datilografada | 8–10 de setembro | ⏳ | cap. V |
 | — | Moldura I | 1930 | ⏳ | — |
@@ -357,7 +363,7 @@ cilindro, nos dias seguintes.
 
 ---
 
-## 5. Dia 5 — O telegrama "AKELY" ✅ (15–29 de agosto)
+## 5. Dia 5 — O telegrama "AKELY" ✅ (15–22 de agosto)
 **Clima:** noite de chuva. Abajur na mesa, chuva na janela (som de chuva no lugar
 da tarde). Há lenha na lareira: **"Acender a lareira"** — ele vai até ela, ajoelha-se, risca
 um fósforo, leva a chama ao jornal sob as toras, e o fogo pega no meio e se
@@ -404,60 +410,76 @@ junto à porta quando a luz volta.
    uma vez, sem som — uma das criaturas, a uns dois metros do vidro, grande,
    **subindo** de baixo do peitoril até sumir no alto, as asas batendo na chuva,
    em pouco mais de um segundo. "Olhar" a janela: *"Só a chuva, escorrendo no vidro."*
-7. **"Escrever a Akeley"** de novo — renovar a oferta (sem tom) → cartão: *"A
-   resposta dele chegou a 28 de agosto."*
-8. **Carta de 28 de agosto**: já não é tão contra o plano; quer pôr as coisas em
-   ordem; *"quero uma saída digna, se puder."*
-9. **A resposta do dia** (29 de agosto):
+7. **"Escrever a Akeley"** de novo — renovar a oferta (sem tom). É a carta que
+   fecha o dia (playtest 8: *"o sonho do A-K-E-L-Y demora para acontecer depois de
+   ele perceber a farsa"*): postada, não há salto — falta o diário (*22 de agosto.
+   Renovei as minhas ofertas de ajuda. O telegrama não foi ele quem mandou [...]
+   A-K-E-L-Y. Quem erra o próprio nome? Chove. Não vou para casa ainda.*), e a noite
+   da farsa é a do fogo e do sonho do **AKELY** (ver *Os sonhos*).
+
+**Fim do dia:** acordado na poltrona, "Ir para casa" → *"Fim de agosto de 1928."*
+
+## 6. Dia 6 — As três últimas cartas ✅ (28 de agosto – 7 de setembro)
+**Clima:** noite sem lua (abajur na mesa, sem chuva, sem pássaros). "Olhar" a
+janela: *"Nenhuma lua. Só as nuvens, baixas e espessas."* A letra de Akeley treme
+mais a cada carta.
+**Ao começar:** *"A resposta dele chegou a 28 de agosto."*
+
+As cartas cruzam o correio, como no Dia 5; a de segunda, lida, traz a de terça no
+dia seguinte (`DocumentData.cartao_depois`); a de terça traz **a noite em claro**, e a
+de quarta cai pela fresta ao raiar o dia. Envelopes de Brattleboro (*AUG 27*, *AUG
+31*, *SEP 3*, *4* e *5*). Reler pelo dossiê não salta de novo.
+
+**Na sala (28 de agosto):** no chão, junto à porta, o envelope de Brattleboro
+(*AUG 27*) com a **carta de 28 de agosto**: já não é tão contra o plano; quer pôr as
+coisas em ordem; *"quero uma saída digna, se puder."* (Até o playtest 8, era o fim
+do Dia 5.)
+
+**O que fazer:**
+1. **A resposta animadora** (29 de agosto):
    | Tom | Abertura |
    |---|---|
    | cético | "Vá à polícia. Homens de carne e osso cortam fios e mandam telegramas." |
    | cauteloso — o do livro | "Uma saída digna é perfeitamente possível, e conte comigo para ela." |
    | crédulo | "Não espere pôr as coisas em ordem." |
 
-   Depois: *"Preparei e pus no correio a resposta mais animadora que pude."* (varia com o tom)
-
-**Fim do dia:** porta → *"Setembro de 1928."*
-
-## 6. Dia 6 — As três últimas cartas ✅ (31 de agosto – 7 de setembro)
-**Clima:** noite sem lua (abajur na mesa, sem chuva, sem pássaros). "Olhar" a
-janela: *"Nenhuma lua. Só as nuvens, baixas e espessas."* A letra de Akeley treme
-mais a cada carta.
-**Ao começar:** *"Aparentemente o ânimo fez efeito, pois Akeley tinha menos
-terrores a relatar quando acusou o recebimento da minha carta."*
-
-As cartas cruzam o correio, como no Dia 5, mas agora **cada carta lida traz a
-seguinte**: ao fechá-la pela primeira vez, o lapso na sala, e a próxima cai
-pela fresta no escuro (`DocumentData.cartao_depois`). Uma carta chega por dia: 5, 6 e 7
-de setembro (envelopes de Brattleboro, *SEP 3*, *4* e *5*). Reler pelo dossiê não
-salta de novo.
-
-**Na sala (31 de agosto):**
-- **Carta calma** (31 de agosto, composta das frases do livro) e o **envelope**
-  (carimbo *AUG 31*): menos terrores; não está muito otimista — *"é só a época da
-  lua cheia que os está segurando"*; espera que não venham muitas noites de nuvens
-  fechadas; talvez se hospede em Brattleboro quando a lua minguar. Responde ao tom
-  do Dia 5 (cético: a polícia o chamaria de louco; crédulo: "diz-me para não esperar").
-
-**O que fazer:**
-1. **"Escrever a Akeley"** — ânimo de novo (sem tom): *"Não se fie só na lua: vá
+   Depois: *"Preparei e pus no correio a resposta mais animadora que pude."* (varia
+   com o tom). Postada, o lapso (de dia em dia) → cartão: *"Aparentemente o ânimo fez
+   efeito, pois Akeley tinha menos terrores a relatar quando acusou o recebimento da
+   minha carta."* — e cai pela fresta a **carta calma** (31 de agosto, composta das
+   frases do livro; carimbo *AUG 31*): menos terrores; não está muito otimista — *"é
+   só a época da lua cheia que os está segurando"*; espera que não venham muitas
+   noites de nuvens fechadas; talvez se hospede em Brattleboro quando a lua minguar.
+   Responde ao tom da resposta animadora (cético: a polícia o chamaria de louco;
+   crédulo: "diz-me para não esperar").
+2. **"Escrever a Akeley"** — ânimo de novo (sem tom): *"Não se fie só na lua: vá
    para Brattleboro agora."* Narrador: *"Escrevi-lhe de novo, animando-o."* Cartão:
    *"Mas a 5 de setembro chegou uma nova carta, que evidentemente cruzara com a minha
    no correio; e a esta eu não pude dar uma resposta tão esperançosa."*
-2. **Carta de segunda-feira** (na íntegra): a noite de nuvens espessas; algo pousa
+3. **Carta de segunda-feira** (na íntegra): a noite de nuvens espessas; algo pousa
    no telhado; um cão sobe pelo puxado baixo; a luta, o **zumbido**, o cheiro; balas
    pela janela; ele apaga a luz e atira das janelas, alto para não acertar os cães;
    de manhã, poças de sangue e de uma **substância verde e pegajosa**, mais no
-   telhado; **cinco cães mortos — um com um tiro nas costas**. Ao fechar, cartão:
-   *"Essa não foi a única carta de Akeley a cruzar com a minha. Na manhã seguinte —
-   6 de setembro — chegou mais uma; desta vez, um rabisco frenético."*
-3. **Carta de terça-feira** (na íntegra): *"Acho que estou enlouquecendo"*;
+   telhado; **cinco cães mortos — um com um tiro nas costas**. Ao fechar, o lapso
+   (uma noite só) e o cartão: *"Essa não foi a única carta de Akeley a cruzar com a
+   minha. Na manhã seguinte — 6 de setembro — chegou mais uma; desta vez, um rabisco
+   frenético."*
+4. **Carta de terça-feira** (na íntegra): *"Acho que estou enlouquecendo"*;
    **"falaram comigo"** na voz zumbida, e uma voz humana os ajudou; *"Fique fora
    disso, Wilmarth"*; levá-lo vivo para Yuggoth e além da última borda curva do
-   espaço; mais seis cães mortos; **"melhor quebrar o disco"**. Ao fechar, cartão:
-   *"Não dormi nada naquela noite. Não tentei responder [...] A resposta veio, de
-   fato, no dia seguinte."*
-4. **Carta de quarta-feira** (na íntegra, a letra quase ilegível de tão trêmula):
+   espaço; mais seis cães mortos; **"melhor quebrar o disco"**. Ao fechar, **a noite
+   em claro** (playtest 8; `Vigilia`), jogável, no lugar de um lapso: *"Não dormi nada
+   naquela noite. Não tentei responder: achei melhor esperar que Akeley respondesse à
+   minha última."* Uns segundos depois, **o telefone dá meio toque e cala** —
+   "Tirar o fone do gancho": ninguém, só um zumbido na linha, longe, que sobe e
+   desce. Depois, sem que ele veja, **a janela, que estava fechada, aparece
+   entreaberta**: a folha de baixo subiu um palmo, o vento frio entra, as cortinas
+   mexem — "Fechar a janela". A criatura cruza o céu sem lua para quem olhar. Então
+   (ou com o tempo) **"Sentar e esperar o dia"**, na cadeira da escrivaninha: ele
+   senta, a lâmpada empalidece, a aurora entra devagar pela janela, a folhinha perde
+   a folha da noite (7 de setembro) — *"A resposta veio, de fato, no dia seguinte."* —
+   e a carta de quarta cai pela fresta. Nada confirma nada.
+5. **Carta de quarta-feira** (na íntegra, a letra quase ilegível de tão trêmula):
    a carta datilografada *deles*, de Bellows Falls; **tocou numa das coisas mortas**
    — evaporou no galpão de lenha; **o filme não mostra nada além do galpão**; *"um
    grande caranguejo com uma porção de anéis carnudos em pirâmide"*; Walter Brown
@@ -466,7 +488,7 @@ salta de novo.
    aquele disco, e não se meta nisso."* Ao fechar: *"A carta me lançou, francamente,
    no mais negro terror."* A porta, até aqui, só diz *"Ainda devo uma resposta ao
    Sr. Akeley."*
-5. **A carta registrada** (7 de setembro):
+6. **A carta registrada** (7 de setembro):
    | Tom | Abertura |
    |---|---|
    | cético | "Vá para Brattleboro e procure um médico. O senhor está exausto." |
@@ -478,8 +500,9 @@ salta de novo.
    praticamente completa — embora eu achasse que a fotografia falhara por algum
    descuido dele, na agitação."* (com `crenca` ≤ −1, a crença não está completa)
 
-💭 Depois da carta de terça ("falaram comigo"), a criatura cruza de novo o céu sem
-lua, para quem estiver olhando pela janela.
+💭 Depois da carta de terça ("falaram comigo"), na noite em claro, a criatura cruza
+de novo o céu sem lua, para quem estiver olhando pela janela (nunca durante um
+lapso: playtest 8, "um mi-go passa em pleno sol").
 
 **Fim do dia (e da demo):** levada a carta registrada à porta, o fim da carta de quarta aparece no papel,
 a câmera se aproxima até a **letra trêmula encher a tela**, a **tinta se espalha**

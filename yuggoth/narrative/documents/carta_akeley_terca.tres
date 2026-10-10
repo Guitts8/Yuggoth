@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="DocumentData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="DocumentData" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://narrative/document_data.gd" id="1_doc"]
-[ext_resource type="Resource" path="res://narrative/narration/cartao_7_setembro.tres" id="2_cartao"]
 
 [resource]
 script = ExtResource("1_doc")
@@ -24,4 +23,3 @@ pages = PackedStringArray("[right][tremulo forca=0.7]Terça-feira.[/tremulo][/ri
 
 [right][tremulo forca=0.7]Seu — AKELEY[/tremulo][/right]")
 exposure_on_read = 0.05
-cartao_depois = ExtResource("2_cartao")

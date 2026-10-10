@@ -55,13 +55,13 @@ Legenda: ✅ jogável · 📄 no GDD, ainda não construído · ➕ falta, entra
 | **Telegrama de Bellows Falls**: "COMPREENDO SUA POSIÇÃO MAS NADA POSSO FAZER…" assinado **AKELY** (sem o segundo E) | ✅ Dia 5: o telegrama; "Comparar a assinatura com as cartas" depois do bilhete |
 | Wilmarth responde ao telegrama | ✅ Dia 5: telegrafa pelo telefone |
 | Bilhete trêmulo: ele **nunca mandou** o telegrama nem recebeu a carta; homem ruivo de voz zumbida; original a lápis, letra desconhecida; mais cães mortos, tiros toda noite sem lua, pegadas de Brown e de mais homens calçados; Califórnia | ✅ Dia 5 |
-| Wilmarth renova as ofertas de ajuda | ✅ Dia 5: segunda carta (sem tom) |
-| 28/8: quer "uma saída digna"; Wilmarth manda "a resposta mais animadora que pude" | ✅ Dia 5: a carta e a resposta do dia (tom cauteloso = o do livro) |
+| Wilmarth renova as ofertas de ajuda | ✅ Dia 5: segunda carta (sem tom); fecha o dia — a noite é a do sonho do AKELY, logo depois da farsa (playtest 8) |
+| 28/8: quer "uma saída digna"; Wilmarth manda "a resposta mais animadora que pude" | ✅ Dia 6, de manhã: a carta e a resposta animadora (tom cauteloso = o do livro) |
 | Akeley responde com menos terrores: a lua cheia segura as criaturas; fala em se hospedar em Brattleboro; Wilmarth anima de novo | ✅ Dia 6: a carta calma (31/8, composta das frases do livro) e o ânimo (sem tom) |
 | **Segunda (3/9), chega a 5/9**: algo pousa no telhado, briga dos cães, zumbido, cheiro, tiros pela janela, poças de sangue e **gosma verde**, 5 cães mortos (um por ele mesmo) | ✅ Dia 6: a carta, na íntegra — 📄 e é a noite (de domingo, 2/9) do Interlúdio |
 | **Terça (4/9), chega a 6/9**: "Falaram comigo"; "Fique fora disso, Wilmarth"; Yuggoth e além; quebre o disco | ✅ Dia 6: a carta, na íntegra |
 | **Quarta (5/9), chega a 7/9**: carta datilografada *deles*; tocou numa das coisas mortas — **evaporou no galpão de lenha**; fotografou e **o filme não mostra nada**; Walter Brown sumiu; o filho George (176 Pleasant St., San Diego); gás venenoso e máscaras; o xerife | ✅ Dia 6: a última carta manuscrita, na íntegra; a letra dela enche a tela na entrada do Interlúdio |
-| Wilmarth não dorme; não responde à de terça e espera | ✅ Dia 6: cartão entre a de terça e a de quarta |
+| Wilmarth não dorme; não responde à de terça e espera | ✅ Dia 6: **a noite em claro**, jogável (playtest 8; `Vigilia`) — 💭 o meio toque do telefone e o zumbido na linha, a janela entreaberta, a criatura no céu são nossos; a carta de quarta cai pela fresta ao raiar o dia |
 | Wilmarth manda uma carta registrada: "mude-se para Brattleboro"; irá com o disco convencer os tribunais; crença "praticamente completa", mas acha que a foto falhou por descuido de Akeley | ✅ Dia 6: a resposta do dia (tom crédulo = o do livro); a fala depois dela |
 
 ## Cap. V — A carta datilografada
@@ -124,8 +124,8 @@ passou a ter 7 dias:
 2. fim de maio — fotografias e a carta enciclopédica; fim do debate ✅
 3. fim de junho — o disco ✅
 4. 18–21 de julho — a pedra não chega (telefone, Keene, Stanley Adams) ✅
-5. 15–29 de agosto — a carta frenética, o telegrama "AKELY", o bilhete desmentindo ✅
-6. 31 de agosto – 7 de setembro — a carta calma e as três últimas manuscritas → Interlúdio ✅
+5. 15–22 de agosto — a carta frenética, o telegrama "AKELY", o bilhete desmentindo, a noite do AKELY ✅
+6. 28 de agosto – 7 de setembro — a saída digna, a carta calma, as três últimas manuscritas e a noite em claro → Interlúdio ✅
 7. 8–10 de setembro — a carta datilografada, os telegramas, a valise
 
 O **Interlúdio** (jogado como Akeley) passa a ser as noites dessas cartas: a briga no

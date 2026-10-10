@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Ligacao" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://narrative/ligacao.gd" id="1_lig"]
+[ext_resource type="Script" path="res://narrative/conditions/value_condition.gd" id="2_cond"]
+
+[sub_resource type="Resource" id="Resource_toque"]
+script = ExtResource("2_cond")
+key = &"vigilia_toque"
+op = 3
+value = 1.0
+
+[resource]
+script = ExtResource("1_lig")
+id = &"vigilia_linha"
+prompt = "Tirar o fone do gancho"
+com_manivela = false
+condition = SubResource("Resource_toque")
+falas = PackedStringArray("(NINGUÉM. SÓ UM ZUMBIDO NA LINHA, LONGE, QUE SOBE E DESCE)")

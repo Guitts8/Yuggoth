@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("1_line")
-id = &"cartao_7_setembro"
-text = "A resposta veio, de fato, no dia seguinte."
+id = &"vigilia_inicio"
+text = "Não dormi nada naquela noite. Não tentei responder: achei melhor esperar que Akeley respondesse à minha última."

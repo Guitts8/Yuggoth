@@ -28,6 +28,10 @@ func _ready() -> void:
 		await _menu_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "vigilia":
+		await _vigilia_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "olhar":
 		await _olhar_fotos()
 		get_tree().quit()
@@ -371,3 +375,41 @@ func _olhar_fotos() -> void:
 			await _s(0.7)
 			await _shot("%s_%d" % [tag, i])
 		i += 1
+
+
+## SHOT_MODO=vigilia: a noite em claro do Dia 6 — a janela entreaberta, a cortina,
+## e o dia raiando.
+func _vigilia_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 6)
+	for f: StringName in [&"comecou_dia_6", &"escreveu_resposta_dia_5", &"narrou_cartao_31_agosto", &"escreveu_animo_dia_6",
+			&"narrou_cartao_5_setembro", &"narrou_cartao_6_setembro", &"leu_carta_akeley_terca", &"lareira_dia_6"]:
+		GameState.set_flag(f)
+	GameState.set_value(&"resposta_dia_5", 0)
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+	await _s(1.5)
+	Narrator.cancel()
+	var esc := root.find_child("Escritorio", true, false) as Escritorio
+	var p := esc.player
+	p.global_position = Vector3(0.3, 0, -0.6)
+	p.look_at(Vector3(0, p.global_position.y, 5))
+	esc.vigilia.ate_o_toque = 1.0
+	esc.vigilia.ate_a_janela = 1.0
+	esc.vigilia.comecar(esc)
+	await _until(func() -> bool: return GameState.has_flag(&"vigilia_janela"), 30.0)
+	await _s(1.0)
+	p.global_position = Vector3(0.6, 0, -1.4)
+	await _olhar(p, Vector3(0.4, 1.4, -3.0))
+	p.head.rotation.x = 0.0
+	for k in 3:
+		await _s(0.9)
+		await _shot("%s_janela_%d" % [tag, k])
+	esc.vigilia.fechar.interact(p)
+	await _s(1.5)
+	await _shot("%s_fechada" % tag)
+	await _until(func() -> bool: return esc.vigilia.esperar.can_interact(p), 40.0)
+	esc.vigilia.esperar.interact(p)
+	for k in 6:
+		await _s(2.5)
+		await _shot("%s_raiar_%d" % [tag, k])

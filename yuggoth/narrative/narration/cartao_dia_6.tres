@@ -5,4 +5,4 @@
 [resource]
 script = ExtResource("1_line")
 id = &"cartao_dia_6"
-text = "Setembro de 1928."
+text = "Fim de agosto de 1928."
