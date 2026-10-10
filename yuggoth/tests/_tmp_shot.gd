@@ -28,6 +28,10 @@ func _ready() -> void:
 		await _menu_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "lapso":
+		await _lapso_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "vigilia":
 		await _vigilia_fotos()
 		get_tree().quit()
@@ -437,3 +441,21 @@ func _vigilia_fotos() -> void:
 	for k in 6:
 		await _s(2.5)
 		await _shot("%s_raiar_%d" % [tag, k])
+
+
+## SHOT_MODO=lapso: um lapso de dias no Dia 6 (ele lendo à mesa), em fotos seguidas.
+func _lapso_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 6)
+	for f: StringName in [&"comecou_dia_6", &"escreveu_resposta_dia_5", &"narrou_cartao_31_agosto"]:
+		GameState.set_flag(f)
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+	await _s(1.5)
+	Narrator.cancel()
+	var esc := root.find_child("Escritorio", true, false) as Escritorio
+	esc.player.global_position = Vector3(0.3, 0, -1.0)
+	SceneDirector.time_skip(load("res://narrative/narration/cartao_5_setembro.tres"))
+	for k in 12:
+		await _s(1.1)
+		await _shot("%s_lapso_%02d" % [tag, k])

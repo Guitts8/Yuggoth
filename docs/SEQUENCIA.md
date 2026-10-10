@@ -124,7 +124,10 @@ da cidade acendendo, as nuvens correndo, o sol cruzando e a sombra do caixilho
 varrendo a mesa —, a **folhinha** no peitoril perde uma folha por dia (com som), e
 o cartão aparece sobre a cena — o que chega cai pela fresta no primeiro escuro. A
 folhinha mostra a data o tempo todo (em inglês, como tudo o que é impresso na sala).
-Desde o playtest 8, cada lapso dura metade do que durava (~5 s por dia, no máximo
+Desde o playtest 9, o lapso é **ele lendo os livros da biblioteca** à escrivaninha:
+senta, um livro abre diante dele, e a vista fica nele, com a janela adiante; à noite
+o livro fecha e a sala apaga (ele foi para casa), de manhã abre de novo e as folhas
+viram. Desde o playtest 8, cada lapso dura metade do que durava (~5 s por dia, no máximo
 ~9 s) e tem o seu jeito: **de dia em dia** (o ciclo inteiro), **dias de chuva** (Dia 5:
 a cidade cinzenta na chuva o tempo todo, a luz da sala sobe e desce sem sol, a chuva
 não para) ou **uma noite só** (a cidade apaga, um fio de aurora, e já é a noite
@@ -500,8 +503,9 @@ do Dia 5.)
    desce. Depois, sem que ele veja, **a janela, que estava fechada, aparece
    entreaberta**: a folha de baixo subiu um palmo, o vento frio entra, as cortinas
    mexem — "Fechar a janela". A criatura cruza o céu sem lua para quem olhar. Então
-   (ou com o tempo) **"Sentar e esperar o dia"**, na cadeira da escrivaninha: ele
-   senta, a lâmpada empalidece, a aurora entra devagar pela janela, a folhinha perde
+   (ou com o tempo) **"Reler as notas até o dia"**, na cadeira da escrivaninha: ele
+   senta com as notas abertas e lê a noite toda, a lâmpada acesa — o livro não fecha,
+   como fecha nos lapsos —; a lâmpada empalidece, a aurora entra devagar pela janela, a folhinha perde
    a folha da noite (7 de setembro) — *"A resposta veio, de fato, no dia seguinte."* —
    e a carta de quarta cai pela fresta. Nada confirma nada.
 5. **Carta de quarta-feira** (na íntegra, a letra quase ilegível de tão trêmula):

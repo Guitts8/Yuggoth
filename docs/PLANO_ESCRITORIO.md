@@ -1004,10 +1004,19 @@ O usuário jogou o playtest 9. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ 
    quadro, de latão, presa no alto da moldura, com a luz quente sobre o papel.
 6. ❓ **A folha principal do dia sempre no meio** da mesa, as outras perto, e as dos
    dias anteriores ficando nas extremidades.
-7. ❓ **A passagem do tempo ligada aos livros lidos** (*"para justificar? o take
+7. ✅ **A passagem do tempo ligada aos livros lidos** (*"para justificar? o take
    talvez?"*), e **"Sentar e esperar o dia" não faz sentido**: se só a noite em claro
    for assim, todos os outros saltos parecem noites sem dormir. Achar uma solução
    para a passagem do tempo que sirva também à noite virada.
+   Decidido pelo usuário: **automático, mas lendo**. Feito: em todo lapso ele senta à
+   escrivaninha e um livro da biblioteca abre diante dele (`LivroEstudo`, no lugar
+   onde o diário abre); a vista fica no livro, com a janela e a folhinha adiante. A
+   cada trecho do dia (`Lapso.trecho`), o livro reage: **de noite, com a sala apagada,
+   fecha** (ele foi para casa); de dia abre de novo e as folhas viram; à noite com a
+   lâmpada acesa, aberto. No fim, fecha e ele se levanta. Na **noite em claro**, "Sentar
+   e esperar o dia" virou **"Reler as notas até o dia"**: o mesmo livro, aberto a
+   noite toda, com a lâmpada acesa — o único lapso em que ele não fecha. É o que
+   diferencia a noite virada das outras.
 
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a

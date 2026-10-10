@@ -7,7 +7,9 @@ extends Node3D
 ## cala — tirado do gancho, só um zumbido na linha —; a janela, que estava
 ## fechada, aparece entreaberta, com a cortina mexendo no vento frio; a criatura
 ## cruza o céu sem lua para quem olhar (já existe, Aparicao). Feito isso (ou com
-## o tempo), "Esperar o dia" na cadeira da escrivaninha: ele senta, e o dia raia
+## o tempo), "Reler as notas até o dia" na cadeira da escrivaninha (playtest 9:
+## "sentar e esperar o dia" não fazia sentido): ele senta com o livro, lê a noite
+## toda com a lâmpada acesa — nunca fecha, ao contrário dos lapsos —, e o dia raia
 ## pela janela devagar (Lapso.raiar); a carta de quarta cai pela fresta.
 ##
 ## A fase (Escritorio) chama `comecar()`; as áreas e os nós vêm do gerador.
@@ -212,10 +214,9 @@ func _on_esperar(_by: Node) -> void:
 	_esc.em_lapso = true
 	var p := _esc.player
 	p.input_enabled = false
-	await _esc._sentar_a_mesa()
+	await _esc.abrir_livro()
 	if not is_inside_tree():
 		return
-	p.olhar_para(Vector3(0.0, 1.5, -3.0), 3.0)
 	if lapso:
 		await lapso.raiar(12.0, func() -> void:
 			if data_fim > 0:
@@ -228,7 +229,9 @@ func _on_esperar(_by: Node) -> void:
 		await Narrator.say(linha_fim)
 	if not is_inside_tree():
 		return
-	p.stand()
+	await _esc.fechar_livro()
+	if not is_inside_tree():
+		return
 	p.input_enabled = true
 	_esc.em_lapso = false
 	correndo = false

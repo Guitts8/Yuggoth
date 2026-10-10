@@ -1014,6 +1014,13 @@ func _miskatonic() -> void:
 	_cesto(g)
 	_quadros(g)
 	_mapa(g)
+	var livro := LivroEstudo.new()
+	livro.name = "LivroEstudo"
+	livro.mat_capa = m["livro_rubro"]
+	livro.mat_papel = m["papel"]
+	livro.mat_tinta = m["esmalte_preto"]
+	_add(g, livro)
+	cena.set("livro_estudo", livro)
 	_cortinas(g)
 
 	# Os dias somem enquanto se sonha (Escritorio._sonhar).
@@ -2536,7 +2543,7 @@ func _vigilia(g: Node3D) -> void:
 	fechar.prompt = "Fechar a janela"
 	v.fechar = fechar
 	var esperar := _area(v, Interactable.new(), "Esperar", Vector3(0.6, 0.6, 0.6), Vector3(0, 0.6, -1.3)) as Interactable
-	esperar.prompt = "Sentar e esperar o dia"
+	esperar.prompt = "Reler as notas até o dia"
 	v.esperar = esperar
 
 

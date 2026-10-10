@@ -79,6 +79,8 @@ const BEBIDA_UISQUE := 2
 @export var respostas_do_dia: Dictionary[int, StringName] = {}
 ## O jeito de cada lapso (Lapso.ESTILOS), pelo id do cartão; sem, "dias".
 @export var estilos_lapso: Dictionary[StringName, String] = {}
+## O livro da biblioteca que ele lê nos lapsos (playtest 9) e na noite em claro.
+@export var livro_estudo: LivroEstudo
 ## A noite em claro (Vigilia) e a carta que, fechada, a começa.
 @export var vigilia: Vigilia
 @export var vigilia_depois_de: StringName
@@ -956,6 +958,26 @@ func _olhar_a_janela() -> void:
 	player.olhar_para(Vector3(0.0, 1.55, -3.0), 1.6)
 
 
+## Senta à escrivaninha e abre um dos livros da biblioteca diante dele; os olhos
+## no livro, com a janela (e a folhinha) adiante, no alto da vista.
+func abrir_livro() -> void:
+	await _sentar_a_mesa()
+	if not is_inside_tree() or livro_estudo == null:
+		return
+	var onde := diario.get_parent_node_3d().global_transform * diario.lugar_aberto
+	livro_estudo.aparecer(onde)
+	await player.olhar_para(Vector3(onde.origin.x, 1.0, -2.55), 1.2, player.global_position).finished
+
+
+## O livro fecha e volta à pilha; ele se levanta.
+func fechar_livro() -> void:
+	if livro_estudo:
+		await livro_estudo.guardar()
+	if not is_inside_tree():
+		return
+	player.stand()
+
+
 ## SceneDirector.time_skip, no escritório: o lapso na própria sala, sem tela
 ## preta. O jogador fica parado; o cartão aparece no primeiro escuro (é aí que
 ## o que chega aparece, pela flag `narrou_<cartão>`).
@@ -970,7 +992,12 @@ func passar_tempo(cartao: NarrationLine) -> void:
 		if not is_inside_tree():
 			return
 	player.input_enabled = false
-	_olhar_a_janela()
+	# Playtest 9: o tempo passa com ele lendo os livros da biblioteca, à mesa — o
+	# livro aberto, a janela adiante; à noite o livro fecha e a sala apaga (foi para
+	# casa), e de manhã abre de novo.
+	await abrir_livro()
+	if not is_inside_tree():
+		return
 	# A fala que veio antes (ex.: a de depois de selar) termina primeiro: o cartão
 	# precisa entrar no escuro do lapso, não depois dele.
 	while Narrator.is_speaking():
@@ -978,9 +1005,16 @@ func passar_tempo(cartao: NarrationLine) -> void:
 		if not is_inside_tree():
 			return
 	_cartao_no_lapso = true
+	if livro_estudo:
+		lapso.trecho.connect(livro_estudo.reagir)
 	await lapso.passar(de, ate, func() -> void:
 		await Narrator.say(cartao, Narrator.Style.CARTAO)
 		_cartao_no_lapso = false, estilos_lapso.get(cartao.id, "dias"))
+	if not is_inside_tree():
+		return
+	if livro_estudo and lapso.trecho.is_connected(livro_estudo.reagir):
+		lapso.trecho.disconnect(livro_estudo.reagir)
+	await fechar_livro()
 	if not is_inside_tree():
 		return
 	GameState.set_value(&"data", ate)

@@ -17,6 +17,10 @@ const SEMANA := ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY
 ## 1928 é bissexto.
 const DIAS_NO_MES := [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
+## Um trecho do dia começou: a hora da cidade e a luz da sala (fração da de antes).
+## O livro que ele lê fecha quando a sala apaga (LivroEstudo.reagir).
+signal trecho(hora: String, luz: float)
+
 ## Playtest 8 ("sempre a mesma animação, e ela demora"): metade do tempo de
 ## antes (eram 18 s, 9 s por dia), e cada lapso no seu ESTILO.
 const DURACAO_TOTAL := 9.0
@@ -138,6 +142,7 @@ func passar(de: int, ate: int, no_escuro: Callable, estilo := "dias") -> void:
 			var para: String = hora_do_dia if k == dias - 1 and h == segmentos.size() - 1 else seg[3]
 			if not horas.has(para):
 				para = hora_atual
+			trecho.emit(para, seg[4])
 			var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
 			t.tween_property(sol, ^"light_energy", seg[1], segundos)
 			t.tween_property(sol, ^"light_color", seg[2], segundos)
