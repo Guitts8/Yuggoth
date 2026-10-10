@@ -15,6 +15,8 @@ extends Node3D
 ## Cena gerada por tools/gerar_escritorio.gd (ver o cabeçalho de lá).
 
 const SONHO_SUBIDA := 2.5
+## A fazenda de Akeley: o Interlúdio, depois da última carta (docs/PLANO_FAZENDA.md).
+const FAZENDA := "res://levels/fazenda/fazenda.tscn"
 const SONHO_DESCIDA := 4.0
 ## Onde a folha escrita deita para ser selada: no mata-borrão, o envelope à frente.
 const SELAGEM_POS := Vector3(0.05, 0.784, -2.2)
@@ -88,7 +90,6 @@ const BEBIDA_UISQUE := 2
 @export var ultima_carta: DocumentData
 ## Cartão depois da tinta. Na demo o jogo acaba aí e volta ao menu; no jogo
 ## completo, aqui entra a troca para a fazenda.
-@export var linha_fim_demo: NarrationLine
 ## Segundos depois de ler a folha do relato até o narrador lembrar das cartas.
 @export var dica_cartas_apos := 8.0
 ## Os saltos no tempo dentro do dia passam na própria sala (passar_tempo).
@@ -473,7 +474,9 @@ func _on_por_na_calha(_by: Node) -> void:
 		_salto_pendente = reply.cartao_depois
 
 
-## Fim do Dia 6 e da demo: a tinta da última carta, o cartão e o menu.
+## Fim do Dia 6: a tinta da última carta enche a tela e cai no quintal da
+## fazenda de Akeley, no entardecer de 2 de setembro — o Interlúdio
+## (docs/PLANO_FAZENDA.md, F2; a demo acaba lá, Fazenda.linha_fim).
 func _para_o_interludio() -> void:
 	_saindo = true
 	var tinta := TintaTransicao.new()
@@ -483,15 +486,10 @@ func _para_o_interludio() -> void:
 	await tinta.tocar(ultima_carta)
 	if not is_inside_tree():
 		return
-	await SceneDirector.fade_out(1.5)
-	if not is_inside_tree():
-		return
-	SceneDirector.hold_black = true
-	tinta.queue_free()
-	await Narrator.say(linha_fim_demo, Narrator.Style.CARTAO)
-	if not is_inside_tree():
-		return
-	Events.quit_to_menu_requested.emit()
+	tree_exiting.disconnect(tinta.queue_free)
+	GameState.set_flag(&"interludio")
+	GameState.set_value(&"data", Lapso.dia_do_ano(9, 2))
+	tinta.revelar(FAZENDA, &"Entardecer")
 
 
 ## O diário (docs/PLANO_ESCRITORIO.md, "A passagem para o sonho"), a última

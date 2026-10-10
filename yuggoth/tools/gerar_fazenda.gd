@@ -106,25 +106,36 @@ func _ready() -> void:
 	_mat("agua", "grao", {unlit = true, world = 1.0, cor = Color(0.2, 0.22, 0.24)})
 	_mat("chao_terra", "estrada", {world = 0.6, cor = Color(0.8, 0.72, 0.62)})
 	_mat("palha", "papel_pardo", {world = 1.5, cor = Color(1.1, 0.95, 0.6)})
+	# Vidro iluminado pela cena (o vidro_janela do escritório é sem luz: brilhava
+	# no crepúsculo).
+	_mat("vidro_fazenda", "grao", {world = 3.0, cor = Color(0.22, 0.25, 0.28)})
+	# O balde de zinco (claro: o ferro_galvanizado parte do aço verde-oliva) e a ração.
+	_mat("zinco", "grao", {world = 12.0, cor = Color(0.46, 0.48, 0.5)})
+	_mat("racao", "cinzas", {world = 20.0, cor = Color(3.2, 2.5, 1.6)})
 
 	cena = Node3D.new()
 	cena.name = "Fazenda"
 	cena.set_script(load("res://levels/fazenda/fazenda.gd"))
 	cena.set("som", _sfx("dia_quieto.wav"))
+	cena.set("linha_fim", load("res://narrative/narration/fim_da_demo.tres"))
 
 	var env := WorldEnvironment.new()
 	env.name = "WorldEnvironment"
 	env.environment = _env()
 	_add(cena, env)
+	# O sol de fim de tarde de setembro, baixo, a oeste-sudoeste: vai para trás da
+	# Dark Mountain (Fazenda._aplicar o apaga aos poucos). As sombras compridas
+	# atravessam o gramado para leste.
 	var sol := DirectionalLight3D.new()
 	sol.name = "Sol"
-	# Tarde de setembro: o sol a sudoeste, já descendo para a montanha.
-	sol.rotation_degrees = Vector3(-32, -40, 0)
-	sol.light_color = Color(1.0, 0.9, 0.74)
-	sol.light_energy = 1.6
+	var rumo := Vector3(0.93, -0.12, -0.36).normalized()
+	sol.transform.basis = Basis.looking_at(rumo, Vector3.UP)
+	sol.light_color = Color(1.0, 0.62, 0.36)
+	sol.light_energy = 1.3
 	sol.shadow_enabled = true
 	sol.directional_shadow_max_distance = 90.0
 	_add(cena, sol)
+	_balde()
 
 	_terreno()
 	_estrada_e_gramado()
@@ -149,31 +160,69 @@ func _ready() -> void:
 	_spawn("Quintal", player.position, 90.0)
 	_spawn("Estrada", Vector3(30.5, 0.0, 4.0), 0.0)
 	_spawn("Vestibulo", Vector3(4.6, T0, 0.4), 90.0)
+	# O começo do Interlúdio: Akeley diante do cercado do canil, olhando para o
+	# oeste — o celeiro, o moinho e a montanha contra o céu da tinta.
+	_spawn("Entardecer", Vector3(7.0, 0.0, -9.5), 95.0)
 
 	_salvar(OUT)
 
 
-## Tarde de setembro (provisória: a luz e o céu de verdade são a F2).
+## O entardecer de 2 de setembro de 1928 (F2): o céu nas cores do céu da tinta da
+## última carta (shaders/tinta.gdshader: o alto escuro, o horizonte alaranjado),
+## o vale a leste afogado em névoa (a neblina de altura) e a neblina puxando para
+## o sol, a oeste. Fazenda._aplicar leva tudo ao crepúsculo.
 func _env() -> Environment:
 	var e := _pos(Environment.new())
 	var ceu := ProceduralSkyMaterial.new()
-	ceu.sky_top_color = Color(0.36, 0.48, 0.66)
-	ceu.sky_horizon_color = Color(0.74, 0.72, 0.66)
-	ceu.ground_horizon_color = Color(0.5, 0.5, 0.46)
-	ceu.ground_bottom_color = Color(0.2, 0.2, 0.18)
+	ceu.sky_top_color = Color(0.16, 0.18, 0.34)
+	ceu.sky_horizon_color = Color(0.88, 0.5, 0.3)
+	ceu.sky_curve = 0.12
+	ceu.ground_horizon_color = Color(0.44, 0.25, 0.15)
+	ceu.ground_bottom_color = Color(0.05, 0.05, 0.06)
+	ceu.sun_angle_max = 25.0
+	ceu.sun_curve = 0.08
 	var sky := Sky.new()
 	sky.sky_material = ceu
+	sky.radiance_size = Sky.RADIANCE_SIZE_32
 	e.background_mode = Environment.BG_SKY
 	e.sky = sky
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	e.ambient_light_energy = 0.55
+	e.ambient_light_energy = 0.5
 	e.fog_enabled = true
-	e.fog_mode = Environment.FOG_MODE_DEPTH
-	e.fog_light_color = Color(0.68, 0.68, 0.64)
-	e.fog_density = 0.9
-	e.fog_depth_begin = 70.0
-	e.fog_depth_end = 380.0
+	e.fog_mode = Environment.FOG_MODE_EXPONENTIAL
+	e.fog_light_color = Color(0.62, 0.46, 0.38)
+	e.fog_density = 0.0045
+	e.fog_sun_scatter = 0.35
+	e.fog_sky_affect = 0.25
+	e.fog_height = -4.0
+	e.fog_height_density = 0.18
+	e.tonemap_exposure = 1.25
 	return e
+
+
+## O balde de ração de Akeley, de ferro galvanizado, cheio de ração, seguro diante
+## da câmera (NaMao, sem mãos). Só aparece no Interlúdio.
+func _balde() -> void:
+	var b := Node3D.new()
+	b.name = "Balde"
+	b.set_script(load("res://components/na_mao.gd"))
+	_add(cena, b)
+	var corpo := _cyl(b, "Corpo", 0.15, 0.12, 0.26, Vector3.ZERO, "zinco", 12)
+	corpo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# A ração por cima da boca, num monte (o cilindro é fechado).
+	var racao := _cyl(b, "Racao", 0.06, 0.142, 0.05, Vector3(0, 0.155, 0), "racao", 12)
+	racao.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_cyl(b, "Aro", 0.155, 0.155, 0.025, Vector3(0, 0.13, 0), "ferro", 12)
+	# Uma luz fraca e curta do lado da câmera: contra o sol baixo, o balde era
+	# uma mancha preta (o truque dos objetos em primeira pessoa).
+	var luz := _omni(b, "Luz", Vector3(-0.2, 0.35, 0.4), Color(1.0, 0.82, 0.66), 0.45, 0.9)
+	luz.light_cull_mask = 1
+	# A alça de arame, em arco sobre a boca.
+	for k in 7:
+		var a := PI * (k + 0.5) / 7.0
+		var alca := _box(b, "Alca%d" % k, Vector3(0.012, 0.012, 0.07), Vector3(0, 0.13 + sin(a) * 0.16, cos(a) * 0.16), "ferro")
+		alca.rotation.x = -a + PI / 2
+		alca.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 
 # --- Ajudantes ----------------------------------------------------------------------
@@ -717,7 +766,7 @@ func _telhado_casa() -> void:
 		# A janela do sótão: posta por fora da empena (a demo não sobe ao sótão).
 		var jz := z + lado * 0.03
 		_bloco("pintura_branca", Vector3(0.8, 1.0, 0.06), Vector3(CUMEEIRA.x, BEIRAL + 1.6, jz), Color.WHITE, false)
-		_bloco("vidro_janela", Vector3(0.64, 0.84, 0.02), Vector3(CUMEEIRA.x, BEIRAL + 1.6, jz + lado * 0.025), Color.WHITE, false)
+		_bloco("vidro_fazenda", Vector3(0.64, 0.84, 0.02), Vector3(CUMEEIRA.x, BEIRAL + 1.6, jz + lado * 0.025), Color.WHITE, false)
 		_bloco("pintura_branca", Vector3(0.64, 0.04, 0.03), Vector3(CUMEEIRA.x, BEIRAL + 1.6, jz + lado * 0.04), Color.WHITE, false)
 		_bloco("pintura_branca", Vector3(0.04, 0.84, 0.03), Vector3(CUMEEIRA.x, BEIRAL + 1.6, jz + lado * 0.04), Color.WHITE, false)
 
@@ -736,7 +785,7 @@ func _porta_georgiana() -> void:
 	for s: float in [-1.0, 1.0]:
 		_bloco("pintura_branca", Vector3(0.22, 0.1, 0.85), Vector3(x + 0.11, T0 + alto + 0.6, s * 0.38), Color.WHITE, false, Vector3(s * 22.0, 0, 0))
 	# A bandeira (o vidro sobre a porta, em leque).
-	_bloco("vidro_janela", Vector3(0.02, 0.3, larg - 0.1), Vector3(x - 0.06, T0 + alto - 0.17, 0), Color.WHITE, false)
+	_bloco("vidro_fazenda", Vector3(0.02, 0.3, larg - 0.1), Vector3(x - 0.06, T0 + alto - 0.17, 0), Color.WHITE, false)
 	for k in 5:
 		_bloco("pintura_branca", Vector3(0.03, 0.3, 0.025), Vector3(x - 0.05, T0 + alto - 0.17, -0.4 + k * 0.2), Color.WHITE, false, Vector3(-30.0 + k * 15.0, 0, 0))
 	# A folha: dobradiça ao sul (aberta, encosta do lado do escritório e deixa o
@@ -1243,7 +1292,7 @@ func _ford() -> void:
 	for s: float in [-1.0, 1.0]:
 		_bloco("ferro", Vector3(0.04, 0.6, 0.04), f + Vector3(-1.0, 1.45, s * 0.66), Color.WHITE, false)
 		_bloco("ferro", Vector3(0.04, 0.6, 0.04), f + Vector3(0.35, 1.45, s * 0.66), Color.WHITE, false)
-	_bloco("vidro_janela", Vector3(0.03, 0.42, 1.25), f + Vector3(0.45, 1.33, 0), Color.WHITE, false)
+	_bloco("vidro_fazenda", Vector3(0.03, 0.42, 1.25), f + Vector3(0.45, 1.33, 0), Color.WHITE, false)
 	_bloco("latao", Vector3(0.06, 0.4, 0.6), f + Vector3(1.47, 0.9, 0), Color(0.6, 0.6, 0.6), false)  # o radiador
 	for rx: float in [1.0, -0.9]:
 		for s: float in [-1.0, 1.0]:

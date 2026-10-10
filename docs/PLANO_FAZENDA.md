@@ -106,12 +106,39 @@ usa ganha o acabamento primeiro.
      ao quintal e volta ao escritório (`Depuracao.fazenda()`).
    - **Teste:** o de fumaça anda do quintal pelos degraus ao vestíbulo, sobe a escada
      até o quarto de hóspedes, desce, sai pelos fundos e entra no celeiro (0 falhas).
-   - **Próximo: a F2** (o entardecer de setembro, e a tinta da última carta caindo no
-     quintal). O usuário confere a planta no playtest 10 (`docs/PLAYTEST.md` §0b).
-2. 🔧 **F2 — O entardecer de setembro.** A luz, o céu e a névoa do vale (reusar
-   `tools/vistas.gd` e o céu da `TintaTransicao`, que já seca num fim de tarde sobre
-   os morros): a tinta da última carta passa a cair no quintal, com Akeley parado,
-   segurando o balde de ração (GDD: *"as mãos são outras"*).
+   - O usuário confere a planta no playtest 10 (`docs/PLAYTEST.md` §0b).
+2. ✅ **F2 — O entardecer de setembro** (2026-10-10, a pedido do usuário logo depois
+   da F1: *"perfeito, faça isso"*).
+   - **A luz** (`Fazenda.entardecer`, 0 → 1 em `duracao_entardecer` = 180 s, o tempo
+     do beat 1): começa com o sol baixo a oeste-sudoeste, alaranjado, as sombras
+     compridas atravessando o quintal para leste, e a casa rosada; o sol se apaga aos
+     poucos (vai para trás da Dark Mountain) até a metade, e o céu (`ProceduralSkyMaterial`,
+     nas cores do céu da tinta: o alto azul-escuro, o horizonte alaranjado) passa ao
+     crepúsculo roxo. A neblina é exponencial, com a de altura afogando o vale a leste
+     e o `fog_sun_scatter` puxando a cor para o sol — a montanha fica dourada de névoa.
+     O `Environment` é copiado no `_ready` (é recurso compartilhado da cena).
+   - **A passagem** (`Escritorio._para_o_interludio`, `TintaTransicao.revelar`): a
+     tinta da última carta enche a tela e seca em céu como antes; então a fazenda entra
+     por baixo dela (a troca de fase sem fade, que é também o checkpoint do Interlúdio)
+     e a tinta se desfaz em 2,5 s no céu de verdade. Marca `interludio` e a data de 2
+     de setembro (domingo; a noite do telhado é a dele).
+   - **Akeley** começa no `Entardecer`, entre a casa e o canil, olhando para o oeste
+     (o celeiro, o moinho e a montanha contra o céu), com o **balde de ração** de
+     ferro galvanizado diante dos olhos — `NaMao` (`components/na_mao.gd`), o objeto
+     seguro diante da câmera sem mãos, com atraso ao virar e o balanço do passo (vai
+     servir à lenha, ao lampião, ao rifle).
+   - **O fim provisório:** a demo acaba no quintal depois de `fim_provisorio` (45 s,
+     parado na pausa): a tela escurece e vem o cartão do fim (`fim_da_demo`, que saiu
+     do escritório) → menu. Continuar volta ao começo do Interlúdio. Pelo F4 de teste
+     (sem a flag), a fazenda continua só para andar: sem o balde, sem o fim.
+   - Vidro: o do Ford e o das janelas do sótão passaram a um material iluminado
+     (`vidro_fazenda`): o `vidro_janela` sem luz brilhava no crepúsculo.
+   - **Testes:** o de fumaça leva a última carta até o quintal (2 de setembro, o balde,
+     o sol ainda baixo) e ao cartão do fim; o `caminhos_test` (`_menu_no_fim_da_demo`)
+     sai no cartão do fim e continua no começo do Interlúdio; o macaco não acusa
+     "fora do mapa" na fazenda (que é maior que o escritório).
+   - **Próximo: a F3** (Akeley: o corpo mais lento, a respiração, sem dossiê, o
+     narrador com as frases das cartas).
 3. 🔧 **F3 — Akeley.** O mesmo Player, mais lento, com a respiração ofegante na câmera
    (GDD §5.1a: "o corpo é outro"); sem dossiê; o narrador passa a ser Akeley, com
    frases das cartas (tradução nossa). Os objetos na mão como a carta do escritório

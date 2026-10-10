@@ -88,7 +88,6 @@ func _ready() -> void:
 	cena.set("linhas_correio", correio)
 	cena.set("linha_resposta_selada", load("res://narrative/narration/resposta_selada.tres"))
 	cena.set("ultima_carta", load("res://narrative/documents/carta_akeley_quarta.tres"))
-	cena.set("linha_fim_demo", load("res://narrative/narration/fim_da_demo.tres"))
 	# O diário, ao fim de cada dia (Dias 1 a 5): as entradas e a fala ao postar.
 	var entradas: Array[DocumentData] = [null]
 	for n in range(1, 6):

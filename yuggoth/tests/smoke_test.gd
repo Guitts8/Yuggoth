@@ -870,8 +870,17 @@ func _ready() -> void:
 	var tinta_na_tela := func() -> bool: return get_tree().root.get_children().any(func(n: Node) -> bool: return n is TintaTransicao)
 	await _until(tinta_na_tela, 60.0)
 	_check(tinta_na_tela.call() and not player.input_enabled, "a letra de Akeley enche a tela; o jogador não anda")
-	await _until(func() -> bool: return main_menu.visible and not tinta_na_tela.call(), 120.0)
-	_check(main_menu.visible and SceneDirector.current_level.is_empty() and not tinta_na_tela.call(), "fim da demo: a tinta vira céu e o jogo volta ao menu")
+	# A tinta cai no quintal da fazenda (docs/PLANO_FAZENDA.md, F2): Akeley com o
+	# balde de ração, no entardecer de 2 de setembro.
+	await _until(func() -> bool: return SceneDirector.current_level == FAZENDA and not tinta_na_tela.call(), 60.0)
+	var faz := get_tree().root.find_child("Fazenda", true, false) as Fazenda
+	_check(faz != null and not tinta_na_tela.call() and GameState.has_flag(&"interludio") and GameState.get_value(&"data") == Lapso.dia_do_ano(9, 2),
+		"a tinta cai no quintal da fazenda: 2 de setembro")
+	if faz:
+		_check(faz.balde.visible and faz.player.input_enabled and not Events.is_modal_open, "Akeley no quintal, com o balde de ração, e anda")
+		_check(faz.sol.light_energy > 0.5 and faz.entardecer < 0.5, "o sol ainda baixo, antes de ir para trás da montanha")
+	await _until(func() -> bool: return main_menu.visible, 120.0)
+	_check(main_menu.visible and SceneDirector.current_level.is_empty() and not tinta_na_tela.call(), "fim da demo, no quintal: o cartão e o menu")
 	_check(not SceneDirector.hold_black, "depois da demo, a tela preta não fica presa")
 	Engine.time_scale = 1.0
 
@@ -1138,13 +1147,17 @@ func _subir_a_escada(esc: Escritorio) -> void:
 ## A fazenda (docs/PLANO_FAZENDA.md, F1: a planta em bloco) se anda: do quintal,
 ## pelos degraus da frente, ao vestíbulo; a escada até o primeiro andar e o
 ## quarto de hóspedes; de volta, pela porta dos fundos, ao celeiro.
+const FAZENDA := "res://levels/fazenda/fazenda.tscn"
+
+
 func _fazenda() -> void:
 	GameState.reset()
-	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Quintal", false)
+	await SceneDirector.change_level(FAZENDA, &"Quintal", false)
 	var faz := get_tree().root.find_child("Fazenda", true, false) as Fazenda
 	var p := faz.player
 	await _seconds(0.5)
 	_check(absf(p.global_position.y) < 0.1 and p.is_on_floor(), "fazenda: de pé no chão do quintal")
+	_check(not faz.balde.visible, "fazenda fora do Interlúdio (F4): sem o balde, sem o fim da demo")
 	await _andar(p, [Vector3(9.0, 0, 0), Vector3(5.0, 0, 0)], 30.0)
 	_check(absf(p.global_position.y - 0.6) < 0.15 and p.global_position.x < 5.5, "fazenda: os degraus da frente, o vestíbulo %s" % p.global_position)
 	await _andar(p, [Vector3(4.9, 0, -0.9), Vector3(-0.3, 0, -0.9), Vector3(-0.3, 0, 0.6), Vector3(3.0, 0, 0.6), Vector3(3.0, 0, 3.0)], 60.0)

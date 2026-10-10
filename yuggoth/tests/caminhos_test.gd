@@ -669,9 +669,10 @@ func _limpo(esc: Escritorio, n: int, quando: String) -> void:
 
 # --- 7d. O menu no fim da demo ---------------------------------------------------------------
 
-## Postada a última carta, a tinta e o cartão do fim em tela preta. No cartão,
-## o Esc abre a pausa; sair para o menu e continuar volta à manhã do Dia 6, sem a
-## tela preta presa.
+## Postada a última carta, a tinta, que cai no quintal da fazenda (F2), e o
+## cartão do fim em tela preta. No cartão, o Esc abre a pausa; sair para o menu e
+## continuar volta ao começo do Interlúdio (o checkpoint é a troca de fase), sem
+## a tela preta presa, com Akeley e o balde.
 func _menu_no_fim_da_demo() -> void:
 	var esc := await _dia(6, {&"comecou_dia_6": true, &"escreveu_resposta_dia_6": true, &"resposta_dia_6": 1})
 	await _entrar(esc)
@@ -683,7 +684,9 @@ func _menu_no_fim_da_demo() -> void:
 	_check(tinta_na_tela.call(), "a última carta postada: a tinta")
 	await _press(&"ui_cancel")
 	_check(not pause.visible, "durante a tinta, a pausa não abre")
-	await _until(func() -> bool: return not tinta_na_tela.call() and SceneDirector.hold_black and Narrator.is_speaking(), 120.0)
+	await _until(func() -> bool: return SceneDirector.current_level == FAZENDA and not tinta_na_tela.call(), 120.0)
+	_check(SceneDirector.current_level == FAZENDA, "a tinta cai no quintal da fazenda")
+	await _until(func() -> bool: return SceneDirector.hold_black and Narrator.is_speaking(), 120.0)
 	Engine.time_scale = 1.0
 	await _press(&"ui_cancel")
 	_check(pause.visible, "no cartão do fim, o Esc abre a pausa")
@@ -694,13 +697,13 @@ func _menu_no_fim_da_demo() -> void:
 	await _seconds(2.0)
 	_check(main_menu.visible and not SceneDirector.hold_black and not get_tree().paused, "saído no cartão do fim: o menu, sem a tela presa")
 	await root.continue_game()
-	await _until(func() -> bool: return not SceneDirector.is_busy and SceneDirector.current_level == ESCRITORIO, 20.0)
+	await _until(func() -> bool: return not SceneDirector.is_busy and SceneDirector.current_level == FAZENDA, 20.0)
 	await _seconds(2.0)
-	esc = root.find_child("Escritorio", true, false)
-	_check(GameState.get_value(&"dia") == 6 and SceneDirector._fade.modulate.a < 0.05 and not SceneDirector.hold_black and not main_menu.visible,
-		"continuar: a manhã do Dia 6, à vista")
-	await _entrar(esc)
-	_check(esc.player.input_enabled and CartaSaida.atual == null, "e ele entra, sem carta na mão")
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	_check(faz != null and GameState.has_flag(&"interludio") and SceneDirector._fade.modulate.a < 0.05 and not SceneDirector.hold_black and not main_menu.visible,
+		"continuar: o começo do Interlúdio, à vista")
+	if faz:
+		_check(faz.balde.visible and faz.player.input_enabled and not Events.is_modal_open, "Akeley com o balde, e anda")
 
 
 # --- 7e. O menu pelo teclado ------------------------------------------------------------------
@@ -1026,7 +1029,8 @@ func _macaco() -> void:
 		desde += (Time.get_ticks_msec() - t0) / 1000.0 * Engine.time_scale
 		var fase := root.get(&"_level") as Node
 		var player: Player = fase.find_child("Player", true, false) if fase else null
-		if player and (player.global_position.y < -6.0 or absf(player.global_position.x) > 30.0 or absf(player.global_position.z) > 30.0):
+		var na_fazenda := fase is Fazenda
+		if player and not na_fazenda and (player.global_position.y < -6.0 or absf(player.global_position.x) > 30.0 or absf(player.global_position.z) > 30.0):
 			fora_do_mapa = true
 			print("   fora do mapa em %s" % player.global_position)
 			break

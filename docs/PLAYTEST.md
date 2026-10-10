@@ -54,10 +54,18 @@ o que esperava.
       à noite (foi para casa) e abre de manhã. E a noite em claro: "Reler as notas até o
       dia", o livro aberto a noite toda. Agora fica claro quando ele não dormiu?
 
-## 0b. Novo, fora do roteiro: a fazenda de Akeley (F1, para andar)
-A planta da fazenda (`docs/PLANO_FAZENDA.md`), ainda sem os beats do Interlúdio e com
-uma luz de tarde provisória. No build de teste, **F4** leva ao quintal e, de lá, F4
-volta ao escritório (se sair do jogo na fazenda, Continuar volta a ela).
+## 0b. Novo: a fazenda de Akeley (F1 a planta, F2 o entardecer)
+A planta da fazenda (`docs/PLANO_FAZENDA.md`), ainda sem os cães nem os beats do
+Interlúdio. **O fim do Dia 6 mudou:** postada a última carta, a tinta não vai mais
+para o cartão do fim — ela se desfaz no céu do entardecer, e você está no quintal
+como Akeley, com o balde de ração; uns 45 segundos depois vem o cartão do fim (até
+os beats existirem). No build de teste, **F4** também leva ao quintal (só para andar:
+sem o balde nem o fim) e, de lá, F4 volta ao escritório.
+- [ ] **A passagem:** a tinta que vira céu emenda com o céu do quintal? O balde diante
+      dos olhos lê como um balde (sem mãos)?
+- [ ] **O entardecer** (uns 3 minutos): o sol baixo e as sombras compridas, a névoa
+      dourada na montanha, o vale afogado; e o crepúsculo roxo no fim. Escuro demais,
+      claro demais, rápido demais?
 - [ ] **A escala:** a casa (dois andares e meio, o tabuado branco, as venezianas
       verdes), o gramado até a estrada com a borda de pedras caiadas, o caminho até a
       porta georgiana, a caixa de correio com o nome. Parece a casa da fotografia do

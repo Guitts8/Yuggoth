@@ -3,8 +3,9 @@ extends CanvasLayer
 ## Entrada do Interlúdio (GDD §5.1a): a caligrafia nervosa da última carta de
 ## Akeley enche a tela, a tinta se espalha e vira o céu de fim de tarde sobre o
 ## vale. Montada em código; quem usa a põe na raiz da árvore (resolução nativa,
-## acima da UI e abaixo do fade) e espera `tocar()`. Bloqueia o jogador como um
-## modal enquanto existe.
+## acima da UI e abaixo do fade) e espera `tocar()`; depois, `revelar()` troca a
+## fase por baixo da tinta (a fazenda, F2) e a desfaz, mostrando o céu de verdade.
+## Bloqueia o jogador como um modal enquanto existe.
 
 const SHADER := preload("res://shaders/tinta.gdshader")
 ## Parágrafos do fim da carta mostrados no papel.
@@ -53,6 +54,19 @@ func tocar(doc: DocumentData) -> void:
 	t.tween_method(_set_param.bind(&"ceu"), 0.0, 1.0, secar)
 	await t.finished
 	await get_tree().create_timer(segurar).timeout
+
+
+## Depois de `tocar()`: a fase `fase` entra por baixo da tinta (sem fade), e a
+## tinta se desfaz em `segundos`, revelando o céu do mundo; então some.
+func revelar(fase: String, entrada: StringName, segundos := 2.5) -> void:
+	await SceneDirector.change_level(fase, entrada, false)
+	if not is_inside_tree():
+		return
+	var t := create_tween().set_parallel()
+	t.tween_property(_tinta, "modulate:a", 0.0, segundos).set_trans(Tween.TRANS_SINE)
+	t.tween_property(_fundo, "modulate:a", 0.0, segundos * 0.6)
+	await t.finished
+	queue_free()
 
 
 ## Fundo preto, o papel com o fim da carta e a camada da tinta por cima.

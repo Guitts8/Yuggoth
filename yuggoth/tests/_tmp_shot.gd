@@ -44,6 +44,10 @@ func _ready() -> void:
 		await _olhar_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "entardecer":
+		await _entardecer_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "fazenda":
 		await _fazenda_fotos()
 		get_tree().quit()
@@ -546,3 +550,49 @@ func _fazenda_fotos() -> void:
 		p.head.rotation.x = atan2(alvo.y - olho.y, Vector2(alvo.x - olho.x, alvo.z - olho.z).length())
 		await _s(0.5)
 		await _shot("%s_%s" % [tag, pt[0]])
+
+
+## SHOT_MODO=entardecer: a passagem da tinta para o quintal (F2) e o quintal em
+## três momentos do entardecer, de frente para a montanha e para a casa.
+func _entardecer_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 6)
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+	await _s(1.0)
+	Narrator.cancel()
+	var esc := root.find_child("Escritorio", true, false) as Escritorio
+	var tinta := TintaTransicao.new()
+	tinta.aproximar = 2.0
+	tinta.espalhar = 1.5
+	tinta.secar = 1.5
+	tinta.segurar = 0.5
+	get_tree().root.add_child(tinta)
+	await tinta.tocar(esc.ultima_carta)
+	await _shot("%s_0_tinta" % tag)
+	GameState.set_flag(&"interludio")
+	tinta.revelar("res://levels/fazenda/fazenda.tscn", &"Entardecer")
+	await _until_nivel("res://levels/fazenda/fazenda.tscn")
+	await _s(1.2)
+	await _shot("%s_1_revelando" % tag)
+	await _s(2.0)
+	await _shot("%s_2_quintal" % tag)
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	var p := faz.player
+	for momento: float in [0.0, 0.45, 1.0]:
+		faz.entardecer = momento
+		faz.duracao_entardecer = 99999.0
+		faz._aplicar(momento)
+		await _s(0.6)
+		for alvo: Array in [["oeste", Vector3(-60, 8, -14)], ["casa", Vector3(1, 3, 0)], ["vale", Vector3(60, -4, -10)]]:
+			var a: Vector3 = alvo[1]
+			p.look_at(Vector3(a.x, p.global_position.y, a.z))
+			var olho := p.camera.global_position
+			p.head.rotation.x = atan2(a.y - olho.y, Vector2(a.x - olho.x, a.z - olho.z).length())
+			await _s(0.5)
+			await _shot("%s_p%d_%s" % [tag, int(momento * 100), alvo[0]])
+
+
+func _until_nivel(caminho: String) -> void:
+	while SceneDirector.current_level != caminho or SceneDirector.is_busy:
+		await get_tree().process_frame

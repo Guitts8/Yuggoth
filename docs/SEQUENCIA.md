@@ -542,11 +542,20 @@ lapso: playtest 8, "um mi-go passa em pleno sol").
 **Fim do dia (e da demo):** levada a carta registrada à porta, o fim da carta de quarta aparece no papel,
 a câmera se aproxima até a **letra trêmula encher a tela**, a **tinta se espalha**
 em manchas até cobrir tudo e **seca num céu de fim de tarde** sobre os morros do
-vale (pixelado na grade do mundo) → tela preta, *"Fim da demonstração. A história
-continua."* → menu principal. (`TintaTransicao`; no jogo completo, aqui entra a
-fazenda.) O save continua no começo do Dia 6.
+vale (pixelado na grade do mundo) → **a tinta se desfaz e o céu é o de verdade**:
+o quintal da fazenda de Akeley no entardecer de 2 de setembro (F2; ver o Interlúdio
+abaixo). (`TintaTransicao.revelar`.) O checkpoint passa a ser o começo do Interlúdio.
 
 ## Interlúdio — "O Cerco" ⏳ (como Akeley, 2–6 de setembro)
+**Jogável agora (F2, 2026-10-10):** a tinta da última carta cai no quintal; Akeley
+está diante do canil, com o balde de ração diante dos olhos, no entardecer de
+domingo, 2 de setembro: o sol baixo a oeste vai para trás da Dark Mountain, as
+sombras compridas atravessam o quintal, a névoa sobe do vale, e o céu passa do
+laranja ao crepúsculo em três minutos. Anda-se por tudo (a casa, as dependências);
+ainda sem os cães nem os beats: depois de uns 45 segundos, a tela escurece e vem o
+cartão *"Fim da demonstração. A história continua."* → menu. Continuar volta ao
+começo do Interlúdio.
+
 **Na demo (decidido em 2026-10-09; `docs/PLANO_FAZENDA.md`):** os beats 1–3 — a
 rotina do entardecer, a preparação e a noite do telhado (2 de setembro) —, e o
 "continua" depois dos tiros. O resto, no jogo completo.
