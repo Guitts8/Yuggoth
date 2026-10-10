@@ -70,6 +70,11 @@ cilindro de cera aparece fora da máquina, de pé ao lado dela (tocar o disco o 
 e o relógio parado mostra outra hora; no **Dia 5**, depois do bilhete, uma das
 fotografias está virada para baixo na mesa.
 
+**A mesa** (playtest 9): a carta que acabou de chegar vai sempre para o meio, sobre o
+mata-borrão; as outras do dia escorregam para perto; as dos dias anteriores ficam numa
+pilha na ponta esquerda da mesa, que cresce dia a dia (e, nos dias de muitas cartas, as
+mais velhas do dia vão para ela também). Tudo se relê pelo dossiê.
+
 **O correio**, em todos os dias: cartas, bilhetes e telegramas **caem pela fresta da
 porta** (com som, inclusive no escuro dos saltos no tempo, sob o cartão) e ficam no
 chão, junto à porta, iluminados pela luz do corredor que entra por baixo dela.

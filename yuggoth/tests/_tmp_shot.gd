@@ -28,6 +28,10 @@ func _ready() -> void:
 		await _menu_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "alcance":
+		await _alcance_sonda()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "lapso":
 		await _lapso_fotos()
 		get_tree().quit()
@@ -459,3 +463,34 @@ func _lapso_fotos() -> void:
 	for k in 12:
 		await _s(1.1)
 		await _shot("%s_lapso_%02d" % [tag, k])
+
+
+## SHOT_MODO=alcance: no Dia 5, com o telegrama aberto, o que tapa a carta de agosto.
+func _alcance_sonda() -> void:
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 5)
+	for k: StringName in [&"comecou_dia_5", &"narrou_cartao_telegrama_akely"]:
+		GameState.set_flag(k)
+	for k: StringName in [&"correio_agosto", &"correio_15_agosto", &"correio_telegrama_akely"]:
+		GameState.set_value(k, 3)
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+	await _s(2.0)
+	var esc := root.find_child("Escritorio", true, false) as Escritorio
+	var alvo := esc.find_child("CartaAgosto", true, false).get_node("Ler") as Interactable
+	var centro := (alvo.get_child(0) as Node3D).global_position
+	print("ALVO ", centro, " folha ", (alvo.get_parent() as Node3D).global_position)
+	var space := esc.get_world_3d().direct_space_state
+	var vistos := {}
+	for h in [1.15, 1.6]:
+		for r in [0.4, 0.8, 1.2]:
+			for i in 16:
+				var a := TAU * i / 16.0
+				var origem := Vector3(centro.x + cos(a) * r, h, centro.z + sin(a) * r)
+				var q := PhysicsRayQueryParameters3D.create(origem, centro, 3, [esc.player.get_rid()])
+				q.collide_with_areas = true
+				q.hit_from_inside = true
+				var c = space.intersect_ray(q).get("collider")
+				if c:
+					vistos[esc.get_path_to(c)] = vistos.get(esc.get_path_to(c), 0) + 1
+	print("COLISORES ", vistos)

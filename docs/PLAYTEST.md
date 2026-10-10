@@ -1,11 +1,11 @@
 # Playtest — o que verificar
 
-Lista de conferência do **playtest 9** (do Prólogo ao fim da demo). Os testes
+Lista de conferência do **playtest 10** (do Prólogo ao fim da demo). Os testes
 automáticos (`smoke_test`, `caminhos_test`, o macaco) garantem que **tudo se joga
 até o fim sem travar**. Eles não julgam se está **bonito, claro, assustador ou fiel
 ao livro**, e não usam o mouse no menu. Esta lista é para isso.
 
-O que o playtest encontrar vira a **Fase 3j** em `docs/PLANO_ESCRITORIO.md`
+O que o playtest encontrar vira a **Fase 3k** em `docs/PLANO_ESCRITORIO.md`
 (✅ feito · 🔧 claro, a fazer · ❓ espera resposta). Atualize este arquivo a cada
 playtest: o que foi conferido sai, e entra o que mudou.
 
@@ -39,7 +39,22 @@ o que esperava.
 
 ---
 
-## 1. Prioridade: o que mudou desde o playtest 8 (a Fase 3i)
+## 0. Prioridade máxima: o que mudou desde o playtest 9 (a Fase 3j)
+- [ ] **Os sons** do café (a tampa, o jorro, o gole, a xícara pousada), do uísque (a
+      rolha, o fio no copo) e da carta descendo a calha.
+- [ ] **O sonho do disco:** a boca da caverna (a rocha em arco, a fresta negra, o
+      matacão) e, entre as árvores, a silhueta de pé de uma delas, olhando (aparece
+      quando você não está olhando para lá).
+- [ ] **Os livros:** os títulos dourados nas capas; "Ver os livros" e "Ler o livro
+      aberto" (as notas do Necronomicon no chão do Dia 6).
+- [ ] **A luz sobre o mapa** à noite.
+- [ ] **A mesa:** a carta que acabou de chegar no meio, as outras perto, as dos dias
+      anteriores na pilha da ponta esquerda.
+- [ ] **A passagem do tempo:** ele lendo os livros da biblioteca à mesa — o livro fecha
+      à noite (foi para casa) e abre de manhã. E a noite em claro: "Reler as notas até o
+      dia", o livro aberto a noite toda. Agora fica claro quando ele não dormiu?
+
+## 1. O que mudou desde o playtest 8 (a Fase 3i)
 
 ### Os últimos dias (o maior pedido)
 - [ ] **Dia 5:** depois de **comparar a assinatura** e renovar a oferta, o dia acaba:

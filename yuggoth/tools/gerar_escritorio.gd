@@ -1003,7 +1003,7 @@ func _miskatonic() -> void:
 	_box(g, "MataBorrao", Vector3(0.5, 0.003, 0.36), Vector3(0.05, MESA + 0.0015, -2.12), "estofado")
 	for s in [-1, 1]:
 		_box(g, "Cantoneira%d" % s, Vector3(0.05, 0.005, 0.37), Vector3(0.05 + s * 0.24, MESA + 0.0025, -2.12), "feltro")
-	var espatula := _group(g, "Espatula", Vector3(-0.68, MESA, -1.9), 80)
+	var espatula := _group(g, "Espatula", Vector3(-0.66, MESA, -1.83), 80)
 	_box(espatula, "Lamina", Vector3(0.15, 0.003, 0.016), Vector3(-0.04, 0.0015, 0), "ferro")
 	_box(espatula, "Cabo", Vector3(0.07, 0.01, 0.018), Vector3(0.07, 0.005, 0), "latao")
 	_abajur_peca(g)
@@ -1876,7 +1876,8 @@ func _mesinha(parent: Node) -> void:
 func _diario(g: Node3D, pena: Node3D) -> void:
 	var d := Diario.new()
 	d.name = "Diario"
-	d.position = Vector3(-0.5, MESA, -1.99)
+	# Playtest 9: um pouco para a direita, para a pilha das cartas antigas na ponta.
+	d.position = Vector3(-0.42, MESA, -1.96)
 	d.rotation_degrees.y = 8
 	_add(g, d)
 	d.unique_name_in_owner = true
@@ -2035,6 +2036,48 @@ func _cesto(parent: Node) -> void:
 	aro.cap_top = false
 	aro.cap_bottom = false
 	_colisao(c, "Colisao", [[Vector3(0.3, 0.34, 0.3), Vector3(0, 0.17, 0)]])
+
+
+## As folhas na escrivaninha (playtest 9; MesaDoDia): a carta que acabou de chegar
+## no meio, sobre o mata-borrão, as outras do dia em volta; e as dos dias
+## anteriores numa pilha na ponta esquerda, que cresce dia a dia (só a vista: tudo
+## se relê pelo dossiê). O rascunho e a carta do leitor (o debate) ficam onde estão.
+const FOLHAS_DOS_DIAS := [
+	[1, "Dia1/Carta"], [2, "Dia2/Carta"], [3, "Dia3/Bilhete"], [3, "Dia3/Transcricao"],
+	[4, "Dia4/Telegrama"], [4, "Dia4/CartaJulho"], [5, "Dia5/CartaAgosto"], [5, "Dia5/Carta15"],
+	[5, "Dia5/TelegramaAkely/Papel"], [5, "Dia5/Bilhete/Folha"], [6, "Dia6/Carta28/Folha"],
+	[6, "Dia6/Setembro/CartaSetembro"], [6, "Dia6/Segunda/Folha"], [6, "Dia6/Terca/Folha"], [6, "Dia6/Quarta/Folha"],
+]
+
+func _mesa_do_dia(parent: Node) -> void:
+	var mesa := MesaDoDia.new()
+	mesa.name = "MesaDoDia"
+	_add(parent, mesa)
+	mesa.raiz = parent
+	var lugar := func(x: float, z: float, graus: float) -> Transform3D:
+		return Transform3D(Basis(Vector3.UP, deg_to_rad(graus)), Vector3(x, MESA, z))
+	# Fora de onde os envelopes pousam (a faixa do fundo, a ponta direita, a frente
+	# no meio) e da pena (onde se escreve).
+	# (A foto do exército, do Dia 4 em diante, mora à esquerda do mata-borrão.)
+	mesa.lugares.assign([lugar.call(0.05, -2.14, -3.0), lugar.call(0.45, -1.95, -10.0), lugar.call(0.3, -2.42, 6.0)])
+	mesa.pilha = Transform3D(Basis(Vector3.UP, deg_to_rad(86.0)), Vector3(-0.69, MESA + 0.0035, -2.01))
+	var pilha := _group(parent, "MesaPassada")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 29
+	var k := 0
+	for fd: Array in FOLHAS_DOS_DIAS:
+		var folha := parent.get_node(String(fd[1])) as Node3D
+		mesa.folhas.append(folha)
+		mesa.dias.append(fd[0])
+		# A cópia na pilha do canto, dos dias seguintes em diante.
+		var tam := ((folha as MeshInstance3D).mesh as BoxMesh).size if folha is MeshInstance3D and (folha as MeshInstance3D).mesh is BoxMesh else Vector3(0.22, 0.006, 0.3)
+		var copia := _box(pilha, "Passada%d" % k, Vector3(tam.x, 0.003, tam.z), Vector3(-0.69 + rng.randf_range(-0.02, 0.02), MESA + 0.0035 + k * 0.0032, -2.01 + rng.randf_range(-0.02, 0.02)), "papel")
+		copia.rotation_degrees.y = 84.0 + rng.randf_range(-7.0, 7.0)
+		var cn := ConditionalNode.new()
+		cn.name = "DiasDepois"
+		cn.condition = _cond_valor(&"dia", ValueCondition.Op.MAIOR, fd[0])
+		_add(copia, cn)
+		k += 1
 
 
 ## A sala acumula (Fase 5), dia a dia, sem que ninguém comente: os livros de
@@ -2416,7 +2459,9 @@ func _folha(parent: Node, nome: String, pos: Vector3, rot_y: float, doc: String,
 
 
 func _escrever(parent: Node, resposta: String, carta_lida: StringName) -> WriteReply:
-	var escrever := _area(parent, WriteReply.new(), "Escrever", Vector3(0.36, 0.2, 0.36), Vector3(0.33, 0.85, -2.22)) as WriteReply
+	# Na pena (playtest 9: a área grande, sobre o meio da mesa, tampava
+	# as folhas que a MesaDoDia põe em volta do mata-borrão).
+	var escrever := _area(parent, WriteReply.new(), "Escrever", Vector3(0.16, 0.1, 0.24), Vector3(0.31, 0.805, -2.13)) as WriteReply
 	escrever.prompt = "Escrever a Akeley"
 	escrever.reply = load("res://narrative/replies/%s.tres" % resposta)
 	escrever.condition = _cond_valor(carta_lida, ValueCondition.Op.MAIOR_OU_IGUAL, 1)
@@ -2450,6 +2495,7 @@ func _dias(parent: Node) -> void:
 	_dia_5(parent)
 	_dia_6(parent)
 	_acumula(parent)
+	_mesa_do_dia(parent)
 
 
 ## Dia 6 (cap. IV): de 28 de agosto às três últimas cartas manuscritas. Abre com
@@ -2505,7 +2551,7 @@ func _dia_6(parent: Node) -> void:
 			Vector3(0.2, MESA + 0.005, -2.0), 7, &"segunda", CHAO_B, Vector3(0.62, -2.2, 8), "SEP 3",
 			"A letra treme mais do que nunca. Carimbo de Brattleboro, 3 de setembro."],
 		["Terca", &"narrou_cartao_6_setembro", "carta_akeley_terca", "Ler a carta de terça-feira",
-			Vector3(-0.42, MESA + 0.007, -1.98), -9, &"terca", CHAO_C, Vector3(0.42, -2.0, -5), "SEP 4",
+			Vector3(-0.42, MESA + 0.007, -1.98), -9, &"terca", CHAO_C, Vector3(0.66, -2.02, -8), "SEP 4",
 			"O endereço é um rabisco que quase sai do envelope. Carimbo de Brattleboro, 4 de setembro."],
 		["Quarta", &"narrou_cartao_7_setembro", "carta_akeley_quarta", "Ler a carta de quarta-feira",
 			Vector3(0.02, MESA + 0.009, -1.9), 3, &"quarta", CHAO_A, Vector3(0.06, -2.48, 3), "SEP 5",
@@ -3685,7 +3731,7 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 func _dia_1(parent: Node) -> void:
 	var g := _grupo_do_dia(parent, 1)
 	_luz(g, "vista_dia", Color(1.0, 0.86, 0.62), 7.0, Vector3(-0.4, 0, 0.6), Vector3(0.8, 3.4, -D - 1.5), 1.0)
-	var carta := _folha(g, "Carta", Vector3(-0.22, MESA + 0.004, -2.12), 12, "carta_akeley_1", "Ler a carta")
+	var carta := _folha(g, "Carta", Vector3(-0.22, MESA + 0.004, -2.12), 12, "carta_akeley_1", "Ler a carta", false)
 	_dentro(carta.get_parent(), &"dia_1")
 	_correio(g, "Envelope", &"dia_1", CHAO_A, Vector3(-0.5, -2.32, 10), {
 		remetente = "H. W. Akeley\nR.F.D. #2, Townshend, Vt.",
@@ -3701,7 +3747,7 @@ func _dia_2(parent: Node, fotos: Array[Node3D]) -> void:
 	var g := _grupo_do_dia(parent, 2)
 	# Fim de tarde: sol baixo e alaranjado, entrando quase na horizontal.
 	_luz(g, "vista_entardecer", Color(1.0, 0.58, 0.32), 5.5, Vector3(-0.6, 0.5, 1.8), Vector3(1.2, 2.2, -D - 1.5), 0.55)
-	var carta := _folha(g, "Carta", Vector3(0.0, MESA + 0.004, -2.1), -6, "carta_akeley_2", "Ler a carta", true, 0.014)
+	var carta := _folha(g, "Carta", Vector3(0.0, MESA + 0.004, -2.1), -6, "carta_akeley_2", "Ler a carta", false, 0.014)
 	_dentro(carta.get_parent(), &"dia_2")
 	var c := _correio(g, "Envelope", &"dia_2", CHAO_A, Vector3(-0.2, -2.47, 6), {
 		remetente = "H. W. Akeley\nR.F.D. #2, Townshend, Vt.",

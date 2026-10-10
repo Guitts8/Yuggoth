@@ -1002,8 +1002,19 @@ O usuário jogou o playtest 9. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ 
    As descrições são nossas e só afirmam o que os livros de fato tratam.
 5. ✅ **Uma luz sobre o mapa**, para ele se ver à noite. Feito: uma luminária de
    quadro, de latão, presa no alto da moldura, com a luz quente sobre o papel.
-6. ❓ **A folha principal do dia sempre no meio** da mesa, as outras perto, e as dos
-   dias anteriores ficando nas extremidades.
+6. ✅ **A folha principal do dia sempre no meio** da mesa, as outras perto, e as dos
+   dias anteriores ficando nas extremidades. Decidido pelo usuário: a principal é **a
+   que acabou de chegar**. Feito (`components/mesa_do_dia.gd`, `MesaDoDia`; no
+   gerador, `_mesa_do_dia`): a carta mais nova vai para o meio, sobre o mata-borrão;
+   as outras do dia, depois que a nova pousa, escorregam para os lugares em volta (à
+   frente, à direita; atrás, à direita) — fora de onde os envelopes pousam e da pena; as
+   dos dias anteriores ficam numa **pilha na ponta esquerda** da mesa, que cresce dia a
+   dia (só a vista: relê-se pelo dossiê), e quando um dia tem mais cartas que lugares
+   (Dias 5 e 6), as mais velhas do dia vão para a pilha também. As cartas dos Dias 1 e 2
+   agora ficam na mesa depois de lidas, como as outras; o diário foi um pouco para a
+   direita, para a pilha; a área de "Escrever a Akeley" ficou só na pena (a grande
+   tampava as folhas em volta do mata-borrão); o envelope de terça pousa na ponta
+   direita.
 7. ✅ **A passagem do tempo ligada aos livros lidos** (*"para justificar? o take
    talvez?"*), e **"Sentar e esperar o dia" não faz sentido**: se só a noite em claro
    for assim, todos os outros saltos parecem noites sem dormir. Achar uma solução
@@ -1086,6 +1097,9 @@ acessibilidade e o export já estão feitos (sessão do menu); falta o playtest 
 2j2. ✅ **As Fases 4, 5 e 6 feitas antes do playtest 9** (a pedido do usuário: "o que
    você pode fazer enquanto eu não consigo jogar"): o mapa do condado, a sala que
    acumula, as estranhezas. Entram na lista do playtest 9.
+2j3. ✅ O usuário jogou o **playtest 9**; a lista virou a **Fase 3j**, toda feita.
+2j4. **← AQUI.** O usuário joga o **playtest 10** (`docs/PLAYTEST.md`); a lista vira a
+   Fase 3k.
 2k. **Decidido em 2026-10-09: o recorte do Interlúdio entra na demo** (os beats 1–3:
    o entardecer, a preparação, a noite do telhado; o "continua" depois dos tiros).
    A fazenda tem diário de bordo próprio: **`docs/PLANO_FAZENDA.md`** (o que o livro
