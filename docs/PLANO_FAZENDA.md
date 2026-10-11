@@ -55,6 +55,146 @@ escuro com a poltrona, a sala de estar com o sofá de Noyes, as tábuas que rang
 corredor de cima, o quarto de hóspedes, o abrigo do Ford, a estrada). O que a demo
 usa ganha o acabamento primeiro.
 
+## O roteiro do recorte — proposta para decidir (2026-10-10)
+Pedido do usuário depois do playtest 10: *"Precisamos primeiro decidir, antes de
+começar a mexer na fazenda, O QUE VAI SER FEITO lá. Para que possamos deixar tão
+excelente tanto os modelos como o storytelling da parte do escritório."* Nada da
+F3 em diante começa antes de este roteiro ser aprovado. Cada item: o que o jogador
+faz, o que vê e ouve, de onde vem no livro (📖) ou se é nosso (💭), e os modelos.
+
+**A ideia que amarra tudo:** o jogador **acabou de ler** a carta de segunda. Ele
+sabe o que vai acontecer esta noite — o telhado, o zumbido, os tiros, os cinco
+cães, o que foi baleado pelas costas. O horror é viver até lá sabendo, sem poder
+mudar nada (GDD §5.1a). E **as legendas de Akeley são a carta que ele vai escrever
+amanhã**: as mesmas frases, na letra dele (Tangerine, a mão de Akeley), aparecendo
+sobre a cena no momento em que acontecem.
+
+**Fatos do livro que o roteiro respeita** (📖 cap. IV): domingo, 2 de setembro, céu
+fechado, sem chuva, sem lua; a lua cheia vinha segurando as criaturas e já mingua;
+**sem eletricidade** (*"mandaria pôr luz elétrica e um holofote se não soubesse que
+cortariam os cabos"*): lampiões de querosene; **o telefone mudo** (*"cortam meus fios
+sempre que tento telefonar à noite"*; ele desistiu de consertar); o **rifle de
+repetição de caça grossa** e as caixas de munição; ele pensa em se mudar para
+Brattleboro ou para o filho em San Diego (*"a casa onde nasci, onde minha família
+viveu por seis gerações"*); é o próprio fotógrafo (a câmera e a pera de borracha
+da foto do Dia 2: *"um homem de rosto agradável, barba grisalha curta"*).
+
+### 0. A passagem: do céu até os olhos de Akeley (~20 s)
+O playtest 10: *"não dá para perceber, além daquelas ondulações imitando montanhas
+de desenho de criança; pensei numa transição que vem do céu até dar na visão de
+Akeley."*
+- A tinta da última carta enche a tela, como hoje, e seca em céu — **sem as
+  montanhas desenhadas** (saem do shader da tinta).
+- O céu de tinta clareia e **é o céu 3D de verdade**: a câmera está alta sobre o
+  vale, a uns 150 m, olhando o poente sobre a crista da Dark Mountain. Na tinta que
+  ainda some, na letra trêmula de Akeley: *"Domingo, 2 de setembro de 1928."*
+- **Um plano só, descendo** (~15 s): passa sobre a crista recortada de mata, desce
+  a encosta, o pântano, o moinho girando, o telhado do celeiro, o canil — os cães
+  erguem as cabeças, um late — e a câmera chega à altura dos olhos, **dentro** de
+  Akeley, diante do canil, olhando o balde. A respiração dele começa; o controle
+  volta.
+- O som faz a ponte: a pena de Wilmarth para no último traço; o vento lá no alto;
+  os pássaros do fim da tarde e os cães cada vez mais perto.
+- Precisa: o **vale de fundo** em 3D (os morros dos dois lados, a estrada, o
+  West River lá embaixo, a crista da montanha), visto de cima — hoje a fazenda só
+  tem o que fica dentro dos muros e a encosta.
+
+### 1. O entardecer — a rotina (~3–4 min)
+- **Alimentar os cães** (📖 *"meus grandes cães policiais"*): o balde nas mãos;
+  as gamelas do canil, uma por baia, "Pôr a ração". Os doze vêm; os quatro com nome
+  têm o seu jeito (Brutus encosta na perna e segue; Conan come primeiro; Hércules
+  rosna para o outro; Rambo não come — fica olhando a mata). Os nomes nas
+  plaquinhas se leem.
+- **A lenha** para a noite: do galpão de lenha, uma braçada diante da câmera (sem
+  mãos), levada até a lareira do escritório. 💭
+- **Fechar o celeiro**: o portão de correr; as galinhas recolhidas.
+- **A caixa de correio** junto à estrada, vazia (domingo). 💭 Ali se vê a estrada
+  e o vale; do outro lado, a mata.
+- **Yautja** (💭, GDD): no fim da rotina, os pássaros param todos de uma vez; Yautja
+  dispara para a mata, latindo, e não volta. Chamar por ele (uma interação) só traz
+  o silêncio.
+- **A lua** (📖 *"só a lua cheia os segurava"*): ela nasce grande sobre os morros
+  do leste e as nuvens a engolem devagar. Akeley: *"Nuvens. Logo hoje."*
+- O sol vai para trás da montanha (a F2, como está).
+
+### 2. A preparação (~2 min)
+- **Os lampiões**: acender os do térreo (o escritório, o vestíbulo, a sala de estar,
+  a cozinha) — no Ato III, Wilmarth acha a casa escura (a ponte do GDD). Riscar o
+  fósforo, a chaminé de vidro, a chama que cresce (como a lareira do escritório).
+- **As venezianas**: fechar as do térreo, de dentro (debruça-se na janela, puxa as
+  folhas, a tranca). Só as do escritório e da sala — para não cansar.
+- **O telefone**: tirar o fone — nada, nem chiado. *"Cortaram de novo."*
+- **O rifle**: do armário da sala dos fundos; carregar, cartucho por cartucho
+  (umas três pressões de E, o som de cada um), a alavanca. Fica diante da câmera,
+  como o balde.
+- **Brutus** deita diante da lareira; os outros ficam soltos no quintal, de guarda
+  (📖 *"os cães todos correram"*: estavam fora).
+- ❓ **As máscaras de gás:** o GDD as põe aqui, mas o livro as dá na carta de
+  **quarta** (*"preparei máscaras para mim e para os cães"*): no domingo ainda não
+  existem. Recomendo tirá-las da demo (ou deixar só os produtos químicos na bancada,
+  sem nome).
+
+### 3. A espera (~1 min)
+- Sentar na poltrona junto ao fogo, o rifle no colo: o tempo passa como no
+  escritório (o relógio do consolo, o lampião baixando, as horas), sem tela preta.
+  Lá fora os cães andam, latem para a mata e se calam. Passa da meia-noite.
+- 💭 O que ele tem na mesa, para quem quiser olhar antes de sentar: as notas da pedra
+  negra (que já mandou a Wilmarth e foi roubada), a câmera com a pera de borracha,
+  as caixas meio feitas da mudança, uma carta do filho, George, de San Diego.
+
+### 4. A noite do telhado (~4 min) — a carta de segunda, vivida
+Cada frase da carta aparece na letra dele quando acontece.
+1. Os grilos param. Hércules rosna para a janela; Brutus levanta a cabeça.
+2. *"Depois da meia-noite algo pousou no telhado da casa"*: o baque em cima, o
+   lampião balança, **poeira cai do forro** do escritório.
+3. *"e os cães todos correram para ver o que era"*: Brutus arranha a porta (o
+   jogador abre, ou ele passa); os latidos rodeiam a casa.
+4. *"um deles conseguiu subir pulando do puxado baixo"*: as unhas nas telhas, a
+   corrida por cima, de um lado ao outro do forro — o som segue pelo teto.
+5. *"uma briga terrível lá em cima, e um zumbido medonho que nunca vou esquecer"*:
+   o zumbido (o bus Whisper) — o mesmo do disco. *"E então um cheiro chocante"*: a
+   imagem lacrimeja e turva, ele tosse.
+6. *"balas entraram pela janela e quase me pegaram"*: um clarão na mata, a vidraça
+   do escritório estoura, um estilhaço no ar. **Não é um jumpscare** (os dois do jogo
+   são do Ato III): vem anunciado — os latidos viram para a frente da casa, o
+   clarão longe antes do estouro.
+7. *"Apaguei a luz"*: "Apagar o lampião" — o escuro total; só o retângulo cinza das
+   janelas.
+8. *"e usei as janelas como seteiras, e varri a casa toda com tiros de rifle"*: de
+   janela em janela (3 ou 4, pela casa), "Atirar": ele ergue o rifle e o cano mira
+   **alto, sozinho** (sem mira livre); cada tiro clareia o quintal por um quadro —
+   árvores, a cerca, os cães correndo, **nada mais**. A alavanca, o cartucho
+   que cai.
+9. ❓ **"acho que acertei um, mirando baixo demais"**: num dos tiros, no meio dos
+   latidos, um ganido que corta. O jogador sabe pela carta o que foi; Akeley ainda
+   não.
+10. *"Isso pareceu acabar com o assunto"*: os latidos param um a um. O silêncio.
+    Escuro. → cartão do fim. (A manhã do sangue e da gosma, os cinco mortos: o jogo
+    completo.)
+
+### O que precisa ficar excelente (os modelos, por ordem de peso)
+| Peso | O quê | Por quê |
+|---|---|---|
+| A | **O cão pastor** (animado: andar, correr, comer, deitar, latir, rosnar) | Doze em cena; carrega toda a noite. O asset mais caro (GDD §11.4). |
+| A | **O rifle** (alavanca, ~1895) | Diante dos olhos o tempo todo nos beats 2–4. |
+| A | **O lampião de querosene** (de mesa e de mão) | A luz da casa inteira; o mesmo objeto do Ato III. |
+| A | **O escritório de Akeley** acabado (a mesa, a poltrona, a lareira, as estantes, as caixas da mudança, a câmera) | Onde ele espera e onde começa o tiroteio; o mesmo cômodo do "Akeley" do Ato III. |
+| A | **O vale visto do alto** (o fundo da passagem) | É a primeira imagem da fazenda. |
+| B | O balde (feito), as gamelas, a braçada de lenha | Diante da câmera. |
+| B | A casa por fora (o tabuado, a porta georgiana, as venezianas), o canil, o celeiro, o moinho | Vistos de perto ao entardecer. |
+| B | As vidraças que estouram | As janelas hoje não têm vidro (o vidro opaco do PSX tampava a vista): o escritório precisa de vidro que se veja através. |
+| C | O Ford no abrigo, o galinheiro, o pântano | Fundo. |
+
+### Sons novos
+Cães (latido, rosnado, ganido, comer, patas no chão e nas telhas), o rifle (tiro,
+alavanca, cartucho), vidro estourando, o baque no telhado, a poeira, o moinho
+rangendo, o lampião, o vento, os grilos que param, os pássaros do entardecer que
+param (o único momento calmo da fazenda: a regra dos pássaros vale).
+
+### Tempo total
+~11 min: a passagem (0,5) + o entardecer (3–4) + a preparação (2) + a espera (1) +
+o telhado (4) + o fim.
+
 ## As fases (em ordem)
 1. ✅ **F1 — A planta em bloco** (2026-10-10, enquanto o usuário não podia jogar o
    playtest 10; commit `3e1c666`). `tools/gerar_fazenda.gd` (+ `.tscn`; `comandos.ps1 gerar-fazenda`)
@@ -142,7 +282,8 @@ usa ganha o acabamento primeiro.
      "fora do mapa" na fazenda (que é maior que o escritório).
    - **Próximo: a F3** (Akeley: o corpo mais lento, a respiração, sem dossiê, o
      narrador com as frases das cartas).
-3. 🔧 **F3 — Akeley.** O mesmo Player, mais lento, com a respiração ofegante na câmera
+3. ❓ **F3 — Akeley** (espera a aprovação do roteiro acima; a passagem nova, do céu
+   aos olhos dele, entra aqui). O mesmo Player, mais lento, com a respiração ofegante na câmera
    (GDD §5.1a: "o corpo é outro"); sem dossiê; o narrador passa a ser Akeley, com
    frases das cartas (tradução nossa). Os objetos na mão como a carta do escritório
    (`CartaSaida`), sem corpo (ver ❓ abaixo).

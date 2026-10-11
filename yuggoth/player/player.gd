@@ -359,10 +359,8 @@ func _update_head(delta: float, crouching: bool) -> void:
 func _update_target() -> void:
 	var hit: Interactable = null
 	# Parado (um lapso no tempo, uma tela aberta), nada na mira.
-	if input_enabled and ray.is_colliding():
-		hit = ray.get_collider() as Interactable
-	if hit and not hit.can_interact(self):
-		hit = null
+	if input_enabled:
+		hit = _primeiro_utilizavel()
 	# O mesmo alvo pode mudar de aviso (ex.: o fonógrafo, de "pôr o cilindro"
 	# para "baixar a agulha"): reavisa o HUD.
 	var prompt := hit.prompt if hit else ""
@@ -370,6 +368,33 @@ func _update_target() -> void:
 		_target = hit
 		_target_prompt = prompt
 		Events.interaction_target_changed.emit(hit)
+
+
+## O primeiro Interactable utilizável na linha da mira. Uma área que não vale
+## agora (já usada, ou com a condição falsa) não tampa a que está atrás dela
+## (playtest 10: no Dia 6, as três "Escrever" da pena estão no mesmo lugar, e a
+## da resposta já escrita escondia a do dia). O mundo (camada 1) ainda tampa.
+func _primeiro_utilizavel() -> Interactable:
+	var achado: Interactable = null
+	var pulados: Array[CollisionObject3D] = []
+	for i in 8:
+		if not ray.is_colliding():
+			break
+		var c := ray.get_collider() as CollisionObject3D
+		var it := c as Interactable
+		if it == null:
+			break
+		if it.can_interact(self):
+			achado = it
+			break
+		pulados.append(it)
+		ray.add_exception(it)
+		ray.force_raycast_update()
+	if not pulados.is_empty():
+		for p in pulados:
+			ray.remove_exception(p)
+		ray.force_raycast_update()
+	return achado
 
 
 func _on_modal_changed(is_open: bool) -> void:

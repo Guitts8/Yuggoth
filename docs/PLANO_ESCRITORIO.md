@@ -1053,6 +1053,40 @@ partes do `caminhos_test`:
 Também rodados: o `caminhos_test` inteiro (0 falhas) e o macaco na semente 14 (a
 demo inteira, 0 falhas).
 
+## Fase 3k — Ajustes do playtest 10 (2026-10-10)
+O usuário jogou o playtest 10. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera resposta.
+
+1. ✅ **Dia 6: "às vezes não é possível escrever para Akeley"** — *"fiquei preso na
+   hora de escrever a carta"*. A causa: as três áreas "Escrever" do Dia 6 (a
+   resposta animadora, o ânimo e a carta registrada) ficam no mesmo lugar, na pena,
+   e o raio da mira parava na primeira que tocava — uma já escrita, que não vale
+   mais —, escondendo a do dia. Corrigido no Player, para todos os casos
+   (`_primeiro_utilizavel`): uma área que não vale agora não tampa a que está atrás
+   dela (só o mundo tampa). O teste de fumaça mira a pena no Dia 6 e confere que o
+   alvo é a carta registrada.
+2. 🔧 **Dia 6: as hitboxes e a progressão em geral.** Provavelmente o mesmo mal (as
+   áreas mortas do dia tampando as vivas); conferir no próximo playtest.
+3. 🔧 **O diário ao fechar** dá um salto quando fica na parte interna da capa.
+   Revisar e dar carinho à animação.
+4. ❓ **As fotos: "dar uma melhorada"** — o usuário não sabe o quê. Propor.
+5. 🔧 **A dobra da carta** com a folha do dia no meio da mesa: a selagem atravessa a
+   folha do dia (as duas sobre o mata-borrão). Proposta: Wilmarth afasta a folha do
+   dia antes de dobrar, e ela volta depois.
+6. 🔧 **O café** começa com a xícara cheia.
+7. 🔧 **O fonógrafo do sonho** (noite 3) é o modelo antigo; o mi-go de pé (a `Vigia`)
+   não foi visto — aparece fora da vista depois de 14 s; deixá-lo mais achável.
+8. 🔧 **Boston:** tirar "Voltar a Arkham" da beira da escada (descer já volta).
+9. 🔧 **Sentar para estudar** (o lapso lendo): o corpo é puxado para a cadeira;
+   levá-lo a pé e girar suave.
+10. 🔧 **O correio depois dos lapsos** não é intuitivo para quem não conhece o jogo.
+    Proposta: o contínuo bate à porta, a sombra dos pés na fresta, o envelope; na
+    primeira vez, uma fala.
+11. ❓ **A passagem para a fazenda** — *"não dá para perceber, além daquelas
+    ondulações imitando montanhas de desenho de criança; pensei numa transição que
+    vem do céu até dar na visão de Akeley"*. Vai com o roteiro da fazenda
+    (`docs/PLANO_FAZENDA.md`, "O roteiro do recorte"), que o usuário pediu para
+    decidir antes de mexer lá.
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado

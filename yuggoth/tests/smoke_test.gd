@@ -859,6 +859,11 @@ func _ready() -> void:
 	await _frames(2)
 	reader.close()
 	await _frames(2)
+	# Playtest 10: as "Escrever" já usadas (a resposta animadora, o ânimo) estão
+	# no mesmo lugar da pena e tampavam a do dia.
+	player.global_position = Vector3(0.3, player.global_position.y, -1.35)
+	await _mirar(player, escrever6.global_position)
+	_check(player._target == escrever6, "Dia 6: a pena mirada é a da carta registrada (as já escritas não tampam)")
 	escrever6.interact(player)
 	await _frames(1)
 	writer._choose(escrever6.reply.options[2])
