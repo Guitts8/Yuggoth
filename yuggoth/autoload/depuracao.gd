@@ -112,6 +112,14 @@ func pular_dia() -> void:
 		_abrir_escritorio("(teste) Prólogo pulado: Dia 1")
 		return
 	var n := int(GameState.get_value(&"dia", 1))
+	# Na fazenda, F2 dá a rotina do entardecer por feita (F5).
+	if SceneDirector.current_level == FAZENDA:
+		var faz := get_tree().root.find_child("Fazenda", true, false)
+		var rotina := faz.get("rotina") as Rotina if faz else null
+		if rotina:
+			rotina.pular()
+			Events.notice_requested.emit("(teste) Rotina do entardecer pulada")
+		return
 	if n >= ULTIMO_DIA:
 		Events.notice_requested.emit("(teste) O Dia %d é o último da demo." % n)
 		return

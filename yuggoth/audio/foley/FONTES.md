@@ -27,7 +27,18 @@ sobrenatural — o zumbido, o disco, as vozes, o sonho — continua sintetizado 
 | [202 More Sound Effects](https://opengameart.org/content/202-more-sound-effects) | OwlishMedia | gole |
 | [Fantasy Sound Effects (Tinysized SFX)](https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx) | Vehicle | servir, servir_uisque, destampar_garrafa, destampar_frasco, calha_correio |
 | [100 CC0 SFX](https://opengameart.org/content/100-cc0-sfx) | rubberduck | pousar_xicara |
+| [Dog barking mono](https://opengameart.org/content/dog-barking-mono) (OGA-BY 3.0 e CC0; usado como CC0) | Brandon Morris | cao_latido_1–4, cao_latidos_longe (baixado em 2026-10-11, F4 da fazenda) |
+| [Dog sounds](https://opengameart.org/content/dog-sounds) | pauliuw | cao_latido_5–6, cao_choramingo, cao_ganido |
+| [Dog Snarl Grunt Grumble](https://opengameart.org/content/dog-snarl-grunt-grumble) | qubodup | cao_rosnado, cao_arreganho |
+
+A rotina do entardecer (F5, `tratar_sons.py rotina`) usa as fontes que já estavam aqui:
+racao (Tinysized coins-shake, mais grave, e rubberduck wood_misc), bomba_poco (rubberduck
+wood_squeak e metal_hit, Tinysized water-pour), agua_bebedouro (rubberduck splash),
+lenha_pegar/lenha_largar (rubberduck wood_hit, wood_falling), portao_correr (Kenney creak3,
+rubberduck metal_sheet e wood_slam), caixa_correio (rubberduck metal_open).
 
 Para refazer: baixe as fontes acima, extraia cada zip numa pasta `x/<nome do zip>/`
-(os arquivos soltos em `zip/`) e rode `python -I tools/tratar_sons.py <pasta>` com
-numpy, scipy e soundfile.
+(os arquivos soltos em `zip/`; os .7z dos cães em `x/dog_pauliuw/`, `x/dog_qubodup/`,
+e os .wav de Brandon Morris em `x/dog_morris/`) e rode `python -I tools/tratar_sons.py
+<pasta> [grupo ...]` com numpy, scipy e soundfile (ex.: `... <pasta> caes` refaz só os
+cães).

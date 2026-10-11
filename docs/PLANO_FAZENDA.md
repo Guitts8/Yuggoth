@@ -368,7 +368,7 @@ roteiro acima onde os dois divergirem.
    - **Testes:** o de fumaça confere a câmera alta no começo da descida, a chegada aos
      olhos de Akeley, o passo, a respiração, a voz, o dossiê fechado e a voz de
      Wilmarth de volta no menu.
-4. 🔧 **F4 — Os cães** (← **em curso**).
+4. ✅ **F4 — Os cães** (2026-10-11).
    - ✅ **O modelo** (`props/cao.gd`, `Cao`, `@tool`, como o `Migo`): um pastor-alemão
      de primitivas com cor de vértice — o tronco em anéis (o peito fundo, a cintura
      recolhida), a sela preta sobre o lombo e o castanho nas patas, no peito e na cara,
@@ -381,19 +381,64 @@ roteiro acima onde os dois divergirem.
    - ✅ **A presença:** os doze no cercado diante das baias ao entardecer, cada um na
      sua pose, quase todos virados para Akeley, que chega com o balde; Rambo olhando a
      mata (`gerar_fazenda._caes`).
-   - 🔧 **O comportamento** (← **próximo**): cada cão com um corpo (`CharacterBody3D`,
-     colisão com as paredes e a tela) e uma máquina de estados simples: **Brutus**
-     segue Akeley a dois passos (e entra com ele); **Conan** vai deitar diante do fogo
-     quando a lareira acende; **Hércules** late para a mata; **Rambo** rosna para a
-     janela do escritório; os outros andam pelo cercado, deitam, sentam. Todos vêm à
-     gamela quando a ração cai; à noite, soltos no quintal.
-   - 🔧 **Os sons** (aprovado baixar, 2026-10-11): latido, rosnado, ganido, comer, as
-     patas no chão e nas telhas — gravações CC0, tratadas por `tools/tratar_sons.py`.
-5. 🔧 **F5 — Beat 1, a rotina** (~3–4 min; ver "A tratativa", 1): a gamela comprida,
-   a lenha do galpão até a lareira do escritório, o celeiro e as galinhas, a caixa de
-   correio vazia, a água do poço; os cães e as linhas curtas de Akeley guiando; os
-   pássaros que param, Yautja que dispara para a mata; a lua que as nuvens engolem.
-6. 🔧 **F6 — Beat 2, a preparação** (~2 min; "A tratativa", 2): os quatro lampiões do
+   - ✅ **O comportamento** (2026-10-11): cada cão é um `CaoIA`
+     (`components/cao_ia.gd`, um `CharacterBody3D` na camada 4 — esbarra no mundo e
+     nos outros cães, mas não tampa a mira nem empurra Akeley) com o `Cao` dentro
+     (`Visual`), filho da `Matilha` (`components/matilha.gd`: o `modo` do momento, o
+     cercado, o quintal, a mata, a janela do escritório, o balde e os sons). Decide a
+     cada 0,6–2,2 s: **ESPERANDO** (o entardecer) — com Akeley perto e o balde na mão,
+     juntam-se na tela do lado dele, olham, sentam, latem pedindo (a mandíbula abre a
+     cada latido: `Cao.latir()`); sem ele, andam à toa, sentam, deitam, cheiram o chão.
+     **Brutus** o segue a dois passos (e senta quando ele para; preso atrás de uma
+     parede, longe e fora da vista, reaparece atrás dele); **Hércules** às vezes vira
+     para a mata e late em rajada; **Rambo** fica de frente para a mata, calado,
+     rosnando baixo. **SOLTOS** (a noite): no quintal. Conan junto ao fogo e Rambo
+     rosnando para a janela entram com a lareira e a noite (F6/F7).
+   - ✅ **Os sons** (baixados em 2026-10-11, aprovado): seis latidos de perto (Brandon
+     Morris, pauliuw), a matilha latindo ao longe (laço), o rosnado (laço) e o
+     arreganho (qubodup), o choramingo e o ganido que corta (pauliuw) — CC0, em
+     `audio/foley/cao_*`, tratados por `tools/tratar_sons.py caes` (agora roda por
+     grupo). Comer e as patas nas telhas ficam para F5/F7.
+   - **Testes:** o de fumaça confere os doze, a matilha juntando-se na tela do lado de
+     Akeley com o balde (11 de 12: Rambo fica com a mata) e Brutus junto dele, de pé no
+     chão. Capturas: `SHOT_MODO=matilha`.
+5. ✅ **F5 — Beat 1, a rotina** (2026-10-11; "A tratativa", 1). `components/rotina.gd`
+   (`Rotina`), com as peças e as áreas de `gerar_fazenda._rotina`:
+   - **A ordem do balde:** "Pôr a ração" — Akeley anda ao longo da gamela comprida (por
+     fora da tela), o balde inclina e a ração corre por ela (o som de grãos secos); a
+     matilha vai para `COMENDO`: onze lado a lado na gamela, o focinho dentro (Rambo
+     não come, fica com a mata); uns 20 s depois, à toa no cercado (`DEPOIS`). "Encher o
+     balde na bomba" (a bomba de balancim junto ao canil: o rangido da alavanca e a
+     água) → "Encher o bebedouro" (o bebedouro de zinco no canto leste; a água sobe) —
+     e o balde fica no chão, ao lado.
+   - **Depois, em qualquer ordem:** "Pegar a lenha" no galpão (uma braçada diante dos
+     olhos, `NaMao` `Bracada`; com ela, só a lareira vale) → "Pôr a lenha na lareira"
+     no escritório (as toras na soleira); "Fechar o portão do celeiro" (as duas folhas
+     correm no trilho, que agora são nós à parte: `PortaoCeleiro`); "Abrir a caixa de
+     correio" (opcional): *"Nada na caixa. É domingo."*
+   - **Os pássaros e Yautja:** feitas a lenha e o celeiro, o ambiente com pássaros
+     (`tarde.wav`, o único momento calmo da fazenda) para de uma vez; Yautja late para
+     a mata e dispara (`CaoIA.fugir`), some além do pântano; *"Os pássaros se calaram
+     todos ao mesmo tempo, e Yautja disparou latindo para a mata."* "Chamar Yautja"
+     (diante dos olhos, qualquer mira pega) — *"— Yautja! Yautja!"*… *"Não voltou."*
+     (sem chamar, em 30 s acaba igual).
+   - **Guiar:** os cães latem pedindo a ração; parado 35 s, Akeley lembra o que falta
+     (*"Primeiro os cães. Estão com fome."*, *"Falta a água deles, da bomba do poço."*,
+     *"A lenha para a noite, antes que escureça."*, *"A lenha vai para a lareira do
+     escritório."*, *"O portão do celeiro ainda está aberto."*). ❓ **Falas compostas
+     (💭), a aprovar.**
+   - **O sol espera a rotina:** o entardecer para em 0,72 até ela acabar, e então o
+     crepúsculo vem depressa; o fim provisório da demo, 30 s depois (até a F6).
+   - **Sons** (CC0, `tratar_sons.py rotina`): a ração, a bomba, a água no bebedouro, a
+     lenha (pegar, largar), o portão de correr, a caixa de correio.
+   - **Testes:** o de fumaça faz a rotina inteira mirando de perto (cada etapa, os
+     onze comendo, Rambo não, o balde no chão, a braçada, a lareira, a caixa, o
+     portão, os pássaros que param, Yautja que não volta); `Rotina.pular()` (e **F2**
+     na fazenda) dá tudo por feito. Capturas: `SHOT_MODO=rotina`.
+   - **Fica para depois:** a lua que as nuvens engolem (vai com a noite, F6/F7); as
+     galinhas recolhidas (o galinheiro, sem som ainda); a bomba merece um modelo
+     melhor (de frente, a alavanca some).
+6. 🔧 **F6 — Beat 2, a preparação** (← **próximo**; ~2 min; "A tratativa", 2): os quatro lampiões do
    térreo, as venezianas do escritório e da sala, o rifle carregado no armário, o
    cercado aberto. Sem as máscaras de gás (são da carta de quarta).
 7. 🔧 **F7 — Beat 3, a noite do telhado** (~4–5 min; "A tratativa", 3 e 4): Brutus e

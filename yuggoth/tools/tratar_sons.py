@@ -296,25 +296,93 @@ def menu():
     salvar("menu_risco", sala(p[seg(0.2) : seg(0.75)], 0.7, 0.15, semente=25), alvo=0.6)
 
 
+def ar_livre(x, rt=0.9, mistura=0.1, semente=40):
+    """O quintal: quase seco, com um eco curto e abafado do vale e dos galpões."""
+    return sala(x, rt, mistura, brilho=2200.0, semente=semente)
+
+
+def caes():
+    """F4 da fazenda: os cães de Akeley (Brandon Morris, pauliuw, qubodup; CC0)."""
+    # Os latidos de perto: os quatro do cão grande de Brandon Morris, cada um
+    # num arquivo (o cão escolhe), um pouco mais graves (pastor-alemão).
+    m = ler("x/dog_morris/dog_barking_mono.wav")
+    for i, (a, b) in enumerate([(0.0, 0.3), (0.5, 0.85), (1.1, 1.45), (1.66, 2.04)]):
+        late = passa_alta(tom(aparar(m[seg(a):seg(b)]), 0.92), 120)
+        salvar("cao_latido_%d" % (i + 1), ar_livre(late, semente=41 + i), alvo=0.85)
+    # Os latidos de pauliuw (mais longos, uma rajada de dois): mais dois.
+    p = ler("x/dog_pauliuw/Dog/Dog 2.wav")
+    salvar("cao_latido_5", ar_livre(passa_alta(aparar(p[seg(0.05):seg(0.7)]), 120), semente=45), alvo=0.85)
+    salvar("cao_latido_6", ar_livre(passa_alta(aparar(p[seg(8.75):seg(9.4)]), 120), semente=46), alvo=0.85)
+    # A matilha latindo ao longe (para a mata, na noite): a gravação com o
+    # ambiente de Brandon Morris, abafada, num laço.
+    longe = passa_baixa(ler("x/dog_morris/dog_barking.wav", 0.9, 6.6), 2600)
+    salvar("cao_latidos_longe", laco(ar_livre(longe, 1.4, 0.25, semente=47), 1.0), True, alvo=0.55)
+    # O rosnado: os três de qubodup, mais graves, emendados num laço baixo e
+    # contínuo; e o rosnado curto (o arreganho).
+    r = [pico(tom(aparar(ler("x/dog_qubodup/dog/%s.flac" % n)), 0.82)) for n in ("dog-grumble", "dog-growl", "dog-grumble", "dog-snarl")]
+    partes = []
+    t = 0.0
+    for k, s in enumerate(r):
+        partes.append((s, t, [0.8, 0.9, 0.75, 0.7][k]))
+        t += len(s) / RATE - 0.12
+    corrido = passa_baixa(misturar(*partes), 4500)
+    salvar("cao_rosnado", laco(np.concatenate([corrido, corrido]), 0.25), True, alvo=0.7)
+    salvar("cao_arreganho", ar_livre(passa_baixa(tom(aparar(ler("x/dog_qubodup/dog/dog-snarl.flac")), 0.88), 5000), semente=48), alvo=0.8)
+    # O choramingo (Sad Dog, pauliuw) e o ganido que corta: o começo agudo dele,
+    # cortado seco.
+    choro = ler("x/dog_pauliuw/Dog/Sad Dog.wav")
+    salvar("cao_choramingo", ar_livre(passa_alta(choro[seg(0.9):seg(2.6)], 200), semente=49), alvo=0.6)
+    ganido = passa_alta(tom(aparar(choro[seg(0.1):seg(0.34)]), 1.12), 300)
+    salvar("cao_ganido", ar_livre(fades(ganido, 0.002, 0.012), 1.2, 0.18, semente=50), alvo=0.8)
+
+
+def rotina():
+    """F5 da fazenda: a rotina do entardecer (Tinysized, rubberduck, Kenney; CC0)."""
+    # A ração despejada na gamela de madeira: grãos secos (as moedas sacudidas,
+    # graves e abafadas, viram ração) e o tamborilar na tábua.
+    graos = passa_baixa(tom(aparar(ler("x/tinysized/sfx-cc0/coins-shake-01.wav")), 0.5), 2600)
+    tabua = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_misc_03.ogg")), 0.8), 2000))
+    y = misturar((pico(graos), 0.0, 0.9), (pico(graos), 0.7, 0.8), (pico(graos), 1.45, 0.7), (tabua, 0.05, 0.25))
+    salvar("racao", ar_livre(y, semente=60), alvo=0.6)
+    # A bomba manual do poço: a alavanca que range (três vezes) e a água que sai.
+    alavanca = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_squeak_01.ogg")), 0.7), 5000))
+    ferro = pico(passa_baixa(aparar(ler("x/100-CC0-wood-metal-SFX/metal_hit_02.ogg")), 3000))
+    agua = pico(passa_baixa(aparar(ler("x/tinysized/sfx-cc0/water-pour-01.wav")), 6000))
+    salvar("bomba_poco", ar_livre(misturar((alavanca, 0.0, 0.8), (ferro, 0.45, 0.25), (alavanca, 0.9, 0.8), (ferro, 1.35, 0.25),
+        (alavanca, 1.8, 0.8), (agua, 1.2, 0.7)), semente=61), alvo=0.65)
+    # A água despejada no bebedouro (o balde virando).
+    salvar("agua_bebedouro", ar_livre(passa_baixa(aparar(ler("x/100-CC0-SFX_0/splash_01.ogg")), 5000), semente=62), alvo=0.6)
+    # A lenha: a braçada tirada da pilha (toras batendo) e posta junto à lareira.
+    toras = [pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_hit_0%d.ogg" % n)), 0.85), 3500)) for n in (3, 5, 7)]
+    salvar("lenha_pegar", ar_livre(misturar((toras[0], 0.0, 0.8), (toras[1], 0.12, 0.7), (toras[2], 0.3, 0.6)), semente=63), alvo=0.7)
+    caindo = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_falling_02.ogg")), 0.85), 3500))
+    salvar("lenha_largar", sala(caindo, 0.4, 0.14, semente=64), alvo=0.75)
+    # O portão de correr do celeiro: o trilho de ferro rangendo e o baque no fim.
+    trilho = pico(passa_baixa(tom(aparar(ler("x/RPGsounds_Kenney/OGG/creak3.ogg")), 0.6), 3000))
+    chapa = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/metal_sheet_02.ogg")), 0.7), 3000))
+    baque = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_slam_03.ogg")), 0.8), 2500))
+    salvar("portao_correr", ar_livre(misturar((trilho, 0.0, 0.8), (chapa, 0.2, 0.35), (trilho, 0.7, 0.6), (baque, 1.5, 0.9)), 1.2, 0.18, semente=65), alvo=0.75)
+    # A tampa da caixa de correio de ferro galvanizado.
+    salvar("caixa_correio", ar_livre(passa_baixa(aparar(ler("x/100-CC0-wood-metal-SFX/metal_open_01.ogg")), 6000), semente=66), alvo=0.6)
+
+
+GRUPOS = {
+    "passos": passos, "portas": portas, "fogo": fogo, "chuva_e_noite": chuva_e_noite, "relogio": relogio,
+    "telefone": telefone, "papel": papel, "lama": lama, "alfinete": alfinete, "bebida": bebida,
+    "calha": calha, "menu": menu, "caes": caes, "rotina": rotina,
+}
+
+
 def main():
+    """`tratar_sons.py <pasta> [grupo ...]`: sem grupos, todos."""
     global FONTE
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
     FONTE = sys.argv[1]
     os.makedirs(OUT, exist_ok=True)
-    passos()
-    portas()
-    fogo()
-    chuva_e_noite()
-    relogio()
-    telefone()
-    papel()
-    lama()
-    alfinete()
-    bebida()
-    calha()
-    menu()
+    for nome in (sys.argv[2:] or GRUPOS.keys()):
+        GRUPOS[nome]()
 
 
 if __name__ == "__main__":

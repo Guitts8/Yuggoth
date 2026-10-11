@@ -9,19 +9,25 @@ extends Node3D
 ## (`entardecer`, 0 → 1 em `duracao_entardecer`). Vinda do escritório (a flag
 ## `interludio`, posta quando a última carta é postada), a tinta da carta cai no
 ## quintal (TintaTransicao.revelar): Akeley está diante do canil com o balde de
-## ração. Até os beats existirem (F5–F8), a demo acaba aqui depois de
-## `fim_provisorio` segundos. Pelo F4 de teste, a fazenda é só para andar.
+## ração. F5: a rotina do entardecer (`Rotina`); feita, o sol se põe e, até os
+## beats seguintes (F6–F8), a demo acaba aqui `fim_provisorio` segundos depois.
+## Pelo Shift+F4 de teste, a fazenda é só para andar.
 ##
 ## Cena gerada por tools/gerar_fazenda.gd.
 
 @export var som: AudioStream
+## O entardecer com pássaros (o único momento calmo da fazenda: a regra dos
+## pássaros); param de uma vez no fim da rotina (Rotina.som_sem_passaros).
+@export var som_passaros: AudioStream
 @export var linha_fim: NarrationLine
 ## A primeira fala de Akeley, quando o corpo se mexe (ou logo depois da descida).
 @export var linha_inicio: NarrationLine
-## Segundos no quintal antes do fim provisório da demo (só no Interlúdio).
-@export var fim_provisorio := 45.0
+## Segundos depois da rotina antes do fim provisório da demo (só no Interlúdio).
+@export var fim_provisorio := 30.0
 ## Segundos do sol baixo ao crepúsculo.
 @export var duracao_entardecer := 180.0
+## Até onde o sol desce enquanto a rotina não acaba (o crepúsculo espera por ela).
+@export var teto_da_rotina := 0.72
 
 @export_group("Akeley")
 ## O corpo é outro (GDD §5.1a): mais lento, ofegante.
@@ -52,6 +58,8 @@ extends Node3D
 
 ## 0 = o sol baixo; 1 = o crepúsculo.
 var entardecer := 0.0
+## O entardecer não passa disto (a rotina o segura; depois, 1).
+var teto := 1.0
 ## A descida do céu em curso (a câmera não é a de Akeley).
 var descendo := false
 var _env: Environment
@@ -64,6 +72,7 @@ var _desvio := Vector2.ZERO
 @onready var player: Player = $Player
 @onready var sol: DirectionalLight3D = $Sol
 @onready var balde: NaMao = $Balde
+@onready var rotina: Rotina = get_node_or_null(^"Rotina") as Rotina
 
 
 func _ready() -> void:
@@ -75,12 +84,16 @@ func _ready() -> void:
 	we.environment = _env
 	_ceu = _env.sky.sky_material as ProceduralSkyMaterial
 	_aplicar(0.0)
-	if som:
-		AudioDirector.play_ambience(som)
 	var akeley := GameState.has_flag(&"interludio")
+	var ambiente_som := som_passaros if akeley and som_passaros else som
+	if ambiente_som:
+		AudioDirector.play_ambience(ambiente_som)
 	balde.visible = akeley
 	balde.process_mode = Node.PROCESS_MODE_INHERIT if akeley else Node.PROCESS_MODE_DISABLED
 	balde.camera = player.camera
+	var caes := get_node_or_null(^"Caes") as Matilha
+	if caes:
+		caes.balde = balde
 	if akeley:
 		_ser_akeley()
 		_interludio()
@@ -101,7 +114,9 @@ func _ser_akeley() -> void:
 
 
 func _process(delta: float) -> void:
-	entardecer = minf(1.0, entardecer + delta / duracao_entardecer)
+	# Passado o teto (a rotina acabou), o crepúsculo vem mais depressa.
+	var passo := delta / duracao_entardecer * (1.0 if teto < 1.0 or entardecer < teto_da_rotina else 4.0)
+	entardecer = minf(teto, entardecer + passo)
 	# O céu refaz a radiância quando muda: só a cada passo visível.
 	if absf(entardecer - _aplicado) > 0.004:
 		_aplicar(entardecer)
@@ -129,6 +144,14 @@ func _interludio() -> void:
 	if not is_inside_tree():
 		return
 	_primeira_fala()
+	# A rotina do entardecer (F5); o sol espera por ela.
+	if rotina:
+		teto = teto_da_rotina
+		rotina.comecar()
+		await rotina.terminou
+		if not is_inside_tree():
+			return
+		teto = 1.0
 	# Parado na pausa (o timer não corre com a árvore pausada).
 	await get_tree().create_timer(fim_provisorio, false).timeout
 	if not is_inside_tree():

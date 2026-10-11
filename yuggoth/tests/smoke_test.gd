@@ -897,6 +897,16 @@ func _ready() -> void:
 		_check(Narrator.voz == Narrator.Voz.AKELEY and faz.player.walk_speed < 1.6 and faz.player.respiracao > 0.0,
 			"o corpo é outro: mais lento, ofegante; quem narra é Akeley")
 		_check(get_tree().get_first_node_in_group(&"sem_dossie") == faz, "como Akeley, sem dossiê")
+		# A matilha (F4): os doze; com o balde perto, juntam-se na tela do lado dele;
+		# Brutus o segue.
+		var matilha := faz.get_node("Caes") as Matilha
+		await _seconds(6.0)
+		var junto := matilha.caes().filter(func(c: CaoIA) -> bool: return c.global_position.x > -1.5)
+		_check(matilha.caes().size() == 12 and junto.size() >= 6, "os doze cães; com o balde, juntam-se na tela do lado de Akeley (%d)" % junto.size())
+		var brutus := matilha.cao("Brutus")
+		_check(brutus and brutus.global_position.distance_to(faz.player.global_position) < 3.5 and absf(brutus.global_position.y) < 0.05,
+			"Brutus junto de Akeley, de pé no chão")
+		await _rotina(faz)
 	await _until(func() -> bool: return main_menu.visible, 120.0)
 	_check(main_menu.visible and SceneDirector.current_level.is_empty() and not tinta_na_tela.call(), "fim da demo, no quintal: o cartão e o menu")
 	_check(Narrator.voz == Narrator.Voz.WILMARTH, "fora da fazenda, quem narra volta a ser Wilmarth")
@@ -1186,6 +1196,52 @@ func _fazenda() -> void:
 		Vector3(-2.0, 0, 0.2), Vector3(-5.0, 0, 0.0), Vector3(-15.0, 0, -6.0), Vector3(-15.0, 0, -12.0)], 120.0)
 	_check(p.global_position.y < 0.3 and p.global_position.z < -10.0, "fazenda: a escada abaixo, a porta dos fundos, o celeiro %s" % p.global_position)
 	SceneDirector.clear_level()
+
+
+## A rotina do entardecer (F5): cada tarefa na ordem do balde, mirando de perto;
+## os cães comem; a lenha na lareira; o celeiro fechado; a caixa vazia; os pássaros
+## param e Yautja foge; Akeley o chama.
+func _rotina(faz: Fazenda) -> void:
+	var r := faz.rotina
+	var p := faz.player
+	var matilha := faz.get_node("Caes") as Matilha
+	_check(r != null and not r.fechar_celeiro.can_interact(p) and r.por_racao.can_interact(p), "a rotina: primeiro a ração (o resto espera)")
+	var fazer := func(area: Interactable, de: Vector3, alvo := Vector3.INF) -> bool:
+		p.global_position = de
+		p.velocity = Vector3.ZERO
+		await _mirar(p, area.global_position if alvo == Vector3.INF else alvo)
+		var mirou := p._target == area
+		if not mirou:
+			print("   (a mira em %s pegou %s)" % [area.name, p.ray.get_collider()])
+		area.interact(p)
+		await _until(func() -> bool: return not r._ocupado, 40.0)
+		await _frames(2)
+		return mirou
+	var mirou: bool = await fazer.call(r.por_racao, Vector3(1.9, 0, -6.45), Vector3(1.7, 0.4, -7.2))
+	_check(mirou and r.racao_gamela.scale.x > 0.9 and not r.racao_balde.visible and matilha.modo == Matilha.Modo.COMENDO, "a ração na gamela; os cães vêm comer")
+	await _seconds(6.0)
+	var comendo := matilha.caes().filter(func(c: CaoIA) -> bool: return c.visual.pose == Cao.Pose.COMENDO)
+	_check(comendo.size() >= 6 and matilha.cao("Rambo").visual.pose != Cao.Pose.COMENDO, "lado a lado na gamela (%d); Rambo não come" % comendo.size())
+	mirou = await fazer.call(r.bombear, Vector3(5.4, 0, -11.6))
+	_check(mirou and r.agua_balde.visible, "a bomba do poço enche o balde")
+	mirou = await fazer.call(r.encher_bebedouro, Vector3(3.5, 0, -9.85), Vector3(2.9, 0.5, -9.85))
+	_check(mirou and r.agua_bebedouro.scale.y > 0.9 and not faz.balde.visible and r.balde_no_chao.visible, "a água no bebedouro; o balde fica no chão")
+	mirou = await fazer.call(r.pegar_lenha, Vector3(-11.0, 0, 3.6))
+	_check(mirou and r.bracada.visible and r.por_lenha.can_interact(p) and not r.fechar_celeiro.can_interact(p), "a braçada de lenha (com ela, só a lareira)")
+	mirou = await fazer.call(r.por_lenha, Vector3(2.5, 0.6, 3.7))
+	_check(mirou and r.lenha_lareira.visible and not r.bracada.visible, "a lenha na lareira do escritório")
+	mirou = await fazer.call(r.abrir_caixa, Vector3(26.6, 0, 2.4))
+	_check(mirou and r.caixa_feita, "a caixa de correio, vazia")
+	mirou = await fazer.call(r.fechar_celeiro, Vector3(-15.0, 0, -5.5))
+	_check(mirou and r.portao[0].position.is_equal_approx(r.portao_fechado[0]), "o portão do celeiro, fechado")
+	await _until(func() -> bool: return r.etapa == Rotina.Etapa.CHAMAR, 30.0)
+	_check(r.etapa == Rotina.Etapa.CHAMAR and AudioDirector.get_ambience() == r.som_sem_passaros, "os pássaros param de uma vez; Yautja dispara para a mata")
+	await _frames(3)
+	_check(p._target == r._chamar, "\"Chamar Yautja\" diante dos olhos")
+	r._chamar.interact(p)
+	var yautja := matilha.cao("Yautja")
+	await _until(func() -> bool: return r.etapa == Rotina.Etapa.FIM and yautja.fugiu, 40.0)
+	_check(yautja.fugiu and not yautja.visible, "Yautja não volta")
 
 
 ## O botão de testes (F4): do menu, direto ao Interlúdio como Akeley, pulando o

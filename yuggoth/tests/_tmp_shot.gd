@@ -52,6 +52,14 @@ func _ready() -> void:
 		await _fazenda_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "rotina":
+		await _rotina_fotos()
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "matilha":
+		await _matilha_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "caes":
 		await _caes_fotos()
 		get_tree().quit()
@@ -680,6 +688,90 @@ func _selagem_fotos() -> void:
 	for k in 34:
 		await _s(0.5)
 		await _shot("%s_selando_%02d" % [tag, k])
+
+
+## SHOT_MODO=rotina: a rotina do entardecer (F5), tarefa por tarefa.
+func _rotina_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"interludio")
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return not faz.descendo, 60.0)
+	Engine.time_scale = 1.0
+	var p := faz.player
+	var r := faz.rotina
+	var passo := func(area: Interactable, de: Vector3, nome: String, espera: float) -> void:
+		p.global_position = de
+		p.velocity = Vector3.ZERO
+		await _olhar(p, area.global_position)
+		var olho := p.camera.global_position
+		var c := area.global_position
+		p.head.rotation.x = atan2(c.y - olho.y, Vector2(c.x - olho.x, c.z - olho.z).length())
+		await _s(0.3)
+		print("ALVO ", nome, " mira=", p._target == area, " pode=", area.can_interact(p))
+		area.interact(p)
+		await _s(espera)
+		await _shot("%s_%s" % [tag, nome])
+	await passo.call(r.por_racao, Vector3(2.6, 0, -6.4), "1_racao", 2.0)
+	await _until(func() -> bool: return not r._ocupado, 30.0)
+	await _s(4.0)
+	p.global_position = Vector3(1.0, 0, -6.4)
+	await _olhar(p, Vector3(-1.0, 0, -8.0))
+	p.head.rotation.x = -0.5
+	await _s(0.5)
+	await _shot("%s_1b_comendo" % tag)
+	await passo.call(r.bombear, Vector3(5.4, 0, -11.6), "2_bomba", 3.0)
+	await _until(func() -> bool: return not r._ocupado, 30.0)
+	await passo.call(r.encher_bebedouro, Vector3(3.4, 0, -9.85), "3_bebedouro", 2.0)
+	await _until(func() -> bool: return not r._ocupado, 30.0)
+	await passo.call(r.pegar_lenha, Vector3(-11.0, 0, 3.6), "4_lenha", 1.0)
+	await _until(func() -> bool: return not r._ocupado, 30.0)
+	await _shot("%s_4b_bracada" % tag)
+	await passo.call(r.por_lenha, Vector3(3.2, 0.6, 3.7), "5_lareira", 1.0)
+	await _until(func() -> bool: return not r._ocupado, 30.0)
+	await _shot("%s_5b_lareira" % tag)
+	await passo.call(r.fechar_celeiro, Vector3(-15.0, 0, -5.5), "6_celeiro", 2.0)
+	await _until(func() -> bool: return not r._ocupado, 30.0)
+	await _shot("%s_6b_celeiro" % tag)
+	print("ETAPA ", r.etapa)
+	await _s(4.0)
+	p.global_position = Vector3(-6.0, 0, -4.0)
+	await _olhar(p, Vector3(-40, 0, -6))
+	for k in 4:
+		await _s(1.5)
+		await _shot("%s_7_yautja_%d" % [tag, k])
+	print("ETAPA ", r.etapa, " yautja fugiu=", faz.get_node("Caes/Yautja").fugiu)
+
+
+## SHOT_MODO=matilha: no Interlúdio, a matilha viva (F4): os cães na tela do lado
+## de Akeley com o balde, latindo; Brutus o seguindo; depois, sem o balde.
+func _matilha_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"interludio")
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return not faz.descendo, 60.0)
+	Engine.time_scale = 1.0
+	var p := faz.player
+	for k in 4:
+		await _s(1.5)
+		await _shot("%s_cerca_%d" % [tag, k])
+	var brutus := faz.get_node("Caes/Brutus") as Node3D
+	# Andando para o leste: Brutus vem atrás.
+	p.look_at(Vector3(20, p.global_position.y, -9.5))
+	Input.action_press(&"mover_frente")
+	await _s(3.0)
+	Input.action_release(&"mover_frente")
+	await _s(1.5)
+	p.look_at(Vector3(brutus.global_position.x, p.global_position.y, brutus.global_position.z))
+	p.head.rotation.x = -0.4
+	await _s(0.4)
+	await _shot("%s_brutus" % tag)
+	print("BRUTUS ", brutus.global_position, " AKELEY ", p.global_position)
+	for c in faz.get_node("Caes").get_children():
+		print("CAO ", c.name, " ", (c as Node3D).global_position, " pose ", (c.get_node("Visual") as Cao).pose)
 
 
 ## SHOT_MODO=caes: os cães (F4) em cada pose, no quintal, de lado, de frente e de

@@ -686,6 +686,10 @@ func _menu_no_fim_da_demo() -> void:
 	_check(not pause.visible, "durante a tinta, a pausa não abre")
 	await _until(func() -> bool: return SceneDirector.current_level == FAZENDA and not tinta_na_tela.call(), 120.0)
 	_check(SceneDirector.current_level == FAZENDA, "a tinta cai no quintal da fazenda")
+	# A rotina (F5), de uma vez: o caminho aqui é o do menu no fim.
+	var faz_r := root.find_child("Fazenda", true, false) as Fazenda
+	await _until(func() -> bool: return faz_r.rotina._ativa, 60.0)
+	faz_r.rotina.pular()
 	await _until(func() -> bool: return SceneDirector.hold_black and Narrator.is_speaking(), 120.0)
 	Engine.time_scale = 1.0
 	await _press(&"ui_cancel")

@@ -119,6 +119,7 @@ func _ready() -> void:
 	cena.set("som", _sfx("dia_quieto.wav"))
 	cena.set("linha_fim", load("res://narrative/narration/fim_da_demo.tres"))
 	cena.set("linha_inicio", load("res://narrative/narration/akeley_caes.tres"))
+	cena.set("som_passaros", _sfx("tarde.wav"))
 
 	var env := WorldEnvironment.new()
 	env.name = "WorldEnvironment"
@@ -148,6 +149,7 @@ func _ready() -> void:
 	_ford()
 	_moinho()
 	_arvores()
+	_rotina()
 	_fechar_obras()
 	_colisao(cena, "Colisao", _col)
 
@@ -1146,9 +1148,14 @@ func _celeiro() -> void:
 	# A porta do palheiro, na empena sul (escura, fechada).
 	_bloco("madeira_escura", Vector3(1.6, 1.6, 0.06), Vector3(cumeeira.x, alto + 1.1, z.y + 0.03), Color.WHITE, false)
 	# O portão de correr, aberto: as duas folhas encostadas na parede, no trilho.
+	# Nós à parte (F5: "Fechar o celeiro" as corre para o meio; Rotina.portao).
+	var portao_g := _group(cena, "PortaoCeleiro", Vector3(cumeeira.x, 0, z.y + 0.1))
 	for s: float in [-1.0, 1.0]:
-		_bloco("celeiro", Vector3(1.85, 3.9, 0.08), Vector3(cumeeira.x + s * (1.8 + 0.95), 1.95, z.y + 0.1), Color(0.9, 0.9, 0.9))
-		_bloco("pintura_branca", Vector3(1.85, 0.1, 0.09), Vector3(cumeeira.x + s * (1.8 + 0.95), 1.95, z.y + 0.11), Color.WHITE, false, Vector3(0, 0, s * 64.0))
+		var folha := _group(portao_g, "Folha%s" % ("O" if s < 0 else "L"), Vector3(s * (1.8 + 0.95), 0, 0))
+		folha.set_meta(&"fechada", Vector3(s * 0.925, 0, 0))
+		_box(folha, "Tabuas", Vector3(1.85, 3.9, 0.08), Vector3(0, 1.95, 0), "celeiro")
+		var travessa := _box(folha, "Travessa", Vector3(1.85, 0.1, 0.09), Vector3(0, 1.95, 0.01), "pintura_branca")
+		travessa.rotation_degrees.z = s * 64.0
 	_bloco("ferro", Vector3(7.6, 0.08, 0.08), Vector3(cumeeira.x, 3.95, z.y + 0.12), Color.WHITE, false)
 	# Os beirais pintados de branco nos cantos.
 	for xx: float in [x.x, x.y]:
@@ -1259,12 +1266,177 @@ func _canil() -> void:
 	_caes(x, Vector2(z.y + 0.6, fz - 0.5))
 
 
+## A rotina do entardecer (F5; docs/PLANO_FAZENDA.md, "A tratativa", 1): a gamela
+## comprida rente à tela da frente do cercado (por dentro), com a ração que corre
+## por ela; o bebedouro de zinco no canto leste; a bomba manual do poço, de ferro,
+## numa laje de pedra, perto do canil; o balde que fica no chão; a braçada de lenha
+## diante dos olhos (NaMao); a lenha arrumada na lareira do escritório; as áreas; e
+## a `Rotina`, que dá a ordem.
+const GAMELA_Z := -7.42
+const GAMELA_X := Vector2(-4.9, 2.2)
+
+
+func _rotina() -> void:
+	var g := _group(cena, "RotinaPecas")
+	var caes := cena.get_node("Caes") as Matilha
+	var balde := cena.get_node("Balde") as NaMao
+	# A gamela: duas tábuas e o fundo, em pés curtos.
+	var gx := (GAMELA_X.x + GAMELA_X.y) / 2
+	var gl := GAMELA_X.y - GAMELA_X.x
+	_bloco("madeira_escura", Vector3(gl, 0.04, 0.3), Vector3(gx, 0.14, GAMELA_Z), Color.WHITE, false)
+	for s: float in [-1.0, 1.0]:
+		_bloco("madeira_escura", Vector3(gl, 0.14, 0.04), Vector3(gx, 0.2, GAMELA_Z + s * 0.15), Color(0.9, 0.9, 0.9), false)
+	for xx: float in [GAMELA_X.x + 0.2, gx, GAMELA_X.y - 0.2]:
+		_bloco("madeira_escura", Vector3(0.08, 0.12, 0.3), Vector3(xx, 0.06, GAMELA_Z), Color(0.8, 0.8, 0.8), false)
+	# A ração corre do leste para o oeste: o pivô na ponta leste, escala em x.
+	var racao := _group(g, "RacaoGamela", Vector3(GAMELA_X.y - 0.05, 0.17, GAMELA_Z))
+	_box(racao, "Racao", Vector3(gl - 0.1, 0.035, 0.22), Vector3(-(gl - 0.1) / 2, 0, 0), "racao")
+	racao.scale.x = 0.001
+	# Os lugares dos cães ao longo dela (por dentro, de frente para a tela).
+	var lugares := PackedVector3Array()
+	var n := 11
+	for i in n:
+		lugares.append(Vector3(lerpf(GAMELA_X.y - 0.35, GAMELA_X.x + 0.35, float(i) / (n - 1)), 0, GAMELA_Z - 0.55))
+	caes.gamela = lugares
+	caes.gamela_frente = Vector3(0, 0, 1)
+	# O bebedouro de zinco, no canto leste do cercado, e a água que sobe nele.
+	var beb := Vector3(2.3, 0, -9.85)
+	_cyl(g, "Bebedouro", 0.32, 0.28, 0.26, beb + Vector3(0, 0.13, 0), "zinco", 12)
+	var agua := _group(g, "AguaBebedouro", beb + Vector3(0, 0.03, 0))
+	_cyl(agua, "Agua", 0.29, 0.29, 0.2, Vector3(0, 0.1, 0), "agua", 12)
+	agua.scale.y = 0.05
+	# A bomba manual do poço: a laje, o corpo de ferro, a bica e a alavanca.
+	var poco := Vector3(5.4, 0, -12.6)
+	_bloco("pedra_campo", Vector3(0.9, 0.16, 0.9), poco + Vector3(0, 0.08, 0))
+	# A bomba de balancim (a "pitcher pump"): o cano que sai da laje, o corpo de
+	# ferro fundido, a bica para a frente (+Z), e a alavanca presa no pivô do alto,
+	# para trás e para cima.
+	var bomba := _group(g, "Bomba", poco)
+	_cyl(bomba, "Cano", 0.045, 0.05, 0.42, Vector3(0, 0.37, 0), "ferro", 8)
+	_cyl(bomba, "Corpo", 0.1, 0.11, 0.5, Vector3(0, 0.83, 0), "ferro", 10)
+	_cyl(bomba, "Anel", 0.12, 0.12, 0.04, Vector3(0, 0.6, 0), "ferro", 10)
+	_cyl(bomba, "Tampa", 0.07, 0.11, 0.06, Vector3(0, 1.11, 0), "ferro", 10)
+	var bica := _cyl(bomba, "Bica", 0.03, 0.04, 0.26, Vector3(0, 0.95, 0.19), "ferro", 6)
+	bica.rotation_degrees.x = 100.0
+	_box(bomba, "Suporte", Vector3(0.05, 0.16, 0.05), Vector3(0, 1.2, -0.07), "ferro")
+	var pivo := _group(bomba, "Alavanca", Vector3(0, 1.26, -0.07))
+	pivo.rotation_degrees.x = 22.0
+	_box(pivo, "Braco", Vector3(0.035, 0.035, 0.62), Vector3(0, 0, -0.3), "ferro")
+	_box(pivo, "Punho", Vector3(0.05, 0.05, 0.12), Vector3(0, 0, -0.6), "madeira_escura")
+	_box(bomba, "Haste", Vector3(0.025, 0.12, 0.025), Vector3(0, 1.2, 0.03), "ferro")
+	_col.append([Vector3(0.25, 1.3, 0.25), poco + Vector3(0, 0.65, 0)])
+	# O balde deixado no chão, ao lado do bebedouro, por fora da tela.
+	var no_chao := _group(g, "BaldeNoChao", Vector3(3.25, 0, -9.7))
+	_cyl(no_chao, "Corpo", 0.15, 0.12, 0.26, Vector3(0, 0.13, 0), "zinco", 12)
+	_cyl(no_chao, "Aro", 0.155, 0.155, 0.025, Vector3(0, 0.26, 0), "ferro", 12)
+	no_chao.visible = false
+	# A água no balde (some ao despejar).
+	var agua_balde := _cyl(balde, "Agua", 0.135, 0.135, 0.03, Vector3(0, 0.1, 0), "agua", 12)
+	agua_balde.visible = false
+	# A braçada de lenha, diante dos olhos (sem mãos), como o balde.
+	var bracada := Node3D.new()
+	bracada.name = "Bracada"
+	bracada.set_script(load("res://components/na_mao.gd"))
+	_add(cena, bracada)
+	bracada.set("posicao", Vector3(0.05, -0.42, -0.7))
+	bracada.set("rotacao", Vector3(10, 0, 0))
+	for k in 5:
+		var tora := _box(bracada, "Tora%d" % k, Vector3(0.11, 0.11, 0.5), Vector3((k % 3 - 1) * 0.12, (k / 3) * 0.1, 0), "madeira_clara")
+		tora.rotation_degrees.y = (k * 7.0) - 14.0
+		tora.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var luz := _omni(bracada, "Luz", Vector3(-0.2, 0.35, 0.4), Color(1.0, 0.82, 0.66), 0.45, 0.9)
+	luz.light_cull_mask = 1
+	# A lenha arrumada na lareira do escritório (a boca a leste da chaminé do sul),
+	# rente à boca, na pedra da soleira.
+	var boca := Vector3(MEIO_X + CHAMINE_MEIA.x + 0.1, T0 + 0.11, CHAMINE_Z)
+	var na_lareira := _group(g, "LenhaLareira", boca)
+	for k in 3:
+		var t := _box(na_lareira, "Tora%d" % k, Vector3(0.1, 0.1, 0.55), Vector3(0, (k / 2) * 0.09, (k % 2) * 0.12 - 0.06), "madeira_clara")
+		t.rotation_degrees.y = k * 9.0
+	na_lareira.visible = false
+
+	# As áreas.
+	var area := func(nome: String, prompt: String, tam: Vector3, pos: Vector3) -> Interactable:
+		var a := _area(g, Interactable.new(), nome, tam, pos) as Interactable
+		a.prompt = prompt
+		return a
+	# A gamela e o bebedouro ficam dentro do cercado; Akeley, fora: as áreas passam
+	# por cima da tela (a colisão dela tampava a mira).
+	var por_racao: Interactable = area.call("PorRacao", "Pôr a ração", Vector3(gl, 0.9, 1.0), Vector3(gx, 0.5, GAMELA_Z + 0.35))
+	var bombear: Interactable = area.call("Bombear", "Encher o balde na bomba", Vector3(0.6, 1.2, 0.6), poco + Vector3(0, 0.9, 0))
+	var encher: Interactable = area.call("EncherBebedouro", "Encher o bebedouro", Vector3(1.2, 0.9, 0.9), beb + Vector3(0.45, 0.45, 0))
+	var pegar: Interactable = area.call("PegarLenha", "Pegar a lenha", Vector3(3.6, 1.2, 0.8), Vector3(-11.0, 0.7, PUXADO_Z.y - 0.9))
+	var por_lenha: Interactable = area.call("PorLenha", "Pôr a lenha na lareira", Vector3(0.6, 0.8, 1.0), boca + Vector3(0, 0.35, 0))
+	var celeiro: Interactable = area.call("FecharCeleiro", "Fechar o portão do celeiro", Vector3(3.6, 2.4, 0.8), Vector3(-15.0, 1.4, -7.6))
+	var caixa: Interactable = area.call("AbrirCaixa", "Abrir a caixa de correio", Vector3(0.6, 0.45, 0.45), Vector3(ESTRADA_X.x - 0.52, 1.25, 2.4))
+
+	var r := Rotina.new()
+	r.name = "Rotina"
+	_add(cena, r)
+	r.matilha = caes
+	r.balde = balde
+	r.bracada = bracada as NaMao
+	r.por_racao = por_racao
+	r.bombear = bombear
+	r.encher_bebedouro = encher
+	r.pegar_lenha = pegar
+	r.por_lenha = por_lenha
+	r.fechar_celeiro = celeiro
+	r.abrir_caixa = caixa
+	r.racao_gamela = racao
+	r.racao_balde = balde.get_node("Racao")
+	r.agua_balde = agua_balde
+	r.agua_bebedouro = agua
+	r.balde_no_chao = no_chao
+	r.lenha_lareira = na_lareira
+	var portao: Array[Node3D] = []
+	var fechado := PackedVector3Array()
+	for f in cena.get_node("PortaoCeleiro").get_children():
+		portao.append(f)
+		fechado.append(f.get_meta(&"fechada"))
+	r.portao = portao
+	r.portao_fechado = fechado
+	# Ao longo da tela, por fora (entre a tela e a parede norte da casa).
+	r.caminho_racao = PackedVector3Array([Vector3(GAMELA_X.y + 0.3, 0, -6.45), Vector3(GAMELA_X.x + 0.4, 0, -6.45)])
+	r.som_racao = _sfx("racao.wav")
+	r.som_bomba = _sfx("bomba_poco.wav")
+	r.som_bebedouro = _sfx("agua_bebedouro.wav")
+	r.som_lenha_pegar = _sfx("lenha_pegar.wav")
+	r.som_lenha_largar = _sfx("lenha_largar.wav")
+	r.som_portao = _sfx("portao_correr.wav")
+	r.som_caixa = _sfx("caixa_correio.wav")
+	r.som_sem_passaros = _sfx("dia_quieto.wav")
+	var lembretes: Dictionary[StringName, NarrationLine] = {}
+	for chave: String in ["racao", "agua", "lenha", "lenha_bracada", "celeiro"]:
+		lembretes[StringName(chave)] = load("res://narrative/narration/akeley_%s.tres" % chave)
+	r.lembretes = lembretes
+	r.linha_caixa = load("res://narrative/narration/akeley_caixa.tres")
+	r.linha_yautja = load("res://narrative/narration/akeley_yautja.tres")
+	r.linha_chamar = load("res://narrative/narration/akeley_chamar.tres")
+	r.linha_nao_voltou = load("res://narrative/narration/akeley_nao_voltou.tres")
+
+
 ## Os doze cães (F4, o começo: a presença) no cercado diante das baias, esperando
 ## a ração ao entardecer: a maioria virada para o leste, de onde Akeley vem com o
 ## balde; Rambo, que não come, olhando a mata (GDD §5.1a). Cada um um pouco
 ## diferente (a pelagem, o porte). O comportamento vem depois (docs/PLANO_FAZENDA.md).
 func _caes(x: Vector2, z: Vector2) -> void:
-	var g := _group(cena, "Caes")
+	var g := Matilha.new()
+	g.name = "Caes"
+	_add(cena, g)
+	g.cercado = AABB(Vector3(x.x + 0.4, 0, z.x), Vector3(x.y - x.x - 0.8, 1.0, z.y - z.x))
+	var latidos: Array[AudioStream] = []
+	for i in 6:
+		latidos.append(_sfx("cao_latido_%d.wav" % (i + 1)))
+	g.latidos = latidos
+	g.rosnado = _sfx("cao_rosnado.wav")
+	g.arreganho = _sfx("cao_arreganho.wav")
+	g.choramingo = _sfx("cao_choramingo.wav")
+	g.ganido = _sfx("cao_ganido.wav")
+	g.latidos_longe = _sfx("cao_latidos_longe.wav")
+	var papeis := {"Brutus": CaoIA.Papel.SEGUIR, "Conan": CaoIA.Papel.FOGO, "Hércules": CaoIA.Papel.MATA, "Rambo": CaoIA.Papel.JANELA}
+	var forma := BoxShape3D.new()
+	forma.size = Vector3(0.32, 0.55, 0.85)
 	var poses := {
 		"Brutus": [Cao.Pose.PARADO, 0.0], "Conan": [Cao.Pose.PARADO, 10.0], "Hércules": [Cao.Pose.SENTADO, -15.0],
 		"Rambo": [Cao.Pose.PARADO, 180.0], "Yautja": [Cao.Pose.PARADO, 150.0], "Dutch": [Cao.Pose.SENTADO, 20.0],
@@ -1275,20 +1447,31 @@ func _caes(x: Vector2, z: Vector2) -> void:
 	rng.seed = 1928
 	for i in CAES.size():
 		var nome: String = CAES[i]
+		var corpo := CaoIA.new()
+		corpo.name = nome
+		corpo.papel = papeis.get(nome, CaoIA.Papel.MATILHA)
 		var c := Cao.new()
-		c.name = nome
+		c.name = "Visual"
 		var p: Array = poses[nome]
 		c.pose = p[0]
 		c.pelagem = rng.randf_range(-0.7, 0.7)
 		c.porte = rng.randf_range(0.92, 1.08)
-		# Espalhados pelo cercado, os da frente mais perto da tela.
+		c.olhar = rng.randf_range(-15.0, 15.0)
+		# Espalhados pelo cercado, os da frente mais perto da tela; Brutus, fora,
+		# junto de Akeley (ele o segue).
 		var px := lerpf(x.x + 0.8, x.y - 0.6, (i + rng.randf_range(-0.3, 0.3)) / (CAES.size() - 1))
 		var pz := lerpf(z.x, z.y, rng.randf())
-		_add(g, c)
-		c.position = Vector3(px, 0.0, pz)
+		_add(g, corpo)
+		corpo.position = Vector3(6.0, 0.0, -8.3) if nome == "Brutus" else Vector3(px, 0.0, pz)
 		# 0° = de frente para o leste (+X); a frente do cão é o -Z.
-		c.rotation_degrees.y = -90.0 + p[1] + rng.randf_range(-8.0, 8.0)
-		c.olhar = rng.randf_range(-15.0, 15.0)
+		corpo.rotation_degrees.y = -90.0 + p[1] + rng.randf_range(-8.0, 8.0)
+		_add(corpo, c)
+		var col := CollisionShape3D.new()
+		col.name = "Forma"
+		col.shape = forma
+		# A base da caixa rente à origem (o chão sob as patas).
+		col.position = Vector3(0, forma.size.y * 0.5 + 0.005, 0)
+		_add(corpo, col)
 
 
 func _tela(de: Vector2, ate: Vector2) -> void:

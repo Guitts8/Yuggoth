@@ -38,6 +38,8 @@ const FOCINHO := Color(0.12, 0.09, 0.08)
 		scale = Vector3.ONE * v
 
 var _t := 0.0
+## Segundos desde o último latido (latir()): a mandíbula abre e fecha com ele.
+var _desde_latido := 9.0
 var _corpo: Node3D
 var _pescoco: Node3D
 var _cabeca: Node3D
@@ -61,6 +63,7 @@ func _process(delta: float) -> void:
 	if _corpo == null:
 		return
 	_t += delta
+	_desde_latido += delta
 	for p in Pose.values():
 		_peso[p] = move_toward(float(_peso.get(p, 1.0 if p == pose else 0.0)), 1.0 if p == pose else 0.0, delta * 2.5)
 	_animar()
@@ -176,6 +179,12 @@ func _reconstruir() -> void:
 	_animar()
 
 
+## Um latido: a cabeça dá um tranco para cima e a mandíbula abre e fecha (quem
+## toca o som é quem chama: CaoIA). Sem chamadas, a pose LATINDO só ergue a cabeça.
+func latir() -> void:
+	_desde_latido = 0.0
+
+
 ## A pose de agora, misturando as poses pelo peso de cada uma (as transições).
 func _animar() -> void:
 	if _corpo == null:
@@ -220,8 +229,11 @@ func _animar() -> void:
 	_corpo.rotation.x = 0.55 * sentado - 0.04 * comendo + sin(fase * 2.0) * 0.015 * anda
 	# A cabeça: olhando; latindo, erguida, a mandíbula batendo em rajadas;
 	# rosnando, baixa e para a frente; comendo, no chão.
-	var rajada := maxf(0.0, sin(_t * TAU * 0.7)) if latindo > 0.0 else 0.0
-	var latido := maxf(0.0, sin(_t * TAU * 5.5)) * rajada
+	# O latido: abre rápido, fecha em ~0,25 s.
+	var latido := 0.0
+	if _desde_latido < 0.28:
+		latido = sin(_desde_latido / 0.28 * PI) if _desde_latido > 0.03 else _desde_latido / 0.03
+	latindo = maxf(latindo, latido * 0.6)
 	# (Sentado, o corpo já inclina 0,55 para trás: o pescoço desfaz quase tudo.)
 	_pescoco.rotation.x = 0.18 * latindo - 0.35 * rosnando - 1.15 * comendo - 0.4 * sentado - 0.25 * deitado - 0.12 * correndo + sin(fase) * 0.04 * anda
 	_pescoco.rotation.y = deg_to_rad(olhar) * 0.5

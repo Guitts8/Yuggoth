@@ -558,7 +558,15 @@ desce dele até Akeley, diante do canil, com o balde de ração diante dos olhos
 entardecer de domingo, 2 de setembro. **O corpo é outro:** mais lento, ofegante (a
 câmera respira), sem dossiê; quem narra é ele, na letra das cartas (*"Meus grandes cães
 policiais sempre os seguram, porque ainda há muito poucos deles por aqui"*, quando ele
-se mexe): o sol baixo a oeste vai para trás da Dark Mountain, as
+se mexe). **Os cães (F4):** os doze no cercado diante do canil; com o balde perto,
+juntam-se na tela do lado dele, olham, sentam e latem pedindo a ração; Brutus o segue
+por toda parte; Hércules late para a mata; Rambo, calado, fica olhando a mata e rosna
+baixo. **A rotina (F5):** a ração despejada ao longo da gamela comprida (os cães comem
+lado a lado; Rambo não), o balde cheio na bomba do poço e despejado no bebedouro (e
+deixado no chão), a braçada de lenha do galpão até a lareira do escritório, o portão
+de correr do celeiro, a caixa de correio vazia (*"É domingo."*); o sol espera por ela.
+Feita, os pássaros se calam de uma vez e Yautja dispara latindo para a mata; Akeley o
+chama — *"Não voltou."* — e o crepúsculo vem. Até a F6, a demo acaba ali: o sol baixo a oeste vai para trás da Dark Mountain, as
 sombras compridas atravessam o quintal, a névoa sobe do vale, e o céu passa do
 laranja ao crepúsculo em três minutos. Anda-se por tudo (a casa, as dependências);
 ainda sem os cães nem os beats: depois de uns 45 segundos, a tela escurece e vem o
