@@ -286,7 +286,7 @@ o telhado (4) + o fim.
      "fora do mapa" na fazenda (que é maior que o escritório).
    - **Próximo: a F3** (Akeley: o corpo mais lento, a respiração, sem dossiê, o
      narrador com as frases das cartas).
-3. ✅ **F3 — Akeley e a passagem do céu** (2026-10-11, roteiro aprovado).
+3. ✅ **F3 — Akeley e a passagem do céu** (2026-10-11, roteiro aprovado; commit `e668749`).
    - **A passagem** (playtest 10: *"não dá para perceber, além daquelas ondulações
      imitando montanhas de desenho de criança; pensei numa transição que vem do céu
      até dar na visão de Akeley"*): a tinta seca em **só céu** (`tinta.gdshader`, sem os
@@ -326,7 +326,7 @@ o telhado (4) + o fim.
      deitado, latindo, rosnando, comendo, com transições) e `andar` (0 parado, 1 o passo
      em quatro tempos, 2+ correndo, o trote largo); `olhar`, `pelagem`, `porte`. Um
      filho `Modelo` (o .glb) o substitui. Conferido em captura (`SHOT_MODO=caes`).
-   - 🔧 **A presença:** os doze no cercado diante das baias ao entardecer, cada um na
+   - ✅ **A presença:** os doze no cercado diante das baias ao entardecer, cada um na
      sua pose, quase todos virados para Akeley, que chega com o balde; Rambo olhando a
      mata (`gerar_fazenda._caes`).
    - 🔧 **O comportamento:** o corpo (`CharacterBody3D`, colisão com as paredes),

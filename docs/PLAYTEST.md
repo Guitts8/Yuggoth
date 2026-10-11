@@ -83,6 +83,9 @@ sem o balde nem o fim) e, de lá, F4 volta ao escritório.
       alto do vale até os olhos dele, diante do canil (dá para olhar em volta com o
       mouse durante a descida). Percebe-se que agora você é outra pessoa? Longa ou
       curta demais? O balde diante dos olhos lê como um balde (sem mãos)?
+- [ ] **Os cães (o começo da F4):** os doze no cercado diante do canil, parados,
+      sentados, deitados (ainda sem andar nem latir). Leem como pastores-alemães? As
+      proporções, a sela preta, as orelhas, a cauda?
 - [ ] **O corpo de Akeley:** mais lento, ofegante (a câmera respira); sem dossiê (Tab);
       a fala dele na letra das cartas. Incomoda, ou ajuda a sentir o corpo velho?
 - [ ] **O entardecer** (uns 3 minutos): o sol baixo e as sombras compridas, a névoa

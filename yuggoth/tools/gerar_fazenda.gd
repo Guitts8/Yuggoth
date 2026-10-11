@@ -1256,6 +1256,7 @@ func _canil() -> void:
 	_tela(Vector2(0.4, fz), Vector2(x.y, fz))
 	_tela(Vector2(x.y, fz), Vector2(x.y, z.y))
 	_bloco("madeira_escura", Vector3(1.3, 1.1, 0.05), Vector3(-1.0, 0.65, fz + 0.65), Color.WHITE, false, Vector3(0, 90, 0))
+	_caes(x, Vector2(z.y + 0.6, fz - 0.5))
 
 
 ## Os doze cães (F4, o começo: a presença) no cercado diante das baias, esperando
