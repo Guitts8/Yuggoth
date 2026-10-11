@@ -17,9 +17,15 @@ enum Style {
 	CARTAO,
 }
 
+## Quem narra. No Interlúdio (a fazenda), é Akeley (GDD §5.1a): as legendas saem
+## na letra dele, a das cartas (docs/PLANO_FAZENDA.md, "O roteiro do recorte").
+enum Voz { WILMARTH, AKELEY }
+
 ## Teto de discrepâncias por jogada.
 const MAX_DISCREPANCIES := 6
 
+## A fase que muda de narrador a põe e a devolve (Fazenda).
+var voz := Voz.WILMARTH
 var _speaking := false
 ## Muda a cada cancel(): falas que esperavam na fila de antes são descartadas.
 var _generation := 0

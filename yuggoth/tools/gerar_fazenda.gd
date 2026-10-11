@@ -118,6 +118,7 @@ func _ready() -> void:
 	cena.set_script(load("res://levels/fazenda/fazenda.gd"))
 	cena.set("som", _sfx("dia_quieto.wav"))
 	cena.set("linha_fim", load("res://narrative/narration/fim_da_demo.tres"))
+	cena.set("linha_inicio", load("res://narrative/narration/akeley_caes.tres"))
 
 	var env := WorldEnvironment.new()
 	env.name = "WorldEnvironment"
@@ -362,10 +363,18 @@ func _altura(x: float, z: float) -> float:
 	if x < -30.0 and x > -64.0:
 		h -= 0.12 * clampf((-30.0 - x) / 4.0, 0.0, 1.0)
 	if x < -64.0:
-		h += (-64.0 - x) * 0.75 - 0.12
+		# A encosta da Dark Mountain até a crista (x -260), e do outro lado desce.
+		h += minf(-64.0 - x, 196.0) * 0.75 - 0.12
+		if x < -260.0:
+			h -= (-260.0 - x) * 0.45
 	# Ondulação, crescendo longe do quintal.
 	var longe := clampf((Vector2(x - 0.0, z - 0.0).length() - 45.0) / 40.0, 0.0, 1.0)
 	h += _relevo.get_noise_2d(x, z) * 3.0 * longe
+	# Os morros em volta do vale, ao longe (playtest 10: da descida do céu, além
+	# das bordas do terreno se via um "mar" escuro).
+	var d := Vector2(x, z).length()
+	if d > 240.0:
+		h += (d - 240.0) * 0.16 + _relevo.get_noise_2d(x * 0.35, z * 0.35) * 22.0 * clampf((d - 240.0) / 120.0, 0.0, 1.0)
 	return h
 
 
@@ -391,8 +400,8 @@ func _cor_chao(x: float, z: float) -> Color:
 ## Uma grade retilínea (as linhas finas perto, grossas longe, sem fendas entre
 ## elas), com a altura e a cor de cada ponto; a colisão segue a malha.
 func _terreno() -> void:
-	var xs := _passos([-260.0, -70.0, 46.0, 210.0], [10.0, 2.0, 8.0])
-	var zs := _passos([-230.0, -66.0, 46.0, 230.0], [10.0, 2.0, 10.0])
+	var xs := _passos([-700.0, -260.0, -70.0, 46.0, 210.0, 700.0], [40.0, 10.0, 2.0, 8.0, 40.0])
+	var zs := _passos([-700.0, -230.0, -66.0, 46.0, 230.0, 700.0], [40.0, 10.0, 2.0, 10.0, 40.0])
 	var mm := Cidade.Malha.new()
 	for i in xs.size() - 1:
 		for j in zs.size() - 1:
@@ -1247,6 +1256,38 @@ func _canil() -> void:
 	_tela(Vector2(0.4, fz), Vector2(x.y, fz))
 	_tela(Vector2(x.y, fz), Vector2(x.y, z.y))
 	_bloco("madeira_escura", Vector3(1.3, 1.1, 0.05), Vector3(-1.0, 0.65, fz + 0.65), Color.WHITE, false, Vector3(0, 90, 0))
+
+
+## Os doze cães (F4, o começo: a presença) no cercado diante das baias, esperando
+## a ração ao entardecer: a maioria virada para o leste, de onde Akeley vem com o
+## balde; Rambo, que não come, olhando a mata (GDD §5.1a). Cada um um pouco
+## diferente (a pelagem, o porte). O comportamento vem depois (docs/PLANO_FAZENDA.md).
+func _caes(x: Vector2, z: Vector2) -> void:
+	var g := _group(cena, "Caes")
+	var poses := {
+		"Brutus": [Cao.Pose.PARADO, 0.0], "Conan": [Cao.Pose.PARADO, 10.0], "Hércules": [Cao.Pose.SENTADO, -15.0],
+		"Rambo": [Cao.Pose.PARADO, 180.0], "Yautja": [Cao.Pose.PARADO, 150.0], "Dutch": [Cao.Pose.SENTADO, 20.0],
+		"Kull": [Cao.Pose.DEITADO, -40.0], "Kurgan": [Cao.Pose.PARADO, -25.0], "Ripley": [Cao.Pose.SENTADO, 5.0],
+		"Snake": [Cao.Pose.DEITADO, 60.0], "Riddick": [Cao.Pose.PARADO, 35.0], "Sansão": [Cao.Pose.SENTADO, -5.0],
+	}
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 1928
+	for i in CAES.size():
+		var nome: String = CAES[i]
+		var c := Cao.new()
+		c.name = nome
+		var p: Array = poses[nome]
+		c.pose = p[0]
+		c.pelagem = rng.randf_range(-0.7, 0.7)
+		c.porte = rng.randf_range(0.92, 1.08)
+		# Espalhados pelo cercado, os da frente mais perto da tela.
+		var px := lerpf(x.x + 0.8, x.y - 0.6, (i + rng.randf_range(-0.3, 0.3)) / (CAES.size() - 1))
+		var pz := lerpf(z.x, z.y, rng.randf())
+		_add(g, c)
+		c.position = Vector3(px, 0.0, pz)
+		# 0° = de frente para o leste (+X); a frente do cão é o -Z.
+		c.rotation_degrees.y = -90.0 + p[1] + rng.randf_range(-8.0, 8.0)
+		c.olhar = rng.randf_range(-15.0, 15.0)
 
 
 func _tela(de: Vector2, ate: Vector2) -> void:

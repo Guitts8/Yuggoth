@@ -14,7 +14,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"dossie"):
 		if visible:
 			close()
-		elif not Events.is_modal_open:
+		# Como Akeley (o Interlúdio), não há dossiê (GDD §5.1a): a fase entra no
+		# grupo `sem_dossie`.
+		elif not Events.is_modal_open and get_tree().get_first_node_in_group(&"sem_dossie") == null:
 			open()
 		else:
 			return

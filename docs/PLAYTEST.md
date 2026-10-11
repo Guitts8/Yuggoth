@@ -78,8 +78,13 @@ para o cartão do fim — ela se desfaz no céu do entardecer, e você está no 
 como Akeley, com o balde de ração; uns 45 segundos depois vem o cartão do fim (até
 os beats existirem). No build de teste, **F4** também leva ao quintal (só para andar:
 sem o balde nem o fim) e, de lá, F4 volta ao escritório.
-- [ ] **A passagem:** a tinta que vira céu emenda com o céu do quintal? O balde diante
-      dos olhos lê como um balde (sem mãos)?
+- [ ] **A passagem (refeita na F3, pedido do playtest 10):** a tinta seca em céu (sem
+      os morros desenhados), a data escrita na letra de Akeley, e a câmera que desce do
+      alto do vale até os olhos dele, diante do canil (dá para olhar em volta com o
+      mouse durante a descida). Percebe-se que agora você é outra pessoa? Longa ou
+      curta demais? O balde diante dos olhos lê como um balde (sem mãos)?
+- [ ] **O corpo de Akeley:** mais lento, ofegante (a câmera respira); sem dossiê (Tab);
+      a fala dele na letra das cartas. Incomoda, ou ajuda a sentir o corpo velho?
 - [ ] **O entardecer** (uns 3 minutos): o sol baixo e as sombras compridas, a névoa
       dourada na montanha, o vale afogado; e o crepúsculo roxo no fim. Escuro demais,
       claro demais, rápido demais?

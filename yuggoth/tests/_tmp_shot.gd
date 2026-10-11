@@ -52,6 +52,23 @@ func _ready() -> void:
 		await _fazenda_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "caes":
+		await _caes_fotos()
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "ceu":
+		GameState.reset()
+		GameState.set_flag(&"interludio")
+		await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+		await _s(0.3)
+		await _shot("%s_ceu_0" % tag)
+		var img := get_viewport().get_texture().get_image()
+		for y in [10, 120, 240, 360, 480, 600, 710]:
+			print("CEU y=", y, " ", img.get_pixel(640, y), " ", img.get_pixel(200, y))
+		await _s(2.0)
+		await _shot("%s_ceu_1" % tag)
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "selagem":
 		await _selagem_fotos()
 		get_tree().quit()
@@ -579,14 +596,20 @@ func _entardecer_fotos() -> void:
 	await tinta.tocar(esc.ultima_carta)
 	await _shot("%s_0_tinta" % tag)
 	GameState.set_flag(&"interludio")
-	tinta.revelar("res://levels/fazenda/fazenda.tscn", &"Entardecer")
+	tinta.revelar("res://levels/fazenda/fazenda.tscn", &"Entardecer", 3.0, "Domingo, 2 de setembro de 1928")
+	await _s(2.6)
+	await _shot("%s_0b_data" % tag)
 	await _until_nivel("res://levels/fazenda/fazenda.tscn")
-	await _s(1.2)
-	await _shot("%s_1_revelando" % tag)
-	await _s(2.0)
+	# A descida do céu, quadro a quadro.
+	for k in 22:
+		await _s(0.85)
+		await _shot("%s_1_descida_%02d" % [tag, k])
+	await _s(1.5)
 	await _shot("%s_2_quintal" % tag)
 	var faz := root.find_child("Fazenda", true, false) as Fazenda
 	var p := faz.player
+	if OS.get_environment("SHOT_SO_DESCIDA") == "1":
+		return
 	for momento: float in [0.0, 0.45, 1.0]:
 		faz.entardecer = momento
 		faz.duracao_entardecer = 99999.0
@@ -657,6 +680,42 @@ func _selagem_fotos() -> void:
 	for k in 34:
 		await _s(0.5)
 		await _shot("%s_selando_%02d" % [tag, k])
+
+
+## SHOT_MODO=caes: os cães (F4) em cada pose, no quintal, de lado, de frente e de
+## perto; e um andando e um correndo.
+func _caes_fotos() -> void:
+	GameState.reset()
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Quintal", false)
+	await _s(1.0)
+	var faz := root.find_child("Fazenda", true, false) as Node3D
+	var p := faz.find_child("Player", true, false) as Player
+	var base := Vector3(14.0, 0.0, 6.0)
+	var poses := [Cao.Pose.PARADO, Cao.Pose.SENTADO, Cao.Pose.DEITADO, Cao.Pose.LATINDO, Cao.Pose.ROSNANDO, Cao.Pose.COMENDO, Cao.Pose.PARADO, Cao.Pose.PARADO]
+	var caes: Array[Cao] = []
+	for i in poses.size():
+		var c := Cao.new()
+		c.name = "CaoTeste%d" % i
+		c.pose = poses[i]
+		c.andar = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.2][i]
+		c.pelagem = [0.0, 0.5, -0.5, 0.2, -0.2, 0.8, -0.8, 0.0][i]
+		faz.add_child(c)
+		c.global_position = base + Vector3(i * 1.3, 0, 0)
+		c.rotation.y = PI / 2.0
+		caes.append(c)
+	await _s(1.5)
+	for vista: Array in [["lado", base + Vector3(4.5, 0, 4.2), base + Vector3(4.5, 0.4, 0)], ["frente", base + Vector3(-2.4, 0, 0.0), base + Vector3(4, 0.3, 0)],
+			["perto", base + Vector3(0.6, 0, 1.6), base + Vector3(0.3, 0.45, 0)], ["alto", base + Vector3(4.5, 2.5, 3.0), base + Vector3(4.5, 0, 0)]]:
+		p.global_position = vista[1]
+		p.velocity = Vector3.ZERO
+		await _s(0.2)
+		var alvo: Vector3 = vista[2]
+		p.look_at(Vector3(alvo.x, p.global_position.y, alvo.z))
+		var olho := p.camera.global_position
+		p.head.rotation.x = atan2(alvo.y - olho.y, Vector2(alvo.x - olho.x, alvo.z - olho.z).length())
+		for k in 3:
+			await _s(0.23)
+			await _shot("%s_caes_%s_%d" % [tag, vista[0], k])
 
 
 func _until_nivel(caminho: String) -> void:

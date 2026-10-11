@@ -1,6 +1,9 @@
 shader_type canvas_item;
 // A tinta se espalha pela tela (progresso 0→1) e seca em céu de fim de tarde
-// sobre o vale (ceu 0→1). Entrada do Interlúdio (GDD §5.1a); ver TintaTransicao.
+// (ceu 0→1): só o céu, nas cores do céu da fazenda (gerar_fazenda._env), que
+// entra por baixo dele com a câmera olhando para o alto (playtest 10: os morros
+// desenhados pareciam "montanhas de desenho de criança"). Entrada do Interlúdio
+// (GDD §5.1a); ver TintaTransicao.
 
 uniform float progresso : hint_range(0.0, 1.0) = 0.0;
 uniform float ceu : hint_range(0.0, 1.0) = 0.0;
@@ -9,11 +12,14 @@ uniform float aspecto = 1.7778;
 // SubViewport), para emendar com o PS1.
 uniform float linhas = 540.0;
 uniform vec4 cor_tinta : source_color = vec4(0.07, 0.06, 0.08, 1.0);
-uniform vec4 ceu_alto : source_color = vec4(0.1, 0.11, 0.22, 1.0);
-uniform vec4 ceu_horizonte : source_color = vec4(0.78, 0.45, 0.3, 1.0);
-uniform vec4 cor_nuvem : source_color = vec4(0.32, 0.27, 0.32, 1.0);
-uniform vec4 morro_longe : source_color = vec4(0.16, 0.15, 0.2, 1.0);
-uniform vec4 morro_perto : source_color = vec4(0.04, 0.05, 0.05, 1.0);
+// Medidas no primeiro quadro da descida (o céu da fazenda já com a névoa, o
+// tonemap e o pós): o malva no alto, o rosado, o horizonte alaranjado.
+uniform vec4 ceu_alto : source_color = vec4(0.48, 0.37, 0.46, 1.0);
+uniform vec4 ceu_horizonte : source_color = vec4(0.84, 0.6, 0.46, 1.0);
+uniform vec4 cor_nuvem : source_color = vec4(0.4, 0.3, 0.38, 1.0);
+// O sol baixo, perto da borda de baixo, à esquerda (onde está no 3D).
+uniform vec2 sol_pos = vec2(0.26, 0.95);
+uniform vec4 cor_sol : source_color = vec4(0.97, 0.88, 0.62, 1.0);
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -38,11 +44,6 @@ float fbm(vec2 p) {
 	return v;
 }
 
-// Altura (em UV, 0 = topo) da linha de um morro em x.
-float cumeeira(float x, float base, float semente) {
-	return base - 0.05 * sin(x * 4.0 + semente) - 0.03 * sin(x * 9.0 + semente * 2.0) - 0.04 * fbm(vec2(x * 3.0, semente));
-}
-
 void fragment() {
 	vec2 p = vec2(UV.x * aspecto, UV.y);
 
@@ -55,15 +56,13 @@ void fragment() {
 	vec2 grade = vec2(linhas * aspecto, linhas);
 	vec2 uv = (floor(UV * grade) + 0.5) / grade;
 	p = vec2(uv.x * aspecto, uv.y);
-	vec3 cor = mix(ceu_alto.rgb, ceu_horizonte.rgb, smoothstep(0.05, 0.7, uv.y));
+	// O horizonte fica embaixo, rente à borda: é para lá que a câmera da fazenda
+	// vai descer.
+	vec3 cor = mix(ceu_alto.rgb, ceu_horizonte.rgb, pow(smoothstep(0.0, 1.0, uv.y), 1.2));
+	float brilho = 1.0 - smoothstep(0.0, 0.42, length((uv - sol_pos) * vec2(aspecto, 1.0)));
+	cor = mix(cor, cor_sol.rgb, brilho * brilho * 0.75);
 	float nuvem = fbm(vec2(p.x * 1.6, p.y * 7.0) + vec2(3.0, 0.0));
-	cor = mix(cor, cor_nuvem.rgb, smoothstep(0.45, 0.75, nuvem) * (1.0 - smoothstep(0.3, 0.7, uv.y)) * 0.8);
-	if (uv.y > cumeeira(p.x, 0.68, 1.0)) {
-		cor = morro_longe.rgb;
-	}
-	if (uv.y > cumeeira(p.x + 5.0, 0.8, 4.0)) {
-		cor = morro_perto.rgb;
-	}
+	cor = mix(cor, cor_nuvem.rgb, smoothstep(0.5, 0.78, nuvem) * (1.0 - smoothstep(0.35, 0.85, uv.y)) * 0.35);
 
 	// Poucas cores, como uma textura de 15 bits.
 	cor = floor(cor * 32.0) / 32.0;

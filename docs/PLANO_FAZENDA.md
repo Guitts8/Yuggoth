@@ -81,7 +81,10 @@ Brattleboro ou para o filho em San Diego (*"a casa onde nasci, onde minha famíl
 viveu por seis gerações"*); é o próprio fotógrafo (a câmera e a pera de borracha
 da foto do Dia 2: *"um homem de rosto agradável, barba grisalha curta"*).
 
-### 0. A passagem: do céu até os olhos de Akeley (~20 s)
+### 0. A passagem: do céu até os olhos de Akeley (~20 s) — ✅ feita na F3
+(Na F3, a descida vem do leste, de frente para o poente — o céu da tinta —, e passa
+sobre o vale, a casa e o celeiro até o canil, com a crista da montanha ao fundo, em vez
+de cruzar a crista: assim o olhar fica sempre no mesmo céu.)
 O playtest 10: *"não dá para perceber, além daquelas ondulações imitando montanhas
 de desenho de criança; pensei numa transição que vem do céu até dar na visão de
 Akeley."*
@@ -283,12 +286,54 @@ o telhado (4) + o fim.
      "fora do mapa" na fazenda (que é maior que o escritório).
    - **Próximo: a F3** (Akeley: o corpo mais lento, a respiração, sem dossiê, o
      narrador com as frases das cartas).
-3. ❓ **F3 — Akeley** (espera a aprovação do roteiro acima; a passagem nova, do céu
-   aos olhos dele, entra aqui). O mesmo Player, mais lento, com a respiração ofegante na câmera
-   (GDD §5.1a: "o corpo é outro"); sem dossiê; o narrador passa a ser Akeley, com
-   frases das cartas (tradução nossa). Os objetos na mão como a carta do escritório
-   (`CartaSaida`), sem corpo (ver ❓ abaixo).
-4. 🔧 **F4 — Os cães.** Um cão pastor provisório de primitivas (como o `Migo`), quatro
+3. ✅ **F3 — Akeley e a passagem do céu** (2026-10-11, roteiro aprovado).
+   - **A passagem** (playtest 10: *"não dá para perceber, além daquelas ondulações
+     imitando montanhas de desenho de criança; pensei numa transição que vem do céu
+     até dar na visão de Akeley"*): a tinta seca em **só céu** (`tinta.gdshader`, sem os
+     morros), nas cores medidas no primeiro quadro do céu 3D (o malva, o rosado, o
+     horizonte alaranjado, o brilho do sol baixo à esquerda: `SHOT_MODO=ceu`); nele se
+     escreve, na letra trêmula de Akeley, *"Domingo, 2 de setembro de 1928"*
+     (`TintaTransicao.revelar(..., legenda)`); a fazenda entra por baixo e a tinta se
+     desfaz no mesmo céu. Então **a descida** (`Fazenda._descida`, 17 s): uma câmera
+     própria, alta sobre o vale a leste (y 120), olhando o poente para o alto; desce
+     por uma Bézier sobre a crista recortada da Dark Mountain, o moinho, a casa e o
+     celeiro com as sombras compridas, rente à casa, até os olhos de Akeley diante do
+     canil; o balde sobe à vista no último trecho e a câmera passa a ser a dele no
+     mesmo quadro. O mouse desvia o olhar (até 50°/35°), e o desvio se desfaz na
+     chegada. O `NaMao` agora segue uma câmera dada (`camera`) e tem `erguer`.
+   - **O terreno** vai até ±700 m, com morros em volta do vale ao longe (do alto, além
+     das bordas, via-se um "mar" escuro); a Dark Mountain termina na crista (x −260,
+     ~147 m) e desce do outro lado.
+   - **O corpo é outro** (`Fazenda._ser_akeley`): o passo 1,45 m/s (era 1,9), o balanço
+     mais lento, a **respiração** ofegante na câmera (`Player.respiracao`, também
+     parado, mais funda andando); **sem dossiê** (a fase entra no grupo `sem_dossie`);
+     **quem narra é Akeley** (`Narrator.voz`): as legendas saem na letra dele
+     (Tangerine, `NarrationView._vestir_voz`), e voltam à de Wilmarth fora da fazenda.
+   - **A primeira fala**, quando ele se mexe (ou 5 s depois): *"Meus grandes cães
+     policiais sempre os seguram, porque ainda há muito poucos deles por aqui."* (a 1ª
+     carta: *"My great police dogs always hold them back, for there are very few here
+     as yet"*; `akeley_caes`, ❓ texto a aprovar).
+   - **Testes:** o de fumaça confere a câmera alta no começo da descida, a chegada aos
+     olhos de Akeley, o passo, a respiração, a voz, o dossiê fechado e a voz de
+     Wilmarth de volta no menu.
+4. 🔧 **F4 — Os cães** (← **em curso**).
+   - ✅ **O modelo** (`props/cao.gd`, `Cao`, `@tool`, como o `Migo`): um pastor-alemão
+     de primitivas com cor de vértice — o tronco em anéis (o peito fundo, a cintura
+     recolhida), a sela preta sobre o lombo e o castanho nas patas, no peito e na cara,
+     o focinho escuro e comprido, as orelhas em pé, a cauda farta e baixa; uns 62 cm na
+     cernelha. Pivôs para tudo o que se mexe (as patas com joelho, o pescoço, a cabeça,
+     a mandíbula, as orelhas, a cauda) e uma pose procedural: `pose` (parado, sentado,
+     deitado, latindo, rosnando, comendo, com transições) e `andar` (0 parado, 1 o passo
+     em quatro tempos, 2+ correndo, o trote largo); `olhar`, `pelagem`, `porte`. Um
+     filho `Modelo` (o .glb) o substitui. Conferido em captura (`SHOT_MODO=caes`).
+   - 🔧 **A presença:** os doze no cercado diante das baias ao entardecer, cada um na
+     sua pose, quase todos virados para Akeley, que chega com o balde; Rambo olhando a
+     mata (`gerar_fazenda._caes`).
+   - 🔧 **O comportamento:** o corpo (`CharacterBody3D`, colisão com as paredes),
+     seguir, ir até a gamela, deitar junto ao fogo, latir para a mata, rosnar para a
+     janela; os outros andam pelo cercado.
+   - 🔧 **Os sons:** latido, rosnado, ganido, comer, as patas no chão e nas telhas —
+     gravações CC0 (baixar pede a rede fora do sandbox). Um cão pastor provisório de primitivas (como o `Migo`), quatro
    com nome e comportamento (seguir, deitar junto ao fogo, latir para a mata, rosnar
    para a janela) numa máquina de estados simples; os outros, presença no canil e no
    quintal (doze no começo, como no livro). O asset animado mais caro: manter simples.

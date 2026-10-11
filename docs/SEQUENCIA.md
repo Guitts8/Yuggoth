@@ -544,15 +544,21 @@ lapso: playtest 8, "um mi-go passa em pleno sol").
 
 **Fim do dia (e da demo):** levada a carta registrada à porta, o fim da carta de quarta aparece no papel,
 a câmera se aproxima até a **letra trêmula encher a tela**, a **tinta se espalha**
-em manchas até cobrir tudo e **seca num céu de fim de tarde** sobre os morros do
-vale (pixelado na grade do mundo) → **a tinta se desfaz e o céu é o de verdade**:
-o quintal da fazenda de Akeley no entardecer de 2 de setembro (F2; ver o Interlúdio
-abaixo). (`TintaTransicao.revelar`.) O checkpoint passa a ser o começo do Interlúdio.
+em manchas até cobrir tudo e **seca num céu de fim de tarde** (só o céu, pixelado na
+grade do mundo; desde a F3, sem os morros desenhados) e nele se escreve, na letra
+trêmula de Akeley, *"Domingo, 2 de setembro de 1928"* → **a tinta se desfaz e o céu
+é o de verdade**, o mesmo, visto do alto do vale; **a câmera desce** sobre a crista da
+Dark Mountain, o moinho, a casa e o celeiro, até os olhos de Akeley diante do canil,
+com o balde (F3; ver o Interlúdio abaixo). (`TintaTransicao.revelar`,
+`Fazenda._descida`.) O checkpoint passa a ser o começo do Interlúdio.
 
 ## Interlúdio — "O Cerco" ⏳ (como Akeley, 2–6 de setembro)
-**Jogável agora (F2, 2026-10-10):** a tinta da última carta cai no quintal; Akeley
-está diante do canil, com o balde de ração diante dos olhos, no entardecer de
-domingo, 2 de setembro: o sol baixo a oeste vai para trás da Dark Mountain, as
+**Jogável agora (F2–F3, 2026-10-11):** a tinta da última carta vira o céu e a câmera
+desce dele até Akeley, diante do canil, com o balde de ração diante dos olhos, no
+entardecer de domingo, 2 de setembro. **O corpo é outro:** mais lento, ofegante (a
+câmera respira), sem dossiê; quem narra é ele, na letra das cartas (*"Meus grandes cães
+policiais sempre os seguram, porque ainda há muito poucos deles por aqui"*, quando ele
+se mexe): o sol baixo a oeste vai para trás da Dark Mountain, as
 sombras compridas atravessam o quintal, a névoa sobe do vale, e o céu passa do
 laranja ao crepúsculo em três minutos. Anda-se por tudo (a casa, as dependências);
 ainda sem os cães nem os beats: depois de uns 45 segundos, a tela escurece e vem o

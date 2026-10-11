@@ -1055,6 +1055,8 @@ demo inteira, 0 falhas).
 
 ## Fase 3k — Ajustes do playtest 10 (2026-10-10)
 O usuário jogou o playtest 10. Legenda: ✅ feito · 🔧 claro, a fazer · ❓ espera resposta.
+Commits: `0d22860` (o item 1) e `7dc649b` (os itens 3, 5–10). O item 11 é a F3 da
+fazenda (`docs/PLANO_FAZENDA.md`). Testes: fumaça e caminhos com 0 falhas.
 
 1. ✅ **Dia 6: "às vezes não é possível escrever para Akeley"** — *"fiquei preso na
    hora de escrever a carta"*. A causa: as três áreas "Escrever" do Dia 6 (a

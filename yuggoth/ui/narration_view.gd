@@ -29,6 +29,8 @@ func _ready() -> void:
 
 func _show_line(text: String, style: Narrator.Style) -> void:
 	_label = card if style == Narrator.Style.CARTAO else caption
+	if _label == caption:
+		_vestir_voz()
 	_label.text = text
 	_label.visible_ratio = 0.0
 	_label.modulate.a = 1.0
@@ -42,6 +44,38 @@ func _show_line(text: String, style: Narrator.Style) -> void:
 	_tween.tween_callback(_on_line_done)
 	if _label == caption and Events.is_modal_open:
 		_on_modal_changed(true)
+
+
+## A legenda na letra de quem narra: Akeley, na fazenda, com a mão trêmula das
+## cartas de agosto em diante; Wilmarth, a fonte da interface.
+func _vestir_voz() -> void:
+	var akeley := Narrator.voz == Narrator.Voz.AKELEY
+	if caption.get_meta(&"akeley", false) == akeley:
+		return
+	caption.set_meta(&"akeley", akeley)
+	if akeley:
+		# O que a legenda tinha antes (para voltar à voz de Wilmarth).
+		if not caption.has_meta(&"original"):
+			var original := {&"line_separation": caption.get_theme_constant(&"line_separation")}
+			for slot in DocumentData.FONT_SLOTS:
+				original[slot] = caption.get_theme_font(slot) if caption.has_theme_font_override(slot) else null
+				original[StringName(String(slot) + "_size")] = caption.get_theme_font_size(StringName(String(slot) + "_size"))
+			caption.set_meta(&"original", original)
+		DocumentData.apply_fonts(caption, DocumentData.Style.MANUSCRITO)
+		if not caption.has_meta(&"tremor"):
+			caption.set_meta(&"tremor", true)
+			caption.install_effect(TremorTextEffect.new())
+		return
+	var de: Dictionary = caption.get_meta(&"original", {})
+	if de.is_empty():
+		return
+	for slot in DocumentData.FONT_SLOTS:
+		if de[slot]:
+			caption.add_theme_font_override(slot, de[slot])
+		else:
+			caption.remove_theme_font_override(slot)
+		caption.add_theme_font_size_override(StringName(String(slot) + "_size"), de[StringName(String(slot) + "_size")])
+	caption.add_theme_constant_override(&"line_separation", de[&"line_separation"])
 
 
 func _cancel() -> void:

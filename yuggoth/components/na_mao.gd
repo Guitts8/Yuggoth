@@ -11,6 +11,12 @@ extends Node3D
 @export var firmeza := 18.0
 ## O balanço do passo, em metros.
 @export var balanco := 0.012
+## A câmera de quem segura (vazio = a câmera atual). A fazenda põe a de Akeley:
+## na descida do céu, a atual é outra.
+@export var camera: Camera3D
+## 0 = abaixado, fora da vista; 1 = diante dos olhos (a descida do céu o ergue
+## quando a câmera chega a Akeley).
+var erguer := 1.0
 
 var _camera: Camera3D
 var _t := 0.0
@@ -18,12 +24,14 @@ var _t := 0.0
 
 func _ready() -> void:
 	top_level = true
-	_camera = get_viewport().get_camera_3d()
+	_camera = camera if camera else get_viewport().get_camera_3d()
 	_seguir(1.0)
 
 
 func _process(delta: float) -> void:
-	if not is_instance_valid(_camera):
+	if camera:
+		_camera = camera
+	elif not is_instance_valid(_camera):
 		_camera = get_viewport().get_camera_3d()
 	_seguir(1.0 - exp(-firmeza * delta))
 
@@ -39,5 +47,6 @@ func _seguir(k: float) -> void:
 		anda = clampf(Vector2((corpo as CharacterBody3D).velocity.x, (corpo as CharacterBody3D).velocity.z).length() / 1.5, 0.0, 1.0)
 	_t += get_process_delta_time() * TAU * 1.8 * anda
 	var passo := Vector3(sin(_t * 0.5) * balanco, -absf(cos(_t * 0.5)) * balanco, 0.0) * anda
-	var alvo := _camera.global_transform * Transform3D(Basis.from_euler(rotacao * PI / 180.0), posicao + passo)
+	var baixo := Vector3(0.0, -0.55, 0.2) * (1.0 - erguer)
+	var alvo := _camera.global_transform * Transform3D(Basis.from_euler(rotacao * PI / 180.0), posicao + passo + baixo)
 	global_transform = global_transform.interpolate_with(alvo, k) if k < 1.0 else alvo

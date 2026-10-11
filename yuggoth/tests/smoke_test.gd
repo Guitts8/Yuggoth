@@ -887,10 +887,19 @@ func _ready() -> void:
 	_check(faz != null and not tinta_na_tela.call() and GameState.has_flag(&"interludio") and GameState.get_value(&"data") == Lapso.dia_do_ano(9, 2),
 		"a tinta cai no quintal da fazenda: 2 de setembro")
 	if faz:
+		# Playtest 10: do céu aos olhos de Akeley, num plano só.
+		_check(faz.descendo and faz._camera_ceu and faz._camera_ceu.current and faz._camera_ceu.global_position.y > 40.0 and not faz.player.input_enabled,
+			"a descida do céu: a câmera alta sobre o vale, o jogador ainda parado")
+		await _until(func() -> bool: return not faz.descendo, 60.0)
+		_check(faz.player.camera.current and faz.player.camera.global_position.y < 2.0, "a descida chega aos olhos de Akeley")
 		_check(faz.balde.visible and faz.player.input_enabled and not Events.is_modal_open, "Akeley no quintal, com o balde de ração, e anda")
 		_check(faz.sol.light_energy > 0.5 and faz.entardecer < 0.5, "o sol ainda baixo, antes de ir para trás da montanha")
+		_check(Narrator.voz == Narrator.Voz.AKELEY and faz.player.walk_speed < 1.6 and faz.player.respiracao > 0.0,
+			"o corpo é outro: mais lento, ofegante; quem narra é Akeley")
+		_check(get_tree().get_first_node_in_group(&"sem_dossie") == faz, "como Akeley, sem dossiê")
 	await _until(func() -> bool: return main_menu.visible, 120.0)
 	_check(main_menu.visible and SceneDirector.current_level.is_empty() and not tinta_na_tela.call(), "fim da demo, no quintal: o cartão e o menu")
+	_check(Narrator.voz == Narrator.Voz.WILMARTH, "fora da fazenda, quem narra volta a ser Wilmarth")
 	_check(not SceneDirector.hold_black, "depois da demo, a tela preta não fica presa")
 	Engine.time_scale = 1.0
 
@@ -1182,6 +1191,10 @@ func _andar(player: Player, pontos: Array, limite := 30.0) -> void:
 	var t := 0.0
 	for alvo: Vector3 in pontos:
 		while t < limite:
+			# A fase pode trocar no caminho (a escada de Boston leva a Arkham).
+			if not is_instance_valid(player) or not player.is_inside_tree():
+				Input.action_release(&"mover_frente")
+				return
 			var p := player.global_position
 			var rumo := Vector3(alvo.x, p.y, alvo.z)
 			if p.distance_to(rumo) < 0.25:

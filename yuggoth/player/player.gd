@@ -23,6 +23,10 @@ const DEBRUCAR_AVANCA := 0.28
 @export var seated_eye_height := 1.15
 @export var bob_amount := 0.03
 @export var bob_frequency := 5.5
+## A respiração na câmera (0 = nenhuma): Akeley, ofegante (GDD §5.1a, "o corpo é
+## outro"). Sobe e desce, um pouco irregular, também parado.
+@export var respiracao := 0.0
+@export var respiracao_frequencia := 0.42
 
 ## Segurando "zoom_visao" (botão direito, Z): o campo de visão aperta para ler de
 ## longe (a folhinha, um papel na mesa), e a mira fica mais lenta.
@@ -71,6 +75,7 @@ var abaixar := 0.0
 var _target: Interactable
 var _target_prompt := ""
 var _bob_t := 0.0
+var _folego_t := 0.0
 var _bob_weight := 0.0
 var _last_bob_sin := 0.0
 var _fov_base := 75.0
@@ -342,6 +347,11 @@ func _update_head(delta: float, crouching: bool) -> void:
 		_bob_t += delta * bob_frequency * (ground_speed / walk_speed)
 	var s := sin(_bob_t)
 	camera.position = Vector3(cos(_bob_t * 0.5) * bob_amount * 0.6, s * bob_amount, 0.0) * _bob_weight
+	if respiracao > 0.0:
+		# O fôlego: mais fundo andando; o ritmo varia um pouco (duas ondas somadas).
+		_folego_t += delta * TAU * respiracao_frequencia * (1.0 + 0.5 * _bob_weight)
+		var f := sin(_folego_t) + 0.35 * sin(_folego_t * 2.3 + 1.1)
+		camera.position += Vector3(0.0, f * 0.009, f * 0.004) * respiracao * (1.0 + _bob_weight)
 	# O desvio de uma cena: a câmera desfaz o pitch da cabeça, gira o yaw extra
 	# em torno da vertical e refaz o pitch somado (sem rolar o horizonte).
 	if _olhar_extra != Vector2.ZERO:

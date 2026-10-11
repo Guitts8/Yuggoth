@@ -703,6 +703,8 @@ func _menu_no_fim_da_demo() -> void:
 	_check(faz != null and GameState.has_flag(&"interludio") and SceneDirector._fade.modulate.a < 0.05 and not SceneDirector.hold_black and not main_menu.visible,
 		"continuar: o começo do Interlúdio, à vista")
 	if faz:
+		# A chegada é a descida do céu, também ao continuar (F3).
+		await _until(func() -> bool: return not faz.descendo, 40.0)
 		_check(faz.balde.visible and faz.player.input_enabled and not Events.is_modal_open, "Akeley com o balde, e anda")
 
 

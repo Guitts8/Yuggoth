@@ -57,16 +57,50 @@ func tocar(doc: DocumentData) -> void:
 
 
 ## Depois de `tocar()`: a fase `fase` entra por baixo da tinta (sem fade), e a
-## tinta se desfaz em `segundos`, revelando o céu do mundo; então some.
-func revelar(fase: String, entrada: StringName, segundos := 2.5) -> void:
+## tinta se desfaz em `segundos`, revelando o céu do mundo; então some. Com
+## `legenda`, antes, ela aparece escrita no céu de tinta na letra de Akeley (a
+## data do Interlúdio: quem escreve agora é ele) e se desfaz junto.
+func revelar(fase: String, entrada: StringName, segundos := 2.5, legenda := "") -> void:
+	var escrito: RichTextLabel = null
+	if legenda:
+		escrito = _legenda(legenda)
+		var e := create_tween()
+		e.tween_property(escrito, "visible_ratio", 1.0, 2.2)
+		await e.finished
+		await get_tree().create_timer(1.2).timeout
+		if not is_inside_tree():
+			return
 	await SceneDirector.change_level(fase, entrada, false)
 	if not is_inside_tree():
 		return
 	var t := create_tween().set_parallel()
 	t.tween_property(_tinta, "modulate:a", 0.0, segundos).set_trans(Tween.TRANS_SINE)
 	t.tween_property(_fundo, "modulate:a", 0.0, segundos * 0.6)
+	if escrito:
+		t.tween_property(escrito, "modulate:a", 0.0, segundos * 0.7)
 	await t.finished
 	queue_free()
+
+
+## A linha escrita no céu, na mão de Akeley (a tinta escura das cartas, que vai
+## aparecendo como se escrita).
+func _legenda(texto: String) -> RichTextLabel:
+	var r := RichTextLabel.new()
+	r.bbcode_enabled = true
+	r.fit_content = true
+	r.scroll_active = false
+	r.autowrap_mode = TextServer.AUTOWRAP_OFF
+	r.add_theme_color_override(&"default_color", Color(0.09, 0.07, 0.1, 0.92))
+	r.add_theme_font_size_override(&"normal_font_size", 40)
+	r.install_effect(TremorTextEffect.new())
+	DocumentData.apply_fonts(r, DocumentData.Style.MANUSCRITO)
+	r.text = "[center][tremulo forca=0.35]%s[/tremulo][/center]" % texto
+	r.visible_ratio = 0.0
+	add_child(r)
+	var tela := get_viewport().get_visible_rect().size
+	r.size = Vector2(tela.x, 0.0)
+	r.position = Vector2(0.0, tela.y * 0.3)
+	return r
 
 
 ## Fundo preto, o papel com o fim da carta e a camada da tinta por cima.

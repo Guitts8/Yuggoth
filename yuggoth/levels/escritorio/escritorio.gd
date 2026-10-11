@@ -552,7 +552,7 @@ func _para_o_interludio() -> void:
 	tree_exiting.disconnect(tinta.queue_free)
 	GameState.set_flag(&"interludio")
 	GameState.set_value(&"data", Lapso.dia_do_ano(9, 2))
-	tinta.revelar(FAZENDA, &"Entardecer")
+	tinta.revelar(FAZENDA, &"Entardecer", 3.0, "Domingo, 2 de setembro de 1928")
 
 
 ## O diário (docs/PLANO_ESCRITORIO.md, "A passagem para o sonho"), a última
