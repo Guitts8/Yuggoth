@@ -54,7 +54,9 @@ func tocar(pai: Node3D, onde: Transform3D, reply: ReplyData, player: Player, som
 	env.remetente = "A. N. Wilmarth\nMiskatonic University\nArkham, Mass."
 	add_child(env)
 	var junto := Vector3(0, env.espessura() * 0.5, 0.25)
-	env.transform = Transform3D(Basis.from_euler(Vector3(0, 0, PI)), junto + Vector3(-0.5, 0.0, 0.0))
+	# Chega pela frente, da mão dele, um pouco erguido (playtest 10: vindo da
+	# esquerda, rente à mesa, ele atravessava o diário).
+	env.transform = Transform3D(Basis.from_euler(Vector3(0, 0, PI)), junto + Vector3(0.0, 0.05, 0.22))
 	var bolso := _bolso(env, envelope_mat)
 	var aba := _aba(env, envelope_mat)
 	# O envelope está de costas: o +Y dele é o chão. Aberta, a aba deita na mesa.
@@ -68,6 +70,11 @@ func tocar(pai: Node3D, onde: Transform3D, reply: ReplyData, player: Player, som
 	# (Player._update_head); andar o levanta.
 	var cadeira := global_transform * Vector3(0, 0, 0.72)
 	cadeira.y = player.global_position.y
+	# Longe, vai até a cadeira a pé antes de sentar (playtest 10).
+	if not player.seated and Vector2(player.global_position.x - cadeira.x, player.global_position.z - cadeira.z).length() > 0.6:
+		await player.conduzir([cadeira + global_basis.z * 0.4], global_transform * Vector3(0, 0, 0.14))
+		if not is_inside_tree():
+			return null
 	var t0 := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t0.tween_property(player, ^"global_position", cadeira, 1.2 * RITMO)
 	player.seated = true
@@ -86,7 +93,7 @@ func tocar(pai: Node3D, onde: Transform3D, reply: ReplyData, player: Player, som
 	await _girar(cima, 180.0, 1.1)
 	await _pausa(0.4)
 
-	# O envelope chega pela esquerda e para junto da folha.
+	# O envelope chega e pousa junto da folha.
 	env.visible = true
 	var t := _tween()
 	t.tween_property(env, ^"position", junto, 1.1 * RITMO).set_ease(Tween.EASE_OUT)

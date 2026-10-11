@@ -517,7 +517,7 @@ func _continuar_em_boston() -> void:
 		await get_tree().process_frame
 	await _until(func() -> bool: return boston.saida.can_interact(boston.player), 20.0)
 	_check(boston.saida.can_interact(boston.player), "a conversa acaba e a escada leva de volta")
-	boston.saida.interact(boston.player)
+	await _andar(boston.player, [Vector3(0, 0, 2.6), boston.descida.global_position], 20.0)
 	await _until(func() -> bool: return SceneDirector.current_level == ESCRITORIO and not SceneDirector.is_busy, 30.0)
 	await _frames(3)
 	var esc: Escritorio = root.find_child("Escritorio", true, false)
@@ -1162,6 +1162,13 @@ func _macaco_passo(usos: Dictionary[String, int], mira_falhou: PackedStringArray
 		await _andar(player, [Vector3(esc.calha.soleira.x, 0, 3.8), esc.escada.global_position], 25.0)
 		await _seconds(1.0)
 		return
+	var boston := fase as Boston
+	if boston and boston.saida.can_interact(player) and randf() < 0.5:
+		# Feita a conversa, a escada leva embora (playtest 10: sem "Voltar a Arkham").
+		_anotar_acao("desce a escada de Boston")
+		await _andar(player, [Vector3(0, 0, 2.6), boston.descida.global_position], 20.0)
+		await _seconds(1.0)
+		return
 	var alvos := _alvos(fase, player, esc)
 	if alvos.is_empty():
 		# Nada a fazer: anda um pouco (o sonho acorda sozinho, uma fala termina).
@@ -1201,7 +1208,8 @@ func _macaco_passo(usos: Dictionary[String, int], mira_falhou: PackedStringArray
 func _alvos(fase: Node, player: Player, esc: Escritorio) -> Array[Interactable]:
 	var lista: Array[Interactable] = []
 	for a: Interactable in fase.find_children("*", "Interactable", true, false):
-		if not a.is_visible_in_tree() or not a.can_interact(player) or a.get_child_count() == 0:
+		# Fora da física (collision_layer 0), nunca fica na mira.
+		if not a.is_visible_in_tree() or not a.can_interact(player) or a.get_child_count() == 0 or a.collision_layer == 0:
 			continue
 		if esc and not esc.calha.porta_aberta and esc._fora() != esc.calha.do_lado_de_fora(a.global_position):
 			continue

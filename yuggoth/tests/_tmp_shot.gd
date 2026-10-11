@@ -52,6 +52,14 @@ func _ready() -> void:
 		await _fazenda_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "selagem":
+		await _selagem_fotos()
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "diario":
+		await _diario_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "boston":
 		await _boston_fotos()
 		get_tree().quit()
@@ -591,6 +599,64 @@ func _entardecer_fotos() -> void:
 			p.head.rotation.x = atan2(a.y - olho.y, Vector2(a.x - olho.x, a.z - olho.z).length())
 			await _s(0.5)
 			await _shot("%s_p%d_%s" % [tag, int(momento * 100), alvo[0]])
+
+
+## SHOT_MODO=diario: o caderno abre diante dele e fecha, em quadros seguidos (o
+## salto da capa ao fechar, playtest 10). SHOT_PASSO (s entre quadros).
+func _diario_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 2)
+	GameState.set_flag(&"comecou_dia_2")
+	GameState.add_document(load("res://narrative/documents/diario_dia_1.tres"))
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+	await _s(1.5)
+	Narrator.cancel()
+	var esc := root.find_child("Escritorio", true, false) as Escritorio
+	var p := esc.player
+	await _entrar(esc)
+	Narrator.cancel()
+	p.input_enabled = false
+	var d := esc.diario
+	d._paginas = [[Diario.ROSTO, 0.0], [d._esquerda.text, 0.0]]
+	await d._abrir(p)
+	await _s(0.5)
+	await _shot("%s_aberto" % tag)
+	var passo := float(OS.get_environment("SHOT_PASSO")) if OS.has_environment("SHOT_PASSO") else 0.1
+	d.fechar(p)
+	for k in int(5.0 / passo):
+		await _s(passo)
+		await _shot("%s_fechando_%03d" % [tag, k])
+		print("Q ", k, " capa ", snappedf(d._k_capa, 0.001), " folhas ", snappedf(d._k_folhas, 0.001), " aberto ", d.aberto)
+
+
+## SHOT_MODO=selagem: no Dia 6, com as cartas de setembro abertas na mesa, a
+## carta registrada selada (playtest 10: a dobra atravessava a folha do dia).
+func _selagem_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", 6)
+	for f: StringName in [&"comecou_dia_6", &"escreveu_resposta_dia_5", &"narrou_cartao_31_agosto", &"escreveu_animo_dia_6",
+			&"narrou_cartao_5_setembro", &"narrou_cartao_6_setembro", &"narrou_cartao_7_setembro", &"leu_carta_akeley_terca",
+			&"leu_carta_akeley_quarta", &"leu_carta_akeley_28_agosto", &"leu_carta_akeley_setembro", &"leu_carta_akeley_segunda"]:
+		GameState.set_flag(f)
+	GameState.set_value(&"resposta_dia_5", 0)
+	for k: StringName in [&"correio_28_agosto", &"correio_setembro", &"correio_segunda", &"correio_terca", &"correio_quarta"]:
+		GameState.set_value(k, 3)
+	await SceneDirector.change_level("res://levels/escritorio/escritorio.tscn", &"Porta", false)
+	await _s(2.0)
+	Narrator.cancel()
+	var esc := root.find_child("Escritorio", true, false) as Escritorio
+	var p := esc.player
+	p.global_position = Vector3(0.1, 0, -1.3)
+	await _olhar(p, Vector3(0.05, 0, -2.2))
+	p.head.rotation.x = -0.9
+	await _s(0.5)
+	await _shot("%s_antes" % tag)
+	esc._on_reply_written(load("res://narrative/replies/resposta_dia_6.tres"), null)
+	for k in 34:
+		await _s(0.5)
+		await _shot("%s_selando_%02d" % [tag, k])
 
 
 func _until_nivel(caminho: String) -> void:

@@ -42,6 +42,14 @@ func _repor() -> void:
 		copo.visible = GameState.has_flag(&"serviu_uisque") or GameState.has_flag(&"frasco_na_mesa")
 
 
+## A manhã seguinte: a xícara de ontem foi lavada (as usadas que ficam são as da
+## sala que acumula).
+func repor() -> void:
+	var nivel := xicara.get_node_or_null(^"Nivel") as Node3D if xicara else null
+	if nivel:
+		nivel.visible = false
+
+
 ## Café da garrafa térmica na xícara, e um gole.
 func cafe(player: Player) -> void:
 	_tocar(som_destampar)
@@ -101,6 +109,10 @@ func gole(player: Player, recipiente: Node3D) -> void:
 	t.tween_method(func(k: float) -> void: recipiente.global_transform = boca.call(10.0 + 45.0 * sin(k * PI)), 0.0, 1.0, 1.6)
 	get_tree().create_timer(0.55).timeout.connect(_tocar.bind(som_gole))
 	await t.finished
+	# Um gole a menos.
+	var nivel := recipiente.get_node_or_null(^"Nivel") as Node3D
+	if nivel and nivel.visible:
+		nivel.scale.y *= 0.8
 	var de := recipiente.global_transform
 	t = _tween()
 	t.tween_method(func(k: float) -> void: recipiente.global_transform = de.interpolate_with(casa, k), 0.0, 1.0, 1.1)
@@ -111,6 +123,11 @@ func gole(player: Player, recipiente: Node3D) -> void:
 ## O que serve vai sobre o recipiente, inclina, o líquido sobe até `cheio`, e
 ## o que serve volta ao lugar.
 func _servir(player: Player, de: Node3D, para: Node3D, cheio: float, som: AudioStream) -> void:
+	# A sala não recarrega de um dia para o outro: o café de ontem ainda estaria
+	# na xícara (playtest 10, "o café sendo posto com a xícara cheia").
+	var nivel := para.get_node_or_null(^"Nivel") as Node3D
+	if nivel:
+		nivel.visible = false
 	await player.olhar_para(para.global_position, 0.8).finished
 	var casa := de.global_transform
 	# Inclina de lado para quem olha, com a boca (o filho "Boca") sobre o
@@ -128,7 +145,6 @@ func _servir(player: Player, de: Node3D, para: Node3D, cheio: float, som: AudioS
 	t.tween_property(de, ^"global_transform", inclinado, 0.5)
 	await t.finished
 	_tocar(som)
-	var nivel := para.get_node_or_null(^"Nivel") as Node3D
 	if nivel:
 		nivel.visible = true
 		# Na xícara, que afunila, o café alarga ao subir (rente à parede de dentro).

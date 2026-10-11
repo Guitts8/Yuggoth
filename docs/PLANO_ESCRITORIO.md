@@ -1065,27 +1065,50 @@ O usuário jogou o playtest 10. Legenda: ✅ feito · 🔧 claro, a fazer · ❓
    dela (só o mundo tampa). O teste de fumaça mira a pena no Dia 6 e confere que o
    alvo é a carta registrada.
 2. 🔧 **Dia 6: as hitboxes e a progressão em geral.** Provavelmente o mesmo mal (as
-   áreas mortas do dia tampando as vivas); conferir no próximo playtest.
-3. 🔧 **O diário ao fechar** dá um salto quando fica na parte interna da capa.
-   Revisar e dar carinho à animação.
-4. ❓ **As fotos: "dar uma melhorada"** — o usuário não sabe o quê. Propor.
-5. 🔧 **A dobra da carta** com a folha do dia no meio da mesa: a selagem atravessa a
-   folha do dia (as duas sobre o mata-borrão). Proposta: Wilmarth afasta a folha do
-   dia antes de dobrar, e ela volta depois.
-6. 🔧 **O café** começa com a xícara cheia.
-7. 🔧 **O fonógrafo do sonho** (noite 3) é o modelo antigo; o mi-go de pé (a `Vigia`)
-   não foi visto — aparece fora da vista depois de 14 s; deixá-lo mais achável.
-8. 🔧 **Boston:** tirar "Voltar a Arkham" da beira da escada (descer já volta).
-9. 🔧 **Sentar para estudar** (o lapso lendo): o corpo é puxado para a cadeira;
-   levá-lo a pé e girar suave.
-10. 🔧 **O correio depois dos lapsos** não é intuitivo para quem não conhece o jogo.
-    Proposta: o contínuo bate à porta, a sombra dos pés na fresta, o envelope; na
-    primeira vez, uma fala.
+   áreas mortas do dia tampando as vivas, corrigido no item 1); conferir no próximo
+   playtest.
+3. ✅ **O diário ao fechar** dava um salto na parte interna da capa. Filmado quadro a
+   quadro (`_tmp_shot`, `SHOT_MODO=diario`): a pilha da esquerda só acabava quando
+   `folhas` chegava a 0, e a última folha em branco sumia de uma vez sobre a guarda
+   (e ficava abaixo dela). Agora a pilha acaba quando a última folha se ergue
+   (`Diario._pose`), sempre acima da guarda. E o carinho: a capa sobe devagar até em
+   pé e cai sobre o miolo, acelerando, com um baque surdo de couro (`som_fechar`).
+4. ❓ **As fotos: "dar uma melhorada"** — o usuário não sabe o quê. Proposta (aceita
+   com o "pode seguir"): fotografar as nossas cenas 3D, em sépia, com mais resolução,
+   e o cartão com cantos e empenamento. **Fica para depois da F4 da fazenda**: a foto
+   da casa de Akeley pede a casa (feita), os cães e o próprio Akeley; e o círculo de
+   pedras e a caverna já existem em 3D (`tools/vistas.gd`).
+5. ✅ **A dobra da carta** atravessava a folha do dia (no meio do mata-borrão desde o
+   playtest 9) e um envelope aberto na frente; e o envelope novo, chegando pela
+   esquerda rente à mesa, atravessava o diário. Agora, antes de dobrar, o que está
+   onde a folha dobra e o envelope pousa vai num arco para uma pilha no fundo da mesa
+   e volta quando a carta sobe à mão (`Escritorio._abrir_espaco`/`_devolver`); o
+   envelope chega pela frente, da mão dele (`Selagem`). Conferido em captura no Dia 6
+   (`SHOT_MODO=selagem`).
+6. ✅ **O café** começava com a xícara cheia: a sala não recarrega de um dia para o
+   outro e o café de ontem ficava nela. A xícara se esvazia de manhã (`Bebida.repor`)
+   e antes de servir; o gole baixa o nível.
+7. ✅ **O fonógrafo do sonho** agora é a mesma máquina da sala (`_maquina_fonografo`,
+   usada pelos dois). **O mi-go de pé** (a `Vigia`) estava a 10 m da clareira, além do
+   chão firme (`RAIO_BOSQUE` = 6): ficava nas ilhas que se soltam e vão embora. Agora
+   a 5,5 m, à esquerda da caverna, entre os troncos, e aparece depois de 8 s (era 14).
+8. ✅ **Boston:** sem "Voltar a Arkham" na mira; a área fica só como a condição da
+   descida (`collision_layer` 0). Os testes descem a escada a pé (o macaco também).
+9. ✅ **Sentar para estudar** (e para anotar, ler o diário, selar): longe da cadeira,
+   ele vai até ela a pé (`Player.conduzir`) e só então senta; antes o corpo deslizava
+   pela sala.
+10. ✅ **O correio depois dos lapsos:** acabado o lapso (ou a noite em claro) com
+    correio novo no chão, o contínuo bate de leve à porta, três passos se afastam pelo
+    corredor e a sombra dos pés passa na luz da fresta (`Escritorio._bateram_a_porta`);
+    na primeira vez, o narrador: *"Bateram de leve à porta, e os passos do contínuo se
+    afastaram pelo corredor. Junto à fresta, no chão, havia correspondência."*
+    (`correio_bateram`, ❓ texto a aprovar).
 11. ❓ **A passagem para a fazenda** — *"não dá para perceber, além daquelas
     ondulações imitando montanhas de desenho de criança; pensei numa transição que
     vem do céu até dar na visão de Akeley"*. Vai com o roteiro da fazenda
     (`docs/PLANO_FAZENDA.md`, "O roteiro do recorte"), que o usuário pediu para
-    decidir antes de mexer lá.
+    decidir antes de mexer lá — aprovado com as recomendações ("pode seguir",
+    2026-10-11); entra na F3 da fazenda.
 
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a

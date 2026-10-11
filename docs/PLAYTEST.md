@@ -1,11 +1,11 @@
 # Playtest — o que verificar
 
-Lista de conferência do **playtest 10** (do Prólogo ao fim da demo). Os testes
+Lista de conferência do **playtest 11** (do Prólogo ao fim da demo). Os testes
 automáticos (`smoke_test`, `caminhos_test`, o macaco) garantem que **tudo se joga
 até o fim sem travar**. Eles não julgam se está **bonito, claro, assustador ou fiel
 ao livro**, e não usam o mouse no menu. Esta lista é para isso.
 
-O que o playtest encontrar vira a **Fase 3k** em `docs/PLANO_ESCRITORIO.md`
+O que o playtest encontrar vira a **Fase 3l** em `docs/PLANO_ESCRITORIO.md`
 (✅ feito · 🔧 claro, a fazer · ❓ espera resposta). Atualize este arquivo a cada
 playtest: o que foi conferido sai, e entra o que mudou.
 
@@ -39,7 +39,24 @@ o que esperava.
 
 ---
 
-## 0. Prioridade máxima: o que mudou desde o playtest 9 (a Fase 3j)
+## 0. Prioridade máxima: o que mudou desde o playtest 10 (a Fase 3k)
+- [ ] **Dia 6, escrever a Akeley:** a pena sempre pega a carta do dia (as áreas já
+      usadas tampavam). Alguma outra coisa no Dia 6 ainda não pega ou não avança?
+- [ ] **O diário fechando:** a capa sobe e cai sobre o miolo, com um baque leve; sem o
+      salto na parte de dentro da capa.
+- [ ] **Selar a carta:** as folhas e o envelope que estavam no meio vão para o fundo da
+      mesa e voltam depois; o envelope novo chega pela frente.
+- [ ] **O café:** a xícara vazia antes de servir.
+- [ ] **O sonho do disco:** o fonógrafo é a máquina da sala; o mi-go de pé, uma silhueta
+      à esquerda da caverna, entre os troncos (olhe para trás e volte).
+- [ ] **Boston:** sem "Voltar a Arkham" — descer a escada leva de volta.
+- [ ] **Sentar à mesa** (os lapsos lendo, o diário, selar): ele vai até a cadeira a pé.
+- [ ] **O correio depois dos lapsos:** batem à porta, os passos se afastam e a sombra
+      passa na fresta. Fica claro que chegou carta? A fala da primeira vez
+      (*"Bateram de leve à porta, e os passos do contínuo se afastaram pelo corredor.
+      Junto à fresta, no chão, havia correspondência."*) está boa?
+
+## Conferido no playtest 10 (a Fase 3j, para não se perder)
 - [ ] **Os sons** do café (a tampa, o jorro, o gole, a xícara pousada), do uísque (a
       rolha, o fio no copo) e da carta descendo a calha.
 - [ ] **O sonho do disco:** a boca da caverna (a rocha em arco, a fresta negra, o

@@ -380,6 +380,7 @@ func _ready() -> void:
 	_check(not esc.diario.aberto and not player.seated and esc.diario.transform.is_equal_approx(esc.diario._casa), "o caderno de volta ao lugar, fechado")
 	_check(not esc.find_child("Dia1", true, false).visible, "objetos do Dia 1 somem no Dia 2")
 	_check(SaveSystem.has_save(), "checkpoint no começo do dia")
+	_check(not esc.bebida.xicara.get_node("Nivel").visible, "de manhã, a xícara vazia (playtest 10: o café de ontem não fica)")
 
 	# --- Escritório: Dia 2 (GDD §5.1, livro cap. II) ---
 	var dia2: Node3D = esc.find_child("Dia2", true, false)
@@ -604,11 +605,12 @@ func _ready() -> void:
 	await _check_alcance(boston, "Boston, pela fresta", Vector2(0.6, 2.8))
 	_check(sonho_max > 0.3, "falando da voz de Keene, a sala amolece")
 	await _until(func() -> bool: return is_zero_approx(GameState.get_number(&"sonho")), 10.0)
-	_check(is_zero_approx(GameState.get_number(&"sonho")) and saida.can_interact(player), "nada de novo: a porta leva de volta a Arkham")
+	_check(is_zero_approx(GameState.get_number(&"sonho")) and saida.can_interact(player), "nada de novo: a escada leva de volta a Arkham")
+	_check(player._target != saida and saida.collision_layer == 0, "sem \"Voltar a Arkham\" na mira (playtest 10): desce-se a pé")
 	var ditas: Array[String] = []
 	var ouvir_narrador := func(texto: String, _estilo: Narrator.Style) -> void: ditas.append(texto)
 	Narrator.line_started.connect(ouvir_narrador)
-	saida.interact(player)
+	await _andar(player, [Vector3(0, 0, 2.6), boston.descida.global_position], 20.0)
 	await _until(func() -> bool: return SceneDirector.current_level == "res://levels/escritorio/escritorio.tscn" and not SceneDirector.is_busy, 30.0)
 	esc = root.find_child("Escritorio", true, false)
 	player = esc.player
@@ -777,7 +779,10 @@ func _ready() -> void:
 			medir.call()
 		return GameState.has_flag(&"narrou_cartao_31_agosto") and not SceneDirector.hold_black and not esc.em_lapso, 60.0)
 	_check(calma_grupo.visible and GameState.get_value(&"data") == Lapso.dia_do_ano(8, 31), "31 de agosto: a carta calma, depois do lapso")
-	_check(t_lapso[0] < 14.0, "o lapso é curto (playtest 8: demorava): %.1f s" % t_lapso[0])
+	# (Com a ida a pé até a cadeira, do playtest 10, que antes era um deslize.)
+	_check(t_lapso[0] < 16.5, "o lapso é curto (playtest 8: demorava): %.1f s" % t_lapso[0])
+	await _until(func() -> bool: return GameState.has_flag(Escritorio.LINHA_BATERAM.get_said_flag()), 8.0)
+	_check(GameState.has_flag(Escritorio.LINHA_BATERAM.get_said_flag()), "correio novo depois do lapso: batem à porta, e o narrador diz (playtest 10)")
 	var calma: DocumentPickup = calma_grupo.get_node("CartaSetembro/Ler")
 	_check(calma.document.resolve_pages()[0].contains("fez-me bem"), "a carta calma responde à resposta animadora")
 	await _abrir_correio(esc, calma_grupo.get_node("Envelope/Correio"))

@@ -127,7 +127,10 @@ tela preta. O jogador fica parado (a cabeça livre), virado para a janela: Arkha
 as horas pela **janela viva** — a aurora, o dia, o entardecer, a noite, as janelas
 da cidade acendendo, as nuvens correndo, o sol cruzando e a sombra do caixilho
 varrendo a mesa —, a **folhinha** no peitoril perde uma folha por dia (com som), e
-o cartão aparece sobre a cena — o que chega cai pela fresta no primeiro escuro. A
+o cartão aparece sobre a cena — o que chega cai pela fresta no primeiro escuro; acabado
+o lapso, **o contínuo bate de leve à porta**, os passos se afastam pelo corredor e a
+sombra dos pés passa na luz da fresta (playtest 10; na primeira vez, o narrador: *"Junto
+à fresta, no chão, havia correspondência"*). A
 folhinha mostra a data o tempo todo (em inglês, como tudo o que é impresso na sala).
 Desde o playtest 9, o lapso é **ele lendo os livros da biblioteca** à escrivaninha:
 senta, um livro abre diante dele, e a vista fica nele, com a janela adiante; à noite
@@ -379,7 +382,7 @@ cilindro, nos dias seguintes.
    sala amolece enquanto ele fala dela: *"Me deixava tonto e com sono, só de
    ouvir"*), se o reconheceria (*"não tenho certeza nem disso"*), ou agradecer e ir.
    *"Era um rapaz franco e simpático, mas vi que não podia acrescentar nada..."* (ao
-   fim da conversa) → **"Voltar a Arkham"** (depois do homem de Keene): o escritório
+   fim da conversa) → **descer a escada** até o patamar (depois do homem de Keene; desde o playtest 10, sem "Voltar a Arkham" na mira): o escritório
    já de noite, o abajur aceso, e o narrador: a noite em claro escrevendo cartas. No
    fim do corredor da pensão, a janelinha dá para os telhados de Boston (em 3D);
    na outra ponta, o vão da escada, com o corrimão na luz fraca que sobe do andar

@@ -29,7 +29,10 @@ var _saindo := false
 func _ready() -> void:
 	player.lamp.available = false
 	AudioDirector.play_ambience(som)
-	saida.interacted.connect(_voltar)
+	# Playtest 10: "remover a opção Voltar a Arkham da beira da escada" — descer
+	# já leva. A área fica só como a condição da descida (fora da mira).
+	saida.collision_layer = 0
+	saida.visible = false
 	descida.body_entered.connect(_on_descida)
 	if GameState.has_flag(&"porta_aberta_boston"):
 		folha.rotation_degrees.y = fresta
@@ -79,7 +82,7 @@ func _on_descida(corpo: Node3D) -> void:
 		_voltar(player)
 
 
-func _voltar(_by: Node) -> void:
+func _voltar(_by: Node = null) -> void:
 	if _saindo:
 		return
 	_saindo = true

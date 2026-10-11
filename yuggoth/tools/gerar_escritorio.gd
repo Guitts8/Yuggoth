@@ -1883,6 +1883,7 @@ func _diario(g: Node3D, pena: Node3D) -> void:
 	d.pena = pena
 	d.som_pena = _sfx("pena.wav")
 	d.som_papel = _sfx("papel_pegar.wav")
+	d.som_fechar = _sfx("menu_baque.wav")
 	d.lugar_aberto = Transform3D(Basis.IDENTITY, Vector3(-0.02, MESA + 0.003, -2.02))
 	var anotar := _area(d, Interactable.new(), "Anotar", Vector3(Diario.LARGURA + 0.02, 0.06, Diario.FUNDO + 0.02), Vector3(Diario.LARGURA * 0.5, 0.03, 0)) as Interactable
 	anotar.prompt = "Anotar o dia"
@@ -3214,15 +3215,12 @@ func _sonho_disco(g: Node3D) -> void:
 	formas.append([Vector3(12, 6, 1.0), boca + Vector3(0, 3, -0.6)])
 	_colisao(g, "Colisao", formas)
 
-	# O toco com o fonógrafo de Akeley (o ditafone que gravou), virado para ele.
+	# O toco com o fonógrafo, virado para ele: a mesma máquina da sala (playtest
+	# 10: era o modelo antigo), o disco que tocava continua aqui.
 	var toco_pos := clareira + Vector3(0.5, 0, -0.6)
 	_cyl(g, "Toco", 0.28, 0.33, 0.55, toco_pos + Vector3(0, 0.275, 0), "madeira_escura", 9)
 	var f := _group(g, "Fonografo", toco_pos + Vector3(0, 0.55, 0), 200)
-	_box(f, "Caixa", Vector3(0.34, 0.14, 0.24), Vector3(0, 0.07, 0), "madeira_clara")
-	var cera := _cyl(f, "Cera", 0.032, 0.032, 0.11, Vector3(0, 0.19, 0.02), "cinzas", 10)
-	cera.rotation_degrees.z = 90
-	var cone := _cyl(f, "Corneta", 0.2, 0.015, 0.5, Vector3(0.0, 0.42, -0.18), "latao", 10)
-	cone.rotation_degrees = Vector3(-60, 0, 0)
+	_maquina_fonografo(f, 0.0, _group(f, "Cilindro"))
 	var fono := _area(f, Fonografo.new(), "Disco", Vector3(0.5, 0.6, 0.5), Vector3(0, 0.2, 0)) as Fonografo
 	fono.gravacao = load("res://narrative/gravacoes/disco_1915.tres")
 	fono.gravacao_longa = load("res://narrative/gravacoes/disco_1915_longo.tres")
@@ -3285,9 +3283,12 @@ func _sonho_disco(g: Node3D) -> void:
 	vigia.name = "Vigia"
 	vigia.aparecer = true
 	vigia.intervalo = 4.0
-	vigia.espera = 14.0
+	vigia.espera = 8.0
 	vigia.altura = 1.4
-	vigia.position = clareira + Vector3(-8.6, 0.0, -5.2)
+	# Playtest 10 ("o mi-go de pé não está no sonho?"): a 10 m, ele ficava além do
+	# chão firme (RAIO_BOSQUE), nas ilhas que se soltam e vão embora. Agora dentro
+	# dele, à esquerda da caverna — para onde se olha —, entre os troncos.
+	vigia.position = clareira + Vector3(-3.6, 0.0, -4.1)
 	_add(g, vigia)
 	var de_pe := Migo.new()
 	de_pe.name = "Migo"
@@ -3632,6 +3633,47 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 		var est := _estojo_cilindro(g, "Estojo%d" % k)
 		est.position = Vector3(-0.15 + k * 0.075, 0.248, 0.04 - (k % 2) * 0.05)
 		est.rotation_degrees.y = -150.0 + k * 47.0
+	var cilindro := _grupo_se(g, "Cilindro", _flag(&"fono_cilindro"))
+	var topo := _maquina_fonografo(g, alto, cilindro)
+	_colisao(g, "Colisao", [[Vector3(0.52, topo, 0.42), Vector3(0, topo / 2, 0)]])
+
+	var f := _area(g, Fonografo.new(), "Fonografo", Vector3(0.42, 0.3, 0.32), Vector3(0, topo + 0.05, 0)) as Fonografo
+	f.unique_name_in_owner = true
+	f.gravacao = load("res://narrative/gravacoes/disco_1915.tres")
+	f.gravacao_longa = load("res://narrative/gravacoes/disco_1915_longo.tres")
+	f.zumbido = _sfx("zumbido.wav")
+	f.narracao_depois = load("res://narrative/narration/depois_do_disco.tres")
+	f.luz = dia3.get_node("Abajur/Luz")
+	# O cilindro está à mão quando o estojo sai do pacote (a última peça).
+	f.cilindro_chegou = _cond_valor(&"correio_dia_3_tiradas", ValueCondition.Op.MAIOR_OU_IGUAL, 3)
+	var tremem: Array[Node3D] = []
+	for n in dia3.get_children():
+		if n.has_meta(&"treme"):
+			tremem.append(n)
+	f.tremer = tremem
+
+	# A noite do Dia 3: anotado o dia, ouvir o disco outra vez — ele baixa a
+	# agulha e vai ouvi-lo da poltrona, olhando a lareira fria; o sono vem com o
+	# disco (LugarSono). A área é maior que a do fonógrafo (ganha a mira) e só
+	# existe nessa noite.
+	var ouvir := _area(g, LugarSono.new(), "OuvirDeNovo", Vector3(0.56, 0.42, 0.46), Vector3(0, topo + 0.05, 0)) as LugarSono
+	ouvir.noite = 3
+	ouvir.prompt = "Ouvir o disco outra vez"
+	ouvir.condition = _cond_valor(&"sono", ValueCondition.Op.IGUAL, 3)
+	ouvir.assento = _assento_poltrona
+	ouvir.diante = _marca(parent as Node3D, "DianteDisco", g.position + Vector3(0.62, 0, 0))
+	ouvir.olhar = _marca(parent as Node3D, "OlharLareiraFria", Vector3(W - 0.25, 0.35, -0.6))
+	ouvir.escutar = 14.0
+	ouvir.linha = load("res://narrative/narration/sono_disco.tres")
+	ouvir.fonografo = f
+
+
+## A máquina comercial de cilindro (Dia 3; e a mesma no sonho do disco, playtest
+## 10: lá era o modelo antigo), com a base em `alto` no espaço de `g`, a frente
+## (-Z local) para quem a usa: a caixa de carvalho, a placa preta, o mecanismo, a
+## manivela, a corneta de latão no guindaste. O cilindro de cera vai em
+## `cilindro` (um grupo dentro de `g`). Devolve a altura do topo da caixa.
+func _maquina_fonografo(g: Node3D, alto: float, cilindro: Node3D) -> float:
 	# A caixa de carvalho, com o rodapé, e a placa preta em cima.
 	var caixa_h := 0.15
 	var topo := alto + caixa_h
@@ -3649,7 +3691,6 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 	_box(g, "Carro", Vector3(0.03, 0.025, 0.08), Vector3(-0.05, topo + 0.09, 0.0), "ferro")
 	var boca := Vector3(-0.05, eixo_y + 0.06, -0.04)
 	_cyl(g, "Diafragma", 0.03, 0.03, 0.014, boca + Vector3(0, -0.012, 0), "latao", 12)
-	var cilindro := _grupo_se(g, "Cilindro", _flag(&"fono_cilindro"))
 	var cera := _cyl(cilindro, "Cera", 0.031, 0.031, 0.11, Vector3(-0.02, eixo_y, -0.04), "cinzas", 12)
 	cera.rotation_degrees.z = 90
 	# A manivela, do lado direito da caixa.
@@ -3694,37 +3735,7 @@ func _fonografo(parent: Node, dia3: Node3D) -> void:
 	var bg := _box(g, "BracoGuindaste", Vector3(0.012, 0.012, braco.length()), Vector3(haste.x, haste_alto, haste.z) + braco / 2, "ferro")
 	bg.rotation.y = atan2(braco.x, braco.z)
 	_box(g, "Corrente", Vector3(0.004, 0.17, 0.004), Vector3(meio_corneta.x, haste_alto - 0.085, meio_corneta.z), "ferro")
-	_colisao(g, "Colisao", [[Vector3(0.52, topo, 0.42), Vector3(0, topo / 2, 0)]])
-
-	var f := _area(g, Fonografo.new(), "Fonografo", Vector3(0.42, 0.3, 0.32), Vector3(0, topo + 0.05, 0)) as Fonografo
-	f.unique_name_in_owner = true
-	f.gravacao = load("res://narrative/gravacoes/disco_1915.tres")
-	f.gravacao_longa = load("res://narrative/gravacoes/disco_1915_longo.tres")
-	f.zumbido = _sfx("zumbido.wav")
-	f.narracao_depois = load("res://narrative/narration/depois_do_disco.tres")
-	f.luz = dia3.get_node("Abajur/Luz")
-	# O cilindro está à mão quando o estojo sai do pacote (a última peça).
-	f.cilindro_chegou = _cond_valor(&"correio_dia_3_tiradas", ValueCondition.Op.MAIOR_OU_IGUAL, 3)
-	var tremem: Array[Node3D] = []
-	for n in dia3.get_children():
-		if n.has_meta(&"treme"):
-			tremem.append(n)
-	f.tremer = tremem
-
-	# A noite do Dia 3: anotado o dia, ouvir o disco outra vez — ele baixa a
-	# agulha e vai ouvi-lo da poltrona, olhando a lareira fria; o sono vem com o
-	# disco (LugarSono). A área é maior que a do fonógrafo (ganha a mira) e só
-	# existe nessa noite.
-	var ouvir := _area(g, LugarSono.new(), "OuvirDeNovo", Vector3(0.56, 0.42, 0.46), Vector3(0, topo + 0.05, 0)) as LugarSono
-	ouvir.noite = 3
-	ouvir.prompt = "Ouvir o disco outra vez"
-	ouvir.condition = _cond_valor(&"sono", ValueCondition.Op.IGUAL, 3)
-	ouvir.assento = _assento_poltrona
-	ouvir.diante = _marca(parent as Node3D, "DianteDisco", g.position + Vector3(0.62, 0, 0))
-	ouvir.olhar = _marca(parent as Node3D, "OlharLareiraFria", Vector3(W - 0.25, 0.35, -0.6))
-	ouvir.escutar = 14.0
-	ouvir.linha = load("res://narrative/narration/sono_disco.tres")
-	ouvir.fonografo = f
+	return topo
 
 
 func _dia_1(parent: Node) -> void:

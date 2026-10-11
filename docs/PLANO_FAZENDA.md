@@ -58,8 +58,10 @@ usa ganha o acabamento primeiro.
 ## O roteiro do recorte — proposta para decidir (2026-10-10)
 Pedido do usuário depois do playtest 10: *"Precisamos primeiro decidir, antes de
 começar a mexer na fazenda, O QUE VAI SER FEITO lá. Para que possamos deixar tão
-excelente tanto os modelos como o storytelling da parte do escritório."* Nada da
-F3 em diante começa antes de este roteiro ser aprovado. Cada item: o que o jogador
+excelente tanto os modelos como o storytelling da parte do escritório."* **Aprovado
+em 2026-10-11** ("pode seguir"), com as recomendações: o ganido vem sempre (como no
+livro); as máscaras de gás saem da demo (são da carta de quarta); a vidraça que
+estoura vem anunciada, sem ser um jumpscare; a passagem do céu aos olhos de Akeley. Cada item: o que o jogador
 faz, o que vê e ouve, de onde vem no livro (📖) ou se é nosso (💭), e os modelos.
 
 **A ideia que amarra tudo:** o jogador **acabou de ler** a carta de segunda. Ele
@@ -129,10 +131,9 @@ Akeley."*
   como o balde.
 - **Brutus** deita diante da lareira; os outros ficam soltos no quintal, de guarda
   (📖 *"os cães todos correram"*: estavam fora).
-- ❓ **As máscaras de gás:** o GDD as põe aqui, mas o livro as dá na carta de
-  **quarta** (*"preparei máscaras para mim e para os cães"*): no domingo ainda não
-  existem. Recomendo tirá-las da demo (ou deixar só os produtos químicos na bancada,
-  sem nome).
+- ✅ **As máscaras de gás saem da demo:** o GDD as punha aqui, mas o livro as dá na
+  carta de **quarta** (*"preparei máscaras para mim e para os cães"*): no domingo
+  ainda não existem.
 
 ### 3. A espera (~1 min)
 - Sentar na poltrona junto ao fogo, o rifle no colo: o tempo passa como no
@@ -165,8 +166,8 @@ Cada frase da carta aparece na letra dele quando acontece.
    **alto, sozinho** (sem mira livre); cada tiro clareia o quintal por um quadro —
    árvores, a cerca, os cães correndo, **nada mais**. A alavanca, o cartucho
    que cai.
-9. ❓ **"acho que acertei um, mirando baixo demais"**: num dos tiros, no meio dos
-   latidos, um ganido que corta. O jogador sabe pela carta o que foi; Akeley ainda
+9. ✅ **"acho que acertei um, mirando baixo demais"**: num dos tiros, sempre, no
+   meio dos latidos, um ganido que corta. O jogador sabe pela carta o que foi; Akeley ainda
    não.
 10. *"Isso pareceu acabar com o assunto"*: os latidos param um a um. O silêncio.
     Escuro. → cartão do fim. (A manhã do sangue e da gosma, os cinco mortos: o jogo

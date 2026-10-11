@@ -20,6 +20,11 @@ const FAZENDA := "res://levels/fazenda/fazenda.tscn"
 const SONHO_DESCIDA := 4.0
 ## Onde a folha escrita deita para ser selada: no mata-borrão, o envelope à frente.
 const SELAGEM_POS := Vector3(0.05, 0.784, -2.2)
+## O correio que chega num lapso (playtest 10): as batidas, os passos, a fala.
+const SOM_BATIDAS := preload("res://audio/foley/batidas_porta.wav")
+const SONS_PASSO: Array[AudioStream] = [preload("res://audio/foley/passo_madeira_1.wav"),
+	preload("res://audio/foley/passo_madeira_2.wav"), preload("res://audio/foley/passo_madeira_3.wav")]
+const LINHA_BATERAM := preload("res://narrative/narration/correio_bateram.tres")
 const BEBIDA_CAFE := 1
 const BEBIDA_UISQUE := 2
 
@@ -344,16 +349,74 @@ func _on_reply_written(reply: ReplyData, _option: ReplyOption) -> void:
 	player.input_enabled = false
 	var selagem := Selagem.new()
 	var onde := Transform3D(Basis.IDENTITY, SELAGEM_POS)
+	var afastados := _abrir_espaco()
 	await selagem.tocar(miskatonic, onde, reply, player, som_papel, som_selo)
 	if not is_inside_tree():
 		return
 	CartaSaida.criar(miskatonic, reply)
 	selagem.queue_free()
+	_devolver(afastados)
 	# Selada, ele se levanta com a carta na mão.
 	player.stand()
 	selando = false
 	player.input_enabled = true
 	Narrator.say(reply.narracao_depois if reply.narracao_depois else linha_resposta_selada)
+
+
+## Antes de selar: o que está onde a folha dobra e o envelope pousa (a folha do
+## dia, no meio do mata-borrão desde o playtest 9; um envelope aberto na frente;
+## uma fotografia) vai para o fundo da mesa, numa pilha, e volta quando a carta
+## sobe à mão (playtest 10: a dobra atravessava as cartas). Devolve [nó, de onde].
+func _abrir_espaco() -> Array:
+	var zona := AABB(SELAGEM_POS + Vector3(-0.2, -0.03, -0.2), Vector3(0.45, 0.1, 0.56))
+	var candidatos: Array[Node3D] = []
+	var mesa := miskatonic.find_child("MesaDoDia", true, false) as MesaDoDia
+	if mesa:
+		candidatos.append_array(mesa.folhas)
+	for c: Node in miskatonic.find_children("*", "Correspondencia", true, false):
+		if c not in Correspondencia.na_mao:
+			candidatos.append((c as Correspondencia).get_visual())
+	for f: Node in miskatonic.find_children("*", "Fotografia", true, false):
+		candidatos.append(f as Node3D)
+	var afastados := []
+	for n in candidatos:
+		if n == null or not n.is_visible_in_tree() or not zona.has_point(n.global_position) or afastados.any(func(a: Array) -> bool: return a[0] == n):
+			continue
+		afastados.append([n, n.global_transform])
+	# A pilha: atravessada no fundo da mesa, atrás do mata-borrão — por cima de um
+	# envelope que já esteja lá.
+	var pilha := Vector3(SELAGEM_POS.x, SELAGEM_POS.y - 0.0005, -2.5)
+	for n in candidatos:
+		if n and n.is_visible_in_tree() and not afastados.any(func(a: Array) -> bool: return a[0] == n) \
+				and Vector2(n.global_position.x - pilha.x, n.global_position.z - pilha.z).length() < 0.2:
+			pilha.y = maxf(pilha.y, n.global_position.y + 0.007)
+	for i in afastados.size():
+		var n: Node3D = afastados[i][0]
+		var de: Transform3D = afastados[i][1]
+		var ate := Transform3D(Basis(Vector3.UP, deg_to_rad(88.0 + i * 5.0)), pilha + Vector3(0, i * 0.004, 0))
+		var t := n.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		t.tween_interval(0.15 * i)
+		t.tween_method(func(k: float) -> void:
+			var x := de.interpolate_with(ate, k)
+			x.origin.y += sin(k * PI) * 0.06
+			n.global_transform = x, 0.0, 1.0, 0.7)
+	return afastados
+
+
+## A pilha do fundo volta para onde estava, uma folha de cada vez.
+func _devolver(afastados: Array) -> void:
+	for i in afastados.size():
+		var n: Node3D = afastados[afastados.size() - 1 - i][0]
+		var para: Transform3D = afastados[afastados.size() - 1 - i][1]
+		if not is_instance_valid(n):
+			continue
+		var de := n.global_transform
+		var t := n.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		t.tween_interval(0.15 * i)
+		t.tween_method(func(k: float) -> void:
+			var x := de.interpolate_with(para, k)
+			x.origin.y += sin(k * PI) * 0.06
+			n.global_transform = x, 0.0, 1.0, 0.7)
 
 
 func _process(_delta: float) -> void:
@@ -554,10 +617,20 @@ func _on_anotar(_by: Node) -> void:
 ## Senta na cadeira da escrivaninha (onde o diário abre) e olha o tampo.
 func _sentar_a_mesa() -> void:
 	var sentar := diario.cadeira(player)
+	var olhar := diario.pagina() + Vector3(0.25, 0, 0)
+	# Longe da cadeira, ele vai até ela a pé, e só então senta (playtest 10: o
+	# corpo deslizava pela sala até a cadeira, "cropando o jogador para lá").
+	var atras := sentar + Vector3(0, 0, 0.4)
+	if Vector2(player.global_position.x - sentar.x, player.global_position.z - sentar.z).length() > 0.6:
+		if player.seated:
+			player.stand()
+		await player.conduzir([atras], olhar)
+		if not is_inside_tree():
+			return
 	var t := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(player, ^"global_position", sentar, 1.2)
+	t.tween_property(player, ^"global_position", sentar, 0.9)
 	player.seated = true
-	await player.olhar_para(diario.pagina() + Vector3(0.25, 0, 0), 1.4, sentar).finished
+	await player.olhar_para(olhar, 1.1, sentar).finished
 
 
 func _lugar_sono(noite: int) -> LugarSono:
@@ -721,6 +794,7 @@ func _fim_do_dia() -> void:
 	# Wilmarth de pé no alto da escada, chegando (Fase 3f).
 	lapso.desfazer_manha()
 	diario.repor()
+	bebida.repor()
 	calha.fechar_ja()
 	_saiu = false
 	_salto_pendente = null
@@ -1003,6 +1077,7 @@ func passar_tempo(cartao: NarrationLine) -> void:
 		if not is_inside_tree():
 			return
 	_cartao_no_lapso = true
+	var no_chao := _correio_no_chao()
 	if livro_estudo:
 		lapso.trecho.connect(livro_estudo.reagir)
 	await lapso.passar(de, ate, func() -> void:
@@ -1022,6 +1097,76 @@ func passar_tempo(cartao: NarrationLine) -> void:
 			return
 	player.input_enabled = true
 	em_lapso = false
+	if _correio_no_chao().any(func(c: Correspondencia) -> bool: return c not in no_chao):
+		_bateram_a_porta()
+
+
+## O que está caído junto à porta, esperando ser pego.
+func _correio_no_chao() -> Array[Correspondencia]:
+	var lista: Array[Correspondencia] = []
+	for c: Node in miskatonic.find_children("*", "Correspondencia", true, false):
+		var corr := c as Correspondencia
+		if corr.is_visible_in_tree() and corr.can_process() and corr.estado() == Correspondencia.NO_CHAO:
+			lista.append(corr)
+	return lista
+
+
+## Correio novo pela fresta durante um lapso (playtest 10: "não é intuitivo, pra
+## quem não sabe como o jogo funciona, a necessidade de olhar ali"): o contínuo
+## bate de leve, os passos se afastam pelo corredor e a sombra dos pés passa na
+## luz da fresta. Na primeira vez, o narrador diz o que foi.
+func _bateram_a_porta() -> void:
+	var porta_pos := calha.soleira + Vector3(0, 1.1, 0.05)
+	var batidas := AudioStreamPlayer3D.new()
+	batidas.stream = SOM_BATIDAS
+	batidas.bus = &"SFX"
+	batidas.volume_db = -4.0
+	add_child(batidas)
+	batidas.global_position = porta_pos
+	batidas.play()
+	batidas.finished.connect(batidas.queue_free)
+	await get_tree().create_timer(1.6).timeout
+	if not is_inside_tree():
+		return
+	# A sombra dos pés: a luz da fresta escurece, aos pedaços, da porta para oeste.
+	var luz := miskatonic.get_node_or_null(^"LuzCorredor") as Light3D
+	var fresta := miskatonic.get_node_or_null(^"Fresta") as Node3D
+	var sombra: MeshInstance3D = null
+	if fresta:
+		sombra = MeshInstance3D.new()
+		var q := QuadMesh.new()
+		q.size = Vector2(0.16, 0.014)
+		sombra.mesh = q
+		var preto := StandardMaterial3D.new()
+		preto.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		preto.albedo_color = Color.BLACK
+		sombra.material_override = preto
+		fresta.get_parent().add_child(sombra)
+		sombra.transform = fresta.transform.translated_local(Vector3(0.0, 0.0, 0.0015))
+	var energia := luz.light_energy if luz else 0.0
+	for k in 3:
+		var passo := AudioStreamPlayer3D.new()
+		passo.stream = SONS_PASSO[k % SONS_PASSO.size()]
+		passo.bus = &"SFX"
+		passo.volume_db = -8.0 - k * 5.0
+		add_child(passo)
+		passo.global_position = porta_pos + Vector3(-0.6 - k * 0.9, -1.0, 0.6)
+		passo.play()
+		passo.finished.connect(passo.queue_free)
+		if sombra:
+			sombra.position.x = fresta.position.x + 0.3 - k * 0.3
+		if luz:
+			luz.light_energy = energia * 0.45
+		await get_tree().create_timer(0.3).timeout
+		if luz:
+			luz.light_energy = energia
+		await get_tree().create_timer(0.25).timeout
+		if not is_inside_tree():
+			return
+	if sombra:
+		sombra.queue_free()
+	if not GameState.has_flag(LINHA_BATERAM.get_said_flag()):
+		Narrator.say(LINHA_BATERAM)
 
 
 func _ambiente_do_dia() -> Environment:

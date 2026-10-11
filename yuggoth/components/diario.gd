@@ -48,6 +48,8 @@ const PUXAO_DA_PENA := 0.3
 
 @export var som_pena: AudioStream
 @export var som_papel: AudioStream
+## A capa que bate fechando (playtest 10).
+@export var som_fechar: AudioStream
 ## A pena da mesa: vem para a página enquanto ele escreve.
 @export var pena: Node3D
 ## A lombada com o caderno aberto, diante da cadeira (no espaço do pai).
@@ -215,10 +217,17 @@ func _abrir(player: Player) -> void:
 	_acertar_pautas.call_deferred()
 	var lugar := get_parent_node_3d().global_transform * lugar_aberto
 	var sentar := cadeira(player)
+	# Longe, vai até a cadeira a pé antes de sentar (playtest 10).
+	if Vector2(player.global_position.x - sentar.x, player.global_position.z - sentar.z).length() > 0.6:
+		if player.seated:
+			player.stand()
+		await player.conduzir([sentar + lugar.basis.z * 0.4], lugar.origin)
+		if not is_inside_tree():
+			return
 	var t := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(player, ^"global_position", sentar, 1.2)
+	t.tween_property(player, ^"global_position", sentar, 0.9)
 	player.seated = true
-	await player.olhar_para(lugar.origin, 1.4, sentar).finished
+	await player.olhar_para(lugar.origin, 1.1, sentar).finished
 	if not is_inside_tree():
 		return
 
@@ -449,7 +458,16 @@ func fechar(player: Player) -> void:
 	# Ao contrário: as folhas voltam para a direita, a capa fecha por cima.
 	_mostrar_aberto(false)
 	await _animar_pose(1.0, 0.0, 1.0, true)
-	await _animar_pose(0.0, 0.0, 0.9)
+	# A capa: erguida devagar até em pé, e dali cai sobre o miolo (acelera no fim,
+	# como cai uma capa de verdade), com um baque surdo de couro.
+	await _animar_pose(0.5, 0.0, 0.6)
+	var cai := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	cai.tween_method(func(k: float) -> void: _pose(k, 0.0), 0.5, 0.0, 0.32)
+	await cai.finished
+	if som_fechar:
+		var baque := AudioDirector.play_sfx(som_fechar, -15.0)
+		baque.pitch_scale = 1.4
+	await get_tree().create_timer(0.25).timeout
 	t = _tween()
 	t.tween_property(self, ^"transform", _casa, 1.0)
 	await t.finished
@@ -645,12 +663,17 @@ func _pose(capa: float, folhas: float) -> void:
 	_k_capa = capa
 	_k_folhas = folhas
 	var direita := MIOLO * (2.0 - folhas)
-	var esquerda := MIOLO * folhas
+	# A pilha da esquerda acaba quando a última folha se ergue dela (a primeira das
+	# que correm, `folhas` < CORRER_JANELA), não no fim: fechando, a folha em branco
+	# sumia de uma vez sobre a guarda da capa (playtest 10, "dá uma bugada ao ficar
+	# na parte interna da capa"). E fica sempre acima da guarda.
+	var esquerda := MIOLO * clampf((folhas - CORRER_JANELA) / (1.0 - CORRER_JANELA), 0.0, 1.0)
+	var sobre_a_guarda := maxf(esquerda, 0.0008)
 	_bloco_dir.scale.y = direita
 	_bloco_esq.scale.y = maxf(esquerda, 0.0001)
-	_bloco_esq.visible = esquerda > 0.0003
+	_bloco_esq.visible = folhas >= CORRER_JANELA
 	_alto_dir.position.y = TABUA + direita
-	_alto_esq.position.y = TABUA + esquerda
+	_alto_esq.position.y = TABUA + sobre_a_guarda
 	_alto_esq.visible = _bloco_esq.visible
 	var angulo := PI * capa
 	var alto := TABUA + MIOLO * 2.0 + TABUA * 0.5
@@ -671,7 +694,7 @@ func _pose(capa: float, folhas: float) -> void:
 		if i == _correndo.size() - 1:
 			_alto_dir.material_override = _mat_vivo if p > 0.0 else _mat_branco
 		folha.rotation.z = PI * smoothstep(0.0, 1.0, p)
-		folha.position.y = lerpf(TABUA + direita, TABUA + esquerda, p) + 0.0004 + sin(p * PI) * 0.006
+		folha.position.y = lerpf(TABUA + direita, TABUA + sobre_a_guarda, p) + 0.0004 + sin(p * PI) * 0.006
 
 
 func _tween() -> Tween:

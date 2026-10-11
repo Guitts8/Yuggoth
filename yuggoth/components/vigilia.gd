@@ -217,6 +217,7 @@ func _on_esperar(_by: Node) -> void:
 	await _esc.abrir_livro()
 	if not is_inside_tree():
 		return
+	var no_chao := _esc._correio_no_chao()
 	if lapso:
 		await lapso.raiar(12.0, func() -> void:
 			if data_fim > 0:
@@ -235,3 +236,6 @@ func _on_esperar(_by: Node) -> void:
 	p.input_enabled = true
 	_esc.em_lapso = false
 	correndo = false
+	# A carta de quarta pela fresta: batem à porta (playtest 10).
+	if _esc._correio_no_chao().any(func(c: Correspondencia) -> bool: return c not in no_chao):
+		_esc._bateram_a_porta()
