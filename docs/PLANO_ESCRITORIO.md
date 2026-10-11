@@ -1104,7 +1104,7 @@ fazenda (`docs/PLANO_FAZENDA.md`). Testes: fumaça e caminhos com 0 falhas.
     corredor e a sombra dos pés passa na luz da fresta (`Escritorio._bateram_a_porta`);
     na primeira vez, o narrador: *"Bateram de leve à porta, e os passos do contínuo se
     afastaram pelo corredor. Junto à fresta, no chão, havia correspondência."*
-    (`correio_bateram`, ❓ texto a aprovar).
+    (`correio_bateram`; texto aprovado em 2026-10-11).
 11. ❓ **A passagem para a fazenda** — *"não dá para perceber, além daquelas
     ondulações imitando montanhas de desenho de criança; pensei numa transição que
     vem do céu até dar na visão de Akeley"*. Vai com o roteiro da fazenda

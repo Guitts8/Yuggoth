@@ -925,6 +925,7 @@ func _ready() -> void:
 		SceneDirector.clear_level()
 
 	await _fazenda()
+	await _f4_do_menu(main_menu)
 
 	# Paginar sem abrir (abrir marcaria `leu_<id>`); no fim, porque é um quadro longo.
 	var sozinhas := PackedStringArray()
@@ -1184,6 +1185,24 @@ func _fazenda() -> void:
 	await _andar(p, [Vector3(3.0, 0, 0.6), Vector3(-0.3, 0, 0.6), Vector3(-0.3, 0, -0.9), Vector3(5.0, 0, -0.9), Vector3(5.0, 0, 0.2),
 		Vector3(-2.0, 0, 0.2), Vector3(-5.0, 0, 0.0), Vector3(-15.0, 0, -6.0), Vector3(-15.0, 0, -12.0)], 120.0)
 	_check(p.global_position.y < 0.3 and p.global_position.z < -10.0, "fazenda: a escada abaixo, a porta dos fundos, o celeiro %s" % p.global_position)
+	SceneDirector.clear_level()
+
+
+## O botão de testes (F4): do menu, direto ao Interlúdio como Akeley, pulando o
+## escritório (pedido do usuário depois do playtest 10).
+func _f4_do_menu(main_menu: MainMenu) -> void:
+	var depuracao := get_node_or_null(^"/root/Depuracao")
+	if depuracao == null:
+		return
+	SceneDirector.clear_level()
+	main_menu.open()
+	await _frames(3)
+	await depuracao.interludio()
+	await _frames(3)
+	var faz := get_tree().root.find_child("Fazenda", true, false) as Fazenda
+	_check(faz != null and not main_menu.visible and GameState.has_flag(&"interludio") and GameState.get_value(&"data") == Lapso.dia_do_ano(9, 2),
+		"F4 do menu: direto ao Interlúdio, 2 de setembro")
+	_check(faz != null and faz.descendo and Narrator.voz == Narrator.Voz.AKELEY, "F4: como Akeley, com a descida do céu")
 	SceneDirector.clear_level()
 
 

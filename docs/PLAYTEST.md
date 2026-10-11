@@ -52,9 +52,8 @@ o que esperava.
 - [ ] **Boston:** sem "Voltar a Arkham" — descer a escada leva de volta.
 - [ ] **Sentar à mesa** (os lapsos lendo, o diário, selar): ele vai até a cadeira a pé.
 - [ ] **O correio depois dos lapsos:** batem à porta, os passos se afastam e a sombra
-      passa na fresta. Fica claro que chegou carta? A fala da primeira vez
-      (*"Bateram de leve à porta, e os passos do contínuo se afastaram pelo corredor.
-      Junto à fresta, no chão, havia correspondência."*) está boa?
+      passa na fresta. Fica claro que chegou carta? (A fala da primeira vez está
+      aprovada.)
 
 ## Conferido no playtest 10 (a Fase 3j, para não se perder)
 - [ ] **Os sons** do café (a tampa, o jorro, o gole, a xícara pousada), do uísque (a
@@ -76,8 +75,9 @@ A planta da fazenda (`docs/PLANO_FAZENDA.md`), ainda sem os cães nem os beats d
 Interlúdio. **O fim do Dia 6 mudou:** postada a última carta, a tinta não vai mais
 para o cartão do fim — ela se desfaz no céu do entardecer, e você está no quintal
 como Akeley, com o balde de ração; uns 45 segundos depois vem o cartão do fim (até
-os beats existirem). No build de teste, **F4** também leva ao quintal (só para andar:
-sem o balde nem o fim) e, de lá, F4 volta ao escritório.
+os beats existirem). No build de teste, **F4** vai direto ao Interlúdio como Akeley
+(de qualquer lugar, também do menu; `comandos.ps1 jogar-fazenda` já abre o jogo lá);
+**Shift+F4** leva ao quintal só para andar; na fazenda, F4 volta ao escritório.
 - [ ] **A passagem (refeita na F3, pedido do playtest 10):** a tinta seca em céu (sem
       os morros desenhados), a data escrita na letra de Akeley, e a câmera que desce do
       alto do vale até os olhos dele, diante do canil (dá para olhar em volta com o

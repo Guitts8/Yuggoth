@@ -199,6 +199,58 @@ param (o único momento calmo da fazenda: a regra dos pássaros vale).
 ~11 min: a passagem (0,5) + o entardecer (3–4) + a preparação (2) + a espera (1) +
 o telhado (4) + o fim.
 
+## A tratativa (2026-10-11): o recorte, decidido com o usuário
+Pedido do usuário: *"preciso que você faça uma tratativa comigo para a fazenda como
+fez para os dias, me faça perguntas sobre como vai ocorrer em cada um deles para
+construirmos, para que eu entenda o que está sendo feito e como vai seguir."* Quatro
+rodadas de perguntas; todas as respostas foram as recomendadas. Isto vale por cima do
+roteiro acima onde os dois divergirem.
+
+**1. O entardecer (a rotina, ~3–4 min)**
+- **A ração:** uma **gamela comprida** no cercado; "Pôr a ração" uma vez, ele despeja
+  andando ao longo dela e os doze vêm comer lado a lado.
+- **As tarefas** (todas): **buscar a lenha** (uma braçada do galpão até a lareira do
+  escritório), **fechar o celeiro** (o portão de correr, as galinhas recolhidas), **a
+  caixa de correio** junto à estrada (vazia, domingo; dali o vale e a mata), **a água do
+  poço** (encher o balde dos cães na bomba manual).
+- **Como se sabe o que fazer:** os cães latem pedindo a ração e olham o balde; Akeley
+  murmura uma linha curta quando uma tarefa falta, nas palavras das cartas.
+- **Yautja:** no fim da rotina, quando os pássaros param de uma vez, ele late para a
+  mata e dispara; "Chamar Yautja" só traz o silêncio.
+
+**2. A preparação (~2 min, no crepúsculo)**
+- **Os lampiões do térreo:** o escritório, o vestíbulo, a sala de estar e a cozinha.
+- **As venezianas do escritório e da sala**, fechadas de dentro; na hora dos tiros ele
+  abre uma fresta.
+- **O rifle:** no armário da sala dos fundos — pegar e carregar cartucho por cartucho
+  (umas três vezes E, a alavanca); fica diante da câmera, como o balde.
+- **Os cães à noite:** ele abre o cercado e eles ficam **soltos no quintal**, de guarda.
+
+**3. A espera e o começo da noite**
+- **A espera:** na poltrona junto ao fogo, o rifle no colo; o relógio, o lampião
+  baixando, as pálpebras pesam (as `Palpebras` do escritório) — **ele cochila e acorda
+  com o baque** no telhado.
+- **Dentro de casa: Brutus e Conan.** Brutus o segue por toda parte e entra junto;
+  Conan deita diante do fogo. Hércules (late para a mata), Rambo (rosna para a janela —
+  de fora, para a janela do escritório) e os outros, soltos lá fora.
+- **O telhado: só som e poeira.** O baque, a poeira do forro, o lampião balançando, as
+  unhas nas telhas, a briga que corre pelo teto. Nada visto.
+- **O cheiro:** a imagem lacrimeja e turva uns segundos, ele tosse e cobre o rosto, os
+  cães ganem; a frase da carta.
+
+**4. Os tiros e o fim**
+- **As balas:** anunciadas — os latidos viram para a frente da casa, um clarão longe na
+  mata — e a **vidraça do escritório estoura**, um estilhaço perto do rosto. Não é um
+  jumpscare.
+- **Os tiros: de janela em janela** (3 ou 4 pela casa): abre a fresta, "Atirar", o
+  cano sobe sozinho, alto; cada tiro clareia o quintal por um quadro (árvores, a cerca,
+  os cães correndo, nada mais); a alavanca, o cartucho que cai. Num deles, sempre, o
+  ganido.
+- **As falas da noite:** a carta de segunda, **frase por frase**, na letra de Akeley,
+  quando cada coisa acontece.
+- **O fim:** os latidos param um a um; ele no escuro, respirando; *"Isso pareceu acabar
+  com o assunto"*; o cartão *"Fim da demonstração. A história continua."*
+
 ## As fases (em ordem)
 1. ✅ **F1 — A planta em bloco** (2026-10-10, enquanto o usuário não podia jogar o
    playtest 10; commit `3e1c666`). `tools/gerar_fazenda.gd` (+ `.tscn`; `comandos.ps1 gerar-fazenda`)
@@ -312,7 +364,7 @@ o telhado (4) + o fim.
    - **A primeira fala**, quando ele se mexe (ou 5 s depois): *"Meus grandes cães
      policiais sempre os seguram, porque ainda há muito poucos deles por aqui."* (a 1ª
      carta: *"My great police dogs always hold them back, for there are very few here
-     as yet"*; `akeley_caes`, ❓ texto a aprovar).
+     as yet"*; `akeley_caes`; aprovado em 2026-10-11).
    - **Testes:** o de fumaça confere a câmera alta no começo da descida, a chegada aos
      olhos de Akeley, o passo, a respiração, a voz, o dossiê fechado e a voz de
      Wilmarth de volta no menu.
@@ -329,27 +381,33 @@ o telhado (4) + o fim.
    - ✅ **A presença:** os doze no cercado diante das baias ao entardecer, cada um na
      sua pose, quase todos virados para Akeley, que chega com o balde; Rambo olhando a
      mata (`gerar_fazenda._caes`).
-   - 🔧 **O comportamento:** o corpo (`CharacterBody3D`, colisão com as paredes),
-     seguir, ir até a gamela, deitar junto ao fogo, latir para a mata, rosnar para a
-     janela; os outros andam pelo cercado.
-   - 🔧 **Os sons:** latido, rosnado, ganido, comer, as patas no chão e nas telhas —
-     gravações CC0 (baixar pede a rede fora do sandbox). Um cão pastor provisório de primitivas (como o `Migo`), quatro
-   com nome e comportamento (seguir, deitar junto ao fogo, latir para a mata, rosnar
-   para a janela) numa máquina de estados simples; os outros, presença no canil e no
-   quintal (doze no começo, como no livro). O asset animado mais caro: manter simples.
-5. 🔧 **F5 — Beat 1, a rotina** (~3 min): alimentar os cães, recolher a lenha, trancar
-   o galpão; os pássaros que cantam e param.
-6. 🔧 **F6 — Beat 2, a preparação** (~2 min): fechar as venezianas, acender os
-   lampiões, carregar o rifle (diegético, sem mira livre); as máscaras de gás na
-   despensa (a carta de quarta).
-7. 🔧 **F7 — Beat 3, a noite do telhado** (~4–5 min): céu fechado, sem lua; depois
-   da meia-noite, algo pousa no telhado (só som e a poeira caindo do forro), os cães
-   correm, um sobe pelo puxado baixo, a briga lá em cima, o zumbido, o cheiro; balas
-   entram pela janela; **apagar a luz** e atirar das janelas, alto (uma interação,
-   no escuro; nunca se vê o que é atingido). Nenhum susto além dos dois do jogo.
-8. 🔧 **F8 — O fim da demo.** Depois dos tiros, o silêncio, e o cartão *"Fim da
-   demonstração. A história continua."* (sai do fim do Dia 6 e vem para cá); o
-   checkpoint no começo do Interlúdio; o teste de fumaça joga o recorte inteiro.
+   - 🔧 **O comportamento** (← **próximo**): cada cão com um corpo (`CharacterBody3D`,
+     colisão com as paredes e a tela) e uma máquina de estados simples: **Brutus**
+     segue Akeley a dois passos (e entra com ele); **Conan** vai deitar diante do fogo
+     quando a lareira acende; **Hércules** late para a mata; **Rambo** rosna para a
+     janela do escritório; os outros andam pelo cercado, deitam, sentam. Todos vêm à
+     gamela quando a ração cai; à noite, soltos no quintal.
+   - 🔧 **Os sons** (aprovado baixar, 2026-10-11): latido, rosnado, ganido, comer, as
+     patas no chão e nas telhas — gravações CC0, tratadas por `tools/tratar_sons.py`.
+5. 🔧 **F5 — Beat 1, a rotina** (~3–4 min; ver "A tratativa", 1): a gamela comprida,
+   a lenha do galpão até a lareira do escritório, o celeiro e as galinhas, a caixa de
+   correio vazia, a água do poço; os cães e as linhas curtas de Akeley guiando; os
+   pássaros que param, Yautja que dispara para a mata; a lua que as nuvens engolem.
+6. 🔧 **F6 — Beat 2, a preparação** (~2 min; "A tratativa", 2): os quatro lampiões do
+   térreo, as venezianas do escritório e da sala, o rifle carregado no armário, o
+   cercado aberto. Sem as máscaras de gás (são da carta de quarta).
+7. 🔧 **F7 — Beat 3, a noite do telhado** (~4–5 min; "A tratativa", 3 e 4): Brutus e
+   Conan dentro; a poltrona, o cochilo, o baque; só som e poeira; o zumbido; o cheiro
+   (olhos e tosse); a vidraça anunciada; apagar o lampião; de janela em janela, o cano
+   alto, os clarões; o ganido. As legendas, a carta de segunda frase por frase.
+   Nenhum susto além dos dois do jogo. Sons e modelos novos: o rifle, o lampião, o
+   vidro, o telhado.
+8. 🔧 **F8 — O fim da demo.** Os latidos param um a um, o escuro, *"Isso pareceu
+   acabar com o assunto"*, o cartão *"Fim da demonstração. A história continua."* (no
+   lugar do fim provisório de 45 s); o checkpoint no começo do Interlúdio; o teste de
+   fumaça joga o recorte inteiro.
+9. 🔧 **Depois: as fotografias do Dia 2** feitas das nossas cenas 3D (a casa com os
+   cães e Akeley, o círculo de pedras, a caverna) — playtest 10, item 4.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no

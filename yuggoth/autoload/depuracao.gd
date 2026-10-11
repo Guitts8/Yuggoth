@@ -8,8 +8,12 @@ extends Node
 ## manhã seguinte. No Prólogo, pula para o Dia 1. F3 recarrega o escritório no
 ## mesmo dia, do jeito que o estado está (destrava sem avançar). Longe de F5–F12:
 ## rodando pelo editor, o jogo repassa essas ao Godot (playtest 6: F8 é o "parar
-## o projeto", e fechava o jogo). F4 vai à fazenda de Akeley (docs/PLANO_FAZENDA.md,
-## ainda fora do roteiro: a planta para andar) e, de lá, volta ao escritório.
+## o projeto", e fechava o jogo). F4 vai direto ao Interlúdio, como Akeley
+## (docs/PLANO_FAZENDA.md; pedido do usuário: "um botão de testes para ir direto
+## para a parte da fazenda, pulando o escritório"), de qualquer lugar — também do
+## menu; na fazenda, F4 volta ao escritório. Shift+F4: a fazenda só para andar, sem
+## ser Akeley (sem o balde, a descida nem o fim). `comandos.ps1 jogar-fazenda` abre
+## o jogo já no Interlúdio (o argumento `--fazenda`).
 
 const VELOCIDADE := 8.0
 const TECLA := KEY_F
@@ -42,6 +46,10 @@ func _ready() -> void:
 	_aviso.add_theme_constant_override(&"outline_size", 6)
 	_aviso.hide()
 	camada.add_child(_aviso)
+	if "--fazenda" in OS.get_cmdline_user_args():
+		# O jogo abrindo: espera o menu chegar e vai direto ao Interlúdio.
+		await get_tree().create_timer(0.6).timeout
+		interludio()
 
 
 func _input(event: InputEvent) -> void:
@@ -58,7 +66,13 @@ func _input(event: InputEvent) -> void:
 		TECLA_RECARREGAR:
 			recarregar_dia()
 		TECLA_FAZENDA:
-			fazenda()
+			if tecla.shift_pressed:
+				fazenda()
+			elif SceneDirector.current_level == FAZENDA:
+				if _pode_mexer():
+					_abrir_escritorio("(teste) De volta ao escritório")
+			else:
+				interludio()
 
 
 func _process(_delta: float) -> void:
@@ -157,6 +171,32 @@ func fazenda() -> void:
 	_acelerando = false
 	await SceneDirector.change_level(FAZENDA, &"Quintal")
 	Events.notice_requested.emit("(teste) A fazenda de Akeley (F4 volta)")
+
+
+## O Interlúdio direto, como Akeley: o estado do fim do Dia 6 (a carta registrada
+## postada), 2 de setembro, e a fazenda com a descida do céu (sem a tinta). Do
+## menu, da pausa ou de qualquer fase.
+func interludio() -> void:
+	if SceneDirector.is_busy:
+		return
+	Engine.time_scale = 1.0
+	_acelerando = false
+	for nome in ["MainMenu", "PauseMenu"]:
+		var menu := get_tree().root.find_child(nome, true, false)
+		if menu and menu.visible and menu.has_method(&"close"):
+			menu.close()
+	for n in get_tree().root.get_children():
+		if n is TintaTransicao:
+			n.queue_free()
+	GameState.reset()
+	GameState.set_flag(&"prologo_concluido")
+	GameState.set_value(&"dia", ULTIMO_DIA)
+	for flag: StringName in [&"comecou_dia_6", &"leu_carta_akeley_quarta", &"escreveu_resposta_dia_6", &"interludio"]:
+		GameState.set_flag(flag)
+	GameState.set_value(&"resposta_dia_6", 1)
+	GameState.set_value(&"data", Lapso.dia_do_ano(9, 2))
+	await SceneDirector.change_level(FAZENDA, &"Entardecer")
+	Events.notice_requested.emit("(teste) O Interlúdio: Akeley, 2 de setembro (F4 volta ao escritório)")
 
 
 func _abrir(c: Correspondencia) -> void:

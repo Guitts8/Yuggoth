@@ -50,7 +50,9 @@ Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
 
   JOGAR
     jogar              abre o jogo (janela própria; F2 pula o dia, F3 recarrega,
-                       F4 vai à fazenda e volta)
+                       F4 vai direto ao Interlúdio como Akeley e volta;
+                       Shift+F4, a fazenda só para andar)
+    jogar-fazenda      abre o jogo já no Interlúdio (pula o escritório)
     jogar-log          abre o jogo e mostra o console (erros aparecem aqui)
     editor             abre o projeto no editor do Godot
 
@@ -122,6 +124,7 @@ switch ($acao) {
 	"ajuda" { Ajuda }
 	"jogar" { Start-Process $godotJanela -ArgumentList "--path", "`"$projeto`"" }
 	"jogar-log" { & $godot --path $projeto }
+	"jogar-fazenda" { Start-Process $godotJanela -ArgumentList "--path", "`"$projeto`"", "--", "--fazenda" }
 	"editor" { Start-Process $godotJanela -ArgumentList "-e", "--path", "`"$projeto`"" }
 	"teste" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/smoke_test.tscn") 600 "teste") }
 	"caminhos" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 1500 "caminhos") }

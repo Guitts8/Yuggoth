@@ -67,7 +67,8 @@ exportado):
 | **F** (segurar) | Acelera tudo 8× (falas, lapsos, sonhos, animações) |
 | **F2** | **Pula para o dia seguinte**: dá o dia corrente por feito (correio aberto, resposta escrita, dia anotado) e abre o escritório na manhã seguinte. No Prólogo, pula para o Dia 1. Não passa do Dia 6 (o último da demo). Feche janelas abertas antes |
 | **F3** | **Recarrega o dia**: abre o escritório de novo no mesmo dia, com o que já foi feito. Serve para destravar sem pular |
-| **F4** | **A fazenda de Akeley** (ainda fora do roteiro: a planta para andar, F1): vai ao quintal; de lá, F4 volta ao escritório no mesmo dia. A troca de fase salva: se sair do jogo na fazenda, Continuar volta a ela (F4 volta) |
+| **F4** | **Direto ao Interlúdio, como Akeley** (pula o escritório): de qualquer lugar, também do menu — o estado do fim do Dia 6, 2 de setembro, a descida do céu, o balde. Na fazenda, F4 volta ao escritório. A troca de fase salva: se sair do jogo na fazenda, Continuar volta a ela |
+| **Shift+F4** | A fazenda só para andar (sem ser Akeley: sem o balde, a descida nem o fim) |
 | C | Troca a vista da janela entre a cidade 3D e o painel antigo |
 
 ## Os comandos crus
