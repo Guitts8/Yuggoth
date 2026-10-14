@@ -521,8 +521,12 @@ fique BOM de VERDADE pois será o modelo mais usado durante todo o jogo."*
   (`_cozinha`): o fogão de ferro com o forno, a chapa e a chaminé, a pia de
   pedra-sabão com a bomba de mão, a mesa de pinho, o guarda-louça. Capturas:
   `SHOT_MODO=fazenda` com `SHOT_EXTRA`.
-- 🔧 **R3b — O exterior da casa:** beirais, telhado com telhas e cumeeira, chaminés,
-  a porta da frente, as janelas por fora.
+- 🔧 **R3b — O exterior (← próximo):** as árvores (hoje "cogumelos": refazer com
+  tronco afinando, galhos em dois níveis, copa de muitos tufos com o lado de baixo
+  mais escuro; olmos em vaso, bordos, macieiras, abetos de saias caídas), arbustos de
+  lilás junto da casa, tufos de capim; o celeiro com faixas brancas, a porta do
+  palheiro com moldura e cruz, o lanternim com cata-vento, os beirais; o galpão e o
+  telheiro do Ford com acabamento. (Visto em 2026-10-14: a casa por fora já está boa.)
 - 🔧 **R4 — As dependências e o quintal:** o canil, o galpão, o celeiro, a bomba, o
   moinho, as cercas, a estrada, o terreno.
 - 🔧 **R5 — Os objetos da preparação:** o lampião, o rifle, o telefone, o armário.

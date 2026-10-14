@@ -93,6 +93,10 @@ func _ready() -> void:
 		await _boston_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "queda":
+		await _queda_fazenda()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "guia":
 		await _guia_fotos()
 		get_tree().quit()
@@ -1153,3 +1157,35 @@ func _guia_fotos() -> void:
 		await _s(1.6)
 		print("GUIA ", v[0], " vis=", guia.visible, " em ", guia.global_position)
 		await _shot("%s_%s" % [tag, v[0]])
+
+
+## SHOT_MODO=queda: solta o jogador numa grade por toda a área andável da fazenda
+## e diz onde ele cai (buracos na colisão do terreno).
+func _queda_fazenda() -> void:
+	GameState.reset()
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Quintal", false)
+	await _s(1.0)
+	var faz := root.find_child("Fazenda", true, false) as Node3D
+	var p := faz.find_child("Player", true, false) as Player
+	var space := p.get_world_3d().direct_space_state
+	var buracos := 0
+	var x := -62.0
+	while x <= 33.0:
+		var z := -58.0
+		while z <= 38.0:
+			var q := PhysicsRayQueryParameters3D.create(Vector3(x, 60, z), Vector3(x, -60, z), 1)
+			var r := space.intersect_ray(q)
+			if r.is_empty():
+				buracos += 1
+				print("BURACO sem chão em ", Vector2(x, z))
+			z += 2.0
+		x += 2.0
+	print("QUEDA buracos: ", buracos)
+	# Soltar o jogador de verdade em pontos da beira oeste e ver onde ele para.
+	for pt: Vector3 in [Vector3(-30, 0, -6), Vector3(-30, 0.5, -6), Vector3(-34, 0, 0), Vector3(-40, 0, -10), Vector3(-28, 0, 4)]:
+		p.global_position = pt
+		p.velocity = Vector3.ZERO
+		await _s(1.5)
+		var q := PhysicsRayQueryParameters3D.create(Vector3(pt.x, 60, pt.z), Vector3(pt.x, -60, pt.z), 1)
+		var r := space.intersect_ray(q)
+		print("SOLTO em ", pt, " parou em ", p.global_position.snappedf(0.01), " chao ", r.get("position", "nada"), " ", r.get("collider", null))
