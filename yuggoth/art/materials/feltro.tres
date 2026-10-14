@@ -1,16 +1,16 @@
 [gd_resource type="ShaderMaterial" format=3]
 
 [ext_resource type="Shader" path="res://shaders/psx_lit.gdshader" id="1_nmiew"]
-[ext_resource type="Texture2D" path="res://art/textures/estofado.png" id="2_nmiew"]
+[ext_resource type="Texture2D" path="res://art/textures/feltro.png" id="2_44mhx"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_nmiew")
-shader_parameter/albedo_tex = ExtResource("2_nmiew")
-shader_parameter/albedo_color = Color(0.55, 0.78, 0.55, 1)
+shader_parameter/albedo_tex = ExtResource("2_44mhx")
+shader_parameter/albedo_color = null
 shader_parameter/uv_scale = null
 shader_parameter/world_uv = true
-shader_parameter/tiles_per_meter = 3.0
+shader_parameter/tiles_per_meter = 4.0
 shader_parameter/snap_scale = null
 shader_parameter/affine_near = null
 shader_parameter/affine_far = null

@@ -128,7 +128,7 @@ func _ready() -> void:
 	ResourceSaver.save(m["capim"], MAT_DIR + "capim.tres")
 	_mat("estofado_vinho", "estofado", {world = 3.0, cor = Color(1.6, 0.75, 0.7)})
 	_mat("couro", "capa_livro", {world = 3.0, cor = Color(0.8, 0.55, 0.42)})
-	_mat("feltro", "estofado", {world = 3.0, cor = Color(0.55, 0.78, 0.55)})
+	_mat("feltro_verde", "estofado", {world = 3.0, cor = Color(0.55, 0.78, 0.55)})
 	_mat("tapete_trancado", "tapete_trancado", {})
 	(m["tapete_trancado"] as ShaderMaterial).set_shader_parameter(&"alpha_cut", 0.5)
 	ResourceSaver.save(m["tapete_trancado"], MAT_DIR + "tapete_trancado.tres")
@@ -1284,7 +1284,7 @@ func _armario_rifles(p: Vector3) -> void:
 	_parte(m, Vector3(1.3, 0.04, 0.1), Vector3(0, 1.45, 0.1), p, giro, Color(1.15, 1.15, 1.15))
 	# Playtest 11 (R5): o fundo forrado de feltro verde, a cimalha com o frontão, a
 	# travessa de cada porta de vidro.
-	_parte("feltro", Vector3(1.3, 1.38, 0.01), Vector3(0, 1.2, 0.15), p, giro)
+	_parte("feltro_verde", Vector3(1.3, 1.38, 0.01), Vector3(0, 1.2, 0.15), p, giro)
 	_parte(m, Vector3(1.4, 0.12, 0.03), Vector3(0, 2.04, -0.2), p, giro, Color(1.1, 1.1, 1.1))
 	_parte(m, Vector3(1.56, 0.03, 0.5), Vector3(0, 1.995, -0.02), p, giro)
 	for sx: float in [-1.0, 1.0]:
