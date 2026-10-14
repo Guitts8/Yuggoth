@@ -176,6 +176,10 @@ func _pensar() -> void:
 		Matilha.Modo.SOLTOS:
 			if papel == Papel.SEGUIR and akeley:
 				_seguir(akeley)
+			elif papel == Papel.FOGO and matilha.fogo != Vector3.INF:
+				_ir_deitar(matilha.fogo, akeley)
+			elif papel == Papel.JANELA:
+				_rosnar_para_a_janela(akeley)
 			elif papel == Papel.MATA and _rng.randf() < 0.5:
 				_vigiar_a_mata(true)
 			else:
@@ -190,9 +194,7 @@ func _seguir(akeley: Player) -> void:
 	_olhar_para = de
 	# Preso para trás (uma parede, a escada): longe e fora da vista, ele chega.
 	if longe > 14.0:
-		var cam := akeley.camera
-		var visto := (global_position - cam.global_position).normalized().dot(-cam.global_basis.z) > 0.3
-		if not visto:
+		if not _ve(akeley.camera, global_position):
 			global_position = atras + Vector3(0, 0.1, 0)
 			velocity = Vector3.ZERO
 			return
@@ -203,6 +205,64 @@ func _seguir(akeley: Player) -> void:
 		_alvo = Vector3.INF
 		var parado := Vector2(akeley.velocity.x, akeley.velocity.z).length() < 0.1
 		_pose(Cao.Pose.SENTADO if parado and _rng.randf() < 0.6 else Cao.Pose.PARADO)
+
+
+## Chega a `p` sem ser visto se estiver longe (a casa tem paredes; não há
+## navegação): fora da vista de Akeley, aparece lá. Devolve se já chegou.
+func _chegar(p: Vector3, akeley: Player) -> bool:
+	if global_position.distance_to(p) < 0.6:
+		return true
+	if akeley and global_position.distance_to(p) > 4.0:
+		var cam := akeley.camera
+		var la_ve := cam.global_position.distance_to(p) < 12.0 and _ve(cam, p)
+		if not _ve(cam, global_position) and not la_ve:
+			global_position = p + Vector3(0, 0.05, 0)
+			velocity = Vector3.ZERO
+			return true
+	_ir(p, PASSO)
+	return false
+
+
+## Akeley vê `ponto`: à frente dele e sem parede no meio (as paredes da casa
+## escondem; sem isso, um cão do outro lado da parede contava como visto).
+func _ve(cam: Camera3D, ponto: Vector3) -> bool:
+	var alvo := ponto + Vector3.UP * 0.4
+	if (alvo - cam.global_position).normalized().dot(-cam.global_basis.z) <= 0.3:
+		return false
+	var q := PhysicsRayQueryParameters3D.create(cam.global_position, alvo, 1)
+	return get_world_3d().direct_space_state.intersect_ray(q).is_empty()
+
+
+## Conan: deita diante do fogo aceso, a cabeça para o calor. Fora da casa, entra
+## pela porta do escritório (aparece ali sem ser visto) e anda até o fogo.
+func _ir_deitar(p: Vector3, akeley: Player) -> void:
+	_olhar_para = p + Vector3(-1, 0, 0)
+	var porta := matilha.porta_do_fogo
+	var dentro := absf(global_position.y - p.y) < 0.3 and global_position.distance_to(p) < 4.5
+	if porta != Vector3.INF and not dentro and global_position.distance_to(porta) > 0.6:
+		if _chegar(porta, akeley):
+			_pose(Cao.Pose.PARADO)
+			return
+	if _chegar(p, akeley):
+		_alvo = Vector3.INF
+		_pose(Cao.Pose.DEITADO)
+	else:
+		_pose(Cao.Pose.PARADO)
+
+
+## Rambo, à noite: do lado de fora, diante da janela do escritório, rosnando
+## baixo para ela (GDD §5.1a).
+func _rosnar_para_a_janela(akeley: Player) -> void:
+	_olhar_para = matilha.janela
+	if _chegar(matilha.diante_da_janela, akeley):
+		_alvo = Vector3.INF
+		if _rng.randf() < 0.3:
+			_pose(Cao.Pose.ROSNANDO)
+			_som(matilha.rosnado if _rng.randf() < 0.7 else matilha.arreganho, -12.0)
+		else:
+			_pose(Cao.Pose.PARADO)
+	else:
+		_pose(Cao.Pose.PARADO)
 
 
 ## Na tela do cercado, do lado de Akeley: olham o balde, latem pedindo, sentam.

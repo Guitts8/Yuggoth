@@ -116,9 +116,13 @@ func pular_dia() -> void:
 	if SceneDirector.current_level == FAZENDA:
 		var faz := get_tree().root.find_child("Fazenda", true, false)
 		var rotina := faz.get("rotina") as Rotina if faz else null
-		if rotina:
+		var prep := faz.get("preparacao") as Preparacao if faz else null
+		if rotina and rotina.etapa != Rotina.Etapa.FIM:
 			rotina.pular()
 			Events.notice_requested.emit("(teste) Rotina do entardecer pulada")
+		elif prep and not prep.feita:
+			prep.pular()
+			Events.notice_requested.emit("(teste) Preparação para a noite pulada")
 		return
 	if n >= ULTIMO_DIA:
 		Events.notice_requested.emit("(teste) O Dia %d é o último da demo." % n)

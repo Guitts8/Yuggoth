@@ -1112,6 +1112,39 @@ fazenda (`docs/PLANO_FAZENDA.md`). Testes: fumaça e caminhos com 0 falhas.
     decidir antes de mexer lá — aprovado com as recomendações ("pode seguir",
     2026-10-11); entra na F3 da fazenda.
 
+## Fase 3l — Ajustes do playtest 11 (2026-10-14)
+O usuário jogou o playtest 11 (o escritório inteiro e a fazenda até a F5). Pedido
+junto: continuar a F6 da fazenda, que ficara sem commit. Legenda: ✅ feito · 🔧 claro,
+a fazer · ❓ espera resposta. Os itens da fazenda (13) estão em `docs/PLANO_FAZENDA.md`.
+
+1. 🔧 **O mapa de Vermont** — *"alguns glitchs visuais acontecem no mapa"*.
+2. 🔧 **A união do escritório com o corredor** — glitches visuais na porta.
+3. 🔧 **O diário: abrir, fechar e as folhas** — *"essas aberturas e fechadas estão
+   estranhas; você escreve em uma folha até o final, vira a página, e o que você
+   escreveu está na página virada"*. Antes de o usuário fazer a animação à mão, refazê-la
+   da melhor forma possível.
+4. 🔧 **A segunda carta de Akeley** — *"bastante difícil de ler"*.
+5. 🔧 **A transcrição do disco** — os títulos e subtítulos difíceis de ler: *"essa
+   grafia é interessante, mas não pode interferir na leitura"*.
+6. 🔧 **Os grilos da noite 3** (o sonho do disco) — *"MUITO alto e incomoda; rouba
+   muito do sentimento"*.
+7. 🔧 **O mi-go de pé** no sonho do disco — *"não vi, do lado esquerdo"*.
+8. 🔧 **A arrumação das folhas na mesa** (`MesaDoDia`) — *"um pouco incômodo; achar
+   uma forma melhor"*.
+9. 🔧 **O lapso lendo:** as folhas do livro ficam brancas e se escrevem na frente dele —
+   *"já deve estar lá a escrita ao virar a página"*.
+10. 🔧 **A noite de Boston:** não cortar para o corredor da pensão; *"sair do escritório
+    e AÍ SIM ir parar no corredor em Boston"*.
+11. 🔧 **Os modelos do cultista, do funcionário do expresso e dos mi-go** — *"terei que
+    fazê-los para ficarem bons e impressionantes, a menos que você não tenha tentado
+    muito"*. Tentar de verdade antes de o usuário modelar.
+12. 🔧 **Os lapsos de vários dias:** o livro não troca — *"só fecha a capa e abre o mesmo
+    livro"*.
+13. 🔧 **A fazenda** (ver `docs/PLANO_FAZENDA.md`, "O playtest 11"): uma luz azul fraca
+    sobre para onde ir; e o modelo da fazenda refeito com acabamento — lugares onde não
+    se passa, peças toscas — *"precisa ficar BOM de VERDADE, será o modelo mais usado
+    durante todo o jogo"*.
+
 ## Onde estamos (revisão de 2026-10-09, depois da 3h)
 **Ok (feito e commitado):** fases 1, 2, 3, 3b, 3c, a passagem para o sonho, a 3d, a
 3e, a 3f, a 3g e a **3h** (itens 1–7). Teste de fumaça com 0 falhas. Tudo enviado

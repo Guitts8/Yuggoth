@@ -193,9 +193,12 @@ func _racao(p: Player) -> void:
 	t.tween_property(balde, ^"rotacao", de, 0.6)
 	await t.finished
 	# Comem uns vinte segundos; então, à toa no cercado.
-	get_tree().create_timer(22.0, false).timeout.connect(func() -> void:
-		if matilha.modo == Matilha.Modo.COMENDO:
-			matilha.modo = Matilha.Modo.DEPOIS)
+	get_tree().create_timer(22.0, false).timeout.connect(_fim_de_comer)
+
+
+func _fim_de_comer() -> void:
+	if matilha.modo == Matilha.Modo.COMENDO:
+		matilha.modo = Matilha.Modo.DEPOIS
 
 
 ## A bomba do poço: a alavanca, a água no balde.
@@ -309,9 +312,7 @@ func _chamar_yautja() -> void:
 	_chamar.position = Vector3(0, 0, -1.2)
 	_chamar.interacted.connect(func(_by: Node) -> void: _chamado())
 	# Sem chamar, em meio minuto acaba do mesmo jeito.
-	get_tree().create_timer(30.0, false).timeout.connect(func() -> void:
-		if etapa == Etapa.CHAMAR:
-			_chamado())
+	get_tree().create_timer(30.0, false).timeout.connect(_chamado)
 
 
 func _chamado() -> void:

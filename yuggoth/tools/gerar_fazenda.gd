@@ -150,6 +150,7 @@ func _ready() -> void:
 	_moinho()
 	_arvores()
 	_rotina()
+	_preparacao()
 	_fechar_obras()
 	_colisao(cena, "Colisao", _col)
 
@@ -1262,7 +1263,15 @@ func _canil() -> void:
 	_tela(cantos[1], cantos[2])
 	_tela(Vector2(0.4, fz), Vector2(x.y, fz))
 	_tela(Vector2(x.y, fz), Vector2(x.y, z.y))
-	_bloco("madeira_escura", Vector3(1.3, 1.1, 0.05), Vector3(-1.0, 0.65, fz + 0.65), Color.WHITE, false, Vector3(0, 90, 0))
+	# A porteira, fechada (F6: "Abrir a porteira" a gira para dentro do cercado e
+	# os cães ficam soltos): a dobradiça na ponta oeste do vão.
+	var porteira := _group(cena, "Porteira", Vector3(-1.0, 0, fz))
+	for k in 3:
+		_box(porteira, "Tabua%d" % k, Vector3(1.3, 0.1, 0.04), Vector3(0.65, 0.3 + k * 0.35, 0), "madeira_escura")
+	for xx: float in [0.05, 1.25]:
+		_box(porteira, "Montante%d" % int(xx), Vector3(0.08, 1.1, 0.05), Vector3(xx, 0.6, 0), "madeira_escura")
+	var diag := _box(porteira, "Diagonal", Vector3(1.4, 0.08, 0.035), Vector3(0.65, 0.65, 0.01), "madeira_escura")
+	diag.rotation_degrees.z = 32.0
 	_caes(x, Vector2(z.y + 0.6, fz - 0.5))
 
 
@@ -1414,6 +1423,257 @@ func _rotina() -> void:
 	r.linha_yautja = load("res://narrative/narration/akeley_yautja.tres")
 	r.linha_chamar = load("res://narrative/narration/akeley_chamar.tres")
 	r.linha_nao_voltou = load("res://narrative/narration/akeley_nao_voltou.tres")
+
+
+## A preparação para a noite (F6; "A tratativa", 2): os lampiões de querosene dos
+## quatro cômodos do térreo, as venezianas do escritório e da sala (áreas por
+## dentro de cada janela), o rifle de repetição no armário da sala dos fundos e a
+## munição na bancada, o telefone de parede do vestíbulo, o fogo da lareira do
+## escritório (a lenha da rotina), a lua e as nuvens; e a `Preparacao`.
+func _preparacao() -> void:
+	var g := _group(cena, "PreparacaoPecas")
+	var caes := cena.get_node("Caes") as Matilha
+	var chama_tex: Texture2D = load("res://art/textures/chama.png")
+	var mat_chama := StandardMaterial3D.new()
+	mat_chama.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_chama.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	mat_chama.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+	mat_chama.billboard_keep_scale = true
+	mat_chama.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	mat_chama.albedo_texture = chama_tex
+
+	# Os lampiões: o pé de latão, o depósito, o colarinho, a chaminé de vidro, a
+	# chama no pavio e a luz quente.
+	var lampioes: Array[Lampiao] = []
+	var lugares := [["Escritorio", Vector3(5.45, T0 + 0.78, 3.25), true], ["Vestibulo", Vector3(0.6, T0 + 0.8, 1.0), false],
+		["SalaEstar", Vector3(3.6, T0 + 0.45, -3.8), false], ["Cozinha", Vector3(-5.8, T0 + 0.75, 3.2), false]]
+	for l: Array in lugares:
+		var lp := _area(g, Lampiao.new(), "Lampiao%s" % l[0], Vector3(0.3, 0.5, 0.3), l[1] + Vector3(0, 0.22, 0)) as Lampiao
+		var forma := lp.get_child(0) as Node3D
+		forma.position = Vector3.ZERO
+		_cyl(lp, "Pe", 0.07, 0.085, 0.03, Vector3(0, -0.205, 0), "latao", 10)
+		_cyl(lp, "Deposito", 0.055, 0.075, 0.1, Vector3(0, -0.14, 0), "latao", 10)
+		_cyl(lp, "Colarinho", 0.03, 0.045, 0.03, Vector3(0, -0.075, 0), "latao", 8)
+		var vidro := _cyl(lp, "Vidro", 0.03, 0.045, 0.2, Vector3(0, 0.04, 0), "vidro_fazenda", 10)
+		var q := QuadMesh.new()
+		q.size = Vector2(0.035, 0.06)
+		q.center_offset = Vector3(0, 0.03, 0)
+		q.material = mat_chama
+		var chama := MeshInstance3D.new()
+		chama.name = "Chama"
+		chama.mesh = q
+		chama.position = Vector3(0, -0.04, 0)
+		chama.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_add(lp, chama)
+		var luz := _omni(lp, "Luz", Vector3(0, 0.05, 0), Color(1.0, 0.72, 0.42), 1.4, 6.5)
+		luz.shadow_enabled = l[2]
+		luz.omni_attenuation = 1.3
+		lp.luz = luz
+		lp.chama = chama
+		lp.vidro = vidro
+		lp.vidro_aceso = m["vidro_aceso"]
+		lp.vidro_apagado = m["vidro_fazenda"]
+		lp.apagavel = false
+		lp.som_fosforo = _sfx("fosforo.wav")
+		lp.som_vidro = _sfx("lampiao.wav")
+		lampioes.append(lp)
+
+	# As venezianas: o escritório (sudeste) e a sala de estar (nordeste), térreo.
+	var janelas := {0: Vector3.RIGHT, 2: Vector3.RIGHT, 15: Vector3.FORWARD, 17: Vector3.FORWARD,
+		4: Vector3.RIGHT, 6: Vector3.RIGHT, 21: Vector3.BACK, 23: Vector3.BACK}
+	var venezianas: Array[Venezianas] = []
+	for n: int in janelas:
+		var jn := cena.get_node("Janelas/Janela%d" % n) as Node3D
+		var fora: Vector3 = janelas[n]
+		var ao_longo := Vector3(-fora.z, 0, fora.x).abs()
+		var tam := ao_longo * 1.0 + fora.abs() * 0.4 + Vector3.UP * 1.4
+		var v := _area(g, Venezianas.new(), "FecharJanela%d" % n, tam, jn.position - fora * 0.45) as Venezianas
+		var folhas: Array[Node3D] = [jn.get_node("VenezianaA"), jn.get_node("VenezianaB")]
+		v.folhas = folhas
+		v.som = _sfx("veneziana.wav")
+		venezianas.append(v)
+
+	# O rifle de repetição de caça grossa: no armário, em pé; e na mão (NaMao).
+	var no_armario := _group(g, "RifleArmario", Vector3(-1.25, T0 + 0.25, -5.27))
+	_rifle(no_armario)
+	no_armario.rotation_degrees = Vector3(-88, 0, 0)
+	var rifle := Node3D.new()
+	rifle.name = "Rifle"
+	rifle.set_script(load("res://components/na_mao.gd"))
+	_add(cena, rifle)
+	rifle.set("posicao", Vector3(0.24, -0.34, -0.5))
+	rifle.set("rotacao", Vector3(4, 8, 0))
+	var corpo := _group(rifle, "Corpo")
+	_rifle(corpo)
+	corpo.position = Vector3(0, 0, 0.45)
+	for c in corpo.find_children("*", "MeshInstance3D", true, false):
+		(c as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var luz_r := _omni(rifle, "Luz", Vector3(-0.2, 0.3, 0.3), Color(1.0, 0.82, 0.66), 0.35, 0.9)
+	luz_r.light_cull_mask = 1
+	# A munição na bancada: as caixas de cartuchos.
+	for k in 3:
+		_bloco("papelao_escuro", Vector3(0.16, 0.07, 0.1), Vector3(-2.3 + (k - 1) * 0.18, T0 + 0.885 + (k % 2) * 0.0, -3.2), Color(1.1, 0.9, 0.7), false)
+	var pegar_rifle := _area(g, Interactable.new(), "PegarRifle", Vector3(1.4, 1.6, 0.45), Vector3(-1.0, T0 + 1.0, -5.15)) as Interactable
+	pegar_rifle.prompt = "Pegar o rifle"
+	var carregar := _area(g, Interactable.new(), "CarregarRifle", Vector3(0.6, 0.3, 0.4), Vector3(-2.3, T0 + 0.95, -3.2)) as Interactable
+	carregar.prompt = "Carregar o rifle"
+
+	# O telefone de parede do vestíbulo (a linha que eles cortam).
+	var tel := _group(g, "Telefone", Vector3(2.4, T0 + 1.45, HALL_Z - EI / 2 - 0.06))
+	_box(tel, "Caixa", Vector3(0.24, 0.42, 0.1), Vector3.ZERO, "madeira_escura")
+	for s: float in [-1.0, 1.0]:
+		_cyl(tel, "Campainha%d" % int(s + 1), 0.035, 0.035, 0.02, Vector3(s * 0.05, 0.14, -0.06), "latao", 10).rotation_degrees.x = 90
+	_cyl(tel, "Bocal", 0.02, 0.03, 0.08, Vector3(0, 0.02, -0.09), "esmalte_preto", 8).rotation_degrees.x = 90
+	_cyl(tel, "Fone", 0.018, 0.022, 0.12, Vector3(-0.15, -0.02, -0.03), "esmalte_preto", 8)
+	var telefone := _area(g, Interactable.new(), "TirarFone", Vector3(0.4, 0.5, 0.25), tel.position + Vector3(0, 0, -0.08)) as Interactable
+	telefone.prompt = "Tirar o fone do gancho"
+
+	# O fogo da lareira do escritório (sobre a lenha da rotina).
+	var boca := Vector3(MEIO_X + CHAMINE_MEIA.x + 0.1, T0 + 0.11, CHAMINE_Z)
+	var acender := _area(g, AcenderLareira.new(), "AcenderLareira", Vector3(0.5, 0.8, 1.0), boca + Vector3(0.1, 0.35, 0)) as AcenderLareira
+	acender.prompt = "Acender a lareira"
+	acender.ajoelhar = boca + Vector3(0.85, -0.11, 0)
+	acender.lenha = boca
+	acender.chama = chama_tex
+	acender.som_riscar = _sfx("fosforo.wav")
+	acender.changes = {Preparacao.FLAG_LAREIRA: 1.0}
+	acender.additive = false
+	acender.condition = _flag(Preparacao.FLAG_LAREIRA, true)
+	var aceso := _grupo_se(g, "FogoLareira", _flag(Preparacao.FLAG_LAREIRA))
+	var fogo := Fogo.new()
+	fogo.name = "Chamas"
+	fogo.position = boca + Vector3(0, 0.02, 0)
+	_add(aceso, fogo)
+	var chamas: Array[Node3D] = []
+	for k in 5:
+		var q := QuadMesh.new()
+		q.size = Vector2(0.16, 0.3)
+		q.center_offset = Vector3(0, 0.15, 0)
+		q.material = mat_chama
+		var mi := MeshInstance3D.new()
+		mi.name = "Chama%d" % k
+		mi.mesh = q
+		mi.position = Vector3(0, 0.02, -0.18 + k * 0.09)
+		mi.scale = Vector3.ONE * (0.75 + 0.4 * sin(k * 1.9 + 0.4) ** 2)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_add(fogo, mi)
+		chamas.append(mi)
+	fogo.chamas = chamas
+	acender.fogo = fogo
+	var luz_f := _omni(fogo, "Luz", Vector3(0.35, 0.35, 0), Color(1.0, 0.58, 0.28), 2.2, 6.0)
+	luz_f.shadow_enabled = true
+	luz_f.omni_attenuation = 1.2
+	fogo.luz = luz_f
+	fogo.energia = 2.2
+	var crepitar := AudioStreamPlayer3D.new()
+	crepitar.name = "Crepitar"
+	crepitar.stream = _sfx("lareira.wav")
+	crepitar.autoplay = true
+	crepitar.bus = &"Ambience"
+	_add(fogo, crepitar)
+
+	# A porteira do cercado.
+	var soltar := _area(g, Interactable.new(), "AbrirPorteira", Vector3(1.4, 1.2, 0.6), Vector3(-0.35, 0.7, -6.85)) as Interactable
+	soltar.prompt = "Abrir a porteira (soltar os cães)"
+
+	# A lua cheia (longe, a leste, atrás dos morros) e as nuvens que a engolem: sem
+	# névoa (estão no céu), sem luz.
+	var lua := MeshInstance3D.new()
+	lua.name = "Lua"
+	var esfera := SphereMesh.new()
+	esfera.radius = 22.0
+	esfera.height = 44.0
+	esfera.radial_segments = 16
+	esfera.rings = 8
+	lua.mesh = esfera
+	var mat_lua := StandardMaterial3D.new()
+	mat_lua.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_lua.albedo_color = Color(0.95, 0.92, 0.78)
+	mat_lua.disable_fog = true
+	lua.material_override = mat_lua
+	lua.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_add(cena, lua)
+	# As nuvens: um banco de bolhas achatadas, escuras como o céu da noite, que
+	# corre do norte e passa diante da lua (sem arestas: eram retângulos).
+	var nuvens := _group(cena, "Nuvens")
+	var mat_n := StandardMaterial3D.new()
+	mat_n.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_n.albedo_color = Color(0.05, 0.05, 0.07)
+	mat_n.disable_fog = true
+	var rng_n := RandomNumberGenerator.new()
+	rng_n.seed = 77
+	for k in 14:
+		var mi := MeshInstance3D.new()
+		mi.name = "Nuvem%d" % k
+		var bolha := SphereMesh.new()
+		var r := rng_n.randf_range(45.0, 85.0)
+		bolha.radius = r
+		bolha.height = r * 2.0
+		bolha.radial_segments = 12
+		bolha.rings = 6
+		mi.mesh = bolha
+		mi.material_override = mat_n
+		mi.position = Vector3(rng_n.randf_range(-30.0, 30.0), rng_n.randf_range(-50.0, 50.0), k * 55.0 - 380.0)
+		mi.scale = Vector3(0.6, rng_n.randf_range(0.3, 0.5), 1.0)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_add(nuvens, mi)
+
+	var p := Preparacao.new()
+	p.name = "Preparacao"
+	_add(cena, p)
+	p.matilha = caes
+	p.lampioes = lampioes
+	p.venezianas = venezianas
+	p.rifle = rifle as NaMao
+	p.rifle_armario = no_armario
+	p.pegar_rifle = pegar_rifle
+	p.carregar_rifle = carregar
+	p.acender_lareira = acender
+	p.soltar_caes = soltar
+	p.porteira = cena.get_node("Porteira")
+	p.telefone = telefone
+	p.diante_do_fogo = boca + Vector3(0.75, -0.11, -0.45)
+	# Por dentro da porta do escritório (do vestíbulo): por onde Conan entra.
+	caes.porta_do_fogo = Vector3(5.1, T0, HALL_Z + 0.6)
+	p.lua = lua
+	p.nuvens = nuvens
+	# A leste, longe: nasce por trás da crista dos morros do outro lado do vale (a
+	# ~33° acima do horizonte da fazenda) e sobe; o banco de nuvens vem do norte.
+	p.lua_de = Vector3(900, 560, -100)
+	p.lua_ate = Vector3(900, 860, -100)
+	p.nuvens_de = Vector3(880, 860, -900)
+	p.nuvens_ate = Vector3(880, 860, 120)
+	p.som_rifle = _sfx("rifle_pegar.wav")
+	p.som_cartucho = _sfx("cartucho.wav")
+	p.som_alavanca = _sfx("alavanca_rifle.wav")
+	p.som_porteira = _sfx("porteira.wav")
+	p.som_gancho = _sfx("telefone_gancho.wav")
+	var lembretes: Dictionary[StringName, NarrationLine] = {
+		&"lampioes": load("res://narrative/narration/akeley_lampioes.tres"),
+		&"venezianas": load("res://narrative/narration/akeley_venezianas.tres"),
+		&"rifle": load("res://narrative/narration/akeley_rifle_lembrete.tres"),
+		&"lareira": load("res://narrative/narration/akeley_lareira.tres"),
+		&"caes": load("res://narrative/narration/akeley_caes_soltar.tres"),
+	}
+	p.lembretes = lembretes
+	p.linha_lampiao = load("res://narrative/narration/akeley_luz.tres")
+	p.linha_rifle = load("res://narrative/narration/akeley_rifle.tres")
+	p.linha_telefone = load("res://narrative/narration/akeley_telefone.tres")
+	p.linha_lua = load("res://narrative/narration/akeley_lua.tres")
+
+
+## O rifle de repetição de alavanca (provisório em primitivas, ao longo de -Z): a
+## coronha, a caixa da culatra, a alavanca em argola, o depósito tubular e o cano.
+func _rifle(pai: Node3D) -> void:
+	_box(pai, "Coronha", Vector3(0.045, 0.11, 0.34), Vector3(0, -0.03, 0.2), "madeira_escura")
+	_box(pai, "Culatra", Vector3(0.04, 0.07, 0.16), Vector3(0, 0, -0.04), "ferro")
+	var alavanca := _box(pai, "Alavanca", Vector3(0.015, 0.06, 0.12), Vector3(0, -0.06, -0.02), "ferro")
+	alavanca.rotation_degrees.x = 8.0
+	_box(pai, "Guarda", Vector3(0.04, 0.045, 0.22), Vector3(0, -0.015, -0.23), "madeira_escura")
+	var cano := _cyl(pai, "Cano", 0.011, 0.012, 0.58, Vector3(0, 0.015, -0.41), "ferro", 6)
+	cano.rotation_degrees.x = 90
+	var deposito := _cyl(pai, "Deposito", 0.01, 0.01, 0.5, Vector3(0, -0.012, -0.37), "ferro", 6)
+	deposito.rotation_degrees.x = 90
 
 
 ## Os doze cães (F4, o começo: a presença) no cercado diante das baias, esperando

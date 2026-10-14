@@ -1242,6 +1242,64 @@ func _rotina(faz: Fazenda) -> void:
 	var yautja := matilha.cao("Yautja")
 	await _until(func() -> bool: return r.etapa == Rotina.Etapa.FIM and yautja.fugiu, 40.0)
 	_check(yautja.fugiu and not yautja.visible, "Yautja não volta")
+	await _preparacao(faz)
+
+
+## A preparação para a noite (F6): os quatro lampiões, as venezianas, o rifle
+## carregado cartucho a cartucho, a lareira (Conan vai deitar diante dela), o
+## telefone mudo, a porteira (os cães soltos); a noite cai.
+func _preparacao(faz: Fazenda) -> void:
+	var pr := faz.preparacao
+	var p := faz.player
+	var matilha := faz.get_node("Caes") as Matilha
+	await _until(func() -> bool: return pr._ativa, 20.0)
+	# O fim provisório da demo espera Conan chegar ao fogo (abaixo).
+	faz.fim_provisorio = 60.0
+	_check(pr._ativa and pr.lampioes.size() == 4 and pr.venezianas.size() == 8, "a preparação: quatro lampiões, as venezianas do escritório e da sala")
+	var fazer := func(area: Interactable, de: Vector3, alvo := Vector3.INF) -> bool:
+		p.global_position = de
+		p.velocity = Vector3.ZERO
+		await _mirar(p, area.global_position if alvo == Vector3.INF else alvo)
+		var mirou := p._target == area
+		if not mirou:
+			print("   (a mira em %s pegou %s)" % [area.name, p.ray.get_collider()])
+		area.interact(p)
+		await _until(func() -> bool: return p.input_enabled and not pr._ocupado, 30.0)
+		await _frames(2)
+		return mirou
+	var mirou: bool = await fazer.call(pr.lampioes[0], Vector3(4.6, 0.6, 3.25))
+	_check(mirou and pr.lampioes[0].aceso and pr.lampioes[0].luz.visible, "o lampião do escritório aceso")
+	mirou = await fazer.call(pr.venezianas[4], Vector3(4.9, 0.6, 2.6))
+	_check(mirou and pr.venezianas[4].fechada, "as venezianas fechadas, de dentro")
+	mirou = await fazer.call(pr.pegar_rifle, Vector3(-1.0, 0.6, -4.2))
+	_check(mirou and pr.rifle.visible and not pr.rifle_armario.visible, "o rifle tirado do armário")
+	for k in Preparacao.CARTUCHOS:
+		mirou = await fazer.call(pr.carregar_rifle, Vector3(-1.4, 0.6, -3.2))
+	_check(mirou and pr.cartuchos == Preparacao.CARTUCHOS, "carregado, cartucho por cartucho")
+	mirou = await fazer.call(pr.telefone, Vector3(2.4, 0.6, 0.3))
+	_check(mirou, "o telefone (mudo)")
+	mirou = await fazer.call(pr.acender_lareira, Vector3(3.0, 0.6, 2.9))
+	await _until(func() -> bool: return pr.lareira_acesa, 30.0)
+	_check(mirou and pr.lareira_acesa and matilha.fogo != Vector3.INF, "a lareira acesa (com a lenha da rotina)")
+	mirou = await fazer.call(pr.soltar_caes, Vector3(-0.3, 0, -6.2), Vector3(-0.35, 0.6, -7.0))
+	_check(mirou and pr.caes_soltos and matilha.modo == Matilha.Modo.SOLTOS, "a porteira aberta: os cães soltos")
+	# Os outros lampiões e venezianas, de uma vez (o resto da casa).
+	for l in pr.lampioes:
+		if not l.aceso:
+			l.acender()
+	for v in pr.venezianas:
+		if not v.fechada:
+			v.fechar_ja()
+			v.fechou.emit()
+	await _until(func() -> bool: return pr.feita, 20.0)
+	_check(pr.feita, "a preparação feita")
+	# Akeley na sala de estar, olhando a janela (de costas para a casa): Conan
+	# entra sem ser visto, pela porta do escritório, e anda até o fogo.
+	p.global_position = Vector3(3.6, 0.6, -2.5)
+	p.look_at(Vector3(3.6, p.global_position.y, -6.0))
+	var conan := matilha.cao("Conan")
+	await _until(func() -> bool: return conan.global_position.distance_to(matilha.fogo) < 0.8, 40.0)
+	_check(conan.global_position.distance_to(matilha.fogo) < 0.8, "Conan deitado diante do fogo %s" % conan.global_position)
 
 
 ## O botão de testes (F4): do menu, direto ao Interlúdio como Akeley, pulando o

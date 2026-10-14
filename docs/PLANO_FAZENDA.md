@@ -438,10 +438,36 @@ roteiro acima onde os dois divergirem.
    - **Fica para depois:** a lua que as nuvens engolem (vai com a noite, F6/F7); as
      galinhas recolhidas (o galinheiro, sem som ainda); a bomba merece um modelo
      melhor (de frente, a alavanca some).
-6. 🔧 **F6 — Beat 2, a preparação** (← **próximo**; ~2 min; "A tratativa", 2): os quatro lampiões do
-   térreo, as venezianas do escritório e da sala, o rifle carregado no armário, o
-   cercado aberto. Sem as máscaras de gás (são da carta de quarta).
-7. 🔧 **F7 — Beat 3, a noite do telhado** (~4–5 min; "A tratativa", 3 e 4): Brutus e
+6. ✅ **F6 — Beat 2, a preparação** (2026-10-14; "A tratativa", 2). A `Preparacao`
+   (`components/preparacao.gd`, peças de `gerar_fazenda._preparacao`) começa quando a
+   rotina acaba; em qualquer ordem, enquanto a noite cai (`Fazenda.noite` vai a 0,8):
+   - **Os quatro lampiões** (`Lampiao`, `components/lampiao.gd`: o escritório, o
+     vestíbulo, a sala de estar, a cozinha) — ele se vira, a chaminé tine, risca o
+     fósforo, a chama pega no pavio e cresce; o primeiro traz a fala da carta de terça
+     (*"Mandaria pôr luz elétrica na casa..."*). `apagavel` fica para a F7.
+   - **As venezianas** do escritório e da sala (`Venezianas`, oito janelas, por
+     dentro): as duas folhas giram e fecham; `fresta()` para a seteira da F7.
+   - **O rifle:** "Pegar o rifle" no armário da sala dos fundos (sobe à vista, `NaMao`)
+     e "Carregar o rifle" na bancada, um cartucho por vez (quatro), a alavanca no fim.
+   - **A lareira do escritório** com a lenha da rotina (`AcenderLareira`, flag
+     `lareira_akeley`): Conan vem deitar diante do fogo — entra pela porta do
+     escritório sem ser visto (`CaoIA._chegar`; desde a F6, "visto" exige linha de
+     vista sem parede no meio, `CaoIA._ve`).
+   - **O telefone** do vestíbulo, se ele tentar: o gancho, nada, *"Mudo. Cortam os fios
+     sempre que tento telefonar à noite."*
+   - **A porteira** do cercado: os cães soltos no quintal (`Matilha.Modo.SOLTOS`),
+     Rambo diante da janela do escritório rosnando para ela.
+   - **O céu:** a lua cheia nasce atrás dos morros do leste e um banco de nuvens a
+     engole (*"A lua cheia ainda os seguraria — se as nuvens deixassem."*).
+   - Parado 35 s, Akeley lembra o que falta. ❓ **Falas compostas (💭), a aprovar.**
+   - **Sons** (CC0, `tratar_sons.py`): o lampião, a veneziana, pegar o rifle, o
+     cartucho, a alavanca, a porteira.
+   - **Testes:** o de fumaça faz tudo mirando de perto e confere Conan diante do fogo;
+     `Preparacao.pular()` (F2 na fazenda, depois da rotina). Capturas:
+     `SHOT_MODO=preparacao`.
+   - **O que o playtest 11 pediu** muda o acabamento disto tudo (ver "O playtest 11"
+     abaixo): os modelos (o lampião, o rifle, o telefone, o armário) são provisórios.
+7. 🔧 **F7 — Beat 3, a noite do telhado** (← depois da reforma do playtest 11) (~4–5 min; "A tratativa", 3 e 4): Brutus e
    Conan dentro; a poltrona, o cochilo, o baque; só som e poeira; o zumbido; o cheiro
    (olhos e tosse); a vidraça anunciada; apagar o lampião; de janela em janela, o cano
    alto, os clarões; o ganido. As legendas, a carta de segunda frase por frase.
@@ -453,6 +479,27 @@ roteiro acima onde os dois divergirem.
    fumaça joga o recorte inteiro.
 9. 🔧 **Depois: as fotografias do Dia 2** feitas das nossas cenas 3D (a casa com os
    cães e Akeley, o círculo de pedras, a caverna) — playtest 10, item 4.
+
+## O playtest 11 (2026-10-14): a reforma antes da F7
+O usuário jogou a fazenda até a F5: *"precisamos melhorar completamente a parte da
+fazenda. Precisamos de indicativos de luz (pode ser uma luz azul fraca) para onde
+devemos ir, uma coisa bem fraca que só indique em cima do para onde ir, quase nada. Ou
+precisamos melhorar o modelo da fazenda, que está bastante prejudicado, vários locais
+onde não passamos, modelos toscos e sem nenhum acabamento ou cuidado, precisamos que
+fique BOM de VERDADE pois será o modelo mais usado durante todo o jogo."*
+
+- 🔧 **R1 — A luz-guia:** um brilho azul fraco, quase nada, sobre o lugar da próxima
+  tarefa (a rotina, a preparação, depois a noite do telhado); some ao chegar perto.
+- 🔧 **R2 — Por onde se passa:** percorrer a planta inteira (o térreo, a escada, o
+  primeiro andar, as portas, o quintal, as dependências) e abrir tudo que deveria ser
+  passável; o teste de fumaça anda os caminhos.
+- 🔧 **R3 — O acabamento da casa:** paredes com espessura, rodapés, guarnições de
+  portas e janelas, beirais, telhado com telhas e cumeeira, chaminés, varanda com
+  colunas e guarda-corpo, o interior mobiliado com cuidado (o escritório de Akeley, a
+  sala, a cozinha, os quartos).
+- 🔧 **R4 — As dependências e o quintal:** o canil, o galpão, o celeiro, a bomba, o
+  moinho, as cercas, a estrada, o terreno.
+- 🔧 **R5 — Os objetos da preparação:** o lampião, o rifle, o telefone, o armário.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no

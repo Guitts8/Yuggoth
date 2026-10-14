@@ -566,11 +566,17 @@ lado a lado; Rambo não), o balde cheio na bomba do poço e despejado no bebedou
 deixado no chão), a braçada de lenha do galpão até a lareira do escritório, o portão
 de correr do celeiro, a caixa de correio vazia (*"É domingo."*); o sol espera por ela.
 Feita, os pássaros se calam de uma vez e Yautja dispara latindo para a mata; Akeley o
-chama — *"Não voltou."* — e o crepúsculo vem. Até a F6, a demo acaba ali: o sol baixo a oeste vai para trás da Dark Mountain, as
-sombras compridas atravessam o quintal, a névoa sobe do vale, e o céu passa do
-laranja ao crepúsculo em três minutos. Anda-se por tudo (a casa, as dependências);
-ainda sem os cães nem os beats: depois de uns 45 segundos, a tela escurece e vem o
-cartão *"Fim da demonstração. A história continua."* → menu. Continuar volta ao
+chama — *"Não voltou."* — e o crepúsculo vem. **A preparação (F6),** em qualquer
+ordem, enquanto a noite cai: os quatro lampiões de querosene do térreo (o fósforo, a
+chaminé, a chama que cresce; *"Mandaria pôr luz elétrica na casa..."* — não há), as
+venezianas do escritório e da sala fechadas por dentro, o rifle tirado do armário da
+sala dos fundos e carregado na bancada cartucho por cartucho, a lareira do escritório
+acesa com a lenha da rotina (Conan vem deitar diante do fogo), o telefone mudo se ele
+tentar (*"Cortam os fios sempre que tento telefonar à noite."*) e a porteira do
+cercado aberta (os cães soltos no quintal, Rambo rosnando para a janela do escritório).
+A lua cheia nasce sobre os morros do leste e as nuvens a engolem. Parado, Akeley
+lembra o que falta. Feita a preparação, uns 30 segundos depois, a tela escurece e vem o
+cartão *"Fim da demonstração. A história continua."* → menu (até a F7, a noite do telhado). Continuar volta ao
 começo do Interlúdio.
 
 **Na demo (decidido em 2026-10-09; `docs/PLANO_FAZENDA.md`):** os beats 1–3 — a

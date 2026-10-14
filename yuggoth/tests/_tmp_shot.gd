@@ -52,6 +52,10 @@ func _ready() -> void:
 		await _fazenda_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "preparacao":
+		await _preparacao_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "rotina":
 		await _rotina_fotos()
 		get_tree().quit()
@@ -650,10 +654,19 @@ func _diario_fotos() -> void:
 	p.input_enabled = false
 	var d := esc.diario
 	d._paginas = [[Diario.ROSTO, 0.0], [d._esquerda.text, 0.0]]
-	await d._abrir(p)
+	var passo := float(OS.get_environment("SHOT_PASSO")) if OS.has_environment("SHOT_PASSO") else 0.1
+	var est := {"abrindo": true}
+	var abre := func() -> void:
+		await d._abrir(p)
+		est["abrindo"] = false
+	abre.call()
+	var q := 0
+	while est["abrindo"] and q < 200:
+		await _s(passo)
+		await _shot("%s_abrindo_%03d" % [tag, q])
+		q += 1
 	await _s(0.5)
 	await _shot("%s_aberto" % tag)
-	var passo := float(OS.get_environment("SHOT_PASSO")) if OS.has_environment("SHOT_PASSO") else 0.1
 	d.fechar(p)
 	for k in int(5.0 / passo):
 		await _s(passo)
@@ -688,6 +701,67 @@ func _selagem_fotos() -> void:
 	for k in 34:
 		await _s(0.5)
 		await _shot("%s_selando_%02d" % [tag, k])
+
+
+## SHOT_MODO=preparacao: a preparação para a noite (F6), tarefa por tarefa.
+func _preparacao_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"interludio")
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return not faz.descendo, 60.0)
+	faz.rotina.pular()
+	await _until(func() -> bool: return faz.preparacao._ativa, 30.0)
+	Engine.time_scale = 1.0
+	var p := faz.player
+	var pr := faz.preparacao
+	var fazer := func(area: Interactable, de: Vector3, nome: String, espera: float, alvo := Vector3.INF) -> void:
+		p.global_position = de
+		p.velocity = Vector3.ZERO
+		var c := area.global_position if alvo == Vector3.INF else alvo
+		p.look_at(Vector3(c.x, p.global_position.y, c.z))
+		await _s(0.2)
+		var olho := p.camera.global_position
+		p.head.rotation.x = atan2(c.y - olho.y, Vector2(c.x - olho.x, c.z - olho.z).length())
+		await _s(0.3)
+		print("ALVO ", nome, " mira=", p._target == area, " pegou=", p.ray.get_collider())
+		area.interact(p)
+		await _s(espera)
+		await _shot("%s_%s" % [tag, nome])
+	await fazer.call(pr.lampioes[0], Vector3(4.6, 0.6, 3.25), "1_lampiao_escritorio", 4.0)
+	await fazer.call(pr.venezianas[4], Vector3(4.9, 0.6, 2.6), "2_veneziana", 2.0)
+	await fazer.call(pr.pegar_rifle, Vector3(-1.0, 0.6, -4.2), "3_rifle", 1.5)
+	for k in 4:
+		await fazer.call(pr.carregar_rifle, Vector3(-1.4, 0.6, -3.2), "4_carregar_%d" % k, 1.4)
+	await fazer.call(pr.acender_lareira, Vector3(3.0, 0.6, 2.9), "5_lareira", 12.0)
+	await fazer.call(pr.telefone, Vector3(2.4, 0.6, 0.3), "6_telefone", 3.0)
+	await fazer.call(pr.soltar_caes, Vector3(-0.3, 0, -6.2), "7_porteira", 4.0, Vector3(-0.35, 0.6, -7.0))
+	for l in pr.lampioes:
+		l.aceso = true
+		l._k = 1.0
+		l._mostrar()
+	for v in pr.venezianas:
+		v.fechar_ja()
+	await _s(8.0)
+	p.global_position = Vector3(3.2, 0.6, 3.9)
+	await _olhar(p, Vector3(1.8, 0.6, 3.6))
+	p.head.rotation.x = -0.45
+	await _s(0.5)
+	await _shot("%s_8_conan" % tag)
+	faz.teto = 1.0
+	faz.entardecer = 1.0
+	faz._noite_alvo = 0.8
+	faz.noite = 0.8
+	faz._aplicar(1.0)
+	print("CONAN ", faz.get_node("Caes/Conan").global_position)
+	p.global_position = Vector3(30.5, 0, -6)
+	await _olhar(p, Vector3(900, 700, -100))
+	p.head.rotation.x = 0.55
+	for k in 6:
+		await _s(6.0)
+		await _shot("%s_9_lua_%d" % [tag, k])
+	print("FEITA ", pr.feita, " modo ", faz.get_node("Caes").modo, " noite ", faz.noite)
 
 
 ## SHOT_MODO=rotina: a rotina do entardecer (F5), tarefa por tarefa.

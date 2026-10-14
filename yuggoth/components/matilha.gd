@@ -18,6 +18,14 @@ enum Modo {
 	SOLTOS,
 }
 
+## Onde Conan deita diante do fogo aceso (INF = o fogo apagado). A Preparacao o põe.
+var fogo := Vector3.INF
+## Por onde Conan entra no escritório (a casa não tem navegação: ele aparece ali,
+## fora da vista, e anda até o fogo).
+@export var porta_do_fogo := Vector3.INF
+## Onde Rambo fica, de fora, rosnando para a janela do escritório (à noite).
+@export var diante_da_janela := Vector3(4.6, 0, 7.6)
+
 ## Os lugares ao longo da gamela (do mundo), um por cão, na ordem dos filhos.
 @export var gamela: PackedVector3Array = []
 ## Para onde se olha comendo (a gamela fica deste lado).
@@ -31,7 +39,7 @@ enum Modo {
 ## Para onde fica a mata (o pântano e a Dark Mountain, a oeste).
 @export var mata := Vector3(-40.0, 1.0, -6.0)
 ## A janela do escritório de Akeley, para onde Rambo rosna à noite.
-@export var janela := Vector3(4.0, 1.4, 6.0)
+@export var janela := Vector3(4.6, 1.4, 6.0)
 
 @export_group("Sons")
 @export var latidos: Array[AudioStream] = []

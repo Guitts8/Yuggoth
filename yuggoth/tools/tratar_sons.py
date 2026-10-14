@@ -366,10 +366,36 @@ def rotina():
     salvar("caixa_correio", ar_livre(passa_baixa(aparar(ler("x/100-CC0-wood-metal-SFX/metal_open_01.ogg")), 6000), semente=66), alvo=0.6)
 
 
+def preparacao():
+    """F6 da fazenda: a preparação para a noite (rubberduck, Kenney, laleksic; CC0)."""
+    # O rifle tirado do armário: madeira e ferro.
+    madeira = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_misc_05.ogg")), 0.9), 4000))
+    ferro = pico(passa_baixa(aparar(ler("x/100-CC0-wood-metal-SFX/metal_hit_04.ogg")), 5000))
+    salvar("rifle_pegar", sala(misturar((madeira, 0.0, 0.7), (ferro, 0.08, 0.35)), 0.4, 0.12, semente=70), alvo=0.6)
+    # Um cartucho entrando no carregador: o clique de latão e a mola.
+    clique = pico(passa_alta(tom(aparar(ler("x/RPGsounds_Kenney/OGG/metalClick.ogg")), 0.85), 600))
+    mola = pico(passa_baixa(aparar(ler("x/100-CC0-wood-metal-SFX/metal_spring_01.ogg")), 6000))
+    salvar("cartucho", sala(misturar((clique, 0.0, 0.8), (mola, 0.03, 0.25)), 0.35, 0.1, semente=71), alvo=0.6)
+    # A alavanca do rifle de repetição: para baixo e para cima, o ferrolho.
+    baixo = pico(passa_baixa(tom(aparar(ler("x/RPGsounds_Kenney/OGG/metalLatch.ogg")), 0.8), 6000))
+    cima = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/metal_hit_05.ogg")), 0.9), 6000))
+    salvar("alavanca_rifle", sala(misturar((baixo, 0.0, 0.9), (cima, 0.22, 0.8)), 0.35, 0.1, semente=72), alvo=0.75)
+    # A veneziana fechando: as dobradiças rangem, a folha bate, a tranca.
+    range_ = pico(passa_baixa(tom(aparar(ler("x/RPGsounds_Kenney/OGG/creak1.ogg")), 0.9), 4500))
+    bate = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_close_01.ogg")), 0.95), 3500))
+    tranca = pico(passa_alta(aparar(ler("x/RPGsounds_Kenney/OGG/metalLatch.ogg")), 900))
+    salvar("veneziana", sala(misturar((range_, 0.0, 0.6), (bate, 0.45, 0.8), (tranca, 0.7, 0.4)), 0.4, 0.12, semente=73), alvo=0.65)
+    # A porteira do cercado: madeira velha nas dobradiças.
+    salvar("porteira", ar_livre(passa_baixa(tom(aparar(ler("x/sounds_8/door_creak_open.wav")), 0.8), 4500), semente=74), alvo=0.6)
+    # O lampião: a chaminé de vidro erguida e posta de volta (o fósforo é o do jogo).
+    vidro = pico(passa_alta(aparar(ler("x/100-CC0-SFX_0/dishes_04.ogg")), 1500))
+    salvar("lampiao", sala(vidro[: seg(0.5)], 0.35, 0.1, semente=75), alvo=0.4)
+
+
 GRUPOS = {
     "passos": passos, "portas": portas, "fogo": fogo, "chuva_e_noite": chuva_e_noite, "relogio": relogio,
     "telefone": telefone, "papel": papel, "lama": lama, "alfinete": alfinete, "bebida": bebida,
-    "calha": calha, "menu": menu, "caes": caes, "rotina": rotina,
+    "calha": calha, "menu": menu, "caes": caes, "rotina": rotina, "preparacao": preparacao,
 }
 
 

@@ -60,6 +60,13 @@ extends Node3D
 var entardecer := 0.0
 ## O entardecer não passa disto (a rotina o segura; depois, 1).
 var teto := 1.0
+## Depois do crepúsculo, a noite (0 → 1): o céu quase preto, a névoa escura, a luz
+## só dos lampiões. A preparação a leva a `noite_da_preparacao`; a noite do
+## telhado (F7), a 1.
+var noite := 0.0
+var _noite_alvo := 0.0
+@export var noite_da_preparacao := 0.8
+@export var duracao_noite := 120.0
 ## A descida do céu em curso (a câmera não é a de Akeley).
 var descendo := false
 var _env: Environment
@@ -73,6 +80,7 @@ var _desvio := Vector2.ZERO
 @onready var sol: DirectionalLight3D = $Sol
 @onready var balde: NaMao = $Balde
 @onready var rotina: Rotina = get_node_or_null(^"Rotina") as Rotina
+@onready var preparacao: Preparacao = get_node_or_null(^"Preparacao") as Preparacao
 
 
 func _ready() -> void:
@@ -117,22 +125,25 @@ func _process(delta: float) -> void:
 	# Passado o teto (a rotina acabou), o crepúsculo vem mais depressa.
 	var passo := delta / duracao_entardecer * (1.0 if teto < 1.0 or entardecer < teto_da_rotina else 4.0)
 	entardecer = minf(teto, entardecer + passo)
+	if entardecer >= 1.0:
+		noite = move_toward(noite, _noite_alvo, delta / duracao_noite)
 	# O céu refaz a radiância quando muda: só a cada passo visível.
-	if absf(entardecer - _aplicado) > 0.004:
+	if absf(entardecer + noite - _aplicado) > 0.004:
 		_aplicar(entardecer)
 
 
 func _aplicar(p: float) -> void:
-	_aplicado = p
+	_aplicado = p + noite
 	var some := smoothstep(0.0, 0.6, p)
 	sol.light_energy = lerpf(sol_energia.x, sol_energia.y, some)
 	sol.light_color = sol_cor.lerp(Color(0.9, 0.42, 0.3), some)
 	sol.visible = sol.light_energy > 0.01
-	_ceu.sky_top_color = ceu_alto[0].lerp(ceu_alto[1], p)
-	_ceu.sky_horizon_color = ceu_horizonte[0].lerp(ceu_horizonte[1], smoothstep(0.2, 1.0, p))
+	var n := smoothstep(0.0, 1.0, noite)
+	_ceu.sky_top_color = ceu_alto[0].lerp(ceu_alto[1], p).lerp(Color(0.008, 0.01, 0.02), n)
+	_ceu.sky_horizon_color = ceu_horizonte[0].lerp(ceu_horizonte[1], smoothstep(0.2, 1.0, p)).lerp(Color(0.03, 0.03, 0.045), n)
 	_ceu.ground_horizon_color = _ceu.sky_horizon_color.darkened(0.5)
-	_env.fog_light_color = neblina[0].lerp(neblina[1], p)
-	_env.ambient_light_energy = lerpf(ambiente.x, ambiente.y, p)
+	_env.fog_light_color = neblina[0].lerp(neblina[1], p).lerp(Color(0.02, 0.022, 0.03), n)
+	_env.ambient_light_energy = lerpf(ambiente.x, ambiente.y, p) * lerpf(1.0, 0.25, n)
 
 
 ## O Interlúdio na demo, por enquanto: a descida do céu, um tempo no quintal ao
@@ -152,6 +163,13 @@ func _interludio() -> void:
 		if not is_inside_tree():
 			return
 		teto = 1.0
+	# A preparação para a noite (F6), no crepúsculo; a noite cai enquanto isso.
+	if preparacao:
+		_noite_alvo = noite_da_preparacao
+		preparacao.comecar(self)
+		await preparacao.terminou
+		if not is_inside_tree():
+			return
 	# Parado na pausa (o timer não corre com a árvore pausada).
 	await get_tree().create_timer(fim_provisorio, false).timeout
 	if not is_inside_tree():
