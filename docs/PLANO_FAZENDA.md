@@ -534,7 +534,19 @@ fique BOM de VERDADE pois será o modelo mais usado durante todo o jogo."*
   lugares presos.
 - 🔧 **R4 — As dependências e o quintal:** o canil, o galpão, o celeiro, a bomba, o
   moinho, as cercas, a estrada, o terreno.
-- 🔧 **R5 — Os objetos da preparação:** o lampião, o rifle, o telefone, o armário.
+- ✅ **R5 — Os objetos da preparação** (2026-10-14): o lampião torneado de verdade
+  (`_torneado`, uma peça de revolução por perfil: o pé em sino, o depósito bojudo com o
+  friso, o queimador com a rodinha do pavio, a chaminé de vidro com o bojo); o rifle de
+  alavanca peça a peça (`_rifle`: a coronha com o punho e a soleira, a culatra com a
+  janela de latão, o cão e o gatilho, a alavanca em argola, a telha, o cano e o
+  depósito com as braçadeiras, as miras) — na mão, atravessado diante do corpo com a
+  culatra à vista no canto de baixo, e no armário de pé no vão do meio, a alavanca para
+  a sala; o telefone de parede de manivela, de carvalho (a tampa almofadada, as
+  campainhas com o badalo, o braço com o bocal em corneta, a prateleira inclinada, a
+  manivela do magneto, o fone no gancho com o fio); o armário dos rifles com o fundo de
+  feltro verde, o frontão, a travessa das portas de vidro, dois rifles e uma espingarda
+  de dois canos que ficam (`_arma_de_pe`) e uma caixa de cartuchos esquecida.
+  Capturas: `SHOT_MODO=preparacao`; o teste de fumaça passa.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no

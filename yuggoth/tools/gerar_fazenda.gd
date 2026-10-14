@@ -128,6 +128,7 @@ func _ready() -> void:
 	ResourceSaver.save(m["capim"], MAT_DIR + "capim.tres")
 	_mat("estofado_vinho", "estofado", {world = 3.0, cor = Color(1.6, 0.75, 0.7)})
 	_mat("couro", "capa_livro", {world = 3.0, cor = Color(0.8, 0.55, 0.42)})
+	_mat("feltro", "estofado", {world = 3.0, cor = Color(0.55, 0.78, 0.55)})
 	_mat("tapete_trancado", "tapete_trancado", {})
 	(m["tapete_trancado"] as ShaderMaterial).set_shader_parameter(&"alpha_cut", 0.5)
 	ResourceSaver.save(m["tapete_trancado"], MAT_DIR + "tapete_trancado.tres")
@@ -1281,11 +1282,51 @@ func _armario_rifles(p: Vector3) -> void:
 	# O cabide: a régua de baixo com os encaixes e a de cima com os entalhes.
 	_parte(m, Vector3(1.3, 0.05, 0.18), Vector3(0, 0.48, 0.05), p, giro, Color(1.15, 1.15, 1.15))
 	_parte(m, Vector3(1.3, 0.04, 0.1), Vector3(0, 1.45, 0.1), p, giro, Color(1.15, 1.15, 1.15))
-	# Dois rifles e uma espingarda que ficam (o rifle de caça grossa é o da F6).
-	for x: float in [-0.5, -0.32, 0.38, 0.55]:
-		_parte("madeira_escura", Vector3(0.045, 0.34, 0.1), Vector3(x, 0.66, 0.06), p, giro, Color(1.25, 1.1, 0.95))
-		_parte("ferro", Vector3(0.025, 0.85, 0.03), Vector3(x, 1.2, 0.08), p, giro)
+	# Playtest 11 (R5): o fundo forrado de feltro verde, a cimalha com o frontão, a
+	# travessa de cada porta de vidro.
+	_parte("feltro", Vector3(1.3, 1.38, 0.01), Vector3(0, 1.2, 0.15), p, giro)
+	_parte(m, Vector3(1.4, 0.12, 0.03), Vector3(0, 2.04, -0.2), p, giro, Color(1.1, 1.1, 1.1))
+	_parte(m, Vector3(1.56, 0.03, 0.5), Vector3(0, 1.995, -0.02), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		_parte(m, Vector3(0.6, 0.03, 0.04), Vector3(sx * 0.95, 1.15, -0.44), p, giro, Color.WHITE, Vector3(0, sx * -75.0, 0))
+	# Dois rifles de alavanca e uma espingarda de dois canos que ficam (o rifle de
+	# caça grossa é o da F6, no vão do meio), de pé com a coronha na régua de baixo.
+	_arma_de_pe(Vector3(-0.52, 0.505, 0.07), p, giro, false, Color(1.25, 1.1, 0.95))
+	_arma_de_pe(Vector3(-0.3, 0.505, 0.07), p, giro, true, Color(1.05, 0.9, 0.8))
+	_arma_de_pe(Vector3(0.42, 0.505, 0.07), p, giro, false, Color(0.95, 0.85, 0.78))
+	# A caixa de cartuchos esquecida na prateleira de baixo.
+	_parte("papelao_escuro", Vector3(0.14, 0.06, 0.09), Vector3(0.2, 0.48, -0.08), p, giro, Color(1.3, 0.95, 0.7))
 	_col.append([Vector3(1.45, 1.95, 0.45), p + Vector3(0, 0.975, 0)])
+
+
+## Uma arma longa de pé num cabide (a coronha em `base`, o cano para cima; a
+## frente da peça, onde ficam a alavanca e o guarda-mato, para -Z local): a
+## soleira, a coronha, o punho, a caixa da culatra, a alavanca em argola (ou, na
+## espingarda, o guarda-mato e os dois canos), a telha, o cano e o depósito.
+func _arma_de_pe(base: Vector3, p: Vector3, giro: float, espingarda: bool, cor: Color) -> void:
+	var m := "madeira_escura"
+	var f := "ferro"
+	var o := base
+	_parte(f, Vector3(0.042, 0.012, 0.1), o + Vector3(0, 0.006, -0.01), p, giro)
+	_parte(m, Vector3(0.04, 0.27, 0.1), o + Vector3(0, 0.145, -0.01), p, giro, cor, Vector3(5, 0, 0))
+	_parte(m, Vector3(0.034, 0.1, 0.05), o + Vector3(0, 0.33, 0.0), p, giro, cor)
+	var culatra := 0.12 if espingarda else 0.16
+	_parte(f, Vector3(0.044 if espingarda else 0.042, culatra, 0.07), o + Vector3(0, 0.38 + culatra / 2, 0.0), p, giro, Color(0.9, 0.9, 0.9))
+	var cima := 0.38 + culatra
+	if espingarda:
+		_parte(f, Vector3(0.008, 0.07, 0.008), o + Vector3(0, 0.42, -0.05), p, giro)
+		_parte(m, Vector3(0.05, 0.22, 0.045), o + Vector3(0, cima + 0.15, -0.012), p, giro, cor)
+		for sx: float in [-1.0, 1.0]:
+			_parte(f, Vector3(0.022, 0.7, 0.022), o + Vector3(sx * 0.012, cima + 0.35, 0.015), p, giro)
+		return
+	_parte(f, Vector3(0.01, 0.13, 0.01), o + Vector3(0, 0.4, -0.065), p, giro)
+	_parte(f, Vector3(0.01, 0.01, 0.04), o + Vector3(0, 0.34, -0.045), p, giro)
+	_parte(f, Vector3(0.01, 0.01, 0.04), o + Vector3(0, 0.465, -0.045), p, giro)
+	_parte(m, Vector3(0.036, 0.28, 0.034), o + Vector3(0, cima + 0.14, -0.012), p, giro, cor)
+	_parte(f, Vector3(0.022, 0.64, 0.022), o + Vector3(0, cima + 0.32, 0.015), p, giro)
+	_parte(f, Vector3(0.019, 0.52, 0.019), o + Vector3(0, cima + 0.26, -0.014), p, giro, Color(0.85, 0.85, 0.85))
+	for y: float in [0.3, 0.5]:
+		_parte(f, Vector3(0.03, 0.012, 0.05), o + Vector3(0, cima + y, 0.0), p, giro)
 
 
 ## A bancada da oficina: o tampo grosso, as pernas com a travessa, a prateleira de
@@ -1982,15 +2023,22 @@ func _preparacao() -> void:
 	# chama no pavio e a luz quente.
 	var lampioes: Array[Lampiao] = []
 	var lugares := [["Escritorio", Vector3(5.45, T0 + 0.78, 3.25), true], ["Vestibulo", Vector3(0.6, T0 + 0.8, 1.0), false],
-		["SalaEstar", Vector3(3.6, T0 + 0.45, -3.8), false], ["Cozinha", Vector3(-5.8, T0 + 0.75, 3.2), false]]
+		["SalaEstar", Vector3(3.4, T0 + 0.765, -3.7), false], ["Cozinha", Vector3(-5.8, T0 + 0.76, 3.2), false]]
 	for l: Array in lugares:
 		var lp := _area(g, Lampiao.new(), "Lampiao%s" % l[0], Vector3(0.3, 0.5, 0.3), l[1] + Vector3(0, 0.22, 0)) as Lampiao
 		var forma := lp.get_child(0) as Node3D
 		forma.position = Vector3.ZERO
-		_cyl(lp, "Pe", 0.07, 0.085, 0.03, Vector3(0, -0.205, 0), "latao", 10)
-		_cyl(lp, "Deposito", 0.055, 0.075, 0.1, Vector3(0, -0.14, 0), "latao", 10)
-		_cyl(lp, "Colarinho", 0.03, 0.045, 0.03, Vector3(0, -0.075, 0), "latao", 8)
-		var vidro := _cyl(lp, "Vidro", 0.03, 0.045, 0.2, Vector3(0, 0.04, 0), "vidro_fazenda", 10)
+		# Playtest 11 (R5): o lampião torneado de verdade — o pé em sino, o
+		# depósito bojudo de querosene com o friso, o queimador de latão com a
+		# galeria, a rodinha do pavio, e a chaminé de vidro com o bojo.
+		_torneado(lp, "Latao", [Vector2(0.0, -0.22), Vector2(0.075, -0.22), Vector2(0.078, -0.212), Vector2(0.05, -0.2),
+			Vector2(0.03, -0.17), Vector2(0.035, -0.162), Vector2(0.06, -0.15), Vector2(0.078, -0.125), Vector2(0.082, -0.105),
+			Vector2(0.074, -0.085), Vector2(0.05, -0.075), Vector2(0.028, -0.07), Vector2(0.03, -0.055), Vector2(0.036, -0.05),
+			Vector2(0.036, -0.035), Vector2(0.03, -0.03), Vector2(0.0, -0.03)], "latao", 14)
+		_box(lp, "Rodinha", Vector3(0.008, 0.022, 0.022), Vector3(0.042, -0.045, 0), "latao")
+		_cyl(lp, "Eixo", 0.003, 0.003, 0.012, Vector3(0.036, -0.045, 0), "latao", 6).rotation_degrees.z = 90.0
+		var vidro := _torneado(lp, "Vidro", [Vector2(0.028, -0.032), Vector2(0.03, -0.02), Vector2(0.046, 0.01), Vector2(0.05, 0.035),
+			Vector2(0.044, 0.06), Vector2(0.024, 0.09), Vector2(0.022, 0.16), Vector2(0.024, 0.17)], "vidro_fazenda", 14)
 		var q := QuadMesh.new()
 		q.size = Vector2(0.035, 0.06)
 		q.center_offset = Vector3(0, 0.03, 0)
@@ -2030,18 +2078,23 @@ func _preparacao() -> void:
 		venezianas.append(v)
 
 	# O rifle de repetição de caça grossa: no armário, em pé; e na mão (NaMao).
-	var no_armario := _group(g, "RifleArmario", Vector3(-1.25, T0 + 0.25, -5.27))
+	# Em pé no vão do meio do cabide, a coronha na régua de baixo, a alavanca para a
+	# sala.
+	var no_armario := _group(g, "RifleArmario", Vector3(-1.03, T0 + 0.93, -5.56))
 	_rifle(no_armario)
-	no_armario.rotation_degrees = Vector3(-88, 0, 0)
+	no_armario.rotation_degrees = Vector3(88, 180, 0)
 	var rifle := Node3D.new()
 	rifle.name = "Rifle"
 	rifle.set_script(load("res://components/na_mao.gd"))
 	_add(cena, rifle)
-	rifle.set("posicao", Vector3(0.24, -0.34, -0.5))
-	rifle.set("rotacao", Vector3(4, 8, 0))
+	# Na mão, atravessado diante do corpo, o cano para a esquerda e para cima (como
+	# se leva um rifle carregado dentro de casa): a culatra, a alavanca e a coronha
+	# à vista no canto de baixo.
+	rifle.set("posicao", Vector3(0.14, -0.21, -0.44))
+	rifle.set("rotacao", Vector3(10, 34, 10))
 	var corpo := _group(rifle, "Corpo")
 	_rifle(corpo)
-	corpo.position = Vector3(0, 0, 0.45)
+	corpo.position = Vector3(0, 0, 0.1)
 	for c in corpo.find_children("*", "MeshInstance3D", true, false):
 		(c as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var luz_r := _omni(rifle, "Luz", Vector3(-0.2, 0.3, 0.3), Color(1.0, 0.82, 0.66), 0.35, 0.9)
@@ -2056,11 +2109,32 @@ func _preparacao() -> void:
 
 	# O telefone de parede do vestíbulo (a linha que eles cortam).
 	var tel := _group(g, "Telefone", Vector3(2.4, T0 + 1.45, HALL_Z - EI / 2 - 0.06))
-	_box(tel, "Caixa", Vector3(0.24, 0.42, 0.1), Vector3.ZERO, "madeira_escura")
+	# Playtest 11 (R5): o telefone de parede de manivela, de carvalho — a caixa
+	# alta com a tampa almofadada e o friso, as duas campainhas de latão em cima, o
+	# braço com o bocal em corneta, a prateleira inclinada embaixo, a manivela do
+	# magneto do lado direito, o fone no gancho do lado esquerdo, com o fio.
+	_box(tel, "Caixa", Vector3(0.24, 0.42, 0.1), Vector3.ZERO, "madeira_clara")
+	_box(tel, "Almofada", Vector3(0.18, 0.2, 0.012), Vector3(0, -0.04, -0.054), "madeira_clara")
+	_box(tel, "Cornija", Vector3(0.27, 0.025, 0.115), Vector3(0, 0.22, -0.005), "madeira_escura")
+	_box(tel, "Base", Vector3(0.27, 0.025, 0.115), Vector3(0, -0.22, -0.005), "madeira_escura")
 	for s: float in [-1.0, 1.0]:
-		_cyl(tel, "Campainha%d" % int(s + 1), 0.035, 0.035, 0.02, Vector3(s * 0.05, 0.14, -0.06), "latao", 10).rotation_degrees.x = 90
-	_cyl(tel, "Bocal", 0.02, 0.03, 0.08, Vector3(0, 0.02, -0.09), "esmalte_preto", 8).rotation_degrees.x = 90
-	_cyl(tel, "Fone", 0.018, 0.022, 0.12, Vector3(-0.15, -0.02, -0.03), "esmalte_preto", 8)
+		var camp := _cyl(tel, "Campainha%d" % int(s + 1), 0.026, 0.038, 0.03, Vector3(s * 0.055, 0.145, -0.068), "latao", 12)
+		camp.rotation_degrees.x = 90
+	_box(tel, "Badalo", Vector3(0.006, 0.04, 0.006), Vector3(0, 0.13, -0.072), "ferro")
+	_box(tel, "Braco", Vector3(0.02, 0.02, 0.07), Vector3(0, 0.05, -0.085), "esmalte_preto")
+	var bocal := _cyl(tel, "Bocal", 0.034, 0.014, 0.06, Vector3(0, 0.05, -0.14), "esmalte_preto", 10)
+	bocal.rotation_degrees.x = 90
+	var prateleira := _box(tel, "Prateleira", Vector3(0.24, 0.015, 0.1), Vector3(0, -0.115, -0.09), "madeira_escura")
+	prateleira.rotation_degrees.x = -12.0
+	# A manivela.
+	_cyl(tel, "EixoManivela", 0.008, 0.008, 0.03, Vector3(0.135, -0.02, 0), "ferro", 6).rotation_degrees.z = 90
+	_box(tel, "Manivela", Vector3(0.008, 0.07, 0.01), Vector3(0.152, -0.05, 0), "ferro")
+	_cyl(tel, "PunhoManivela", 0.009, 0.009, 0.03, Vector3(0.166, -0.08, 0), "madeira_escura", 6).rotation_degrees.z = 90
+	# O gancho e o fone pendurado nele.
+	_box(tel, "Gancho", Vector3(0.04, 0.012, 0.012), Vector3(-0.14, 0.06, -0.02), "ferro")
+	_cyl(tel, "Fone", 0.016, 0.02, 0.12, Vector3(-0.155, -0.005, -0.025), "esmalte_preto", 8)
+	_cyl(tel, "BocaFone", 0.028, 0.02, 0.02, Vector3(-0.155, -0.075, -0.025), "esmalte_preto", 10)
+	_box(tel, "Fio", Vector3(0.006, 0.2, 0.006), Vector3(-0.13, -0.17, -0.02), "esmalte_preto")
 	var telefone := _area(g, Interactable.new(), "TirarFone", Vector3(0.4, 0.5, 0.25), tel.position + Vector3(0, 0, -0.08)) as Interactable
 	telefone.prompt = "Tirar o fone do gancho"
 
@@ -2201,15 +2275,35 @@ func _preparacao() -> void:
 ## O rifle de repetição de alavanca (provisório em primitivas, ao longo de -Z): a
 ## coronha, a caixa da culatra, a alavanca em argola, o depósito tubular e o cano.
 func _rifle(pai: Node3D) -> void:
-	_box(pai, "Coronha", Vector3(0.045, 0.11, 0.34), Vector3(0, -0.03, 0.2), "madeira_escura")
-	_box(pai, "Culatra", Vector3(0.04, 0.07, 0.16), Vector3(0, 0, -0.04), "ferro")
-	var alavanca := _box(pai, "Alavanca", Vector3(0.015, 0.06, 0.12), Vector3(0, -0.06, -0.02), "ferro")
-	alavanca.rotation_degrees.x = 8.0
-	_box(pai, "Guarda", Vector3(0.04, 0.045, 0.22), Vector3(0, -0.015, -0.23), "madeira_escura")
-	var cano := _cyl(pai, "Cano", 0.011, 0.012, 0.58, Vector3(0, 0.015, -0.41), "ferro", 6)
+	# Playtest 11 (R5): o rifle de alavanca de caça grossa, peça a peça (ao longo de
+	# -Z; a culatra na origem): a coronha com o punho estreito, o salto e a soleira
+	# de ferro; a caixa da culatra com o cão e o gatilho; a alavanca em argola; a
+	# telha de madeira; o cano e o depósito tubular com as braçadeiras; as miras.
+	var m := "madeira_escura"
+	var f := "ferro"
+	_box(pai, "Punho", Vector3(0.034, 0.05, 0.11), Vector3(0, -0.02, 0.1), m)
+	var coronha := _box(pai, "Coronha", Vector3(0.04, 0.085, 0.27), Vector3(0, -0.045, 0.28), m)
+	coronha.rotation_degrees.x = -6.0
+	_box(pai, "Pente", Vector3(0.036, 0.03, 0.22), Vector3(0, -0.012, 0.28), m)
+	_box(pai, "Soleira", Vector3(0.042, 0.12, 0.012), Vector3(0, -0.05, 0.42), f)
+	_box(pai, "Culatra", Vector3(0.042, 0.075, 0.16), Vector3(0, -0.005, -0.03), f)
+	_box(pai, "Janela", Vector3(0.044, 0.02, 0.06), Vector3(0, 0.005, -0.04), "latao")
+	var cao := _box(pai, "Cao", Vector3(0.012, 0.03, 0.02), Vector3(0, 0.04, 0.045), f)
+	cao.rotation_degrees.x = 25.0
+	_box(pai, "Gatilho", Vector3(0.006, 0.025, 0.006), Vector3(0, -0.058, 0.02), f)
+	# A alavanca: a argola sob a culatra e o punho.
+	_box(pai, "AlavancaFrente", Vector3(0.01, 0.05, 0.01), Vector3(0, -0.065, -0.06), f)
+	_box(pai, "AlavancaBaixo", Vector3(0.01, 0.01, 0.13), Vector3(0, -0.09, 0.0), f)
+	_box(pai, "AlavancaTras", Vector3(0.01, 0.045, 0.01), Vector3(0, -0.068, 0.065), f)
+	_box(pai, "Telha", Vector3(0.036, 0.034, 0.3), Vector3(0, -0.006, -0.26), m)
+	var cano := _cyl(pai, "Cano", 0.011, 0.012, 0.62, Vector3(0, 0.02, -0.41), f, 8)
 	cano.rotation_degrees.x = 90
-	var deposito := _cyl(pai, "Deposito", 0.01, 0.01, 0.5, Vector3(0, -0.012, -0.37), "ferro", 6)
+	var deposito := _cyl(pai, "Deposito", 0.0095, 0.0095, 0.56, Vector3(0, -0.006, -0.38), f, 8)
 	deposito.rotation_degrees.x = 90
+	for z: float in [-0.42, -0.64]:
+		_box(pai, "Bracadeira%d" % int(-z * 100), Vector3(0.03, 0.05, 0.012), Vector3(0, 0.007, z), f)
+	_box(pai, "MiraFrente", Vector3(0.004, 0.014, 0.01), Vector3(0, 0.037, -0.705), f)
+	_box(pai, "MiraTras", Vector3(0.02, 0.01, 0.012), Vector3(0, 0.035, -0.18), f)
 
 
 ## Os doze cães (F4, o começo: a presença) no cercado diante das baias, esperando
@@ -2978,3 +3072,47 @@ func _celeiro_acabamento() -> void:
 	_bloco("ferro", Vector3(0.14, 0.14, 0.02), lt + Vector3(-0.25, 1.8, 0.1), Color(0.5, 0.5, 0.5), false, Vector3(0, 25, 45))
 	for s: float in [-1.0, 1.0]:
 		_bloco("ferro", Vector3(0.36, 0.015, 0.015), lt + Vector3(0, 1.62, 0), Color(0.5, 0.5, 0.5), false, Vector3(0, 45.0 + s * 45.0, 0))
+
+
+## Uma peça torneada (revolução de `perfil`, [raio, altura] de baixo para cima) em
+## volta do Y, com `lados` faces; a normal de cada face aponta para fora.
+func _torneado(pai: Node3D, nome: String, perfil: Array, mat: String, lados: int) -> MeshInstance3D:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for k in perfil.size() - 1:
+		var a: Vector2 = perfil[k]
+		var b: Vector2 = perfil[k + 1]
+		for i in lados:
+			var u0 := TAU * i / lados
+			var u1 := TAU * (i + 1) / lados
+			var p00 := Vector3(cos(u0) * a.x, a.y, sin(u0) * a.x)
+			var p01 := Vector3(cos(u1) * a.x, a.y, sin(u1) * a.x)
+			var p10 := Vector3(cos(u0) * b.x, b.y, sin(u0) * b.x)
+			var p11 := Vector3(cos(u1) * b.x, b.y, sin(u1) * b.x)
+			var meio := Vector3(0, (a.y + b.y) / 2, 0)
+			for tri: Array in [[p00, p10, p01], [p01, p10, p11]]:
+				var t0: Vector3 = tri[0]
+				var t1: Vector3 = tri[1]
+				var t2: Vector3 = tri[2]
+				var n := (t1 - t0).cross(t2 - t0)
+				if n.length_squared() < 1e-12:
+					continue
+				var centro := (t0 + t1 + t2) / 3.0
+				# Para fora do eixo; nas faces quase horizontais, para cima/baixo.
+				var fora := Vector3(centro.x, 0, centro.z)
+				if fora.length() < 1e-4:
+					fora = Vector3(0, signf(centro.y - meio.y) if absf(centro.y - meio.y) > 1e-5 else 1.0, 0)
+				if n.dot(fora) > 0.0:
+					var tmp := t1
+					t1 = t2
+					t2 = tmp
+				for v: Vector3 in [t0, t1, t2]:
+					st.set_uv(Vector2(atan2(v.z, v.x) / TAU, v.y * 4.0))
+					st.add_vertex(v)
+	st.generate_normals()
+	var mi := MeshInstance3D.new()
+	mi.name = nome
+	mi.mesh = st.commit()
+	mi.material_override = m[mat]
+	_add(pai, mi)
+	return mi
