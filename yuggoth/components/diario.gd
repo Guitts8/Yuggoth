@@ -17,19 +17,25 @@ extends Node3D
 ## fora do .tscn); o gerador põe só o nó, as áreas e a pena.
 ##
 ## O caderno (playtest 5): capa de couro com cantos e a lombada de couro mais
-## escuro, com nervuras; o corte das folhas; a fita marcadora vermelha. Abre com
-## sentido: a capa gira na lombada e deita à esquerda; as folhas correm, umas
-## atrás das outras, até a fita (o miolo passa da direita para a esquerda), e o
-## par aberto é o do dia. Fecha ao contrário. `_pose(capa, folhas)`.
+## escuro, com nervuras; o corte das folhas; a fita marcadora vermelha.
+##
+## Playtest 11 ("essas aberturas e fechadas estão estranhas"): a capa sobe devagar,
+## passa do prumo e cai na mesa com o próprio peso (um quique curto); por dentro, a
+## guarda marmorizada. O miolo abre na fita como se abre um caderno de verdade:
+## a metade de cima sobe inteira, um maço de folhas (`_maco`) que verga no caminho
+## (a borda livre vem atrás do vinco, `DOBRA`) e deita à esquerda. A folha que vira
+## escrevendo ou lendo também verga (`DOBRA_FOLHA`), como papel. Fecha ao
+## contrário. `_pose(capa, folhas)`; a curva é `_curvar`.
 
 const LARGURA := 0.15
 const FUNDO := 0.215
 ## O miolo de cada lado, aberto; fechado, os dois juntos.
-const MIOLO := 0.017
+const MIOLO := 0.012
 const TABUA := 0.003
-## As folhas que correm ao abrir, e quanto do caminho cada uma leva.
-const CORRENDO := 9
-const CORRER_JANELA := 0.3
+## Quanto a borda livre fica para trás do vinco no meio do caminho (radianos): o
+## maço, mais duro; a folha solta, mais mole.
+const DOBRA := 0.75
+const DOBRA_FOLHA := 1.5
 ## O par de páginas abertas é uma textura só (SubViewport), ~1 pixel da textura
 ## por pixel do mundo com a vista apertada sobre a página.
 const TEXTURA := Vector2i(640, 448)
@@ -80,9 +86,10 @@ var _tela := false
 ## `_mat_vivo` mostra o par atual; `_mat_foto`, uma foto do par anterior.
 var _pag_esq: MeshInstance3D
 var _pag_dir: MeshInstance3D
-var _virada: Node3D
-var _frente: MeshInstance3D
-var _verso: MeshInstance3D
+var _virada: MeshInstance3D
+var _virada_malha := ArrayMesh.new()
+## [frente (para cima, deitada à direita), verso].
+var _virada_mats: Array[Material] = []
 var _mat_vivo: ShaderMaterial
 var _mat_foto: ShaderMaterial
 var _mat_branco: Material
@@ -90,11 +97,15 @@ var _mat_branco: Material
 var _fita_aberta: Node3D
 var _capa: Node3D
 var _lombada: Node3D
-var _bloco_esq: Node3D
 var _bloco_dir: Node3D
-var _alto_esq: Node3D
 var _alto_dir: Node3D
-var _correndo: Array[Node3D] = []
+## A metade de cima do miolo, que abre na fita: [cima (a primeira página, em
+## branco), baixo (a página da esquerda do par aberto), o corte].
+var _maco: MeshInstance3D
+var _maco_malha := ArrayMesh.new()
+var _maco_mats: Array[Material] = []
+## O sentido em que o maço anda agora (1 abrindo, -1 fechando): a borda vem atrás.
+var _sentido := 1.0
 var _aberto: Node3D
 ## A pose atual (`_pose`): a capa (0 fechada, 1 deitada à esquerda) e o miolo
 ## (0 todo à direita, 1 aberto na fita).
@@ -110,6 +121,14 @@ var _direita: RichTextLabel
 var _mancha: Mancha
 var _pautas: Pautas
 var _escrevendo := false
+## Escrevendo: a página em que a pena está (a da direita ou, depois de virar a
+## folha, a da esquerda) e a letra em que essa página começa.
+var _pag: RichTextLabel
+var _jan: Control
+var _pag_desde := 0
+## A página do caderno (0 = o rosto) onde a entrada do dia começa; as pares
+## ficam à esquerda.
+var _inicio := 1
 var _queda_desde := -1
 var _pena_som: AudioStreamPlayer
 var _t := 0.0
@@ -162,7 +181,7 @@ func _process(delta: float) -> void:
 ## e vão devagar.
 func _seguir_a_pena(delta: float) -> void:
 	var ponta := _ponta_px()
-	var linha := Vector2(TEXTURA.x * 0.75, ponta.y + 6.0)
+	var linha := Vector2(_meio_da_pagina(), ponta.y + 6.0)
 	var alvo := global_transform * _na_pagina(linha.lerp(ponta + Vector2(-30.0, 6.0), PUXAO_DA_PENA))
 	var olho := _player.camera.global_position
 	var yaw := atan2(-(alvo.x - olho.x), -(alvo.z - olho.z))
@@ -177,22 +196,38 @@ func _seguir_a_pena(delta: float) -> void:
 ## Wilmarth senta, o caderno vem para diante dele e abre; a entrada se escreve.
 ## Com `falhar`, a última linha cai e a tinta escorre: termina aberto, a pena
 ## tombada na página.
-func anotar(entrada: DocumentData, anterior: DocumentData, player: Player, falhar: bool) -> void:
-	# À esquerda, a última folha da entrada anterior.
-	_esquerda.text = anterior.resolve_pages()[0] if anterior else ROSTO
-	var folhas := _folhas(_esquerda)
-	_esquerda.visible_characters = -1
-	_esquerda.position.y = -folhas[folhas.size() - 1]
-	_direita.text = entrada.resolve_pages()[0] if entrada else ""
-	_direita.position.y = 0.0
+##
+## Playtest 11: as páginas são as do caderno, em sequência (o rosto, depois cada
+## entrada a partir da página seguinte à da anterior). Se a do dia começa numa
+## página da direita, à esquerda fica o fim da anterior; se começa na da esquerda,
+## o par é novo. Cheia a da direita, a folha vira e leva o que foi escrito; a
+## escrita continua na esquerda do par seguinte, depois na direita.
+func anotar(entrada: DocumentData, _anterior: DocumentData, player: Player, falhar: bool) -> void:
+	var antes := _sequencia(entrada.id if entrada else &"")
+	_inicio = antes.size()
+	var texto: String = entrada.resolve_pages()[0] if entrada else ""
+	_direita.text = texto
 	_direita.visible_characters = 0
+	var folhas := _folhas(_direita)
+	if _inicio % 2 == 1:
+		# Começa à direita: à esquerda, a última página escrita.
+		_mostrar(_esquerda, antes[_inicio - 1])
+		_direita.position.y = 0.0
+		_usar_pagina(_direita, _jan_dir, 0)
+	else:
+		# Começa num par novo, à esquerda; a da direita, em branco.
+		_esquerda.text = texto
+		_esquerda.visible_characters = 0
+		_esquerda.position.y = 0.0
+		_direita.position.y = -folhas[1] if folhas.size() > 1 else 0.0
+		_usar_pagina(_esquerda, _jan_esq, 0)
 	_mancha.raio = 0.0
 	_mancha.escorrido = 0.0
 	await _abrir(player)
 	if not is_inside_tree():
 		return
 	var ponta := _ponta_px()
-	var linha := Vector2(TEXTURA.x * 0.75, ponta.y + 6.0)
+	var linha := Vector2(_meio_da_pagina(), ponta.y + 6.0)
 	await player.olhar_para(global_transform * _na_pagina(linha.lerp(ponta, PUXAO_DA_PENA)), 0.8).finished
 	if not is_inside_tree():
 		return
@@ -235,24 +270,44 @@ func _abrir(player: Player) -> void:
 	t = _tween()
 	t.tween_property(self, ^"transform", lugar_aberto, 1.0)
 	await t.finished
-	# A capa abre; as folhas correm até a fita.
-	await _animar_pose(1.0, 0.0, 0.9)
-	await _animar_pose(1.0, 1.0, 1.3, true)
-	_mostrar_aberto(true)
-
-	# Debruça-se: a cabeça vai à frente sobre a página e a vista se aperta nela.
+	# Debruça-se enquanto abre (playtest 11: de longe, a abertura passava sem ser
+	# vista): a cabeça vai à frente e a vista se aperta sobre o caderno.
 	player.fov_forcado = FOV_ESCREVENDO
-	t = player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(player, ^"debrucado", 1.0, 1.3)
+	var deb := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	deb.tween_property(player, ^"debrucado", 1.0, 2.4)
+	await _abrir_capa()
+	if not is_inside_tree():
+		return
+	# O miolo abre na fita.
+	await _animar_pose(1.0, 1.0, 1.05)
+	_tocar(som_papel, -12.0)
+	_mostrar_aberto(true)
+	if deb.is_running():
+		await deb.finished
+
+
+## A capa: sobe devagar até o prumo, cai do outro lado com o próprio peso e quica
+## de leve na mesa.
+func _abrir_capa() -> void:
+	_tocar(som_papel, -10.0)
+	var t := create_tween()
+	t.tween_method(func(k: float) -> void: _pose(k, 0.0), 0.0, 0.5, 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_method(func(k: float) -> void: _pose(k, 0.0), 0.5, 1.0, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_callback(func() -> void:
+		if som_fechar:
+			var baque := AudioDirector.play_sfx(som_fechar, -22.0)
+			baque.pitch_scale = 1.6)
+	t.tween_method(func(k: float) -> void: _pose(k, 0.0), 1.0, 0.975, 0.08).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_method(func(k: float) -> void: _pose(k, 0.0), 0.975, 1.0, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	await t.finished
 
 
-## Folhear o diário: abre no último par escrito e espera o jogador fechar
-## ([E]/[Esc]); quem fecha o caderno depois é quem chamou (`fechar()`).
-func ler(player: Player) -> void:
-	_paginas = [[ROSTO, 0.0]]
+## As páginas do caderno, em ordem: o rosto e as folhas de cada entrada do
+## dossiê (menos `menos`), como [texto, rolagem, até que letra].
+func _sequencia(menos: StringName) -> Array:
+	var paginas: Array = [[ROSTO, 0.0]]
 	var entradas := GameState.dossier.filter(func(d: DocumentData) -> bool:
-		return String(d.id).begins_with("diario_dia_"))
+		return String(d.id).begins_with("diario_dia_") and d.id != menos)
 	entradas.sort_custom(func(a: DocumentData, b: DocumentData) -> bool:
 		return String(a.id).naturalnocasecmp_to(String(b.id)) < 0)
 	for d: DocumentData in entradas:
@@ -260,10 +315,17 @@ func ler(player: Player) -> void:
 		_esquerda.text = texto
 		var folhas := _folhas(_esquerda)
 		for k in folhas.size():
-			_paginas.append([texto, folhas[k], _fim_da_folha(_esquerda, k)])
-	_par = maxi(0, _paginas.size() - 2)
+			paginas.append([texto, folhas[k], _fim_da_folha(_esquerda, k)])
+	return paginas
+
+
+## Folhear o diário: abre no último par escrito e espera o jogador fechar
+## ([E]/[Esc]); quem fecha o caderno depois é quem chamou (`fechar()`).
+func ler(player: Player) -> void:
+	_paginas = _sequencia(&"")
+	# Abre no par da última página escrita (os pares começam nas páginas pares).
+	_par = (_paginas.size() - 1) & ~1
 	_mostrar_par()
-	_direita.visible_characters = -1
 	_mancha.raio = 0.0
 	_mancha.escorrido = 0.0
 	await _abrir(player)
@@ -305,13 +367,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
-## Vira uma folha: para a frente, a da direita levanta e deita à esquerda; para
-## trás, o contrário. A folha que vira leva o par antigo de um lado e o novo do
+## Vira uma folha (o par anda duas páginas): para a frente, a da direita levanta
+## e deita à esquerda; para trás, o contrário. A folha que vira leva o par antigo de um lado e o novo do
 ## outro (uma foto da textura antes da troca), e a página que ela ainda cobre
 ## continua mostrando o par antigo até a folha passar.
 func _virar(direcao: int) -> void:
-	var novo := _par + direcao
-	if _virando or novo < 0 or novo > maxi(0, _paginas.size() - 2):
+	var novo := _par + direcao * 2
+	if _virando or novo < 0 or novo > _paginas.size() - 1:
 		return
 	await _animar_virada(direcao, func() -> void:
 		_par = novo
@@ -333,25 +395,22 @@ func _animar_virada(direcao: int, trocar: Callable) -> void:
 	_mat_foto.set_shader_parameter(&"albedo_tex", ImageTexture.create_from_image(foto))
 	if direcao > 0:
 		_pag_esq.material_override = _mat_foto
-		_frente.material_override = _mat_foto
-		_verso.material_override = _mat_vivo
-		_virada.rotation.z = 0.0
+		_virada_mats = [_mat_foto, _mat_vivo]
 	else:
 		_pag_dir.material_override = _mat_foto
-		_verso.material_override = _mat_foto
-		_frente.material_override = _mat_vivo
-		_virada.rotation.z = PI
+		_virada_mats = [_mat_vivo, _mat_foto]
+	var sentido := 1.0 if direcao > 0 else -1.0
+	_curvar_folha(0.0 if direcao > 0 else 1.0, sentido)
 	trocar.call()
 	await RenderingServer.frame_post_draw
 	if not is_inside_tree():
 		return
 	_virada.visible = true
 	_tocar(som_papel)
+	# A folha verga: o vinco vai na frente e a borda vem atrás.
 	var t := _tween()
-	t.tween_property(_virada, ^"rotation:z", PI if direcao > 0 else 0.0, VIRAR_SEGUNDOS)
-	# A folha se arqueia um pouco no meio do caminho.
-	t.parallel().tween_method(func(k: float) -> void:
-		_virada.position.y = _altura_virada() + sin(k * PI) * 0.012, 0.0, 1.0, VIRAR_SEGUNDOS)
+	t.tween_method(func(k: float) -> void:
+		_curvar_folha(k if direcao > 0 else 1.0 - k, sentido), 0.0, 1.0, VIRAR_SEGUNDOS)
 	await t.finished
 	_pag_esq.material_override = _mat_vivo
 	_pag_dir.material_override = _mat_vivo
@@ -450,14 +509,16 @@ func pagina() -> Vector3:
 ## Escrita a entrada sem falha (ou lido o diário): fecha o caderno, a pena
 ## volta, ele se ergue.
 func fechar(player: Player) -> void:
+	_pena_para_casa(0.8)
+	await get_tree().create_timer(0.5).timeout
+	# Ao contrário, ainda debruçado (playtest 11: erguia-se antes e o caderno
+	# fechava longe): o maço volta para a direita; ele se ergue enquanto a capa
+	# fecha por cima.
+	_mostrar_aberto(false)
+	await _animar_pose(1.0, 0.0, 1.05)
 	player.fov_forcado = 0.0
 	var t := player.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(player, ^"debrucado", 0.0, 1.0)
-	_pena_para_casa(0.8)
-	await t.finished
-	# Ao contrário: as folhas voltam para a direita, a capa fecha por cima.
-	_mostrar_aberto(false)
-	await _animar_pose(1.0, 0.0, 1.0, true)
+	t.tween_property(player, ^"debrucado", 0.0, 1.6)
 	# A capa: erguida devagar até em pé, e dali cai sobre o miolo (acelera no fim,
 	# como cai uma capa de verdade), com um baque surdo de couro.
 	await _animar_pose(0.5, 0.0, 0.6)
@@ -468,6 +529,8 @@ func fechar(player: Player) -> void:
 		var baque := AudioDirector.play_sfx(som_fechar, -15.0)
 		baque.pitch_scale = 1.4
 	await get_tree().create_timer(0.25).timeout
+	if t.is_running():
+		await t.finished
 	t = _tween()
 	t.tween_property(self, ^"transform", _casa, 1.0)
 	await t.finished
@@ -499,33 +562,36 @@ func _escrever(falhar: bool) -> void:
 	if falhar:
 		_queda_desde = texto.strip_edges(false, true).rfind("\n") + 1
 	var normal := total if _queda_desde < 0 else _queda_desde
-	# As folhas que a entrada ocupa: cheia uma, ele vira a página e continua na
-	# seguinte (playtest 4: "ao finalizar a folha, ele deve passar para a próxima").
+	# As páginas que a entrada ocupa (playtest 4: "ao finalizar a folha, ele deve
+	# passar para a próxima"): da direita para a esquerda do par seguinte, virando
+	# a folha; da esquerda para a direita do mesmo par, só a pena muda de página.
 	var folhas := _folhas(_direita)
 	var por := _linhas_por_folha(_direita)
 	_escrevendo = true
 	_ligar_pena()
-	var feito := 0
 	var t: Tween
 	for k in folhas.size():
+		var desde := 0 if k == 0 else _direita.get_line_range(k * por).x
 		var fim := total if k == folhas.size() - 1 else _direita.get_line_range((k + 1) * por).x
-		var alvo := mini(fim, normal)
-		if alvo > feito:
-			t = create_tween()
-			t.tween_property(_direita, ^"visible_characters", alvo, (alvo - feito) / LETRAS_POR_SEGUNDO)
-			await t.finished
+		if k > 0:
+			if (_inicio + k) % 2 == 0:
+				await _virar_escrevendo(folhas, k, desde)
+			else:
+				await _pena_para(_direita, _jan_dir, desde)
 			if not is_inside_tree():
 				return
-			feito = alvo
-		if k < folhas.size() - 1:
-			await _virar_escrevendo(folhas[k], folhas[k + 1], fim)
+		var alvo := mini(fim, normal)
+		if alvo > desde:
+			t = create_tween()
+			t.tween_property(_pag, ^"visible_characters", alvo, (alvo - desde) / LETRAS_POR_SEGUNDO)
+			await t.finished
 			if not is_inside_tree():
 				return
 	if falhar:
 		# A última linha, cada vez mais devagar, até a mão parar.
-		var resto := total - normal
+		var resto := total - maxi(normal, _pag.visible_characters)
 		t = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		t.tween_property(_direita, ^"visible_characters", total, resto / LETRAS_POR_SEGUNDO * 2.6)
+		t.tween_property(_pag, ^"visible_characters", total, resto / LETRAS_POR_SEGUNDO * 2.6)
 		await t.finished
 		if not is_inside_tree():
 			return
@@ -550,9 +616,10 @@ func _escrever(falhar: bool) -> void:
 	await get_tree().create_timer(1.5).timeout
 
 
-## A folha da direita encheu: a pena se ergue, a folha vira (a cheia vai para a
-## esquerda) e a escrita continua no alto da nova página.
-func _virar_escrevendo(rolagem_cheia: float, rolagem_nova: float, fim_cheia: int) -> void:
+## A folha da direita encheu: a pena se ergue, a folha vira e leva o que foi
+## escrito (o verso dela, agora à esquerda, está em branco), e a escrita continua
+## no alto da página da esquerda do par novo (a folha `k` do texto).
+func _virar_escrevendo(folhas: PackedFloat32Array, k: int, desde: int) -> void:
 	_escrevendo = false
 	_parar_pena()
 	if pena:
@@ -561,30 +628,66 @@ func _virar_escrevendo(rolagem_cheia: float, rolagem_nova: float, fim_cheia: int
 		t.tween_property(pena, ^"global_transform", de.translated(Vector3.UP * 0.05), 0.3)
 		await t.finished
 	await _animar_virada(1, func() -> void:
+		# As duas páginas do par novo, em branco: o texto até `desde` fica acima
+		# da janela de cada uma.
 		_esquerda.text = _direita.text
-		_esquerda.visible_characters = fim_cheia
-		_esquerda.position.y = -rolagem_cheia
-		_direita.position.y = -rolagem_nova)
+		_esquerda.visible_characters = desde
+		_esquerda.position.y = -folhas[k]
+		_direita.visible_characters = desde
+		_direita.position.y = -folhas[k + 1] if k + 1 < folhas.size() else -folhas[k])
 	if not is_inside_tree():
 		return
+	await _pena_para(_esquerda, _jan_esq, desde)
+
+
+## A escrita passa para a página `r` (a letra `desde` é a primeira dela): a pena
+## se ergue, vai ao alto da página e continua.
+func _pena_para(r: RichTextLabel, janela: Control, desde: int) -> void:
+	_escrevendo = false
+	_parar_pena()
+	r.visible_characters = desde
+	_usar_pagina(r, janela, desde)
+	if pena:
+		var de := pena.global_transform
+		var ate := _pena_em(global_transform * _na_pagina(_ponta_px()), Vector3(0.35, 0.85, 0.4))
+		var t := _tween()
+		t.tween_method(func(k: float) -> void:
+			var m := de.interpolate_with(ate, k)
+			pena.global_transform = m.translated(Vector3.UP * sin(k * PI) * 0.03), 0.0, 1.0, 0.55)
+		await t.finished
+		if not is_inside_tree():
+			return
 	_escrevendo = true
 	_ligar_pena()
 
 
+func _usar_pagina(r: RichTextLabel, janela: Control, desde: int) -> void:
+	_pag = r
+	_jan = janela
+	_pag_desde = desde
+
+
+## O meio da página em que se escreve (x, pixels da textura).
+func _meio_da_pagina() -> float:
+	return _jan.position.x + _jan.size.x * 0.5
+
+
 ## Onde está a ponta da pena (pixels da textura): logo depois da última letra visível.
 func _ponta_px() -> Vector2:
-	var c := _direita.visible_characters
-	var fonte := _direita.get_theme_font(&"normal_font")
+	var r := _pag
+	var c := r.visible_characters
+	var fonte := r.get_theme_font(&"normal_font")
 	var subida := fonte.get_ascent(FONTE) * 0.8
-	var origem := _jan_dir.position + _direita.position
-	if c <= 0:
-		return origem + Vector2(0, subida)
-	var texto := _direita.get_parsed_text()
-	var linha := _direita.get_character_line(c - 1)
-	var faixa := _direita.get_line_range(linha)
+	var origem := _jan.position + r.position
+	if c <= _pag_desde:
+		# Nada escrito nesta página ainda: o começo da primeira linha dela.
+		return _jan.position + Vector2(0, subida)
+	var texto := r.get_parsed_text()
+	var linha := r.get_character_line(c - 1)
+	var faixa := r.get_line_range(linha)
 	var trecho := texto.substr(faixa.x, c - faixa.x).replace("\n", "")
 	var largura := fonte.get_string_size(trecho, HORIZONTAL_ALIGNMENT_LEFT, -1, FONTE).x
-	var p := origem + Vector2(largura, _direita.get_line_offset(linha) + subida)
+	var p := origem + Vector2(largura, r.get_line_offset(linha) + subida)
 	if _queda_desde >= 0 and c > _queda_desde:
 		p += QuedaTextEffect.deslocamento(c - 1 - _queda_desde)
 	return p
@@ -644,6 +747,8 @@ func _mostrar_aberto(sim: bool) -> void:
 func _animar_pose(capa: float, folhas: float, segundos: float, correndo := false) -> void:
 	var de := Vector2(_k_capa, _k_folhas)
 	var ate := Vector2(capa, folhas)
+	if ate.y != de.y:
+		_sentido = signf(ate.y - de.y)
 	var t := _tween()
 	t.tween_method(func(k: float) -> void:
 		var p := de.lerp(ate, k)
@@ -657,53 +762,124 @@ func _animar_pose(capa: float, folhas: float, segundos: float, correndo := false
 
 ## O caderno entre fechado e aberto na fita. `capa` 0..1: a capa gira na lombada
 ## e deita à esquerda (a dobradiça desce à mesa na segunda metade, sem a capa
-## entrar nela). `folhas` 0..1: o miolo passa da direita para a esquerda, e as
-## folhas soltas viram, cada uma no seu trecho, da pilha da direita à da esquerda.
+## entrar nela). `folhas` 0..1: o maço (a metade de cima do miolo) gira no vinco,
+## vergando, da direita para a esquerda, onde deita sobre a guarda.
 func _pose(capa: float, folhas: float) -> void:
 	_k_capa = capa
 	_k_folhas = folhas
-	var direita := MIOLO * (2.0 - folhas)
-	# A pilha da esquerda acaba quando a última folha se ergue dela (a primeira das
-	# que correm, `folhas` < CORRER_JANELA), não no fim: fechando, a folha em branco
-	# sumia de uma vez sobre a guarda da capa (playtest 10, "dá uma bugada ao ficar
-	# na parte interna da capa"). E fica sempre acima da guarda.
-	var esquerda := MIOLO * clampf((folhas - CORRER_JANELA) / (1.0 - CORRER_JANELA), 0.0, 1.0)
-	var sobre_a_guarda := maxf(esquerda, 0.0008)
-	_bloco_dir.scale.y = direita
-	_bloco_esq.scale.y = maxf(esquerda, 0.0001)
-	_bloco_esq.visible = folhas >= CORRER_JANELA
-	_alto_dir.position.y = TABUA + direita
-	_alto_esq.position.y = TABUA + sobre_a_guarda
-	_alto_esq.visible = _bloco_esq.visible
 	var angulo := PI * capa
 	var alto := TABUA + MIOLO * 2.0 + TABUA * 0.5
 	var queda := clampf(capa * 2.0 - 1.0, 0.0, 1.0)
 	_capa.rotation.z = angulo
 	_capa.position.y = lerpf(alto, TABUA * 0.5, queda)
-	# A lombada cobre o miolo; aberto, fica sob o vinco.
-	_lombada.scale.y = TABUA * (2.0 - capa) + maxf(direita, esquerda) - 0.0005 * capa
-	var passo := (1.0 - CORRER_JANELA) / maxf(1.0, CORRENDO - 1.0)
-	for i in _correndo.size():
-		var p := clampf((folhas - i * passo) / CORRER_JANELA, 0.0, 1.0)
-		var folha := _correndo[i]
-		# A última fica deitada à esquerda (é a página escrita) até o par aberto
-		# cobri-la.
-		folha.visible = p > 0.0 and (p < 1.0 or i == _correndo.size() - 1) and not aberto
-		# A página do dia (à direita, na fita) só aparece quando a última folha
-		# sai de cima dela.
-		if i == _correndo.size() - 1:
-			_alto_dir.material_override = _mat_vivo if p > 0.0 else _mat_branco
-		folha.rotation.z = PI * smoothstep(0.0, 1.0, p)
-		folha.position.y = lerpf(TABUA + direita, TABUA + sobre_a_guarda, p) + 0.0004 + sin(p * PI) * 0.006
+	# A lombada cobre o miolo inteiro; aberto, fica sob o vinco.
+	_lombada.scale.y = TABUA * (2.0 - capa) + MIOLO * (2.0 - folhas) - 0.0005 * capa
+	# O maço gira na linha do meio dele, junto ao vinco: em cima da metade da
+	# direita, fechado; sobre a guarda da capa, aberto.
+	var k := smoothstep(0.0, 1.0, folhas)
+	_maco.position = Vector3(lerpf(0.002, -0.002, k), lerpf(TABUA + MIOLO * 1.5, TABUA + MIOLO * 0.5, k) + 0.0003, 0)
+	_curvar(_maco_malha, folhas, _sentido, DOBRA, MIOLO, LARGURA - 0.006, Vector2(0.0, 1.0), Vector2(0.5, 0.0), true)
+	_aplicar_mats(_maco_malha, _maco_mats)
+
+
+## A folha que vira (`t` 0 deitada à direita, 1 à esquerda), vergando.
+func _curvar_folha(t: float, sentido: float) -> void:
+	_virada.position.y = _altura_virada() + sin(t * PI) * 0.003
+	_curvar(_virada_malha, t, sentido, DOBRA_FOLHA, 0.0004, LARGURA - 0.004, Vector2(0.5, 1.0), Vector2(0.5, 0.0), false)
+	_aplicar_mats(_virada_malha, _virada_mats)
+
+
+static func _aplicar_mats(malha: ArrayMesh, mats: Array[Material]) -> void:
+	for i in mini(malha.get_surface_count(), mats.size()):
+		malha.surface_set_material(i, mats[i])
+
+
+## Refaz `malha`: uma folha (ou um maço, com `espessura`) presa no vinco (a origem,
+## ao longo de Z), de largura `w`, com `t` 0 deitada para +X e 1 para -X. No meio
+## do caminho a borda livre fica para trás do vinco (`dobra` radianos, no sentido
+## contrário ao movimento, `sentido`), e o comprimento não muda: a curva é a soma
+## de pedaços iguais. Superfícies: a de cima (u de `u_cima` pela largura), a de
+## baixo (`u_baixo`) e, com `bordas`, o corte (a borda livre e as duas pontas).
+static func _curvar(malha: ArrayMesh, t: float, sentido: float, dobra: float, espessura: float, w: float,
+		u_cima: Vector2, u_baixo: Vector2, bordas: bool) -> void:
+	const N := 12
+	const NZ := 4
+	var d := FUNDO - 0.008
+	var a := PI * t
+	var curva := dobra * sin(PI * t) * sentido
+	var angulos := PackedFloat32Array()
+	for i in N + 1:
+		angulos.append(clampf(a - curva * float(i) / N, 0.0, PI))
+	var meio := PackedVector2Array([Vector2.ZERO])
+	var p := Vector2.ZERO
+	for i in N:
+		var phi := (angulos[i] + angulos[i + 1]) * 0.5
+		p += Vector2(cos(phi), sin(phi)) * w / N
+		meio.append(p)
+	var cima := PackedVector3Array()
+	var baixo := PackedVector3Array()
+	var normais := PackedVector3Array()
+	for i in N + 1:
+		var n := Vector2(-sin(angulos[i]), cos(angulos[i]))
+		normais.append(Vector3(n.x, n.y, 0))
+		cima.append(Vector3(meio[i].x + n.x * espessura * 0.5, meio[i].y + n.y * espessura * 0.5, 0))
+		baixo.append(Vector3(meio[i].x - n.x * espessura * 0.5, meio[i].y - n.y * espessura * 0.5, 0))
+	malha.clear_surfaces()
+	for lado: float in [1.0, -1.0]:
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var linha := cima if lado > 0 else baixo
+		var u := u_cima if lado > 0 else u_baixo
+		for i in N:
+			for j in NZ:
+				var quad := [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]]
+				var vs: Array = []
+				for c: Array in quad:
+					var z := -d * 0.5 + d * float(c[1]) / NZ
+					vs.append([linha[c[0]] + Vector3(0, 0, z), Vector2(lerpf(u.x, u.y, float(c[0]) / N), float(c[1]) / NZ),
+						normais[c[0]] * lado])
+				_quad(st, vs)
+		st.commit(malha)
+	if not bordas:
+		return
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var ponta := Vector3(cos(angulos[N]), sin(angulos[N]), 0)
+	for j in NZ:
+		var z0 := -d * 0.5 + d * float(j) / NZ
+		var z1 := -d * 0.5 + d * float(j + 1) / NZ
+		_quad(st, [[cima[N] + Vector3(0, 0, z0), Vector2(0, 0), ponta], [cima[N] + Vector3(0, 0, z1), Vector2(1, 0), ponta],
+			[baixo[N] + Vector3(0, 0, z1), Vector2(1, 1), ponta], [baixo[N] + Vector3(0, 0, z0), Vector2(0, 1), ponta]])
+	for lado: float in [-1.0, 1.0]:
+		var z := d * 0.5 * lado
+		var n := Vector3(0, 0, lado)
+		for i in N:
+			_quad(st, [[cima[i] + Vector3(0, 0, z), Vector2(float(i) / N, 0), n], [cima[i + 1] + Vector3(0, 0, z), Vector2(float(i + 1) / N, 0), n],
+				[baixo[i + 1] + Vector3(0, 0, z), Vector2(float(i + 1) / N, 1), n], [baixo[i] + Vector3(0, 0, z), Vector2(float(i) / N, 1), n]])
+	st.commit(malha)
+
+
+## Um quadrilátero ([ponto, uv, normal] × 4) com a frente para o lado da normal.
+static func _quad(st: SurfaceTool, vs: Array) -> void:
+	for tri: Array in [[vs[0], vs[1], vs[2]], [vs[0], vs[2], vs[3]]]:
+		var n: Vector3 = (tri[1][0] - tri[0][0]).cross(tri[2][0] - tri[0][0])
+		# A face da frente do Godot é a de giro horário visto de fora: o produto
+		# vetorial aponta para longe de quem vê.
+		if n.dot(tri[0][2]) > 0.0:
+			tri = [tri[0], tri[2], tri[1]]
+		for v: Array in tri:
+			st.set_normal(v[2])
+			st.set_uv(v[1])
+			st.add_vertex(v[0])
 
 
 func _tween() -> Tween:
 	return create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
-func _tocar(som: AudioStream) -> void:
+func _tocar(som: AudioStream, db := -6.0) -> void:
 	if som:
-		AudioDirector.play_sfx(som, -6.0)
+		AudioDirector.play_sfx(som, db)
 
 
 # --- Montagem -------------------------------------------------------------------
@@ -712,7 +888,9 @@ func _montar() -> void:
 	var capa := _cor("res://art/materials/capa_livro.tres", Color(0.4, 0.16, 0.12))
 	var couro := _cor("res://art/materials/capa_livro.tres", Color(0.19, 0.08, 0.06))
 	var corte := _cor("res://art/materials/papel.tres", Color(0.86, 0.8, 0.66))
-	var guarda := _cor("res://art/materials/papel.tres", Color(0.5, 0.36, 0.3))
+	var guarda := Selagem._material("res://art/materials/papel.tres")
+	guarda.set_shader_parameter(&"albedo_tex", _guarda_marmorizada())
+	guarda.set_shader_parameter(&"albedo_color", Color.WHITE)
 	var fita := _cor("res://art/materials/papel.tres", Color(0.62, 0.09, 0.08))
 	var miolo := Vector3(LARGURA - 0.006, 1.0, FUNDO - 0.008)
 	# A página em branco (pautada, como as do par aberto): o alto do miolo e as
@@ -725,33 +903,32 @@ func _montar() -> void:
 	_mat_vivo = Selagem._material("res://art/materials/papel.tres")
 
 	var corpo := _no(self, "_Corpo")
-	# A contracapa (embaixo) e o miolo, que se reparte entre os dois lados ao abrir
-	# (pivôs no pé: a escala em y é a altura).
+	# A contracapa (embaixo) e a metade de baixo do miolo, à direita (pivô no pé: a
+	# escala em y é a altura); o alto dela é a página da direita do par aberto (a
+	# textura viva). A metade de cima é o maço, que abre na fita.
 	_caixa(corpo, Vector3(LARGURA, TABUA, FUNDO), Vector3(LARGURA * 0.5, TABUA * 0.5, 0), capa)
-	for lado in [1.0, -1.0]:
-		var bloco := _no(corpo, "_BlocoDir" if lado > 0 else "_BlocoEsq")
-		bloco.position = Vector3(lado * (LARGURA * 0.5 - 0.001), TABUA, 0)
-		_sem_tampa(_caixa(bloco, miolo, Vector3(0, 0.5, 0), corte))
-		# O alto do miolo é a página: à direita, a do par aberto (a textura viva:
-		# fechando, ela fica onde estava); à esquerda, em branco. Fora do bloco
-		# (que escala), um pouco acima dele (`_pose`).
-		var alto := _folha(corpo, "_AltoDir" if lado > 0 else "_AltoEsq", -miolo.x * 0.5, miolo.x * 0.5,
-			0.5 if lado > 0 else 0.0, 1.0, Vector3.UP)
-		alto.position.x = bloco.position.x
-		alto.material_override = _mat_vivo if lado > 0 else branco
-		if lado > 0:
-			_bloco_dir = bloco
-			_alto_dir = alto
-		else:
-			_bloco_esq = bloco
-			_alto_esq = alto
+	_bloco_dir = _no(corpo, "_BlocoDir")
+	_bloco_dir.position = Vector3(LARGURA * 0.5 - 0.001, TABUA, 0)
+	_bloco_dir.scale.y = MIOLO
+	_sem_tampa(_caixa(_bloco_dir, miolo, Vector3(0, 0.5, 0), corte))
+	_alto_dir = _folha(corpo, "_AltoDir", -miolo.x * 0.5, miolo.x * 0.5, 0.5, 1.0, Vector3.UP)
+	_alto_dir.position = Vector3(_bloco_dir.position.x, TABUA + MIOLO, 0)
+	_alto_dir.material_override = _mat_vivo
+	_maco = MeshInstance3D.new()
+	_maco.name = "_Maco"
+	_maco.mesh = _maco_malha
+	corpo.add_child(_maco)
+	_maco_mats = [branco, _mat_vivo, corte]
 	# A capa gira na lombada (Z) e vai deitar do lado esquerdo: o couro com os
 	# cantos e a faixa da lombada por fora, a folha de guarda por dentro.
 	_capa = _no(corpo, "_Capa")
 	var tabua := _caixa(_capa, Vector3(LARGURA, TABUA, FUNDO), Vector3(LARGURA * 0.5, 0, 0), capa)
 	_cantos(tabua, TABUA * 0.5 + 0.0004, couro)
 	_caixa(tabua, Vector3(0.024, 0.0008, FUNDO + 0.001), Vector3(-LARGURA * 0.5 + 0.012, TABUA * 0.5 + 0.0004, 0), couro)
-	_caixa(tabua, Vector3(LARGURA - 0.01, 0.0005, FUNDO - 0.01), Vector3(0.002, -TABUA * 0.5 - 0.0003, 0), guarda)
+	# Por dentro, a guarda marmorizada (uma folha só, virada para dentro).
+	var gd := _folha(tabua, "_Guarda", -LARGURA * 0.5 + 0.004, LARGURA * 0.5 - 0.004, 0.0, 1.0, Vector3.DOWN)
+	gd.position.y = -TABUA * 0.5 - 0.0002
+	gd.material_override = guarda
 	# A lombada de couro escuro com as nervuras (pivô no pé).
 	_lombada = _no(corpo, "_Lombada")
 	_caixa(_lombada, Vector3(0.006, 1.0, FUNDO + 0.001), Vector3(-0.003, 0.5, 0), couro)
@@ -763,19 +940,6 @@ func _montar() -> void:
 	_caixa(corpo, Vector3(0.006, TABUA + MIOLO, 0.0005), Vector3(0.0075, (TABUA + MIOLO) * 0.5, pe), fita)
 	var ponta := _caixa(corpo, Vector3(0.006, 0.0005, 0.036), Vector3(0.0095, 0.0003, pe + 0.018), fita)
 	ponta.rotation.y = deg_to_rad(-9.0)
-
-	_correndo.clear()
-	for i in CORRENDO:
-		var folha := _no(corpo, "_Correndo%d" % i)
-		folha.visible = false
-		_folha(folha, "_Cima", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.UP).material_override = branco
-		# A última a chegar à esquerda (a primeira a sair, fechando) leva a página
-		# da esquerda do par aberto: o texto não some ao fechar, sai com a folha.
-		if i == CORRENDO - 1:
-			_folha(folha, "_Baixo", 0.0, LARGURA - 0.006, 0.5, 0.0, Vector3.DOWN).material_override = _mat_vivo
-		else:
-			_folha(folha, "_Baixo", 0.0, LARGURA - 0.006, 0.0, 1.0, Vector3.DOWN).material_override = branco
-		_correndo.append(folha)
 
 	_aberto = _no(self, "_Aberto")
 	_aberto.visible = false
@@ -799,6 +963,7 @@ func _montar() -> void:
 	_jan_dir = _janela(Rect2(meia + MARGEM.x, MARGEM.y, meia - MARGEM.x * 2.0, TEXTURA.y - MARGEM.y * 2.0))
 	_esquerda = _rotulo(_jan_esq)
 	_direita = _rotulo(_jan_dir)
+	_usar_pagina(_direita, _jan_dir, 0)
 	_mancha = Mancha.new()
 	_mancha.size = Vector2(TEXTURA)
 	_mancha.cor = TINTA
@@ -814,13 +979,16 @@ func _montar() -> void:
 	_pag_dir = _folha(_aberto, "_PaginaDir", 0.0, wp, 0.5, 1.0, Vector3.UP)
 	_pag_esq.position.y = y
 	_pag_dir.position.y = y
-	_virada = _no(_aberto, "_Virada")
-	_virada.position.y = _altura_virada()
+	# A folha que vira: a frente (para cima, deitada à direita) e o verso, que
+	# deitado à esquerda mostra a página da esquerda (`_curvar_folha`).
+	_virada = MeshInstance3D.new()
+	_virada.name = "_Virada"
+	_virada.mesh = _virada_malha
 	_virada.visible = false
-	_frente = _folha(_virada, "_Frente", 0.0, wp, 0.5, 1.0, Vector3.UP)
-	# O verso: deitado à esquerda (girado meia volta), mostra a página da esquerda.
-	_verso = _folha(_virada, "_Verso", 0.0, wp, 0.5, 0.0, Vector3.DOWN)
-	for mi in [_pag_esq, _pag_dir, _frente, _verso]:
+	_aberto.add_child(_virada)
+	_virada_mats = [_mat_vivo, _mat_vivo]
+	_curvar_folha(0.0, 1.0)
+	for mi in [_pag_esq, _pag_dir]:
 		mi.material_override = _mat_vivo
 	_pose(0.0, 0.0)
 
@@ -836,6 +1004,27 @@ static func _pagina_em_branco() -> Texture2D:
 		for x in range(7, img.get_width() - 4):
 			img.set_pixel(x, int(y), pauta)
 		y += 15.0
+	return ImageTexture.create_from_image(img)
+
+
+## A guarda marmorizada (o papel de dentro da capa): veios torcidos de vermelho,
+## creme, azul e ocre.
+static func _guarda_marmorizada() -> Texture2D:
+	var ruido := FastNoiseLite.new()
+	ruido.seed = 11
+	ruido.frequency = 0.06
+	ruido.domain_warp_enabled = true
+	ruido.domain_warp_amplitude = 18.0
+	ruido.domain_warp_frequency = 0.04
+	# Tons apagados, próximos uns dos outros (playtest 11: berrante, parecia camuflagem).
+	var cores := [Color(0.36, 0.17, 0.13), Color(0.5, 0.36, 0.26), Color(0.27, 0.22, 0.22), Color(0.44, 0.27, 0.17)]
+	var img := Image.create(96, 136, false, Image.FORMAT_RGB8)
+	for y in img.get_height():
+		for x in img.get_width():
+			var n := (ruido.get_noise_2d(x * 1.0, y * 0.45) * 0.5 + 0.5) * 6.0
+			var i := int(n) % cores.size()
+			var c: Color = cores[i].lerp(cores[(i + 1) % cores.size()], smoothstep(0.75, 1.0, fposmod(n, 1.0)))
+			img.set_pixel(x, y, c)
 	return ImageTexture.create_from_image(img)
 
 
@@ -923,7 +1112,7 @@ func _rotulo(janela: Control) -> RichTextLabel:
 	r.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	r.position = Vector2.ZERO
-	r.size = Vector2(janela.size.x, janela.size.y * 6.0)
+	r.size = Vector2(janela.size.x, janela.size.y * 24.0)
 	r.add_theme_color_override(&"default_color", TINTA)
 	DocumentData.apply_fonts(r, DocumentData.Style.WILMARTH, FONTE)
 	r.install_effect(TremorTextEffect.new())

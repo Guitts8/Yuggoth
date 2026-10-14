@@ -1119,13 +1119,31 @@ a fazer · ❓ espera resposta. Os itens da fazenda (13) estão em `docs/PLANO_F
 
 1. 🔧 **O mapa de Vermont** — *"alguns glitchs visuais acontecem no mapa"*.
 2. 🔧 **A união do escritório com o corredor** — glitches visuais na porta.
-3. 🔧 **O diário: abrir, fechar e as folhas** — *"essas aberturas e fechadas estão
+3. ✅ **O diário: abrir, fechar e as folhas** — *"essas aberturas e fechadas estão
    estranhas; você escreve em uma folha até o final, vira a página, e o que você
    escreveu está na página virada"*. Antes de o usuário fazer a animação à mão, refazê-la
-   da melhor forma possível.
-4. 🔧 **A segunda carta de Akeley** — *"bastante difícil de ler"*.
-5. 🔧 **A transcrição do disco** — os títulos e subtítulos difíceis de ler: *"essa
-   grafia é interessante, mas não pode interferir na leitura"*.
+   da melhor forma possível. Filmado quadro a quadro: a capa aberta parecia uma tábua,
+   nove folhas rígidas viravam em leque, e ele só se debruçava depois. Refeito
+   (`components/diario.gd`): a capa sobe devagar, passa do prumo e cai com o próprio
+   peso, com um quique e um baque; por dentro, a guarda marmorizada; o miolo abre na
+   fita como um caderno de verdade — a metade de cima sobe inteira, um maço que
+   **verga** no caminho (a borda vem atrás do vinco, `_curvar`) e deita à esquerda; ele
+   se debruça enquanto abre e fecha ainda debruçado. A folha que vira também verga.
+   **As páginas** agora são as do caderno, em sequência (`_sequencia`): a entrada do
+   dia começa na página seguinte à da anterior; cheia a da direita, a folha vira e
+   leva o escrito embora (o verso, à esquerda, está em branco) e a escrita continua
+   na esquerda do par novo, depois na direita; folhear anda de par em par. O miolo
+   ficou mais fino (era um tijolo).
+4. ✅ **A segunda carta de Akeley** — *"bastante difícil de ler"*. Quase toda era letra
+   ilegível de propósito (`[ilegivel]` a 12%, e cada parágrafo repetido), e as notas de
+   Wilmarth estavam na letra inclinada de Akeley. Agora os parágrafos de Akeley se
+   leem (só uma continuação "cerrada" curta por folha fica ilegível, e a última, que
+   ele se recusa a transcrever), sem repetições; as notas de Wilmarth vão na letra
+   dele, menor (`[nota]…[/nota]`, `DocumentData.expandir`).
+5. ✅ **A transcrição do disco** — os títulos e subtítulos difíceis de ler: *"essa
+   grafia é interessante, mas não pode interferir na leitura"*. Eram caixa alta na
+   letra cursiva (as maiúsculas de floreio não se leem). Agora em caixa baixa,
+   sublinhados, na mesma letra. Conferido em captura (`SHOT_MODO=documento`).
 6. 🔧 **Os grilos da noite 3** (o sonho do disco) — *"MUITO alto e incomoda; rouba
    muito do sentimento"*.
 7. 🔧 **O mi-go de pé** no sonho do disco — *"não vi, do lado esquerdo"*.

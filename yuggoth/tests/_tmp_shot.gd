@@ -93,6 +93,10 @@ func _ready() -> void:
 		await _boston_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "documento":
+		await _documento_fotos()
+		get_tree().quit()
+		return
 	for n in range(1, 7):
 		if not dias.is_empty() and str(n) not in dias:
 			continue
@@ -672,6 +676,22 @@ func _diario_fotos() -> void:
 		await _s(passo)
 		await _shot("%s_fechando_%03d" % [tag, k])
 		print("Q ", k, " capa ", snappedf(d._k_capa, 0.001), " folhas ", snappedf(d._k_folhas, 0.001), " aberto ", d.aberto)
+	# A escrita que passa de página (playtest 11): uma entrada longa.
+	var longa := DocumentData.new()
+	longa.id = &"diario_teste_longa"
+	var frase := "Escrevo isto com a mão firme, embora a noite tenha sido longa e o vento não pare de bater nas vidraças. "
+	longa.pages = [frase.repeat(14)]
+	GameState.add_document(longa)
+	var est2 := {"fim": false}
+	var escreve := func() -> void:
+		await d.anotar(longa, null, p, false)
+		est2["fim"] = true
+	escreve.call()
+	var q2 := 0
+	while not est2["fim"] and q2 < 400:
+		await _s(0.25)
+		await _shot("%s_escrevendo_%03d" % [tag, q2])
+		q2 += 1
 
 
 ## SHOT_MODO=selagem: no Dia 6, com as cartas de setembro abertas na mesa, a
@@ -887,3 +907,20 @@ func _caes_fotos() -> void:
 func _until_nivel(caminho: String) -> void:
 	while SceneDirector.current_level != caminho or SceneDirector.is_busy:
 		await get_tree().process_frame
+
+
+## SHOT_MODO=documento, SHOT_DOCS=id1,id2: cada folha de cada documento, no leitor.
+func _documento_fotos() -> void:
+	await _s(1.0)
+	var leitor := root.find_child("DocumentReader", true, false)
+	for id in OS.get_environment("SHOT_DOCS").split(",", false):
+		var doc := load("res://narrative/documents/%s.tres" % id) as DocumentData
+		Events.document_requested.emit(doc)
+		await _s(0.6)
+		for k in leitor._pages.size():
+			leitor._page = k
+			leitor._show_page()
+			await _s(0.4)
+			await _shot("%s_%s_%d" % [tag, id, k])
+		leitor.close()
+		await _s(0.3)

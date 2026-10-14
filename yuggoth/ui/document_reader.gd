@@ -95,7 +95,7 @@ func _paginate(source: PackedStringArray) -> PackedStringArray:
 		var current := PackedStringArray()
 		for i in paras.size():
 			var para := paras[i]
-			body.text = "\n\n".join(current + PackedStringArray([para]))
+			body.text = _expandido("\n\n".join(current + PackedStringArray([para])))
 			if current.is_empty() or body.get_content_height() <= limit:
 				current.append(para)
 				continue
@@ -108,6 +108,10 @@ func _paginate(source: PackedStringArray) -> PackedStringArray:
 			current.append(para)
 		out.append("\n\n".join(current))
 	return out
+
+
+func _expandido(texto: String) -> String:
+	return DocumentData.expandir(texto, body.get_meta(&"tamanho_base", _tamanho_base))
 
 
 static var _tags := RegEx.create_from_string("\\[[^\\]]*\\]")
@@ -148,7 +152,7 @@ func _turn(direction: int) -> void:
 
 
 func _show_page() -> void:
-	body.text = _pages[_page] if not _pages.is_empty() else ""
+	body.text = _expandido(_pages[_page]) if not _pages.is_empty() else ""
 	var hints := "[E] fechar"
 	if _pages.size() > 1:
 		hints = "%d / %d    [←] [→] página    %s" % [_page + 1, _pages.size(), hints]

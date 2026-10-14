@@ -50,6 +50,17 @@ static var _font_cache: Dictionary[String, Font] = {}
 @export var cartao_depois: NarrationLine
 
 
+## [nota]…[/nota]: o que Wilmarth anota no meio de uma carta de outro (a segunda
+## de Akeley), na letra dele, um pouco menor (playtest 11: na letra de Akeley,
+## inclinada, não se lia). `tamanho` é o corpo de base do rótulo (antes da escala
+## do estilo).
+static func expandir(texto: String, tamanho: int) -> String:
+	if not texto.contains("[nota]"):
+		return texto
+	var abre := "[font=%s][font_size=%d][color=#3f3550]" % [STYLE_FONTS[Style.WILMARTH][0], roundi(tamanho * 0.78)]
+	return texto.replace("[nota]", abre).replace("[/nota]", "[/color][/font_size][/font]")
+
+
 func resolve_pages() -> PackedStringArray:
 	var variant := resolve_variant()
 	return variant.pages if variant else pages
