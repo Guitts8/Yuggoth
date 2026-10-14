@@ -96,6 +96,7 @@ func _texturas() -> void:
 	_save(_tapete_trancado(), "tapete_trancado")
 	_save(_colcha(), "colcha")
 	_save(_lombadas(), "lombadas")
+	_save(_capim(), "capim")
 
 
 func _save(img: Image, name: String) -> void:
@@ -2438,4 +2439,29 @@ func _lombadas() -> Image:
 						cor = _shade(c, f)
 				img.set_pixel(xx, y, cor)
 		x += w
+	return img
+
+
+## Um tufo de capim alto (as folhas finas e curvas, com alfa), para as folhas
+## cruzadas do quintal da fazenda.
+func _capim() -> Image:
+	var w := 64
+	var h := 64
+	var img := _img(w, h)
+	img.fill(Color(0, 0, 0, 0))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 77
+	for k in 22:
+		var x0 := rng.randf_range(4.0, w - 4.0)
+		var alto := rng.randf_range(h * 0.45, h * 0.98)
+		var curva := rng.randf_range(-14.0, 14.0)
+		var cor := Color(0.36, 0.42, 0.2).lerp(Color(0.55, 0.5, 0.28), rng.randf()) * rng.randf_range(0.8, 1.1)
+		for t in int(alto):
+			var y := h - 1 - t
+			var f := float(t) / alto
+			var x := int(x0 + curva * f * f)
+			var larg := 2 if f < 0.6 else 1
+			for dx in larg:
+				if x + dx >= 0 and x + dx < w:
+					img.set_pixel(x + dx, y, Color(cor.r * (0.7 + 0.4 * f), cor.g * (0.7 + 0.4 * f), cor.b * (0.7 + 0.3 * f), 1.0))
 	return img

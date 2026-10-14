@@ -521,12 +521,17 @@ fique BOM de VERDADE pois será o modelo mais usado durante todo o jogo."*
   (`_cozinha`): o fogão de ferro com o forno, a chapa e a chaminé, a pia de
   pedra-sabão com a bomba de mão, a mesa de pinho, o guarda-louça. Capturas:
   `SHOT_MODO=fazenda` com `SHOT_EXTRA`.
-- 🔧 **R3b — O exterior (← próximo):** as árvores (hoje "cogumelos": refazer com
-  tronco afinando, galhos em dois níveis, copa de muitos tufos com o lado de baixo
-  mais escuro; olmos em vaso, bordos, macieiras, abetos de saias caídas), arbustos de
-  lilás junto da casa, tufos de capim; o celeiro com faixas brancas, a porta do
-  palheiro com moldura e cruz, o lanternim com cata-vento, os beirais; o galpão e o
-  telheiro do Ford com acabamento. (Visto em 2026-10-14: a casa por fora já está boa.)
+- ✅ **R3b — O exterior** (2026-10-14): as árvores refeitas (`_arvore`: o tronco que
+  afina com o pé alargado, quatro ou cinco galhos-mestres com galhos finos, e a copa de
+  muitos tufos irregulares, escuros embaixo e claros em cima — os olmos em vaso, os
+  bordos da estrada; `_macieira` baixa e aberta, com maçãs; `_abeto_perto`, as cicutas
+  de saias caídas na beira do pântano); os lilases em volta da casa (`_arbusto`); o
+  capim alto pelo quintal (1600 tufos de folhas cruzadas num MultiMesh — as posições
+  vão na meta e a fase as põe ao carregar, `Fazenda._capim`, porque o gerador headless
+  não guarda o buffer); o celeiro com o rodapé de pedra, as molduras brancas do portão
+  e das janelinhas, a porta do palheiro com a cruz, as tábuas da empena e o lanternim
+  de venezianas com o cata-vento (`_celeiro_acabamento`). O percurso continua com 0
+  lugares presos.
 - 🔧 **R4 — As dependências e o quintal:** o canil, o galpão, o celeiro, a bomba, o
   moinho, as cercas, a estrada, o terreno.
 - 🔧 **R5 — Os objetos da preparação:** o lampião, o rifle, o telefone, o armário.

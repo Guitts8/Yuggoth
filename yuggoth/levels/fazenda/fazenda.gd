@@ -94,6 +94,7 @@ func _ready() -> void:
 	_env = we.environment.duplicate(true)
 	we.environment = _env
 	_ceu = _env.sky.sky_material as ProceduralSkyMaterial
+	_capim()
 	var dentro := get_node_or_null(^"LuzesDeDentro")
 	if dentro:
 		for l: Light3D in dentro.get_children():
@@ -283,3 +284,15 @@ func _primeira_fala() -> void:
 			return
 		t += get_process_delta_time()
 	Narrator.say(linha_inicio)
+
+
+## O capim do quintal (gerar_fazenda._arbustos_e_capim): as posições vêm na meta.
+func _capim() -> void:
+	var mi := get_node_or_null(^"Capim") as MultiMeshInstance3D
+	if mi == null or not mi.has_meta(&"instancias"):
+		return
+	var dados: PackedFloat32Array = mi.get_meta(&"instancias")
+	var multi := mi.multimesh.duplicate() as MultiMesh
+	multi.instance_count = dados.size() / 12
+	multi.buffer = dados
+	mi.multimesh = multi

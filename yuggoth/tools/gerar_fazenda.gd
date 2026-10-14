@@ -123,6 +123,9 @@ func _ready() -> void:
 	_mat("teto_casa", "reboco", {world = 0.8, cor = Color(1.32, 1.3, 1.24)})
 	_mat("assoalho_largo", "assoalho_largo", {world = 0.75})
 	_mat("colcha", "colcha", {world = 2.0})
+	_mat("capim", "capim", {})
+	(m["capim"] as ShaderMaterial).set_shader_parameter(&"alpha_cut", 0.5)
+	ResourceSaver.save(m["capim"], MAT_DIR + "capim.tres")
 	_mat("estofado_vinho", "estofado", {world = 3.0, cor = Color(1.6, 0.75, 0.7)})
 	_mat("couro", "capa_livro", {world = 3.0, cor = Color(0.8, 0.55, 0.42)})
 	_mat("tapete_trancado", "tapete_trancado", {})
@@ -166,6 +169,7 @@ func _ready() -> void:
 	_ford()
 	_moinho()
 	_arvores()
+	_arbustos_e_capim()
 	_rotina()
 	_preparacao()
 	# A luz-guia (playtest 11): azul, fraca, sobre a próxima tarefa.
@@ -1607,6 +1611,7 @@ func _dependencias() -> void:
 	_galpao_lenha()
 	_arcada()
 	_celeiro()
+	_celeiro_acabamento()
 	_galinheiro()
 
 
@@ -2376,7 +2381,7 @@ func _arvores() -> void:
 	# Os olmos do gramado (altos, de copa em vaso) e os bordos ao longo da
 	# estrada, com as primeiras folhas de setembro amarelando.
 	for p: Vector3 in [Vector3(12.0, 0, 9.0), Vector3(22.0, 0, -9.0), Vector3(-6.0, 0, 11.0)]:
-		_arvore(mm, p, _rng.randf_range(13.0, 15.0), 4.6, Color(0.2, 0.3, 0.14))
+		_arvore(mm, p, _rng.randf_range(13.0, 15.0), 4.6, Color(0.2, 0.3, 0.14), true)
 		troncos.append(p)
 	var z := -56.0
 	while z < 38.0:
@@ -2389,6 +2394,12 @@ func _arvores() -> void:
 	for i in 8:
 		var p := Vector3(16.0 + (i % 4) * 4.0 + _rng.randf_range(-0.6, 0.6), 0, -32.0 - (i / 4) * 5.0)
 		_macieira(mm, p)
+		troncos.append(p)
+	# Na beira do pântano, uma fileira de cicutas de perto (playtest 11).
+	for i in 12:
+		var p := Vector3(_rng.randf_range(-36.0, -31.0), 0, -44.0 + i * 7.0 + _rng.randf_range(-2.0, 2.0))
+		p.y = _altura(p.x, p.z)
+		_abeto_perto(mm, p, _rng.randf_range(9.0, 14.0))
 		troncos.append(p)
 	# O pântano: bétulas ralas e troncos mortos, touceiras de juncos.
 	for i in 45:
@@ -2423,24 +2434,6 @@ func _arvores() -> void:
 		_col.append([Vector3(0.5, 3.0, 0.5), p + Vector3(0, 1.5, 0)])
 
 
-## Uma árvore de copa redonda (olmo, bordo): o tronco, três galhos abrindo em
-## vaso, a copa em bolas de folhagem.
-func _arvore(mm: Cidade.Malha, p: Vector3, alt: float, raio: float, folha: Color) -> void:
-	var tronco := Color(0.27, 0.23, 0.19)
-	var fuste := alt * 0.42
-	mm.caixa(Vector3(0.42, fuste, 0.42), p + Vector3(0, fuste / 2, 0), tronco)
-	for k in 3:
-		var ang := TAU * k / 3 + _rng.randf_range(-0.4, 0.4)
-		var dir := Vector3(cos(ang), 0, sin(ang))
-		var compr := alt * 0.32
-		var meio := p + Vector3(0, fuste, 0) + dir * compr * 0.3 + Vector3.UP * compr * 0.42
-		_bloco("bosque", Vector3(0.22, compr, 0.22), meio, tronco, false, Vector3(rad_to_deg(dir.z) * 0.6, 0, -rad_to_deg(dir.x) * 0.6))
-	for k in 7:
-		var c := p + Vector3(_rng.randf_range(-raio, raio) * 0.55, alt * _rng.randf_range(0.62, 0.86), _rng.randf_range(-raio, raio) * 0.55)
-		var r := raio * _rng.randf_range(0.42, 0.6)
-		_vistas._bola(mm, c, Vector3(r, r * 0.75, r), folha * _rng.randf_range(0.85, 1.15), _rng)
-
-
 ## Uma bétula: o tronco fino e pálido com os nós escuros; perto, a copa rala em
 ## três bolas pequenas; longe (a encosta), dois fusos.
 func _betula(mm: Cidade.Malha, p: Vector3, alt: float, perto: bool) -> void:
@@ -2456,11 +2449,6 @@ func _betula(mm: Cidade.Malha, p: Vector3, alt: float, perto: bool) -> void:
 	else:
 		mm.bipiramide(alt * 0.13, alt * 0.45, p + Vector3(0, alt * 0.74, 0), 5, folha, _rng.randf() * TAU)
 		mm.bipiramide(alt * 0.1, alt * 0.3, p + Vector3(0.3, alt * 0.52, 0), 5, folha * 0.9, _rng.randf() * TAU)
-
-
-func _macieira(mm: Cidade.Malha, p: Vector3) -> void:
-	mm.caixa(Vector3(0.22, 1.4, 0.22), p + Vector3(0, 0.7, 0), Color(0.3, 0.24, 0.18))
-	mm.bipiramide(_rng.randf_range(1.6, 2.1), 2.0, p + Vector3(0, 2.4, 0), 6, Color(0.24, 0.34, 0.16) * _rng.randf_range(0.9, 1.1), _rng.randf() * TAU)
 
 
 ## Um tronco morto do pântano, sem casca, com dois galhos quebrados.
@@ -2736,3 +2724,257 @@ func _cozinha() -> void:
 			else:
 				_cilindro_deitado("porcelana", gl + b * Vector3(x, py + 0.1, 0.14), 0.09, 0.01, gg)
 	_colide(Vector3(1.2, 2.0, 0.5), Vector3(0, 1.0, 0.0), gl, gg)
+
+
+## Uma árvore de folha larga (playtest 11: as de antes pareciam cogumelos): o
+## tronco que afina, com o pé alargado; quatro ou cinco galhos-mestres abrindo do
+## alto do fuste (em vaso, no olmo: mais em pé), cada um com dois galhos finos; e a
+## copa feita de muitos tufos irregulares nas pontas, escuros embaixo e claros em
+## cima, com vãos entre eles por onde se vê o céu.
+func _arvore(mm: Cidade.Malha, p: Vector3, alt: float, raio: float, folha: Color, vaso := false) -> void:
+	var tronco := Color(0.27, 0.23, 0.19)
+	var fuste := alt * (0.4 if vaso else 0.3)
+	var topo := p + Vector3(0, fuste, 0)
+	_galho(mm, p + Vector3(0, -0.2, 0), p + Vector3(0, 0.5, 0), 0.38, 0.24, tronco * 0.9)
+	_galho(mm, p + Vector3(0, 0.5, 0), topo, 0.24, 0.17, tronco)
+	var n := _rng.randi_range(4, 5)
+	for k in n:
+		var ang := TAU * k / n + _rng.randf_range(-0.35, 0.35)
+		var incl := deg_to_rad(_rng.randf_range(22.0, 34.0) if vaso else _rng.randf_range(38.0, 58.0))
+		var dir := Vector3(cos(ang) * sin(incl), cos(incl), sin(ang) * sin(incl))
+		var compr := alt * _rng.randf_range(0.3, 0.38)
+		var fim := topo + dir * compr
+		_galho(mm, topo, fim, 0.15, 0.07, tronco)
+		_tufo(mm, fim + Vector3(0, raio * 0.15, 0), raio * _rng.randf_range(0.38, 0.5), folha)
+		for j in 2:
+			var a2 := ang + (j - 0.5) * _rng.randf_range(0.8, 1.3)
+			var d2 := (Vector3(cos(a2) * 0.8, 0.9, sin(a2) * 0.8) + dir).normalized()
+			var fim2 := fim + d2 * compr * _rng.randf_range(0.4, 0.6)
+			_galho(mm, fim, fim2, 0.07, 0.03, tronco)
+			_tufo(mm, fim2, raio * _rng.randf_range(0.32, 0.46), folha)
+	# O alto da copa.
+	for k in 3:
+		var c := topo + Vector3(_rng.randf_range(-raio, raio) * 0.3, alt * _rng.randf_range(0.42, 0.55), _rng.randf_range(-raio, raio) * 0.3)
+		_tufo(mm, c, raio * _rng.randf_range(0.4, 0.55), folha)
+
+
+## Um galho (ou o tronco): um tronco de cone de seis lados de `a` a `b`.
+func _galho(mm: Cidade.Malha, a: Vector3, b: Vector3, r0: float, r1: float, cor: Color) -> void:
+	var eixo := (b - a).normalized()
+	var lado := eixo.cross(Vector3.FORWARD if absf(eixo.z) < 0.9 else Vector3.RIGHT).normalized()
+	var frente := lado.cross(eixo).normalized()
+	const N := 6
+	for i in N:
+		var u0 := TAU * i / N
+		var u1 := TAU * (i + 1) / N
+		var d0 := lado * cos(u0) + frente * sin(u0)
+		var d1 := lado * cos(u1) + frente * sin(u1)
+		var sombra := 0.85 + 0.15 * sin(u0)
+		mm.quad(a + d0 * r0, a + d1 * r0, b + d1 * r1, b + d0 * r1, (d0 + d1).normalized(), cor * sombra)
+
+
+## Um tufo de folhagem: uma bola irregular, achatada embaixo, escura por baixo e
+## clara por cima (a luz do céu), com a cor variando um pouco.
+func _tufo(mm: Cidade.Malha, c: Vector3, r: float, folha: Color) -> void:
+	const LADOS := 8
+	const ANEIS := 5
+	var pts: Array = []
+	var tom := folha * _rng.randf_range(0.88, 1.12)
+	for j in ANEIS + 1:
+		var v := PI * j / ANEIS
+		var fila: Array = []
+		for i in LADOS:
+			var u := TAU * i / LADOS
+			var d := Vector3(sin(v) * cos(u), cos(v), sin(v) * sin(u))
+			var k := _rng.randf_range(0.82, 1.15) if j > 0 and j < ANEIS else 1.0
+			var q := d * r * k
+			if q.y < 0.0:
+				q.y *= 0.55
+			fila.append(c + q)
+		pts.append(fila)
+	for j in ANEIS:
+		var luz := lerpf(1.12, 0.6, float(j) / ANEIS)
+		for i in LADOS:
+			var a: Vector3 = pts[j][i]
+			var b: Vector3 = pts[j][(i + 1) % LADOS]
+			var cc: Vector3 = pts[j + 1][i]
+			var d: Vector3 = pts[j + 1][(i + 1) % LADOS]
+			var nn := ((a + b + cc + d) / 4.0 - c).normalized()
+			mm.quad(a, b, d, cc, nn, tom * luz * _rng.randf_range(0.92, 1.06))
+
+
+## A macieira do pomar: baixa, o tronco torto, os galhos abertos quase deitados, a
+## copa larga de tufos menores, e uma ou outra maçã vermelha.
+func _macieira(mm: Cidade.Malha, p: Vector3) -> void:
+	var tronco := Color(0.3, 0.24, 0.18)
+	var topo := p + Vector3(_rng.randf_range(-0.2, 0.2), 1.2, _rng.randf_range(-0.2, 0.2))
+	_galho(mm, p, topo, 0.15, 0.11, tronco)
+	var folha := Color(0.24, 0.34, 0.16)
+	for k in 4:
+		var ang := TAU * k / 4 + _rng.randf_range(-0.4, 0.4)
+		var incl := deg_to_rad(_rng.randf_range(55.0, 70.0))
+		var dir := Vector3(cos(ang) * sin(incl), cos(incl), sin(ang) * sin(incl))
+		var fim := topo + dir * _rng.randf_range(1.4, 1.9)
+		_galho(mm, topo, fim, 0.08, 0.04, tronco)
+		_tufo(mm, fim + Vector3(0, 0.3, 0), _rng.randf_range(0.75, 1.0), folha)
+		_tufo(mm, topo.lerp(fim, 0.5) + Vector3(0, 0.6, 0), _rng.randf_range(0.7, 0.9), folha)
+		for m2 in 3:
+			var maca := fim + Vector3(_rng.randf_range(-0.6, 0.6), _rng.randf_range(-0.4, 0.2), _rng.randf_range(-0.6, 0.6))
+			mm.caixa(Vector3(0.09, 0.09, 0.09), maca, Color(0.55, 0.1, 0.07))
+	_tufo(mm, topo + Vector3(0, 1.1, 0), 1.0, folha)
+
+
+## Um abeto (cicuta) de perto, na beira do pântano: o tronco, e as saias de ramos
+## caídas, sete andares que afinam até a ponta, cada uma meio torta.
+func _abeto_perto(mm: Cidade.Malha, p: Vector3, alt: float) -> void:
+	_galho(mm, p + Vector3(0, -0.2, 0), p + Vector3(0, alt * 0.95, 0), 0.22, 0.04, Color(0.22, 0.16, 0.12))
+	var verde := Color(0.1, 0.17, 0.11) * _rng.randf_range(0.85, 1.15)
+	for k in 7:
+		var t := float(k) / 7.0
+		var y := alt * (0.18 + t * 0.72)
+		var r := alt * 0.22 * (1.0 - t * 0.85) * _rng.randf_range(0.9, 1.1)
+		var c := p + Vector3(_rng.randf_range(-0.1, 0.1), y - alt * 0.08, _rng.randf_range(-0.1, 0.1))
+		mm.piramide(r, alt * 0.2, c, 9, verde * (0.8 + 0.25 * t))
+		# A saia cai: um anel mais escuro, abaixo da borda.
+		mm.piramide(r * 1.05, alt * 0.05, c - Vector3(0, alt * 0.03, 0), 9, verde * 0.6)
+
+
+## Um arbusto (o lilás junto da casa, os de beira de cerca): tufos baixos juntos.
+func _arbusto(mm: Cidade.Malha, p: Vector3, r: float) -> void:
+	var folha := Color(0.24, 0.37, 0.16)
+	var lenho := Color(0.25, 0.2, 0.16)
+	for k in 5:
+		var a := TAU * k / 5.0 + _rng.randf_range(-0.3, 0.3)
+		var fim := p + Vector3(cos(a) * r * 0.5, r * _rng.randf_range(0.9, 1.4), sin(a) * r * 0.5)
+		_galho(mm, p, fim, 0.03, 0.015, lenho)
+		_tufo(mm, fim, r * _rng.randf_range(0.28, 0.4), folha)
+	# A massa da moita, do chão para cima (sem o pé à mostra: não é árvore).
+	for k in 12:
+		var c := p + Vector3(_rng.randf_range(-r, r) * 0.75, r * _rng.randf_range(0.2, 1.0), _rng.randf_range(-r, r) * 0.75)
+		_tufo(mm, c, r * _rng.randf_range(0.3, 0.45), folha * _rng.randf_range(0.85, 1.2))
+
+
+## Os arbustos em volta da casa (os lilases dos dois lados dos degraus da frente
+## e nos cantos) e os tufos de capim alto pelo quintal (um MultiMesh, sem colisão:
+## o gramado deixava de ser um pano liso).
+func _arbustos_e_capim() -> void:
+	var mm := _obra("bosque")
+	for pt: Vector3 in [Vector3(6.8, 0, 2.4), Vector3(6.8, 0, -2.4), Vector3(6.7, 0, 5.2), Vector3(6.7, 0, -5.3),
+			Vector3(-3.6, 0, -5.6), Vector3(2.0, 0, 6.8), Vector3(7.4, 0, 7.2), Vector3(-9.6, 0, 6.6)]:
+		_arbusto(mm, pt, _rng.randf_range(0.8, 1.1))
+		_col.append([Vector3(1.0, 1.4, 1.0), pt + Vector3(0, 0.7, 0)])
+	# O capim: tufos de três folhas cruzadas, onde não há casa, caminho nem estrada.
+	var tufo := ArrayMesh.new()
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for k in 3:
+		var a := PI * k / 3.0
+		var d := Vector3(cos(a), 0, sin(a)) * 0.3
+		var cima := Vector3.UP * 0.55
+		# Os dois lados de cada folha (o material é de um lado só).
+		for lado: Array in [[-d, d], [d, -d]]:
+			var p0: Vector3 = lado[0]
+			var p1: Vector3 = lado[1]
+			var u0 := 0.0 if lado[0] == -d else 1.0
+			var u1 := 1.0 - u0
+			for v: Array in [[p0, Vector2(u0, 1)], [p1, Vector2(u1, 1)], [p1 + cima, Vector2(u1, 0)], [p0, Vector2(u0, 1)], [p1 + cima, Vector2(u1, 0)], [p0 + cima, Vector2(u0, 0)]]:
+				st.set_uv(v[1])
+				st.set_normal(Vector3.UP)
+				st.add_vertex(v[0])
+	st.commit(tufo)
+	var multi := MultiMesh.new()
+	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.mesh = tufo
+	var pontos: Array[Transform3D] = []
+	var tentativas := 0
+	while pontos.size() < 1600 and tentativas < 9000:
+		tentativas += 1
+		var x := _rng.randf_range(-30.0, 27.0)
+		var z := _rng.randf_range(-45.0, 34.0)
+		if x > CASA_X.x - 1.0 and x < CASA_X.y + 2.0 and z > CASA_Z.x - 1.0 and z < CASA_Z.y + 1.0:
+			continue
+		if x > PUXADO_X.x - 4.5 and x < CASA_X.x and z > PUXADO_Z.x - 1.0 and z < PUXADO_Z.y + 1.0:
+			continue
+		if x > -22.0 and x < -8.0 and z > -22.0 and z < -7.0:
+			continue
+		if x > -28.0 and x < -20.0 and z > -20.0 and z < -6.5:
+			continue
+		if absf(z) < 1.4 and x > 6.0:
+			continue  # o caminho da frente
+		var esc := _rng.randf_range(0.5, 1.1)
+		var b := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3(esc, esc * _rng.randf_range(0.7, 1.3), esc))
+		pontos.append(Transform3D(b, Vector3(x, _altura(x, z) - 0.02, z)))
+	# Sem tela (o gerador roda headless), o MultiMesh não guarda as posições: elas
+	# vão na meta e a fase as põe ao carregar (Fazenda._capim).
+	var dados := PackedFloat32Array()
+	for t in pontos:
+		dados.append_array([t.basis.x.x, t.basis.y.x, t.basis.z.x, t.origin.x, t.basis.x.y, t.basis.y.y, t.basis.z.y, t.origin.y,
+			t.basis.x.z, t.basis.y.z, t.basis.z.z, t.origin.z])
+	var mi := MultiMeshInstance3D.new()
+	mi.set_meta(&"instancias", dados)
+	mi.name = "Capim"
+	mi.multimesh = multi
+	mi.material_override = m["capim"]
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_add(cena, mi)
+
+
+## O acabamento do celeiro (playtest 11): o rodapé de pedra, as faixas brancas em
+## volta do portão e das janelinhas, os beirais e as tábuas da empena, a porta do
+## palheiro com a moldura e a cruz, e o lanternim de venezianas na cumeeira, com o
+## cata-vento.
+func _celeiro_acabamento() -> void:
+	var x := Vector2(-21.0, -9.0)
+	var z := Vector2(-21.0, -8.0)
+	var alto := 5.0
+	var cume := Vector2((x.x + x.y) / 2, alto + 3.6)
+	var branco := "pintura_branca"
+	# O rodapé de pedra.
+	for s: float in [-1.0, 1.0]:
+		var zf: float = z.y if s > 0 else z.x
+		for seg: Vector2 in ([Vector2(x.x, cume.x - 1.85), Vector2(cume.x + 1.85, x.y)] if s > 0 else [x]):
+			_bloco("pedra_campo", Vector3(seg.y - seg.x, 0.3, 0.2), Vector3((seg.x + seg.y) / 2, 0.15, zf + s * 0.02), Color.WHITE, false)
+		var xf: float = x.y if s > 0 else x.x
+		_bloco("pedra_campo", Vector3(0.2, 0.3, z.y - z.x), Vector3(xf + s * 0.02, 0.15, (z.x + z.y) / 2), Color.WHITE, false)
+	# A moldura do portão.
+	for s: float in [-1.0, 1.0]:
+		_bloco(branco, Vector3(0.16, 3.9, 0.05), Vector3(cume.x + s * 1.88, 1.95, z.y + 0.02), Color.WHITE, false)
+	_bloco(branco, Vector3(3.92, 0.16, 0.05), Vector3(cume.x, 3.86, z.y + 0.02), Color.WHITE, false)
+	# As janelinhas: a moldura branca.
+	for jn: Array in [[Vector3(-12.0, 1.9, z.x - 0.02), true], [Vector3(x.x - 0.02, 1.9, -14.5), false], [Vector3(x.y + 0.02, 1.9, -17.5), false]]:
+		var c: Vector3 = jn[0]
+		var em_x: bool = jn[1]
+		for s: float in [-1.0, 1.0]:
+			_bloco(branco, Vector3(0.08, 0.9, 0.04) if em_x else Vector3(0.04, 0.9, 0.08), c + (Vector3(s * 0.34, 0, 0) if em_x else Vector3(0, 0, s * 0.34)), Color.WHITE, false)
+			_bloco(branco, Vector3(0.76, 0.08, 0.04) if em_x else Vector3(0.04, 0.08, 0.76), c + Vector3(0, s * 0.43, 0), Color.WHITE, false)
+	# A porta do palheiro: a moldura e a cruz brancas, e o gancho da polia em cima.
+	var pp := Vector3(cume.x, alto + 1.1, z.y + 0.065)
+	for s: float in [-1.0, 1.0]:
+		_bloco(branco, Vector3(0.1, 1.7, 0.04), pp + Vector3(s * 0.82, 0, 0), Color.WHITE, false)
+		_bloco(branco, Vector3(1.74, 0.1, 0.04), pp + Vector3(0, s * 0.82, 0), Color.WHITE, false)
+		_bloco(branco, Vector3(2.15, 0.08, 0.03), pp + Vector3(0, 0, 0.01), Color.WHITE, false, Vector3(0, 0, s * 45.0))
+	_bloco("madeira_escura", Vector3(0.14, 0.14, 1.0), Vector3(cume.x, cume.y - 0.5, z.y + 0.45), Color.WHITE, false)
+	# As tábuas brancas da empena (ao longo das águas) e os beirais.
+	var ang := rad_to_deg(atan2(cume.y - alto, cume.x - x.x))
+	var rampa := Vector2(cume.x - x.x, cume.y - alto).length() + 0.4
+	for s: float in [-1.0, 1.0]:
+		var zf: float = (z.y + 0.42) if s > 0 else (z.x - 0.42)
+		for lado: float in [-1.0, 1.0]:
+			var meio := Vector3(cume.x + lado * (cume.x - x.x) / 2, (alto + cume.y) / 2 + 0.05, zf)
+			_bloco(branco, Vector3(rampa, 0.2, 0.05), meio, Color.WHITE, false, Vector3(0, 0, -lado * ang))
+	for lado: float in [-1.0, 1.0]:
+		var xb: float = (x.y + 0.35) if lado > 0 else (x.x - 0.35)
+		_bloco(branco, Vector3(0.05, 0.18, z.y - z.x + 0.8), Vector3(xb, alto - 0.12, (z.x + z.y) / 2), Color.WHITE, false)
+	# O lanternim: a caixa de venezianas, o telhadinho de quatro águas, o cata-vento.
+	var lt := Vector3(cume.x, cume.y + 0.45, (z.x + z.y) / 2)
+	_bloco("celeiro", Vector3(1.1, 0.9, 1.1), lt, Color.WHITE, false)
+	for s: float in [-1.0, 1.0]:
+		for k in 4:
+			_bloco(branco, Vector3(0.9, 0.04, 0.03), lt + Vector3(0, -0.3 + k * 0.18, s * 0.565), Color.WHITE, false, Vector3(-30.0 * s, 0, 0))
+			_bloco(branco, Vector3(0.03, 0.04, 0.9), lt + Vector3(s * 0.565, -0.3 + k * 0.18, 0), Color.WHITE, false, Vector3(0, 0, 30.0 * s))
+	_obra("telhado").piramide(0.95, 0.7, lt + Vector3(0, 0.45, 0), 4, Color.WHITE)
+	_bloco("ferro", Vector3(0.03, 0.9, 0.03), lt + Vector3(0, 1.5, 0), Color(0.5, 0.5, 0.5), false)
+	_bloco("ferro", Vector3(0.6, 0.06, 0.02), lt + Vector3(0.05, 1.8, 0), Color(0.5, 0.5, 0.5), false, Vector3(0, 25, 0))
+	_bloco("ferro", Vector3(0.14, 0.14, 0.02), lt + Vector3(-0.25, 1.8, 0.1), Color(0.5, 0.5, 0.5), false, Vector3(0, 25, 45))
+	for s: float in [-1.0, 1.0]:
+		_bloco("ferro", Vector3(0.36, 0.015, 0.015), lt + Vector3(0, 1.62, 0), Color(0.5, 0.5, 0.5), false, Vector3(0, 45.0 + s * 45.0, 0))
