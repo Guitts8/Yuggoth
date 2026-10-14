@@ -129,6 +129,10 @@ func _ready() -> void:
 	_mat("estofado_vinho", "estofado", {world = 3.0, cor = Color(1.6, 0.75, 0.7)})
 	_mat("couro", "capa_livro", {world = 3.0, cor = Color(0.8, 0.55, 0.42)})
 	_mat("feltro_verde", "estofado", {world = 3.0, cor = Color(0.55, 0.78, 0.55)})
+	# A tela de arame do cercado dos cães (R4): só os arames; o resto é vazio.
+	_mat("tela_arame", "tela_arame", {world = 5.0})
+	(m["tela_arame"] as ShaderMaterial).set_shader_parameter(&"alpha_cut", 0.5)
+	ResourceSaver.save(m["tela_arame"], MAT_DIR + "tela_arame.tres")
 	_mat("tapete_trancado", "tapete_trancado", {})
 	(m["tapete_trancado"] as ShaderMaterial).set_shader_parameter(&"alpha_cut", 0.5)
 	ResourceSaver.save(m["tapete_trancado"], MAT_DIR + "tapete_trancado.tres")
@@ -167,8 +171,11 @@ func _ready() -> void:
 	_acabamento_interior()
 	_dependencias()
 	_canil()
+	_canil_acabamento()
 	_ford()
 	_moinho()
+	_dependencias_acabamento()
+	_postes()
 	_arvores()
 	_arbustos_e_capim()
 	_rotina()
@@ -385,7 +392,13 @@ func _altura(x: float, z: float) -> float:
 	if x > 34.0:
 		h -= minf((x - 34.0) * 0.45, 38.0)
 	if x > 140.0:
-		h += (x - 140.0) * 0.9
+		# Playtest 11 (R4): a encosta do outro lado do vale sobe até uns 70 m e daí
+		# só devagar (subia sem parar, um paredão de 500 m que tapava o céu do leste).
+		h += minf((x - 140.0) * 0.9, 70.0) + maxf(x - 218.0, 0.0) * 0.12
+	# Os morros do outro lado do vale com relevo (eram uma rampa lisa), as lombadas
+	# e os sulcos crescendo com a distância.
+	if x > 110.0:
+		h += _relevo.get_noise_2d(x * 0.6 + 300.0, z * 0.6) * 16.0 * clampf((x - 110.0) / 90.0, 0.0, 1.0)
 	if z > 26.0:
 		h -= (z - 26.0) * 0.16
 	if z < -40.0:
@@ -405,6 +418,8 @@ func _altura(x: float, z: float) -> float:
 	var d := Vector2(x, z).length()
 	if d > 240.0:
 		h += (d - 240.0) * 0.16 + _relevo.get_noise_2d(x * 0.35, z * 0.35) * 22.0 * clampf((d - 240.0) / 120.0, 0.0, 1.0)
+		# A crista recortada (R4): um relevo mais miúdo por cima.
+		h += _relevo.get_noise_2d(x * 1.3 + 50.0, z * 1.3) * 7.0 * clampf((d - 240.0) / 120.0, 0.0, 1.0)
 	return h
 
 
@@ -460,12 +475,23 @@ func _terreno() -> void:
 	forma.shape = _guardar(mi.mesh.create_trimesh_shape(), "chao_colisao")
 	_add(corpo, forma)
 	# As poças do pântano.
+	# Playtest 11 (R4): cada poça é um polígono torto na altura do ponto mais baixo
+	# dela — o chão mais alto a cobre, e a margem sai irregular (eram retângulos
+	# chapados, uns boiando).
 	var agua := _obra("agua")
 	for k in 26:
 		var p := Vector3(_rng.randf_range(-60.0, -34.0), 0.0, _rng.randf_range(-55.0, 35.0))
-		var r := Vector2(_rng.randf_range(1.0, 3.5), _rng.randf_range(0.8, 2.5))
-		var y := _altura(p.x, p.z) + 0.03
-		_face(agua, Vector3(p.x - r.x, y, p.z - r.y), Vector3(2 * r.x, 0, 0), Vector3(0, 0, 2 * r.y), Vector3.UP, Color(1, 1, 1) * _rng.randf_range(0.9, 1.1))
+		var r := Vector2(_rng.randf_range(1.5, 4.5), _rng.randf_range(1.2, 3.5))
+		var borda: Array[Vector3] = []
+		var y := _altura(p.x, p.z)
+		for i in 12:
+			var a := TAU * i / 12
+			var q := Vector3(p.x + cos(a) * r.x * _rng.randf_range(0.7, 1.15), 0, p.z + sin(a) * r.y * _rng.randf_range(0.7, 1.15))
+			borda.append(q)
+			y = minf(y, _altura(q.x, q.z))
+		var tom := Color(1, 1, 1) * _rng.randf_range(0.9, 1.1)
+		for i in 12:
+			agua.tri(Vector3(p.x, y + 0.06, p.z), borda[i] + Vector3(0, y + 0.06, 0), borda[(i + 1) % 12] + Vector3(0, y + 0.06, 0), Vector3.UP, tom)
 
 
 ## Os pontos de uma grade de `marcos[0]` a `marcos[-1]`, com o passo `passos[i]`
@@ -529,8 +555,25 @@ func _estrada_e_gramado() -> void:
 	# A caixa de correio de ferro galvanizado, num poste, com o nome.
 	var cx := _group(g, "CaixaCorreio", Vector3(ESTRADA_X.x - 0.6, 0, 2.4))
 	_bloco("madeira_escura", Vector3(0.1, 1.1, 0.1), cx.position + Vector3(0, 0.55, 0))
-	_bloco("ferro_galvanizado", Vector3(0.48, 0.22, 0.2), cx.position + Vector3(0.08, 1.2, 0), Color.WHITE, false)
-	_bloco("ferro_galvanizado", Vector3(0.48, 0.06, 0.16), cx.position + Vector3(0.08, 1.33, 0), Color.WHITE, false)
+	# Playtest 11 (R4): a caixa rural de tampo abaulado (a de 1915), a portinhola na
+	# ponta da estrada com o puxador, a bandeirinha vermelha baixada, e a mão-francesa
+	# do poste.
+	var cb := cx.position + Vector3(0.08, 0, 0)
+	_bloco("ferro_galvanizado", Vector3(0.48, 0.16, 0.2), cb + Vector3(0, 1.17, 0), Color.WHITE, false)
+	var arco := _obra("ferro_galvanizado")
+	for i in 8:
+		var a0 := PI * i / 8
+		var a1 := PI * (i + 1) / 8
+		var p0 := Vector3(0, 1.25 + sin(a0) * 0.1, cos(a0) * 0.1)
+		var p1 := Vector3(0, 1.25 + sin(a1) * 0.1, cos(a1) * 0.1)
+		var nn := Vector3(0, sin((a0 + a1) / 2), cos((a0 + a1) / 2))
+		arco.quad(cb + p0 + Vector3(-0.24, 0, 0), cb + p0 + Vector3(0.24, 0, 0), cb + p1 + Vector3(0.24, 0, 0), cb + p1 + Vector3(-0.24, 0, 0), nn, Color.WHITE)
+		for s: float in [-1.0, 1.0]:
+			arco.tri(cb + Vector3(s * 0.24, 1.25, 0), cb + p0 + Vector3(s * 0.24, 0, 0), cb + p1 + Vector3(s * 0.24, 0, 0), Vector3(s, 0, 0), Color(0.85, 0.85, 0.85))
+	_bloco("ferro", Vector3(0.012, 0.04, 0.03), cb + Vector3(0.247, 1.22, 0), Color(0.6, 0.6, 0.6), false)
+	_bloco("pintura_branca", Vector3(0.26, 0.02, 0.012), cb + Vector3(-0.02, 1.14, -0.107), Color(0.75, 0.12, 0.1), false)
+	_bloco("pintura_branca", Vector3(0.08, 0.07, 0.012), cb + Vector3(0.12, 1.12, -0.108), Color(0.75, 0.12, 0.1), false)
+	_bloco("madeira_escura", Vector3(0.06, 0.06, 0.32), cx.position + Vector3(0, 0.98, 0), Color.WHITE, false, Vector3(-40, 0, 0))
 	var nome := Label3D.new()
 	nome.name = "Nome"
 	nome.text = "H. W. AKELEY"
@@ -1672,16 +1715,38 @@ func _galpao_lenha() -> void:
 	_bloco("telhado", Vector3(x.y - x.x + 0.3, 0.12, compr), Vector3((x.x + x.y) / 2, alto + 0.35, (z.x + z.y) / 2 - 0.2), Color.WHITE, false, Vector3(rad_to_deg(ang), 0, 0))
 	for xx: float in [x.x + 0.1, (x.x + x.y) / 2]:
 		_bloco("madeira_escura", Vector3(0.14, alto - 0.3, 0.14), Vector3(xx, (alto - 0.3) / 2, z.x + 0.1))
-	# A lenha: fileiras de toras cortadas contra a parede de trás.
+	# A lenha (playtest 11, R4): as toras rachadas empilhadas contra a parede de
+	# trás, de ponta para o norte — o corte claro à vista, a casca escura dos lados —,
+	# cada fila desencontrada da de baixo; duas pilhas, a da esquerda mais baixa.
 	var lenha := _obra("madeira_clara")
-	for fila in 5:
-		for k in 14:
-			var c := Vector3(x.x + 0.4 + k * 0.27, 0.13 + fila * 0.24, z.y - 0.5)
-			_face_toras(lenha, c)
+	for fila in 7:
+		var xx := x.x + 0.3 + (0.1 if fila % 2 else 0.0)
+		while xx < x.y - 0.3:
+			var r := _rng.randf_range(0.075, 0.11)
+			if fila < (4 if xx < x.x + 1.5 else 7):
+				var c := Vector3(xx, 0.1 + fila * 0.185 + _rng.randf_range(-0.015, 0.015), z.y - 0.5 + _rng.randf_range(-0.06, 0.06))
+				_tora(lenha, c, r, _rng.randf_range(0.48, 0.6))
+			xx += r * 2.1
 	_col.append([Vector3(3.8, 1.3, 0.6), Vector3(x.x + 2.2, 0.65, z.y - 0.5)])
-	_movel("madeira_escura", Vector3(0.45, 0.45, 0.45), Vector3(-11.0, 0.225, 2.6))
-	_bloco("madeira_clara", Vector3(0.04, 0.75, 0.04), Vector3(-11.0, 0.7, 2.6), Color.WHITE, false, Vector3(20, 0, 10))
-	_bloco("ferro", Vector3(0.03, 0.12, 0.18), Vector3(-11.08, 0.45, 2.6), Color.WHITE, false, Vector3(20, 0, 10))
+	# O cepo (um toco de tronco largo), o machado cravado nele e as achas largadas
+	# em volta.
+	var cepo := Vector3(-11.0, 0, 2.6)
+	_cilindro("madeira_escura", cepo + Vector3(0, 0.22, 0), 0.26, 0.44, 9, Color(0.95, 0.85, 0.75))
+	_cilindro("madeira_clara", cepo + Vector3(0, 0.442, 0), 0.24, 0.006, 9, Color(1.15, 0.95, 0.68))
+	_col.append([Vector3(0.5, 0.45, 0.5), cepo + Vector3(0, 0.225, 0)])
+	_bloco("madeira_clara", Vector3(0.04, 0.75, 0.04), cepo + Vector3(0.12, 0.78, 0), Color.WHITE, false, Vector3(0, 0, -35))
+	_bloco("ferro", Vector3(0.18, 0.1, 0.025), cepo + Vector3(-0.06, 0.5, 0), Color(0.75, 0.75, 0.75), false, Vector3(0, 0, -35))
+	for k in 5:
+		var a := _rng.randf() * TAU
+		var p := cepo + Vector3(cos(a), 0, sin(a)) * _rng.randf_range(0.45, 0.9)
+		_tora(lenha, p + Vector3(0, 0.07, 0), _rng.randf_range(0.06, 0.08), _rng.randf_range(0.35, 0.45))
+	# O serrote de arco pendurado na parede oeste, por dentro.
+	var serrote := Vector3(x.x + 0.16, 1.55, 3.6)
+	for s: float in [-1.0, 1.0]:
+		_bloco("madeira_clara", Vector3(0.025, 0.42, 0.03), serrote + Vector3(0, 0, s * 0.32), Color.WHITE, false, Vector3(s * 8.0, 0, 0))
+	_bloco("madeira_clara", Vector3(0.025, 0.03, 0.62), serrote, Color.WHITE, false)
+	_bloco("ferro", Vector3(0.008, 0.03, 0.7), serrote + Vector3(0, -0.2, 0), Color(0.8, 0.8, 0.8), false)
+	_bloco("ferro", Vector3(0.006, 0.006, 0.66), serrote + Vector3(0, 0.19, 0), Color(0.6, 0.6, 0.6), false)
 
 
 ## Uma tora deitada (de leste a oeste), a ponta clara do corte para o norte.
@@ -1760,7 +1825,7 @@ func _celeiro() -> void:
 	for k in 3:
 		var zb := z.x + 6.2 + k * 2.0
 		_bloco("madeira_escura", Vector3(2.4, 1.3, 0.08), Vector3(x.x + 1.3, 0.65, zb))
-	_movel("madeira_clara", Vector3(1.6, 0.6, 3.0), Vector3(-11.2, 0.8, -15.0))
+	_carroca(Vector3(-11.3, 0, -15.0))
 	_movel("palha", Vector3(1.2, 0.8, 0.8), Vector3(-18.5, 0.4, -10.0), Color.WHITE, true, Vector3(0, 15, 0))
 	# Um portão de verdade não tem colisão no vão; as folhas abertas, sim.
 
@@ -1791,10 +1856,15 @@ func _cerca(de: Vector2, ate: Vector2, mat: String) -> void:
 	var n := maxi(1, ceili(compr / 2.0))
 	for i in n + 1:
 		var p := de + dir * compr * i / n
-		_bloco(mat, Vector3(0.12, 1.2, 0.12), Vector3(p.x, 0.6, p.y), Color.WHITE, false)
+		_bloco(mat, Vector3(0.12, 1.25, 0.12), Vector3(p.x, 0.62, p.y), Color.WHITE * _rng.randf_range(0.85, 1.1), false,
+			Vector3(_rng.randf_range(-2, 2), giro + _rng.randf_range(-8, 8), _rng.randf_range(-2, 2)))
 	var meio := (de + ate) / 2
+	# Playtest 11 (R4): as tábuas pregadas de um lado dos mourões (não através
+	# deles), cada uma de um tom, meio torta.
+	var lado := Vector2(-dir.y, dir.x) * 0.075
 	for k in 3:
-		_bloco(mat, Vector3(compr, 0.1, 0.03), Vector3(meio.x, 0.35 + k * 0.33, meio.y), Color(0.9, 0.9, 0.9), false, Vector3(0, giro, 0))
+		_bloco(mat, Vector3(compr, 0.1, 0.03), Vector3(meio.x + lado.x, 0.35 + k * 0.33 + _rng.randf_range(-0.02, 0.02), meio.y + lado.y),
+			Color(0.9, 0.9, 0.9) * _rng.randf_range(0.85, 1.1), false, Vector3(0, giro, _rng.randf_range(-0.6, 0.6)))
 	_col.append([Vector3(compr, 1.4, 0.2), Vector3(meio.x, 0.7, meio.y), Vector3(0, giro, 0)])
 
 
@@ -1849,6 +1919,8 @@ func _canil() -> void:
 		_box(porteira, "Montante%d" % int(xx), Vector3(0.08, 1.1, 0.05), Vector3(xx, 0.6, 0), "madeira_escura")
 	var diag := _box(porteira, "Diagonal", Vector3(1.4, 0.08, 0.035), Vector3(0.65, 0.65, 0.01), "madeira_escura")
 	diag.rotation_degrees.z = 32.0
+	_box(porteira, "Tela", Vector3(1.14, 0.98, 0.004), Vector3(0.65, 0.63, -0.03), "tela_arame")
+	_box(porteira, "Trinco", Vector3(0.12, 0.03, 0.03), Vector3(1.3, 0.75, 0.03), "ferro")
 	_caes(x, Vector2(z.y + 0.6, fz - 0.5))
 
 
@@ -2371,10 +2443,21 @@ func _tela(de: Vector2, ate: Vector2) -> void:
 	var n := maxi(1, ceili(compr / 2.2))
 	for i in n + 1:
 		var p := de + dir * compr * i / n
-		_bloco("madeira_escura", Vector3(0.1, 1.4, 0.1), Vector3(p.x, 0.7, p.y), Color.WHITE, false)
+		_bloco("madeira_escura", Vector3(0.1, 1.5, 0.1), Vector3(p.x, 0.75, p.y), Color.WHITE * _rng.randf_range(0.85, 1.1), false,
+			Vector3(_rng.randf_range(-2, 2), giro, _rng.randf_range(-2, 2)))
 	var meio := (de + ate) / 2
-	for k in 4:
-		_bloco("ferro", Vector3(compr, 0.015, 0.015), Vector3(meio.x, 0.15 + k * 0.38, meio.y), Color.WHITE, false, Vector3(0, giro, 0))
+	# Playtest 11 (R4): a tela de verdade — a malha de losangos de arame (dos dois
+	# lados), presa entre a tábua de baixo (para os cães não cavarem) e a régua de
+	# cima.
+	_bloco("madeira_escura", Vector3(compr, 0.06, 0.06), Vector3(meio.x, 1.47, meio.y), Color(0.9, 0.9, 0.9), false, Vector3(0, giro, 0))
+	_bloco("madeira_escura", Vector3(compr, 0.18, 0.035), Vector3(meio.x, 0.09, meio.y), Color(0.8, 0.8, 0.8), false, Vector3(0, giro, 0))
+	var tela := _obra("tela_arame")
+	var lado := Vector3(-dir.y, 0, dir.x)
+	var a := Vector3(de.x, 0.17, de.y)
+	var b := Vector3(ate.x, 0.17, ate.y)
+	var alto := Vector3(0, 1.28, 0)
+	for s: float in [-1.0, 1.0]:
+		tela.quad(a, b, b + alto, a + alto, lado * s, Color.WHITE)
 	_col.append([Vector3(compr, 1.4, 0.12), Vector3(meio.x, 0.7, meio.y), Vector3(0, giro, 0)])
 
 
@@ -2456,12 +2539,47 @@ func _moinho() -> void:
 	# A roda (virada para o leste, ao vento do vale) e o leme.
 	var cubo := base + Vector3(0.5, alto + 0.4, 0)
 	_bloco("ferro", Vector3(0.6, 0.3, 0.3), cubo, Color.WHITE, false)
+	# Playtest 11 (R4): as dezoito pás de chapa em leque (radiais, não um aro), entre
+	# o aro de dentro e o de fora, com os raios de ferro até o cubo.
+	var roda := cubo + Vector3(0.34, 0, 0)
 	for i in 18:
 		var a := TAU * i / 18
-		var p := cubo + Vector3(0.3, sin(a) * 1.25, cos(a) * 1.25)
-		_bloco("ferro_galvanizado", Vector3(0.02, 1.5, 0.32), p, Color.WHITE, false, Vector3(rad_to_deg(-a), 0, 0))
+		var radial := Vector3(0, sin(a), cos(a))
+		_bloco("ferro_galvanizado", Vector3(0.015, 1.0, 0.26), roda + radial * 0.88, Color.WHITE * (0.9 + 0.12 * sin(a * 3.0)), false,
+			Vector3(90.0 - rad_to_deg(a), 0, 0))
+	for r: float in [0.38, 1.36]:
+		for i in 18:
+			var a := TAU * (i + 0.5) / 18
+			var radial := Vector3(0, sin(a), cos(a))
+			_bloco("ferro", Vector3(0.03, 2.0 * r * sin(PI / 18) + 0.02, 0.035), roda + radial * r, Color(0.7, 0.7, 0.7), false, Vector3(-rad_to_deg(a), 0, 0))
+	for i in 6:
+		var a := TAU * i / 6
+		_bloco("ferro", Vector3(0.025, 1.0, 0.025), roda + Vector3(0.02, sin(a), cos(a)) * 0.5, Color(0.7, 0.7, 0.7), false, Vector3(90.0 - rad_to_deg(a), 0, 0))
+	_cilindro("ferro", roda + Vector3(0.05, 0, 0), 0.12, 0.12, 8)
+	# O leme: a haste e a chapa de cauda com as nervuras.
 	_bloco("ferro_galvanizado", Vector3(2.4, 0.9, 0.03), cubo + Vector3(-1.6, 0.1, 0), Color.WHITE, false)
+	for k in 3:
+		_bloco("ferro", Vector3(2.3, 0.025, 0.04), cubo + Vector3(-1.6, -0.25 + k * 0.35, 0), Color(0.7, 0.7, 0.7), false)
 	_bloco("madeira_clara", Vector3(2.0, 0.08, 0.08), cubo + Vector3(-0.9, 0, 0), Color.WHITE, false)
+	# A plataforma de tábuas sob a cabeça, a escada por uma das faces até ela, a
+	# vara da bomba descendo pelo meio da torre e a caixa d'água de aduelas ao pé.
+	_bloco("madeira_clara", Vector3(1.7, 0.06, 1.7), base + Vector3(0, alto - 0.55, 0), Color(0.75, 0.75, 0.75), false)
+	for s: float in [-1.0, 1.0]:
+		_viga("madeira_clara", base + Vector3(s * 0.2, 0, abre - 0.05), base + Vector3(s * 0.2, alto - 0.5, 0.4), 0.05, Color(0.8, 0.8, 0.8))
+	var k2 := 0.4
+	while k2 < alto - 0.6:
+		var t := k2 / (alto - 0.5)
+		_bloco("madeira_clara", Vector3(0.44, 0.035, 0.035), base + Vector3(0, k2, lerpf(abre - 0.05, 0.4, t) + 0.02), Color(0.8, 0.8, 0.8), false)
+		k2 += 0.36
+	_bloco("ferro", Vector3(0.03, alto - 0.4, 0.03), base + Vector3(0, (alto - 0.4) / 2 + 0.3, 0), Color(0.6, 0.6, 0.6), false)
+	_cilindro("ferro", base + Vector3(0, 0.35, 0), 0.08, 0.7, 8)
+	var caixa := base + Vector3(2.7, 0, 1.2)
+	_cilindro("madeira_clara", caixa + Vector3(0, 0.75, 0), 0.95, 1.5, 14, Color(0.85, 0.78, 0.7))
+	_cilindro("agua", caixa + Vector3(0, 1.4, 0), 0.9, 0.02, 14)
+	for y: float in [0.25, 0.75, 1.3]:
+		_cilindro("ferro", caixa + Vector3(0, y, 0), 0.965, 0.05, 14, Color(0.6, 0.6, 0.6))
+	_col.append([Vector3(1.9, 1.5, 1.9), caixa + Vector3(0, 0.75, 0)])
+	_viga("ferro", base + Vector3(0.1, 0.5, 0.1), caixa + Vector3(-0.9, 1.35, -0.3), 0.04, Color(0.55, 0.55, 0.55))
 
 
 # --- As árvores -----------------------------------------------------------------------
@@ -2507,9 +2625,15 @@ func _arvores() -> void:
 	for i in 140:
 		var p := Vector3(_rng.randf_range(-63.0, -30.0), 0, _rng.randf_range(-58.0, 38.0))
 		p.y = _altura(p.x, p.z)
+		var taboa := _rng.randf() < 0.4
 		for k in 6:
 			var q := p + Vector3(_rng.randf_range(-0.25, 0.25), 0, _rng.randf_range(-0.25, 0.25))
-			mm.piramide(_rng.randf_range(0.025, 0.045), _rng.randf_range(0.5, 1.3), q, 3, Color(0.42, 0.4, 0.2) * _rng.randf_range(0.8, 1.15))
+			var h := _rng.randf_range(0.5, 1.3)
+			mm.piramide(_rng.randf_range(0.025, 0.045), h, q, 3, Color(0.42, 0.4, 0.2) * _rng.randf_range(0.8, 1.15))
+			# As taboas: a espiga parda no alto de uma haste (R4).
+			if taboa and k % 2 == 0:
+				mm.caixa(Vector3(0.012, h * 0.95, 0.012), q + Vector3(0.05, h * 0.47, 0), Color(0.4, 0.38, 0.2))
+				mm.caixa(Vector3(0.045, 0.17, 0.045), q + Vector3(0.05, h * 0.95, 0), Color(0.3, 0.19, 0.1))
 	# A mata da encosta: cicutas e bétulas, densa, até a crista (o fim do terreno).
 	for i in 1100:
 		var p := Vector3(_rng.randf_range(-258.0, -66.0), 0, _rng.randf_range(-228.0, 228.0))
@@ -2536,10 +2660,18 @@ func _betula(mm: Cidade.Malha, p: Vector3, alt: float, perto: bool) -> void:
 		mm.caixa(Vector3(0.15, 0.06, 0.15), p + Vector3(0, _rng.randf_range(0.8, alt - 1.0), 0), Color(0.12, 0.12, 0.12))
 	var folha := Color(0.26, 0.34, 0.15) if _rng.randf() < 0.85 else Color(0.5, 0.46, 0.18)
 	if perto:
-		for k in 3:
-			var c := p + Vector3(_rng.randf_range(-0.6, 0.6), alt * _rng.randf_range(0.6, 0.92), _rng.randf_range(-0.6, 0.6))
-			var r := _rng.randf_range(0.7, 1.1)
-			_vistas._bola(mm, c, Vector3(r, r * 1.2, r), folha * _rng.randf_range(0.85, 1.1), _rng)
+		# Playtest 11 (R4): de perto, os galhos finos subindo do tronco e a copa
+		# rala de tufos pequenos nas pontas (eram três bolas).
+		for k in 5:
+			var y := alt * _rng.randf_range(0.45, 0.8)
+			var a := _rng.randf() * TAU
+			var dir := Vector3(cos(a) * 0.6, 1.0, sin(a) * 0.6).normalized()
+			var de := p + Vector3(0, y, 0)
+			var fim := de + dir * alt * _rng.randf_range(0.18, 0.3)
+			_galho(mm, de, fim, 0.04, 0.015, Color(0.7, 0.68, 0.62))
+			_tufo(mm, fim, _rng.randf_range(0.45, 0.7), folha)
+			_tufo(mm, de.lerp(fim, 0.55) + Vector3(0, 0.15, 0), _rng.randf_range(0.35, 0.5), folha * 0.9)
+		_tufo(mm, p + Vector3(0, alt * 0.98, 0), 0.55, folha)
 	else:
 		mm.bipiramide(alt * 0.13, alt * 0.45, p + Vector3(0, alt * 0.74, 0), 5, folha, _rng.randf() * TAU)
 		mm.bipiramide(alt * 0.1, alt * 0.3, p + Vector3(0.3, alt * 0.52, 0), 5, folha * 0.9, _rng.randf() * TAU)
@@ -2549,9 +2681,15 @@ func _betula(mm: Cidade.Malha, p: Vector3, alt: float, perto: bool) -> void:
 func _morta(mm: Cidade.Malha, p: Vector3) -> void:
 	var alt := _rng.randf_range(2.5, 5.5)
 	var cor := Color(0.42, 0.4, 0.36)
-	mm.caixa(Vector3(0.22, alt, 0.22), p + Vector3(0, alt / 2, 0), cor)
-	mm.caixa(Vector3(1.2, 0.1, 0.1), p + Vector3(0.5, alt * 0.7, 0), cor * 0.9)
-	mm.caixa(Vector3(0.1, 0.1, 0.9), p + Vector3(0, alt * 0.5, 0.4), cor * 0.9)
+	# Playtest 11 (R4): o tronco que afina e se inclina, a ponta lascada, e dois ou
+	# três galhos quebrados, tortos.
+	var topo := p + Vector3(_rng.randf_range(-0.4, 0.4), alt, _rng.randf_range(-0.4, 0.4))
+	_galho(mm, p + Vector3(0, -0.2, 0), topo, 0.16, 0.05, cor)
+	for k in _rng.randi_range(2, 3):
+		var de := p.lerp(topo, _rng.randf_range(0.35, 0.8))
+		var a := _rng.randf() * TAU
+		var fim := de + Vector3(cos(a), _rng.randf_range(0.2, 0.9), sin(a)).normalized() * _rng.randf_range(0.6, 1.4)
+		_galho(mm, de, fim, 0.06, 0.02, cor * 0.9)
 
 
 # --- O acabamento dos interiores (playtest 11) --------------------------------------
@@ -3116,3 +3254,365 @@ func _torneado(pai: Node3D, nome: String, perfil: Array, mat: String, lados: int
 	mi.material_override = m[mat]
 	_add(pai, mi)
 	return mi
+
+
+
+# --- As dependências e o quintal (playtest 11, R4) -----------------------------------
+
+## Uma viga (uma caixa de seção `esp`) de `a` a `b`, em qualquer direção.
+func _viga(mat: String, a: Vector3, b: Vector3, esp: float, cor := Color.WHITE) -> void:
+	var d := b - a
+	var comp := d.length()
+	if comp < 0.001:
+		return
+	var y := d / comp
+	var x := y.cross(Vector3.UP if absf(y.y) < 0.99 else Vector3.RIGHT).normalized()
+	var z := x.cross(y)
+	_bloco(mat, Vector3(esp, comp, esp), (a + b) / 2, cor, false, Basis(x, y, z).get_euler() * 180.0 / PI)
+
+
+## As ripas sobre as juntas das tábuas (o "board and batten" dos galpões da Nova
+## Inglaterra), de `de` a `ate` na face de fora de uma parede (a normal `fora`), de
+## `y0` a `y1`, uma a cada `passo`; numa abertura ([centro ao longo da parede,
+## largura, base, topo], como as de `_parede`), só acima e abaixo dela.
+func _ripas(de: Vector2, ate: Vector2, fora: Vector3, y0: float, y1: float, aberturas := [], passo := 0.42) -> void:
+	var compr := de.distance_to(ate)
+	var dir := (ate - de) / compr
+	var giro := rad_to_deg(atan2(fora.x, fora.z))
+	var s := passo * 0.5
+	while s < compr - 0.05:
+		var p := de + dir * s
+		var ao_longo: float = p.x if absf(dir.x) > 0.5 else p.y
+		var trechos := [Vector2(y0, y1)]
+		for a: Array in aberturas:
+			if absf(ao_longo - float(a[0])) < float(a[1]) / 2 + 0.04:
+				trechos = [Vector2(y0, a[2]), Vector2(a[3], y1)]
+		for t: Vector2 in trechos:
+			if t.y - t.x > 0.06:
+				_bloco("celeiro", Vector3(0.06, t.y - t.x, 0.025), Vector3(p.x, (t.x + t.y) / 2, p.y) + fora * 0.012,
+					Color(0.78, 0.78, 0.78), false, Vector3(0, giro, 0))
+		s += passo
+
+
+## Uma janelinha de galpão vista de fora, em `c` (o meio do vão, na face de fora da
+## parede de normal `fora`): o vidro escuro um pouco para dentro, o caixilho em cruz
+## e, com `moldura`, a moldura branca e o peitoril.
+func _janelinha(c: Vector3, fora: Vector3, larg: float, alto: float, moldura := true) -> void:
+	var giro := rad_to_deg(atan2(fora.x, fora.z))
+	var b := Basis.from_euler(Vector3(0, deg_to_rad(giro), 0))
+	var rot := Vector3(0, giro, 0)
+	_bloco("vidro_fazenda", Vector3(larg, alto, 0.01), c + b * Vector3(0, 0, -0.05), Color(0.8, 0.85, 0.9), false, rot)
+	_bloco("pintura_branca", Vector3(0.035, alto, 0.03), c + b * Vector3(0, 0, -0.035), Color(0.9, 0.9, 0.9), false, rot)
+	_bloco("pintura_branca", Vector3(larg, 0.035, 0.03), c + b * Vector3(0, 0, -0.035), Color(0.9, 0.9, 0.9), false, rot)
+	if moldura:
+		for s: float in [-1.0, 1.0]:
+			_bloco("pintura_branca", Vector3(0.07, alto + 0.14, 0.035), c + b * Vector3(s * (larg / 2 + 0.035), 0, 0.012), Color.WHITE, false, rot)
+			_bloco("pintura_branca", Vector3(larg + 0.14, 0.07, 0.035), c + b * Vector3(0, s * (alto / 2 + 0.035), 0.012), Color.WHITE, false, rot)
+		_bloco("pintura_branca", Vector3(larg + 0.22, 0.04, 0.09), c + b * Vector3(0, -alto / 2 - 0.085, 0.04), Color.WHITE, false, rot)
+
+
+## Uma tora de lenha deitada ao longo de Z, de `compr`: os lados de casca escura e
+## as pontas claras do corte.
+func _tora(mm: Cidade.Malha, c: Vector3, r: float, compr: float) -> void:
+	const N := 7
+	var casca := Color(0.42, 0.32, 0.24) * _rng.randf_range(0.75, 1.1)
+	var corte := Color(1.2, 1.0, 0.7) * _rng.randf_range(0.85, 1.1)
+	var giro := _rng.randf() * TAU
+	var h := Vector3(0, 0, compr / 2)
+	for i in N:
+		var u0 := giro + TAU * i / N
+		var u1 := giro + TAU * (i + 1) / N
+		var p0 := Vector3(cos(u0) * r, sin(u0) * r, 0)
+		var p1 := Vector3(cos(u1) * r, sin(u1) * r, 0)
+		mm.quad(c + p0 - h, c + p1 - h, c + p1 + h, c + p0 + h, ((p0 + p1) / 2).normalized(), casca)
+		for s: float in [-1.0, 1.0]:
+			mm.tri(c + h * s, c + p0 + h * s, c + p1 + h * s, Vector3(0, 0, s), corte)
+
+
+## Uma roda de raios de madeira com o aro de ferro, de eixo em X, em `c`.
+func _roda(c: Vector3, raio: float) -> void:
+	var aro := _obra("ferro")
+	const N := 14
+	for i in N:
+		var a0 := TAU * i / N
+		var a1 := TAU * (i + 1) / N
+		var d0 := Vector3(0, sin(a0), cos(a0))
+		var d1 := Vector3(0, sin(a1), cos(a1))
+		var nn := ((d0 + d1) / 2).normalized()
+		for s: float in [-1.0, 1.0]:
+			var w := Vector3(s * 0.035, 0, 0)
+			aro.quad(c + d0 * raio + w, c + d1 * raio + w, c + d1 * (raio - 0.07) + w, c + d0 * (raio - 0.07) + w, Vector3(s, 0, 0), Color(0.7, 0.6, 0.5))
+		aro.quad(c + d0 * raio + Vector3(-0.035, 0, 0), c + d1 * raio + Vector3(-0.035, 0, 0), c + d1 * raio + Vector3(0.035, 0, 0), c + d0 * raio + Vector3(0.035, 0, 0), nn, Color(0.55, 0.55, 0.55))
+	for i in 10:
+		var a := TAU * i / 10
+		_bloco("madeira_clara", Vector3(0.035, raio - 0.08, 0.035), c + Vector3(0, sin(a), cos(a)) * (raio - 0.04) / 2, Color(0.75, 0.65, 0.55), false,
+			Vector3(90.0 - rad_to_deg(a), 0, 0))
+	_bloco("madeira_escura", Vector3(0.16, 0.12, 0.12), c, Color.WHITE, false)
+
+
+## A carroça de tábuas do celeiro, ao longo de Z: o leito com os taipais, as quatro
+## rodas de raios (as de trás maiores), os eixos e a lança caída no chão.
+func _carroca(p: Vector3) -> void:
+	var m2 := "madeira_clara"
+	_bloco(m2, Vector3(1.3, 0.07, 2.8), p + Vector3(0, 0.88, 0), Color(0.85, 0.8, 0.72), false)
+	for s: float in [-1.0, 1.0]:
+		_bloco(m2, Vector3(0.04, 0.32, 2.8), p + Vector3(s * 0.63, 1.07, 0), Color(0.8, 0.75, 0.7), false)
+		_bloco(m2, Vector3(1.3, 0.32, 0.04), p + Vector3(0, 1.07, s * 1.38), Color(0.8, 0.75, 0.7), false)
+		for k in 3:
+			_bloco("ferro", Vector3(0.05, 0.36, 0.03), p + Vector3(s * 0.66, 1.07, -1.0 + k), Color(0.6, 0.6, 0.6), false)
+	for fz: Array in [[-0.95, 0.42], [0.95, 0.52]]:
+		var zr: float = fz[0]
+		var r: float = fz[1]
+		_bloco("madeira_escura", Vector3(1.75, 0.09, 0.09), p + Vector3(0, r, zr), Color.WHITE, false)
+		for s: float in [-1.0, 1.0]:
+			_roda(p + Vector3(s * 0.8, r, zr), r)
+	_viga("madeira_clara", p + Vector3(0, 0.42, -1.1), p + Vector3(0.1, 0.05, -2.8), 0.07)
+	_col.append([Vector3(1.8, 1.25, 3.0), p + Vector3(0, 0.62, 0)])
+
+
+## O acabamento do canil: as ripas, as cantoneiras e as testeiras brancas, o rodapé
+## de pedra atrás e dos lados, os caibros sob o beiral, as portinholas de cada baia
+## (articuladas no alto: umas escoradas abertas, outras caídas), as vasilhas com água.
+func _canil_acabamento() -> void:
+	var x := Vector2(-8.0, 2.8)
+	var z := Vector2(-13.0, -10.5)
+	var alto := 1.7
+	var baia := (x.y - x.x) / CAES.size()
+	var bocas := []
+	for i in CAES.size():
+		bocas.append([x.x + (i + 0.5) * baia, 0.5, 0.0, 0.7])
+	_ripas(Vector2(x.x, z.y), Vector2(x.y, z.y), Vector3.BACK, 0.02, alto - 0.3, bocas, 0.3)
+	_ripas(Vector2(x.x, z.x), Vector2(x.y, z.x), Vector3.FORWARD, 0.18, alto)
+	for s: float in [-1.0, 1.0]:
+		var xf: float = x.y if s > 0 else x.x
+		_ripas(Vector2(xf, z.x), Vector2(xf, z.y), Vector3(s, 0, 0), 0.18, alto - 0.15)
+		_bloco("pedra_campo", Vector3(0.14, 0.18, z.y - z.x + 0.1), Vector3(xf + s * 0.03, 0.09, (z.x + z.y) / 2), Color.WHITE, false)
+	_bloco("pedra_campo", Vector3(x.y - x.x + 0.1, 0.18, 0.14), Vector3((x.x + x.y) / 2, 0.09, z.x - 0.03), Color.WHITE, false)
+	var branco := "pintura_branca"
+	for xf: float in [x.x, x.y]:
+		_bloco(branco, Vector3(0.1, alto - 0.3, 0.1), Vector3(xf, (alto - 0.3) / 2, z.y), Color.WHITE, false)
+		_bloco(branco, Vector3(0.1, alto, 0.1), Vector3(xf, alto / 2, z.x), Color.WHITE, false)
+	# O telhado de uma água cai para a frente (o sul): a testeira da frente, a de
+	# trás, e os caibros à vista sob o beiral.
+	var ang := rad_to_deg(atan2(0.3, z.y - z.x))
+	var meio_x := (x.x + x.y) / 2
+	_bloco(branco, Vector3(x.y - x.x + 0.42, 0.13, 0.03), Vector3(meio_x, 1.37, z.y + 0.37), Color.WHITE, false, Vector3(ang, 0, 0))
+	_bloco(branco, Vector3(x.y - x.x + 0.42, 0.13, 0.03), Vector3(meio_x, 1.75, z.x - 0.17), Color.WHITE, false, Vector3(ang, 0, 0))
+	var xc := x.x + 0.2
+	while xc < x.y:
+		_bloco("madeira_escura", Vector3(0.05, 0.08, 0.42), Vector3(xc, 1.38, z.y + 0.18), Color(0.8, 0.8, 0.8), false, Vector3(ang, 0, 0))
+		xc += 0.6
+	# As portinholas.
+	for i in CAES.size():
+		var cx := x.x + (i + 0.5) * baia
+		var giro := -_rng.randf_range(55.0, 80.0) if (i * 7) % 3 != 0 else -_rng.randf_range(2.0, 10.0)
+		var g := deg_to_rad(giro)
+		var c := Vector3(cx, 0.72, z.y + 0.03) + Vector3(0, -0.36 * cos(g), -0.36 * sin(g))
+		_bloco("madeira_escura", Vector3(0.5, 0.72, 0.03), c, Color(0.95, 0.85, 0.8), false, Vector3(giro, 0, 0))
+		_bloco("ferro", Vector3(0.52, 0.03, 0.04), Vector3(cx, 0.72, z.y + 0.03), Color(0.6, 0.6, 0.6), false)
+	# As vasilhas com água, de zinco, dentro do cercado.
+	for p: Vector3 in [Vector3(-6.6, 0, -9.3), Vector3(-2.9, 0, -9.6)]:
+		_cilindro("zinco", p + Vector3(0, 0.05, 0), 0.19, 0.1, 10, Color(0.9, 0.9, 0.9))
+		_cilindro("agua", p + Vector3(0, 0.085, 0), 0.17, 0.01, 10)
+
+
+## O resto do acabamento das dependências (R4): o galpão de lenha, o celeiro por
+## dentro e as janelinhas, o galinheiro e o chiqueiro, o abrigo do Ford, a estrada
+## com os sulcos; e a luz de dentro dos galpões, que acompanha o dia.
+func _dependencias_acabamento() -> void:
+	var luzes := cena.get_node("LuzesDeDentro")
+	var luz := func(nome: String, p: Vector3, energia: float, alcance: float) -> void:
+		var l := _omni(luzes, nome, p, Color(1.0, 0.85, 0.7), energia, alcance)
+		l.light_specular = 0.0
+		l.omni_attenuation = 0.8
+	# O galpão de lenha: as ripas por fora, a cantoneira branca, a luz.
+	_ripas(Vector2(-13.0, PUXADO_Z.y), Vector2(PUXADO_X.x, PUXADO_Z.y), Vector3.BACK, 0.0, 2.6)
+	_ripas(Vector2(-13.0, PUXADO_Z.x), Vector2(-13.0, PUXADO_Z.y), Vector3.LEFT, 0.0, 2.6)
+	_bloco("pintura_branca", Vector3(0.1, 2.6, 0.1), Vector3(-13.0, 1.3, PUXADO_Z.y), Color.WHITE, false)
+	luz.call("Galpao", Vector3(-11.0, 2.0, 3.8), 0.3, 5.0)
+	_celeiro_dentro()
+	luz.call("Celeiro", Vector3(-15.0, 3.6, -11.5), 0.45, 10.0)
+	luz.call("Palheiro", Vector3(-15.0, 4.8, -18.0), 0.25, 7.0)
+	_galinheiro_acabamento()
+	# O abrigo do Ford: as ripas da parede do fundo.
+	_ripas(Vector2(9.0, -18.0), Vector2(15.0, -18.0), Vector3.FORWARD, 0.0, 2.6)
+	_estrada_acabamento()
+
+
+## O celeiro por dentro: a estrutura à vista (os esteios junto às paredes, as
+## linhas de amarração com as mãos-francesas, os caibros e a cumeeira), a escada do
+## palheiro, os fardos de feno no palheiro e no chão, o feno solto, as frentes das
+## baias e as manjedouras, o forcado, os latões de leite; as janelinhas com o vidro
+## e a porta do lado leste, aberta, encostada na parede.
+func _celeiro_dentro() -> void:
+	var x := Vector2(-21.0, -9.0)
+	var z := Vector2(-21.0, -8.0)
+	var alto := 5.0
+	var cume := Vector2(-15.0, alto + 3.6)
+	var m2 := "madeira_escura"
+	var cor := Color(0.85, 0.78, 0.7)
+	var zz := z.x + 1.0
+	while zz < z.y - 0.5:
+		for xx: float in [x.x + 0.26, x.y - 0.26]:
+			_bloco(m2, Vector3(0.2, alto, 0.2), Vector3(xx, alto / 2, zz), cor, false)
+			var s := 1.0 if xx < cume.x else -1.0
+			_viga(m2, Vector3(xx + s * 0.1, alto - 1.2, zz), Vector3(xx + s * 1.1, alto - 0.2, zz), 0.12, cor)
+		_bloco(m2, Vector3(x.y - x.x - 0.3, 0.2, 0.2), Vector3(cume.x, alto - 0.1, zz), cor, false)
+		zz += 3.0
+	var zc := z.x + 0.4
+	while zc < z.y - 0.2:
+		for borda: float in [x.x, x.y]:
+			_viga(m2, Vector3(borda, alto - 0.1, zc), Vector3(cume.x, cume.y - 0.16, zc), 0.1, cor * 0.9)
+		zc += 1.3
+	_bloco(m2, Vector3(0.14, 0.22, z.y - z.x), Vector3(cume.x, cume.y - 0.22, (z.x + z.y) / 2), cor, false)
+	# A escada do palheiro (a borda dele em z -15.9, a 3 m).
+	var pe := Vector3(-14.4, 0.0, -15.25)
+	var topo := Vector3(-14.4, 3.45, -15.95)
+	for s: float in [-1.0, 1.0]:
+		_viga("madeira_clara", pe + Vector3(s * 0.22, 0, 0), topo + Vector3(s * 0.22, 0, 0), 0.06, Color(0.8, 0.75, 0.7))
+	for k in 10:
+		_bloco("madeira_clara", Vector3(0.44, 0.04, 0.04), pe.lerp(topo, (k + 1) / 11.0), Color(0.8, 0.75, 0.7), false)
+	# Os fardos: a frente da meda no palheiro, em duas fiadas, e uma pilha no chão.
+	for fiada in 2:
+		for k in 8:
+			var b := Vector3(-19.4 + k * 1.0 + _rng.randf_range(-0.08, 0.08) + fiada * 0.4, 3.27 + fiada * 0.4, -16.1 + _rng.randf_range(-0.05, 0.05))
+			if fiada == 1 and k > 5:
+				continue
+			_bloco("palha", Vector3(0.9, 0.4, 0.45), b, Color(1.05, 1.0, 0.88) * _rng.randf_range(0.85, 1.05), false, Vector3(0, _rng.randf_range(-6, 6), 0))
+	for k in 3:
+		var b := Vector3(-20.3, 0.2 + (k / 2) * 0.4, -9.4 + (k % 2) * 0.55 + (k / 2) * 0.25)
+		_bloco("palha", Vector3(0.45, 0.4, 0.9), b, Color(1.05, 1.0, 0.88) * _rng.randf_range(0.85, 1.05), false, Vector3(0, _rng.randf_range(-8, 8), 0))
+	_col.append([Vector3(0.6, 0.8, 1.6), Vector3(-20.3, 0.4, -9.1)])
+	for k in 7:
+		_bloco("palha", Vector3(_rng.randf_range(0.8, 1.6), 0.025, _rng.randf_range(0.6, 1.2)),
+			Vector3(_rng.randf_range(-20.0, -16.0), 0.05, _rng.randf_range(-20.0, -10.0)), Color(0.9, 0.85, 0.75), false, Vector3(0, _rng.randf_range(0, 180), 0))
+	# As baias (as divisórias já existem, em z -14.8, -12.8, -10.8): os esteios da
+	# frente, a travessa, e as manjedouras contra a parede oeste.
+	for zb: float in [-14.8, -12.8, -10.8]:
+		_bloco(m2, Vector3(0.14, 1.5, 0.14), Vector3(-18.45, 0.75, zb), cor, false)
+	_bloco(m2, Vector3(0.08, 0.1, 4.1), Vector3(-18.45, 1.45, -12.8), cor, false)
+	for zb: float in [-14.8, -12.8]:
+		_bloco(m2, Vector3(0.5, 0.45, 1.6), Vector3(-20.55, 0.85, zb + 1.0), cor, false)
+		_bloco("palha", Vector3(0.42, 0.06, 1.5), Vector3(-20.55, 1.08, zb + 1.0), Color.WHITE, false)
+		_col.append([Vector3(0.5, 1.1, 1.6), Vector3(-20.55, 0.55, zb + 1.0)])
+	# O forcado encostado na parede leste, perto do portão.
+	var cabo0 := Vector3(-9.6, 0.02, -9.6)
+	var cabo1 := Vector3(-9.25, 1.55, -9.6)
+	_viga("madeira_clara", cabo0, cabo1, 0.035, Color(0.85, 0.75, 0.6))
+	var d := (cabo1 - cabo0).normalized()
+	_bloco("ferro", Vector3(0.03, 0.03, 0.2), cabo1, Color(0.6, 0.6, 0.6), false)
+	for k in 4:
+		var bt := cabo1 + Vector3(0, 0, (k - 1.5) * 0.06)
+		_viga("ferro", bt, bt + d * 0.32, 0.012, Color(0.6, 0.6, 0.6))
+	# Os latões de leite.
+	for p: Vector3 in [Vector3(-10.0, 0, -8.7), Vector3(-10.42, 0, -8.8)]:
+		_cilindro("zinco", p + Vector3(0, 0.25, 0), 0.16, 0.5, 10)
+		_cilindro("zinco", p + Vector3(0, 0.55, 0), 0.1, 0.1, 10)
+		_cilindro("zinco", p + Vector3(0, 0.62, 0), 0.115, 0.04, 10, Color(0.85, 0.85, 0.85))
+	_col.append([Vector3(0.8, 0.65, 0.4), Vector3(-10.2, 0.32, -8.75)])
+	# As janelinhas (a moldura branca é do _celeiro_acabamento).
+	_janelinha(Vector3(-12.0, 1.9, z.x), Vector3.FORWARD, 0.6, 0.8, false)
+	_janelinha(Vector3(x.x, 1.9, -14.5), Vector3.LEFT, 0.6, 0.8, false)
+	_janelinha(Vector3(x.y, 1.9, -17.5), Vector3.RIGHT, 0.6, 0.8, false)
+	# A porta do lado leste: a moldura branca e a folha de tábuas aberta, encostada
+	# na parede ao norte do vão.
+	for s: float in [-1.0, 1.0]:
+		_bloco("pintura_branca", Vector3(0.04, 2.2, 0.1), Vector3(x.y + 0.02, 1.1, -12.0 + s * 0.55), Color.WHITE, false)
+	_bloco("pintura_branca", Vector3(0.04, 0.1, 1.2), Vector3(x.y + 0.02, 2.15, -12.0), Color.WHITE, false)
+	_bloco("celeiro", Vector3(0.05, 2.05, 0.98), Vector3(x.y + 0.06, 1.04, -13.08), Color(0.9, 0.9, 0.9), false)
+	for y: float in [0.4, 1.0, 1.6]:
+		_bloco("pintura_branca", Vector3(0.02, 0.08, 0.9), Vector3(x.y + 0.095, y, -13.08), Color.WHITE, false)
+
+
+## O galinheiro e o chiqueiro: as ripas, as cantoneiras, as janelinhas, a porta
+## aberta, o buraco das galinhas com a rampa; no cercado, a lama e o cocho.
+func _galinheiro_acabamento() -> void:
+	var x := Vector2(-27.0, -21.0)
+	var z := Vector2(-19.0, -11.0)
+	var alto := 2.4
+	_ripas(Vector2(x.x, z.y), Vector2(x.y, z.y), Vector3.BACK, 0.0, alto, [[-25.5, 0.8, 0.0, 1.9], [-22.8, 0.6, 1.1, 1.7], [-24.0, 0.3, 0.0, 0.5]])
+	_ripas(Vector2(x.x, z.x), Vector2(x.y, z.x), Vector3.FORWARD, 0.0, alto)
+	_ripas(Vector2(x.x, z.x), Vector2(x.x, z.y), Vector3.LEFT, 0.0, alto, [[-15.0, 0.6, 1.1, 1.7]])
+	for zf: float in [z.x, z.y]:
+		_bloco("pintura_branca", Vector3(0.1, alto, 0.1), Vector3(x.x, alto / 2, zf), Color.WHITE, false)
+	_janelinha(Vector3(-22.8, 1.4, z.y), Vector3.BACK, 0.6, 0.6)
+	_janelinha(Vector3(x.x, 1.4, -15.0), Vector3.LEFT, 0.6, 0.6)
+	# A porta: a moldura e a folha aberta contra a parede, a oeste do vão.
+	for s: float in [-1.0, 1.0]:
+		_bloco("pintura_branca", Vector3(0.08, 1.98, 0.04), Vector3(-25.5 + s * 0.44, 0.99, z.y + 0.02), Color.WHITE, false)
+	_bloco("pintura_branca", Vector3(0.96, 0.08, 0.04), Vector3(-25.5, 1.94, z.y + 0.02), Color.WHITE, false)
+	_bloco("celeiro", Vector3(0.78, 1.88, 0.04), Vector3(-26.36, 0.95, z.y + 0.07), Color(0.9, 0.9, 0.9), false)
+	# O buraco das galinhas e a rampa com as travessinhas.
+	_bloco("esmalte_preto", Vector3(0.28, 0.32, 0.02), Vector3(-24.0, 0.3, z.y + 0.005), Color.WHITE, false)
+	_bloco("madeira_clara", Vector3(0.3, 0.025, 0.85), Vector3(-24.0, 0.13, z.y + 0.42), Color(0.85, 0.8, 0.7), false, Vector3(17, 0, 0))
+	for k in 4:
+		_bloco("madeira_clara", Vector3(0.3, 0.02, 0.02), Vector3(-24.0, 0.2 - k * 0.055, z.y + 0.2 + k * 0.18), Color(0.8, 0.75, 0.65), false)
+	# O chiqueiro: a lama e o cocho.
+	_bloco("chao_terra", Vector3(5.8, 0.02, 3.8), Vector3(-24.0, 0.012, z.y + 2.0), Color(0.62, 0.52, 0.42), false)
+	_bloco("madeira_escura", Vector3(1.3, 0.22, 0.4), Vector3(-22.6, 0.11, z.y + 3.4), Color(0.9, 0.85, 0.8), false)
+	_bloco("chao_terra", Vector3(1.2, 0.01, 0.3), Vector3(-22.6, 0.222, z.y + 3.4), Color(0.45, 0.38, 0.3), false)
+
+
+## A estrada (R4): os dois sulcos das rodas, mais escuros, a faixa de capim no meio e
+## a grama comendo as beiras, tudo ondulando um pouco ao longo do caminho.
+func _estrada_acabamento() -> void:
+	var meio := (ESTRADA_X.x + ESTRADA_X.y) / 2
+	var sulco := _obra("estrada")
+	var capim := _obra("grama")
+	var faixas := [[meio - 0.9, 0.38, sulco, Color(0.6, 0.55, 0.52), 0.045], [meio + 0.52, 0.38, sulco, Color(0.6, 0.55, 0.52), 0.045],
+		[meio - 0.3, 0.6, capim, Color(0.5, 0.56, 0.3), 0.05], [ESTRADA_X.x - 0.05, 0.45, capim, Color(0.42, 0.5, 0.27), 0.05],
+		[ESTRADA_X.y - 0.4, 0.45, capim, Color(0.42, 0.5, 0.27), 0.05]]
+	var z := -230.0
+	while z < 230.0:
+		var z1 := z + (2.0 if absf(z) < 70.0 else 10.0)
+		for f: Array in faixas:
+			var w: float = f[1]
+			var dy: float = f[4]
+			var x0 := float(f[0]) + sin(z * 0.11 + w * 9.0) * 0.12
+			var x1 := float(f[0]) + sin(z1 * 0.11 + w * 9.0) * 0.12
+			var a := Vector3(x0, _altura(x0, z) + dy, z)
+			var b := Vector3(x0 + w, _altura(x0 + w, z) + dy, z)
+			var c := Vector3(x1 + w, _altura(x1 + w, z1) + dy, z1)
+			var d := Vector3(x1, _altura(x1, z1) + dy, z1)
+			(f[2] as Cidade.Malha).quad(a, b, c, d, Vector3.UP, f[3])
+		z = z1
+
+
+## A linha do telefone (a que "eles cortam", livro): os postes de castanheiro ao
+## longo da estrada, do lado da casa, com a cruzeta, os isoladores de vidro e os fios
+## que caem um pouco entre um e outro; e o ramal que atravessa o gramado até a
+## parede leste da casa.
+func _postes() -> void:
+	var xp := ESTRADA_X.x - 1.3
+	var topos: Array[Vector3] = []
+	var z := -220.0
+	while z <= 220.0:
+		var p := Vector3(xp + _rng.randf_range(-0.15, 0.15), _altura(xp, z), z)
+		var inclina := Vector3(_rng.randf_range(-1.5, 1.5), 0, _rng.randf_range(-1.5, 1.5))
+		_bloco("madeira_escura", Vector3(0.2, 7.2, 0.2), p + Vector3(0, 3.5, 0), Color(0.8, 0.75, 0.7), false, inclina)
+		_bloco("madeira_escura", Vector3(1.3, 0.1, 0.1), p + Vector3(0, 6.75, 0), Color(0.85, 0.8, 0.75), false)
+		for s: float in [-1.0, 1.0]:
+			_cilindro("vidro_fazenda", p + Vector3(s * 0.5, 6.86, 0), 0.04, 0.12, 6, Color(1.4, 1.8, 1.6))
+		topos.append(p + Vector3(0, 6.92, 0))
+		if absf(z) < 60.0:
+			_col.append([Vector3(0.25, 7.0, 0.25), p + Vector3(0, 3.5, 0)])
+		z += 36.0
+	var fio := func(a: Vector3, b: Vector3, cai: float) -> void:
+		var antes := a
+		for k in 4:
+			var t := (k + 1) / 4.0
+			var q := a.lerp(b, t) - Vector3(0, cai * 4.0 * t * (1.0 - t), 0)
+			_viga("esmalte_preto", antes, q, 0.014)
+			antes = q
+	for i in topos.size() - 1:
+		for s: float in [-1.0, 1.0]:
+			fio.call(topos[i] + Vector3(s * 0.5, 0, 0), topos[i + 1] + Vector3(s * 0.5, 0, 0), 0.45)
+	# O ramal: do poste mais perto da casa até o isolador na parede leste, no alto.
+	var perto := topos[0]
+	for t: Vector3 in topos:
+		if absf(t.z) < absf(perto.z):
+			perto = t
+	var parede := Vector3(CASA_X.y + 0.15, T1 + 1.6, -1.6)
+	_bloco("ferro", Vector3(0.3, 0.03, 0.03), parede + Vector3(-0.15, 0, 0), Color(0.6, 0.6, 0.6), false)
+	_cilindro("vidro_fazenda", parede + Vector3(0, 0.05, 0), 0.04, 0.1, 6, Color(1.4, 1.8, 1.6))
+	fio.call(perto + Vector3(-0.5, 0, 0), parede + Vector3(0, 0.08, 0), 0.9)

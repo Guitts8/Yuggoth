@@ -532,8 +532,28 @@ fique BOM de VERDADE pois será o modelo mais usado durante todo o jogo."*
   e das janelinhas, a porta do palheiro com a cruz, as tábuas da empena e o lanternim
   de venezianas com o cata-vento (`_celeiro_acabamento`). O percurso continua com 0
   lugares presos.
-- 🔧 **R4 — As dependências e o quintal:** o canil, o galpão, o celeiro, a bomba, o
-  moinho, as cercas, a estrada, o terreno.
+- ✅ **R4 — As dependências e o quintal** (2026-10-14): o canil com as ripas sobre as
+  juntas (`_ripas`), as cantoneiras e testeiras brancas, o rodapé de pedra, os caibros
+  sob o beiral, as portinholas das baias (umas escoradas, outras caídas) e as vasilhas
+  de zinco; o cercado de tela de arame de verdade (a malha de losangos com alfa,
+  `tela_arame` em `gerar_assets`, entre a tábua de baixo e a régua de cima; a porteira
+  com a tela e o trinco); o galpão de lenha com as toras rachadas empilhadas peça a
+  peça (`_tora`), o cepo com o machado cravado e o serrote de arco; o celeiro por
+  dentro (`_celeiro_dentro`: os esteios, as mãos-francesas, os caibros e a cumeeira, a
+  escada do palheiro, os fardos, as baias com as manjedouras, o forcado, os latões, as
+  janelinhas, a porta leste aberta) e a carroça de rodas de raios (`_carroca`, `_roda`);
+  o galinheiro e o chiqueiro (as ripas, a porta, o buraco das galinhas com a rampa, a
+  lama e o cocho); o moinho com as dezoito pás em leque entre dois aros, o leme com
+  nervuras, a plataforma, a escada, a vara da bomba e a caixa d'água de aduelas; as
+  cercas de tábuas pregadas de um lado dos mourões tortos; a estrada com os sulcos e a
+  faixa de capim (`_estrada_acabamento`); a linha do telefone (`_postes`: os postes com
+  a cruzeta e os isoladores, os fios que caem entre eles e o ramal até a casa — a linha
+  que "eles cortam"); a caixa de correio rural de tampo abaulado com a bandeirinha; as
+  poças do pântano em polígonos tortos, as taboas, as bétulas e as árvores mortas com
+  galhos; os morros do outro lado do vale com relevo (eram uma rampa que tapava o céu
+  do leste) e a crista recortada; a luz de dentro dos galpões. O percurso continua com
+  0 lugares presos; o teste de fumaça passa. Capturas: `SHOT_MODO=fazenda` com
+  `SHOT_EXTRA`.
 - ✅ **R5 — Os objetos da preparação** (2026-10-14): o lampião torneado de verdade
   (`_torneado`, uma peça de revolução por perfil: o pé em sino, o depósito bojudo com o
   friso, o queimador com a rodinha do pavio, a chaminé de vidro com o bojo); o rifle de

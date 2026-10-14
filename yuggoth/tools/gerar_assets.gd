@@ -97,6 +97,7 @@ func _texturas() -> void:
 	_save(_colcha(), "colcha")
 	_save(_lombadas(), "lombadas")
 	_save(_capim(), "capim")
+	_save(_tela_arame(), "tela_arame")
 
 
 func _save(img: Image, name: String) -> void:
@@ -2439,6 +2440,22 @@ func _lombadas() -> Image:
 						cor = _shade(c, f)
 				img.set_pixel(xx, y, cor)
 		x += w
+	return img
+
+
+## A tela de arame do cercado dos cães (playtest 11, R4): a malha de losangos de
+## arame galvanizado, com alfa (o resto é vazio); duas malhas por ladrilho.
+func _tela_arame() -> Image:
+	var n := 32
+	var img := _img(n, n)
+	img.fill(Color(0, 0, 0, 0))
+	for y in n:
+		for x in n:
+			var a := posmod(x + y, n / 2)
+			var b := posmod(x - y, n / 2)
+			if a == 0 or b == 0:
+				var k := 0.85 + 0.15 * sin(float(x * 7 + y * 3))
+				img.set_pixel(x, y, Color(0.62 * k, 0.63 * k, 0.6 * k, 1.0))
 	return img
 
 
