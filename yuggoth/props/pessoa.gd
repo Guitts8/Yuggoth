@@ -295,7 +295,9 @@ func _cabelo(st: SurfaceTool, c: Vector3) -> void:
 			var u := TAU * i / LADOS
 			var v: float = float(linha.call(u)) * float(j) / ANEIS
 			var p: Vector3 = _ponto_da_cabeca(u, v)[0]
-			var grosso := 0.003 + 0.02 * pow(1.0 - float(j) / ANEIS, 1.5) * (0.7 + 0.3 * cos(u))
+			var t := float(j) / ANEIS
+			# Volume por igual no alto (sem bico na coroa), afinando só na borda.
+			var grosso := 0.004 + 0.012 * (1.0 - t * t) * (0.8 + 0.2 * cos(u))
 			p += p.normalized() * grosso
 			# A risca, do lado esquerdo.
 			if absf(sin(u) + 0.35) < 0.08 and cos(u) < 0.3 and j < ANEIS / 2:
@@ -399,14 +401,10 @@ func _tronco(st: SurfaceTool) -> void:
 	for an: Array in aneis:
 		cores.append(camisa.darkened(0.06 if an[0] < 0.1 else 0.0))
 	_torno(st, aneis, 16, cores)
-	# O colarinho e a gravata.
-	for s in [-1.0, 1.0]:
-		var a := Vector3(s * 0.005, 0.55, -0.058)
-		_tri(st, a, Vector3(s * 0.055, 0.565, -0.035), Vector3(s * 0.03, 0.51, -0.075), camisa.lightened(0.1), camisa, camisa.lightened(0.05), Vector3(0, 0.5, 0.2))
-	var g0 := Vector3(0, 0.535, -0.078)
-	_tri(st, g0 + Vector3(-0.016, 0, 0), g0 + Vector3(0.016, 0, 0), g0 + Vector3(0, -0.03, -0.004), gravata.lightened(0.1), gravata.lightened(0.1), gravata, Vector3(0, 0.4, 0.3))
-	_tri(st, g0 + Vector3(-0.012, -0.02, -0.003), g0 + Vector3(0.012, -0.02, -0.003), g0 + Vector3(0, -0.31, -0.03), gravata, gravata, gravata.darkened(0.25), Vector3(0, 0.3, 0.3))
-	_tri(st, g0 + Vector3(0, -0.31, -0.03), g0 + Vector3(-0.022, -0.27, -0.03), g0 + Vector3(0.022, -0.27, -0.03), gravata.darkened(0.25), gravata, gravata, Vector3(0, 0.3, 0.3))
+	# O colarinho.
+	for sx in [-1.0, 1.0]:
+		var a := Vector3(sx * 0.005, 0.55, -0.062)
+		_tri(st, a, Vector3(sx * 0.055, 0.565, -0.038), Vector3(sx * 0.03, 0.505, -0.082), camisa.lightened(0.1), camisa, camisa.lightened(0.05), Vector3(0, 0.5, 0.2))
 	# O cinto e as calças até o alto da coxa.
 	_torno(st, [[-0.1, 0.168, 0.107, 0.0], [-0.06, 0.168, 0.107, 0.0]], 16, [SAPATO.lightened(0.05), SAPATO.lightened(0.05)])
 	_torno(st, [[-0.2, 0.17, 0.11, 0.0], [-0.1, 0.168, 0.108, 0.0]], 16, [calca, calca])
@@ -418,8 +416,34 @@ func _tronco(st: SurfaceTool) -> void:
 	var cores_c: Array = []
 	for k in col.size():
 		cores_c.append(colete.lightened(0.04 * k))
-	_torno(st, col, 16, cores_c, 2)
-	# O V do decote (a borda do colete) e os botões.
+	_torno(st, col, 16, cores_c)
+	# O V do decote: a camisa à mostra, do colarinho até o meio do peito, por cima
+	# do colete fechado (cortar faces fazia degraus), acompanhando a curva do peito;
+	# e a gravata por cima dela.
+	if not paleto:
+		var vt := [Vector3(-0.078, 0.478, -0.098), Vector3(0.078, 0.478, -0.098), Vector3(-0.04, 0.36, -0.133), Vector3(0.04, 0.36, -0.133), Vector3(0, 0.235, -0.13)]
+		var fora := Vector3(0, 0.35, 0.3)
+		_tri(st, vt[0], vt[1], vt[2], camisa, camisa, camisa.darkened(0.05), fora)
+		_tri(st, vt[1], vt[3], vt[2], camisa, camisa.darkened(0.05), camisa.darkened(0.05), fora)
+		_tri(st, vt[2], vt[3], vt[4], camisa.darkened(0.05), camisa.darkened(0.05), camisa.darkened(0.1), fora)
+		for sx in [-1.0, 1.0]:
+			# A borda do colete, um filete escuro de cada lado do V.
+			var a: Vector3 = vt[0] if sx < 0 else vt[1]
+			var m: Vector3 = vt[2] if sx < 0 else vt[3]
+			var b: Vector3 = vt[4]
+			var lado := Vector3(sx * 0.008, 0, -0.001)
+			var borda := colete.darkened(0.35)
+			for seg: Array in [[a, m], [m, b]]:
+				_tri(st, seg[0], seg[1], seg[1] + lado, borda, borda, borda, fora)
+				_tri(st, seg[0], seg[1] + lado, seg[0] + lado, borda, borda, borda, fora)
+	# A gravata: o nó e a lâmina, por cima da camisa.
+	var gt := [Vector3(0, 0.538, -0.083), Vector3(-0.013, 0.512, -0.094), Vector3(0.013, 0.512, -0.094),
+		Vector3(-0.02, 0.36, -0.139), Vector3(0.02, 0.36, -0.139), Vector3(0, 0.24, -0.136)]
+	_tri(st, gt[0], gt[1], gt[2], gravata.lightened(0.12), gravata, gravata, Vector3(0, 0.4, 0.3))
+	_tri(st, gt[1], gt[3], gt[2], gravata, gravata.darkened(0.1), gravata, Vector3(0, 0.4, 0.3))
+	_tri(st, gt[2], gt[3], gt[4], gravata, gravata.darkened(0.1), gravata.darkened(0.1), Vector3(0, 0.4, 0.3))
+	_tri(st, gt[3], gt[5], gt[4], gravata.darkened(0.1), gravata.darkened(0.25), gravata.darkened(0.1), Vector3(0, 0.4, 0.3))
+	# Os botões do colete.
 	for k in 4:
 		var y := 0.0 + k * 0.075
 		_disco(st, Vector3(0, y, -0.114 - 0.002 * k), Vector3(0.007, 0.007, 0), Vector3(0, 0, -1), BOTAO, 6)
@@ -482,21 +506,33 @@ func _braco(raiz: Node3D, lado: float) -> void:
 		_tubo(st, [Vector3(0, 0, 0), Vector3(0, -0.13, -0.005), Vector3(0, -0.24, 0)], [Vector2(0.04, 0.042), Vector2(0.038, 0.04), Vector2(0.032, 0.033)], [manga.darkened(0.08), manga, manga], 10)
 		# O punho da camisa.
 		_tubo(st, [Vector3(0, -0.225, 0), Vector3(0, -0.255, 0)], [Vector2(0.036, 0.037), Vector2(0.036, 0.037)], [camisa.lightened(0.05), camisa.lightened(0.05)], 10)
-	_mao(st, Vector3(0, -0.26, 0), lado)
 	_malha(st, "_Antebraco", cotovelo)
+	# A mão num pivô próprio (o punho): a palma vira para a coxa, ou de lado.
+	var punho := Node3D.new()
+	punho.name = "_Punho"
+	punho.position = Vector3(0, -0.255, 0)
+	cotovelo.add_child(punho)
+	st = _st()
+	_mao(st, Vector3.ZERO, lado)
+	_malha(st, "_Mao", punho)
 	# A pose.
 	match pose:
 		Pose.PARADO:
 			ombro.rotation = Vector3(0.05, 0, lado * 0.08)
 			cotovelo.rotation = Vector3(0.18, 0, 0)
+			punho.rotation = Vector3(0, lado * -1.35, 0)
 		Pose.MAO_NA_PORTA:
-			if lado < 0:
-				# O braço esquerdo para a frente e para cima, a mão na borda da porta.
-				ombro.rotation = Vector3(1.05, -0.25, lado * 0.15)
-				cotovelo.rotation = Vector3(0.75, 0, 0)
+			if lado > 0:
+				# O braço direito dobrado, o antebraço para a frente e para fora, a mão
+				# na borda da porta entreaberta, na altura do peito.
+				ombro.rotation = Vector3(0.45, -0.35, lado * 0.25)
+				cotovelo.rotation = Vector3(1.5, 0, 0)
+				# A palma de lado, para a borda da porta, os dedos por trás dela.
+				punho.rotation = Vector3(0.2, lado * 1.45, 0)
 			else:
 				ombro.rotation = Vector3(0.05, 0, lado * 0.08)
-				cotovelo.rotation = Vector3(0.2, 0, 0)
+				cotovelo.rotation = Vector3(0.25, 0, 0)
+				punho.rotation = Vector3(0, lado * -1.35, 0)
 		Pose.MAOS_JUNTAS:
 			# As mãos juntas diante da barriga, metidas nas mangas.
 			ombro.rotation = Vector3(0.15, 0, lado * 0.04)

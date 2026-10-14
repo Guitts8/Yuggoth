@@ -343,23 +343,19 @@ func _funcionario() -> void:
 	# Girado 90°: o -Z local (a frente) aponta para -X global (o corredor); o +X
 	# local (a direita dele) para -Z global.
 	var f := _group(cena, "Funcionario", Vector3(W + 0.3, 0, PORTA_Z.y - 0.17), 90)
-	for x in [-0.1, 0.1]:
-		var lado := "E" if x < 0 else "D"
-		_box(f, "Perna" + lado, Vector3(0.13, 0.9, 0.14), Vector3(x, 0.45, 0), "colete")
-	_box(f, "Camisa", Vector3(0.38, 0.62, 0.22), Vector3(0, 1.22, 0), "camisa")
-	_box(f, "Colete", Vector3(0.395, 0.4, 0.235), Vector3(0, 1.14, 0), "colete")
-	_cyl(f, "Pescoco", 0.05, 0.05, 0.09, Vector3(0, 1.57, 0), "pele", 6)
-	_cyl(f, "Cabeca", 0.085, 0.092, 0.21, Vector3(0, 1.72, 0), "pele", 8)
-	_cyl(f, "Cabelo", 0.06, 0.098, 0.08, Vector3(0, 1.85, 0.015), "cabelo", 8)
-	for x in [-0.034, 0.034]:
-		_box(f, "Olho%d" % signf(x), Vector3(0.022, 0.012, 0.01), Vector3(x, 1.74, -0.088), "esmalte_preto")
-	_box(f, "Nariz", Vector3(0.022, 0.04, 0.03), Vector3(0, 1.71, -0.1), "pele")
-	_box(f, "Boca", Vector3(0.04, 0.008, 0.01), Vector3(0, 1.665, -0.088), "esmalte_preto")
-	# O braço direito caído; o esquerdo apoiado no batente, a mão na madeira.
-	_box(f, "BracoD", Vector3(0.09, 0.6, 0.1), Vector3(0.24, 1.2, 0), "camisa")
-	_box(f, "BracoE", Vector3(0.09, 0.26, 0.1), Vector3(-0.24, 1.38, 0), "camisa")
-	_box(f, "AntebracoE", Vector3(0.08, 0.08, 0.2), Vector3(-0.22, 1.28, -0.12), "camisa")
-	_box(f, "MaoE", Vector3(0.06, 0.1, 0.06), Vector3(-0.2, 1.3, -0.23), "pele")
+	# Playtest 11: o rapaz de verdade (props/pessoa.gd) — camisa, colete, gravata,
+	# o cabelo curto; a mão esquerda na borda da porta, e os olhos em Wilmarth.
+	var rapaz := Pessoa.new()
+	rapaz.name = "Rapaz"
+	rapaz.altura = 1.74
+	rapaz.pose = Pessoa.Pose.MAO_NA_PORTA
+	rapaz.pele = Color(0.88, 0.7, 0.6)
+	rapaz.cabelo = Color(0.32, 0.22, 0.13)
+	rapaz.camisa = Color(0.88, 0.86, 0.8)
+	rapaz.colete = Color(0.2, 0.2, 0.26)
+	rapaz.calca = Color(0.18, 0.17, 0.2)
+	rapaz.gravata = Color(0.3, 0.14, 0.12)
+	_add(f, rapaz)
 
 	var fala := _area(f, Interlocutor.new(), "Conversa", Vector3(0.45, 0.6, 0.3), Vector3(0, 1.6, -0.05)) as Interlocutor
 	fala.unique_name_in_owner = true

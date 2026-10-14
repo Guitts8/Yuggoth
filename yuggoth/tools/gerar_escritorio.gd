@@ -3369,7 +3369,16 @@ func _loucura_do_disco(g: Node3D, mat: Material, bosque: Node3D, clareira: Vecto
 		v.espera = 6.0 + k * 2.0
 		v.altura = 1.55
 		_add(g, v)
-		_add(v, _vistas.vulto(mat))
+		# Playtest 11: os cultistas de verdade (props/pessoa.gd, o manto e o capuz, as
+		# mãos juntas, o rosto pálido no fundo do capuz).
+		var cultista := Pessoa.new()
+		cultista.name = "Cultista"
+		cultista.manto = true
+		cultista.pose = Pessoa.Pose.MAOS_JUNTAS
+		cultista.altura = 1.7 + 0.06 * sin(k * 2.3)
+		cultista.pele = Color(0.66, 0.63, 0.6)
+		cultista.la = Color(0.07, 0.065, 0.075)
+		_add(v, cultista)
 
 	# A porta do escritório, de pé sozinha entre as árvores, fechada, com a luz
 	# do corredor por baixo.

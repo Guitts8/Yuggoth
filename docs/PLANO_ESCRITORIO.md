@@ -1181,9 +1181,29 @@ a fazer · ❓ espera resposta. Os itens da fazenda (13) estão em `docs/PLANO_F
     corredor e desce a escada — e só então chega à pensão (`Escritorio.sair_para`,
     chamado pela `Interlocutor` quando a fase dona tem esse método). Os testes saem a
     pé (`_sair_para_boston`).
-11. 🔧 **Os modelos do cultista, do funcionário do expresso e dos mi-go** — *"terei que
+11. ✅ **Os modelos do cultista, do funcionário do expresso e dos mi-go** — *"terei que
     fazê-los para ficarem bons e impressionantes, a menos que você não tenha tentado
-    muito"*. Tentar de verdade antes de o usuário modelar.
+    muito"*. Tentado de verdade, ainda em código (conferido em captura, `SHOT_MODO=migo`
+    e `SHOT_MODO=pessoa`); se não bastar, o `Modelo` (.glb) de cada um substitui:
+    - **O mi-go** (`props/migo.gd`, refeito): a casca em placas que se encaixam como as
+      de um camarão, com o sulco escuro entre elas e a crista de espinhos; a barriga
+      carnosa; a cauda em leque; a "cabeça" um elipsoide convoluto de fato (dobras
+      como as de um cérebro, escuras no fundo) com 140 antenas curtas e curvas; as asas
+      de morcego em quatro dedos ósseos de três falanges, com a membrana recortada e
+      refeita a cada quadro — dobra no bater e recolhe colada ao corpo; quatro pares de
+      membros articulados, baixos como os de um caranguejo, com as juntas saltadas,
+      garras e o par da frente com pinças.
+    - **A pessoa** (`props/pessoa.gd`, nova, reutilizável): a cabeça é uma esfera
+      deformada — o crânio, o maxilar em V, o queixo, as maçãs, o arco das sobrancelhas,
+      as órbitas fundas com os olhos, o nariz em cunha, os lábios, as orelhas — e o
+      cabelo uma casca com a linha do cabelo esfumada; o tronco torneado com a camisa,
+      o colarinho, a gravata e o colete (decote em V, botões) ou o paletó; braços e
+      pernas com cotovelo, joelho e punho em pivôs (`pose`), mãos com dedos; respira e
+      vira a cabeça para `olhar_alvo`. `manto`: o cultista, de manto até o chão, o
+      capuz fundo com o rosto pálido lá dentro, as mãos juntas nas mangas.
+    - **O funcionário** em Boston é uma `Pessoa` (camisa, colete, gravata), a mão na
+      borda da porta, e olha para Wilmarth enquanto a porta está aberta; **os vultos**
+      diante da caverna, no sonho do disco, são cultistas.
 12. ✅ **Os lapsos de vários dias:** o livro não troca — *"só fecha a capa e abre o mesmo
     livro"*. Fechado à noite (a sala às escuras), ele o devolve: de manhã abre outro
     volume (`LivroEstudo.VOLUMES`: a capa rubra, verde, parda, com outra largura e

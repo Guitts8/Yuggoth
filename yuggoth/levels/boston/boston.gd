@@ -24,6 +24,7 @@ var _saindo := false
 @onready var folha: Node3D = %Folha
 @onready var bater: Interactable = %Bater
 @onready var player: Player = $Player
+@onready var rapaz: Pessoa = get_node_or_null(^"Funcionario/Rapaz") as Pessoa
 
 
 func _ready() -> void:
@@ -43,6 +44,12 @@ func _ready() -> void:
 	await get_tree().create_timer(1.0).timeout
 	if is_inside_tree() and linha_chegada and not GameState.has_flag(linha_chegada.get_said_flag()):
 		Narrator.say(linha_chegada)
+
+
+func _process(_delta: float) -> void:
+	# Com a porta aberta, o rapaz olha para Wilmarth (playtest 11).
+	if rapaz:
+		rapaz.olhar_alvo = player.camera.global_position if GameState.has_flag(&"porta_aberta_boston") else Vector3.INF
 
 
 func _on_value_changed(key: StringName, _value: Variant) -> void:

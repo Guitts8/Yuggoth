@@ -261,6 +261,17 @@ func _boston_fotos() -> void:
 	Narrator.cancel()
 	var b := root.find_child("Boston", true, false) as Boston
 	var p := b.player
+	# O rapaz pela fresta (playtest 11: o modelo novo).
+	b.bater.interact(p)
+	await _until(func() -> bool: return GameState.has_flag(&"porta_aberta_boston"), 20.0)
+	await _s(1.0)
+	for k in 3:
+		p.global_position = Vector3(-0.25 + k * 0.12, 0, -1.2 - k * 0.15)
+		await _olhar(p, Vector3(1.0, 0, -1.25))
+		var olho := p.camera.global_position
+		p.head.rotation.x = atan2(1.62 - olho.y, Vector2(1.0 - olho.x, -1.25 - olho.z).length())
+		await _s(1.2)
+		await _shot("%s_rapaz_%d" % [tag, k])
 	var base := p.rotation.y
 	for i in 4:
 		p.rotation.y = base + i * PI / 2.0
