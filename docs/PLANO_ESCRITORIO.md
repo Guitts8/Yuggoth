@@ -1117,8 +1117,19 @@ O usuário jogou o playtest 11 (o escritório inteiro e a fazenda até a F5). Pe
 junto: continuar a F6 da fazenda, que ficara sem commit. Legenda: ✅ feito · 🔧 claro,
 a fazer · ❓ espera resposta. Os itens da fazenda (13) estão em `docs/PLANO_FAZENDA.md`.
 
-1. 🔧 **O mapa de Vermont** — *"alguns glitchs visuais acontecem no mapa"*.
-2. 🔧 **A união do escritório com o corredor** — glitches visuais na porta.
+1. ✅ **O mapa de Vermont** — *"alguns glitchs visuais acontecem no mapa"*. Os nomes
+   impressos têm 1 cm de altura e, a 480 linhas, viravam pontinhos que cintilavam ao
+   mexer a cabeça; e na textura o rio e as divisas passavam da moldura impressa, no pé
+   do mapa. Agora as fontes têm mipmaps (todas: vale para todo texto em 3D — avisos,
+   diplomas, envelopes), os rótulos do mapa usam o recorte com pré-passo de
+   profundidade e filtro anisotrópico, e a margem fora do filete fica limpa
+   (`gerar_assets._mapa_vermont`).
+2. ✅ **A união do escritório com o corredor** — glitches visuais na porta. O piso da
+   sala passa 10 cm da parede (a sobra das quinas) e o do corredor começava na mesma
+   linha, no mesmo plano: brigavam (z-fighting) bem na soleira. O piso do corredor
+   agora começa do outro lado da parede, e uma soleira de madeira cobre a emenda; do
+   corredor, o vão em cima da folha (o forro que a luz do teto não alcança) aparecia
+   como uma faixa preta — o alizar do corredor agora encosta no vão.
 3. ✅ **O diário: abrir, fechar e as folhas** — *"essas aberturas e fechadas estão
    estranhas; você escreve em uma folha até o final, vira a página, e o que você
    escreveu está na página virada"*. Antes de o usuário fazer a animação à mão, refazê-la
@@ -1144,20 +1155,39 @@ a fazer · ❓ espera resposta. Os itens da fazenda (13) estão em `docs/PLANO_F
    grafia é interessante, mas não pode interferir na leitura"*. Eram caixa alta na
    letra cursiva (as maiúsculas de floreio não se leem). Agora em caixa baixa,
    sublinhados, na mesma letra. Conferido em captura (`SHOT_MODO=documento`).
-6. 🔧 **Os grilos da noite 3** (o sonho do disco) — *"MUITO alto e incomoda; rouba
-   muito do sentimento"*.
-7. 🔧 **O mi-go de pé** no sonho do disco — *"não vi, do lado esquerdo"*.
-8. 🔧 **A arrumação das folhas na mesa** (`MesaDoDia`) — *"um pouco incômodo; achar
-   uma forma melhor"*.
-9. 🔧 **O lapso lendo:** as folhas do livro ficam brancas e se escrevem na frente dele —
-   *"já deve estar lá a escrita ao virar a página"*.
-10. 🔧 **A noite de Boston:** não cortar para o corredor da pensão; *"sair do escritório
-    e AÍ SIM ir parar no corredor em Boston"*.
+6. ✅ **Os grilos da noite 3** (o sonho do disco) — *"MUITO alto e incomoda; rouba
+   muito do sentimento"*. O som da noite (`noite.wav`) foi retratado: os grilos longe e
+   abafados (o chiado agudo era o que incomodava) e a noite toda mais baixa — vale
+   para todas as noites. E com o fonógrafo tocando o ambiente abaixa 14 dB
+   (`AudioDirector.abafar`): o disco é o que se ouve.
+7. ✅ **O mi-go de pé** no sonho do disco — *"não vi, do lado esquerdo"*. Ficava atrás de
+   um tronco, escuro na névoa. Agora num vão entre os troncos e os vultos (o gerador
+   procura, `_vao_entre_troncos`), à esquerda, e com uma contraluz fria e fraca que
+   recorta a silhueta. E o modelo é o novo (item 11).
+8. ✅ **A arrumação das folhas na mesa** (`MesaDoDia`) — *"um pouco incômodo; achar
+   uma forma melhor"*. As folhas escorregavam sozinhas pela mesa a cada carta nova.
+   Agora nenhuma se mexe sozinha: a que chega pousa por cima, um pouco à direita e à
+   frente da anterior, em leque — a mais nova inteira à vista, das outras a margem
+   (e cada uma se lê pelo pedaço que aparece). O telegrama de AKELY (Dia 5), pequeno,
+   fica fora do leque, no lugar dele à direita (sumia inteiro debaixo das cartas).
+9. ✅ **O lapso lendo:** as folhas do livro ficam brancas e se escrevem na frente dele —
+   *"já deve estar lá a escrita ao virar a página"*. A folha que virava era um papel em
+   branco que tapava as linhas. Agora as páginas são impressas (uma textura de página
+   com o título corrido, os parágrafos e o número, `LivroEstudo._pagina_impressa`), a
+   folha que vira tem texto nos dois lados e verga como papel (`Diario._curvar`).
+10. ✅ **A noite de Boston:** não cortar para o corredor da pensão; *"sair do escritório
+    e AÍ SIM ir parar no corredor em Boston"*. Acabada a ligação de Keene, nada troca
+    de fase: a porta diz "Sair" (*"Para Boston, esta noite."*), ele abre, anda pelo
+    corredor e desce a escada — e só então chega à pensão (`Escritorio.sair_para`,
+    chamado pela `Interlocutor` quando a fase dona tem esse método). Os testes saem a
+    pé (`_sair_para_boston`).
 11. 🔧 **Os modelos do cultista, do funcionário do expresso e dos mi-go** — *"terei que
     fazê-los para ficarem bons e impressionantes, a menos que você não tenha tentado
     muito"*. Tentar de verdade antes de o usuário modelar.
-12. 🔧 **Os lapsos de vários dias:** o livro não troca — *"só fecha a capa e abre o mesmo
-    livro"*.
+12. ✅ **Os lapsos de vários dias:** o livro não troca — *"só fecha a capa e abre o mesmo
+    livro"*. Fechado à noite (a sala às escuras), ele o devolve: de manhã abre outro
+    volume (`LivroEstudo.VOLUMES`: a capa rubra, verde, parda, com outra largura e
+    grossura).
 13. 🔧 **A fazenda** (ver `docs/PLANO_FAZENDA.md`, "O playtest 11"): uma luz azul fraca
     sobre para onde ir; e o modelo da fazenda refeito com acabamento — lugares onde não
     se passa, peças toscas — *"precisa ficar BOM de VERDADE, será o modelo mais usado

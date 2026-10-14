@@ -141,6 +141,8 @@ var _sala_escondida: Dictionary[Node3D, Array] = {}
 
 ## O dia acabou e falta ir para casa (Fase 3e): a porta abre para o corredor.
 var _pode_ir := false
+## Para onde a porta leva quando não é para casa ([fase, entrada]; `sair_para`).
+var _destino: Array = []
 ## Com a porta aberta, ele já esteve no corredor: de volta à sala, ela fecha.
 var _saiu := false
 ## O salto no tempo de uma carta postada (Dias 5 e 6): espera ele voltar à sala
@@ -424,7 +426,7 @@ func _process(_delta: float) -> void:
 	if not _sala_escondida.is_empty():
 		return
 	var fora := _fora()
-	porta.prompt = "Abrir a porta" if CartaSaida.atual else "Ir para casa"
+	porta.prompt = "Abrir a porta" if CartaSaida.atual else ("Sair" if not _destino.is_empty() else "Ir para casa")
 	# Aberta, a porta não se usa: o corredor está ali. Cada lado tem a sua área.
 	# Num sonho, ela não leva a lugar nenhum: não oferece "Ir para casa".
 	var fechada := not calha.porta_aberta and not calha.movendo
@@ -779,7 +781,20 @@ func _hora_de_ir() -> void:
 func _on_escada(body: Node3D) -> void:
 	if body == player and _pode_ir and calha.porta_aberta and not _saindo:
 		_pode_ir = false
-		_fim_do_dia()
+		if _destino.is_empty():
+			_fim_do_dia()
+		else:
+			_saindo = true
+			SceneDirector.change_level(_destino[0], _destino[1])
+
+
+## Uma ligação que leva a outro lugar (Keene, Dia 4: a pensão em Boston): em vez de
+## cortar para lá, a porta leva — ele sai pelo corredor e desce a escada (playtest
+## 11). `Interlocutor._falar` chama.
+func sair_para(fase: String, entrada: StringName) -> void:
+	_destino = [fase, entrada]
+	_pode_ir = true
+	Events.notice_requested.emit("Para Boston, esta noite.")
 
 
 func _fim_do_dia() -> void:

@@ -1016,6 +1016,7 @@ func _miskatonic() -> void:
 	var livro := LivroEstudo.new()
 	livro.name = "LivroEstudo"
 	livro.mat_capa = m["livro_rubro"]
+	livro.mats_capa.assign([m["livro_verde"], m["livro_pardo"]])
 	livro.mat_papel = m["papel"]
 	livro.mat_tinta = m["esmalte_preto"]
 	_add(g, livro)
@@ -1179,7 +1180,11 @@ func _rotulo_mapa(pai: Node3D, nome: String, texto: String, pos: Vector3, tamanh
 	l.outline_size = 0
 	l.line_spacing = -8.0
 	l.position = pos
-	l.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+	# Playtest 11 ("glitches no mapa"): letra de 1 cm a 480 linhas cintilava ao mexer
+	# a cabeça. As fontes agora têm mipmaps, e o recorte com pré-passo de
+	# profundidade deixa a borda macia sem brigar com o papel.
+	l.alpha_cut = Label3D.ALPHA_CUT_OPAQUE_PREPASS
+	l.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	l.double_sided = false
 	_add(pai, l)
 	return l
@@ -1314,7 +1319,12 @@ func _corredor(g: Node3D) -> void:
 	var x1 := ESCADA_X
 	var largura := x1 - x0
 	var cx := (x0 + x1) / 2
-	_quad(c, "Piso", Vector2(largura, CORREDOR), Vector3(cx, 0, meio), Vector3(-90, 0, 0), "piso_corredor")
+	# Playtest 11 ("glitches na união do escritório com o corredor"): o piso da sala
+	# passa 10 cm da parede (a sobra das quinas) e o do corredor começava na mesma
+	# linha, no mesmo plano — brigavam na soleira. Agora o do corredor começa do
+	# outro lado da parede, e a soleira de madeira cobre a emenda.
+	_quad(c, "Piso", Vector2(largura, CORREDOR - PAREDE_SUL), Vector3(cx, 0, (perto + fundo) / 2), Vector3(-90, 0, 0), "piso_corredor")
+	_box(c, "Soleira", Vector3(PORTA_L + 0.04, 0.008, PAREDE_SUL + 0.03), Vector3(PORTA_X, 0.004, D + (PAREDE_SUL + 0.03) / 2 - 0.005), "madeira_escura")
 	_quad(c, "Teto", Vector2(largura, CORREDOR), Vector3(cx, H, meio), Vector3(90, 0, 0), "teto")
 	_quad(c, "ParedeFrente", Vector2(largura, H), Vector3(cx, H / 2, fundo), Vector3(0, 180, 0), "parede_corredor")
 	_quad(c, "PontaO", Vector2(CORREDOR, H), Vector3(x0, H / 2, meio), Vector3(0, 90, 0), "parede_corredor")
@@ -1358,10 +1368,12 @@ func _corredor(g: Node3D) -> void:
 	for s in [-1, 1]:
 		_box(c, "Montante%d" % (s + 1), Vector3(0.03, PORTA_H, PAREDE_SUL), Vector3(PORTA_X + s * (PORTA_L / 2 + 0.015), PORTA_H / 2, D + PAREDE_SUL / 2), "madeira_clara")
 	_box(c, "VaoAlto", Vector3(PORTA_L + 0.06, 0.03, PAREDE_SUL), Vector3(PORTA_X, PORTA_H + 0.015, D + PAREDE_SUL / 2), "madeira_clara")
-	# O alizar do lado do corredor.
+	# O alizar do lado do corredor, rente ao vão (cobre 1 cm dele): sem isso, o
+	# forro de cima do vão, que a luz do teto não alcança, era uma faixa preta
+	# entre a folha e a verga.
 	for s in [-1, 1]:
-		_box(c, "Alizar%d" % (s + 1), Vector3(0.1, PORTA_H + 0.12, 0.025), Vector3(PORTA_X + s * (PORTA_L / 2 + 0.07), (PORTA_H + 0.12) / 2, perto + 0.0125), "madeira_escura")
-	_box(c, "AlizarVerga", Vector3(PORTA_L + 0.3, 0.14, 0.03), Vector3(PORTA_X, PORTA_H + 0.12, perto + 0.015), "madeira_escura")
+		_box(c, "Alizar%d" % (s + 1), Vector3(0.1, PORTA_H + 0.13, 0.025), Vector3(PORTA_X + s * (PORTA_L / 2 + 0.04), (PORTA_H + 0.13) / 2, perto + 0.0125), "madeira_escura")
+	_box(c, "AlizarVerga", Vector3(PORTA_L + 0.24, 0.14, 0.03), Vector3(PORTA_X, PORTA_H + 0.06, perto + 0.015), "madeira_escura")
 	# A plaqueta de latão com o nome, na parede junto à porta, do lado de fora.
 	var placa := _group(c, "Plaqueta", Vector3(vao_l + 0.28, 1.5, perto + 0.012))
 	_box(placa, "Latao", Vector3(0.24, 0.075, 0.006), Vector3.ZERO, "latao")
@@ -2042,10 +2054,12 @@ func _cesto(parent: Node) -> void:
 ## no meio, sobre o mata-borrão, as outras do dia em volta; e as dos dias
 ## anteriores numa pilha na ponta esquerda, que cresce dia a dia (só a vista: tudo
 ## se relê pelo dossiê). O rascunho e a carta do leitor (o debate) ficam onde estão.
+# (O telegrama de AKELY, do Dia 5, fica fora do leque, no lugar dele à direita:
+# pequeno, sumia inteiro debaixo das cartas — playtest 11.)
 const FOLHAS_DOS_DIAS := [
 	[1, "Dia1/Carta"], [2, "Dia2/Carta"], [3, "Dia3/Bilhete"], [3, "Dia3/Transcricao"],
 	[4, "Dia4/Telegrama"], [4, "Dia4/CartaJulho"], [5, "Dia5/CartaAgosto"], [5, "Dia5/Carta15"],
-	[5, "Dia5/TelegramaAkely/Papel"], [5, "Dia5/Bilhete/Folha"], [6, "Dia6/Carta28/Folha"],
+	[5, "Dia5/Bilhete/Folha"], [6, "Dia6/Carta28/Folha"],
 	[6, "Dia6/Setembro/CartaSetembro"], [6, "Dia6/Segunda/Folha"], [6, "Dia6/Terca/Folha"], [6, "Dia6/Quarta/Folha"],
 ]
 
@@ -2059,7 +2073,8 @@ func _mesa_do_dia(parent: Node) -> void:
 	# Fora de onde os envelopes pousam (a faixa do fundo, a ponta direita, a frente
 	# no meio) e da pena (onde se escreve).
 	# (A foto do exército, do Dia 4 em diante, mora à esquerda do mata-borrão.)
-	mesa.lugares.assign([lugar.call(0.05, -2.14, -3.0), lugar.call(0.45, -1.95, -10.0), lugar.call(0.3, -2.42, 6.0)])
+	# A base do leque (playtest 11): as seguintes pousam à frente e à direita dela.
+	mesa.lugares.assign([lugar.call(-0.06, -2.2, -3.0)])
 	mesa.pilha = Transform3D(Basis(Vector3.UP, deg_to_rad(86.0)), Vector3(-0.69, MESA + 0.0035, -2.01))
 	var pilha := _group(parent, "MesaPassada")
 	var rng := RandomNumberGenerator.new()
@@ -3288,8 +3303,17 @@ func _sonho_disco(g: Node3D) -> void:
 	# Playtest 10 ("o mi-go de pé não está no sonho?"): a 10 m, ele ficava além do
 	# chão firme (RAIO_BOSQUE), nas ilhas que se soltam e vão embora. Agora dentro
 	# dele, à esquerda da caverna — para onde se olha —, entre os troncos.
-	vigia.position = clareira + Vector3(-3.6, 0.0, -4.1)
+	# Playtest 11 ("não vi o mi-go de pé do lado esquerdo"): ficava atrás de um
+	# tronco, escuro na névoa. Agora num vão entre os troncos (nenhum a menos de
+	# 1 m dele nem no caminho da clareira até ele), um pouco mais perto, e com uma
+	# luz fria e fraca por trás, que recorta a silhueta.
+	var evitar: PackedVector3Array = bosque.get_meta(&"troncos")
+	evitar.append_array(bosque.get_meta(&"vultos"))
+	vigia.position = _vao_entre_troncos(evitar, clareira, clareira + Vector3(-3.4, 0.0, -2.4))
 	_add(g, vigia)
+	var contra := _omni(vigia, "Contraluz", (vigia.position - clareira).normalized() * 1.1 + Vector3(0, 2.0, 0),
+		Color(0.55, 0.65, 0.9), 0.9, 3.2)
+	contra.omni_attenuation = 1.6
 	var de_pe := Migo.new()
 	de_pe.name = "Migo"
 	de_pe.silhueta = true
@@ -3303,6 +3327,27 @@ func _sonho_disco(g: Node3D) -> void:
 	_add(vigia, de_pe)
 
 	_loucura_do_disco(g, mat, bosque, clareira)
+
+
+## O ponto perto de `perto` (procura num raio de 1 m) com nenhum tronco a menos
+## de 1 m e nenhum a menos de 0,6 m da linha que vem de `de` (a vista da clareira).
+func _vao_entre_troncos(troncos: PackedVector3Array, de: Vector3, perto: Vector3) -> Vector3:
+	var melhor := perto
+	var folga_melhor := -INF
+	for i in range(-4, 5):
+		for j in range(-4, 5):
+			var p := perto + Vector3(i * 0.25, 0, j * 0.25)
+			var folga := INF
+			for t in troncos:
+				var t2 := Vector2(t.x, t.z)
+				folga = minf(folga, t2.distance_to(Vector2(p.x, p.z)) - 1.0)
+				folga = minf(folga, Geometry2D.get_closest_point_to_segment(t2, Vector2(de.x, de.z), Vector2(p.x, p.z)).distance_to(t2) - 0.6)
+			folga -= Vector2(i, j).length() * 0.02
+			if folga > folga_melhor:
+				folga_melhor = folga
+				melhor = p
+	print("vigia: folga %.2f em %s" % [folga_melhor, melhor])
+	return melhor
 
 
 ## O sonho do disco enlouquece (Fase 3f, item 19): os vultos diante da caverna,

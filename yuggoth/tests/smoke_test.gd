@@ -566,6 +566,7 @@ func _ready() -> void:
 	await _until(func() -> bool: return GameState.has_flag(&"ligou_relato_keene"), 60.0)
 	Events.subtitle_requested.disconnect(ouvir_tel)
 	_check(falas_tel.any(func(f: String) -> bool: return f.contains("Stanley Adams")), "o relato de Keene: Stanley Adams")
+	await _sair_para_boston(esc)
 
 	# --- Boston: a vinheta (livro cap. III) ---
 	const BOSTON := "res://levels/boston/boston.tscn"
@@ -980,21 +981,33 @@ func _inalcancaveis(esc: Node3D, limites := Vector2(2.3, 2.8)) -> PackedStringAr
 	for alvo: Interactable in esc.find_children("*", "Interactable", true, false):
 		if not alvo.is_visible_in_tree():
 			continue
-		var centro := (alvo.get_child(0) as Node3D).global_position
+		var forma := alvo.get_child(0) as Node3D
+		var centro := forma.global_position
+		# O centro e, numa área achatada (uma folha na mesa), pontos dela: uma folha
+		# pousada por cima de outra (o leque da mesa, playtest 11) deixa à vista a
+		# margem da de baixo, e é por ela que se mira.
+		var pontos: Array[Vector3] = [centro]
+		var caixa := (forma as CollisionShape3D).shape as BoxShape3D if forma is CollisionShape3D else null
+		if caixa and caixa.size.y < 0.1:
+			for d: Vector2 in [Vector2(-0.35, -0.35), Vector2(0.35, -0.35), Vector2(-0.35, 0.35), Vector2(0.35, 0.35)]:
+				pontos.append(forma.global_transform * Vector3(d.x * caixa.size.x, 0, d.y * caixa.size.z))
 		var achou := false
-		for h in [1.15, 1.6]:
-			for r in [0.4, 0.8, 1.2]:
-				for i in 16:
-					var a := TAU * i / 16.0
-					var origem := Vector3(centro.x + cos(a) * r, h, centro.z + sin(a) * r)
-					if absf(origem.x) > limites.x or absf(origem.z) > limites.y or origem.distance_to(centro) > 1.9:
-						continue
-					var q := PhysicsRayQueryParameters3D.create(origem, centro, 3, [(esc.get_node(^"Player") as Player).get_rid()])
-					q.collide_with_areas = true
-					# De dentro de um móvel não se mira (a lareira inteira tapava a lenha).
-					q.hit_from_inside = true
-					if space.intersect_ray(q).get("collider") == alvo:
-						achou = true
+		for ponto in pontos:
+			for h in [1.15, 1.6]:
+				for r in [0.4, 0.8, 1.2]:
+					for i in 16:
+						var a := TAU * i / 16.0
+						var origem := Vector3(ponto.x + cos(a) * r, h, ponto.z + sin(a) * r)
+						if absf(origem.x) > limites.x or absf(origem.z) > limites.y or origem.distance_to(ponto) > 1.9:
+							continue
+						var q := PhysicsRayQueryParameters3D.create(origem, ponto, 3, [(esc.get_node(^"Player") as Player).get_rid()])
+						q.collide_with_areas = true
+						# De dentro de um móvel não se mira (a lareira inteira tapava a lenha).
+						q.hit_from_inside = true
+						if space.intersect_ray(q).get("collider") == alvo:
+							achou = true
+							break
+					if achou:
 						break
 				if achou:
 					break
@@ -1430,3 +1443,17 @@ func _seconds(t: float) -> void:
 func _frames(n: int) -> void:
 	for i in n:
 		await get_tree().physics_frame
+
+
+## Depois da ligação de Keene (playtest 11): a porta diz "Sair"; ele a abre, anda
+## pelo corredor e desce a escada, e só então chega a Boston.
+func _sair_para_boston(esc: Escritorio) -> void:
+	var p := esc.player
+	await _until(func() -> bool: return esc._pode_ir and not esc._destino.is_empty() and p.input_enabled and not Events.is_modal_open, 60.0)
+	await _frames(2)
+	_check(SceneDirector.current_level.ends_with("escritorio.tscn") and esc.porta.prompt == "Sair", "depois de Keene, ainda no escritório: a porta diz \"Sair\" %s" % [[esc.porta.prompt, esc._pode_ir, esc._destino, p.input_enabled, Events.is_modal_open, SceneDirector.current_level]])
+	if p.seated:
+		p.stand()
+	esc.porta.interact(p)
+	await _until(func() -> bool: return esc.calha.porta_aberta and p.input_enabled, 20.0)
+	await _andar(p, [Vector3(esc.calha.soleira.x, 0, 3.8), esc.escada.global_position], 25.0)

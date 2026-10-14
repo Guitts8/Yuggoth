@@ -21,6 +21,8 @@ const HUM_PITCH := Vector2(1.0, 0.94)
 ## Ganho do bus Ambience com um modal aberto, e quão rápido (dB/s) chega lá.
 const DUCK_DB := -16.0
 const DUCK_SPEED := 30.0
+## Ganho do bus Ambience com algo que precisa ser ouvido (`abafar`).
+const ABAFADO_DB := -14.0
 
 var _ambience: Array[AudioStreamPlayer] = []
 var _ambience_active := 0
@@ -35,6 +37,8 @@ var _lowpass: AudioEffectLowPassFilter
 var _distortion: AudioEffectDistortion
 var _pitch: AudioEffectPitchShift
 var _duck: AudioEffectAmplify
+## Quem pediu o ambiente abaixado (`abafar`), pelo id da instância.
+var _abafadores: Dictionary[int, bool] = {}
 
 
 func _ready() -> void:
@@ -70,8 +74,20 @@ func _process(delta: float) -> void:
 	_shown_exposure = move_toward(_shown_exposure, target, delta * EXPOSURE_FOLLOW)
 	_update_whisper(_shown_exposure)
 	if _duck:
-		var duck := DUCK_DB if Events.is_modal_open else 0.0
+		for k in _abafadores.keys():
+			if not is_instance_valid(instance_from_id(k)):
+				_abafadores.erase(k)
+		var duck := DUCK_DB if Events.is_modal_open else (ABAFADO_DB if not _abafadores.is_empty() else 0.0)
 		_duck.volume_db = move_toward(_duck.volume_db, duck, delta * DUCK_SPEED)
+
+
+## Abaixa o ambiente enquanto `dono` quer ser ouvido (o fonógrafo tocando,
+## playtest 11: os grilos da noite 3 roubavam o disco). Liberado o dono, volta.
+func abafar(dono: Object, sim: bool) -> void:
+	if sim:
+		_abafadores[dono.get_instance_id()] = true
+	else:
+		_abafadores.erase(dono.get_instance_id())
 
 
 ## Troca o ambiente com crossfade. `null` silencia.

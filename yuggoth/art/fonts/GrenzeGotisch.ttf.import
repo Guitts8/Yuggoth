@@ -14,7 +14,7 @@ dest_files=["res://.godot/imported/GrenzeGotisch.ttf-706b61df01b7002d1417813012a
 
 Rendering=null
 antialiasing=1
-generate_mipmaps=false
+generate_mipmaps=true
 disable_embedded_bitmaps=true
 multichannel_signed_distance_field=false
 msdf_pixel_range=8

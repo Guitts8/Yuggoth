@@ -141,7 +141,7 @@ func _abrir_e_fechar_telas() -> void:
 ## parágrafo) nem tag desconhecida.
 func _textos() -> void:
 	var problemas := PackedStringArray()
-	var conhecidas := ["i", "b", "u", "s", "center", "right", "font_size", "color", "sussurro", "tremulo", "queda", "ilegivel", "indent", "p", "url", "font"]
+	var conhecidas := ["i", "b", "u", "s", "center", "right", "font_size", "color", "sussurro", "tremulo", "queda", "ilegivel", "indent", "p", "url", "font", "nota"]
 	var tags := RegEx.create_from_string("\\[(/?)([a-z_]+)[^\\]]*\\]")
 	for arquivo in DirAccess.get_files_at("res://narrative/documents"):
 		var doc := load("res://narrative/documents/" + arquivo.trim_suffix(".remap")) as DocumentData
@@ -449,14 +449,18 @@ func _exame_na_ligacao_de_keene() -> void:
 			break
 	var viewer: Control = root.get_node("UI/ExamineViewer")
 	var escreveu_antes := [false]
-	while tel.em_ligacao() or SceneDirector.current_level == ESCRITORIO:
+	# Examinando sem parar enquanto a ligação corre; acabada, ele sai a pé
+	# (playtest 11) — fecha o exame, abre a porta, desce a escada.
+	while tel.em_ligacao() or not esc._pode_ir:
 		if is_instance_valid(alvo) and not viewer.visible and not Events.is_modal_open:
 			alvo.interact(esc.player)
 		if is_instance_valid(escrever) and escrever.can_interact(esc.player):
 			escreveu_antes[0] = true
 		await get_tree().process_frame
-		if SceneDirector.is_busy:
-			break
+	_check(SceneDirector.current_level == ESCRITORIO, "acabada a ligação de Keene, examinando: ainda no escritório (sai-se a pé)")
+	await _until(func() -> bool: return viewer.visible, 5.0)
+	viewer.close()
+	await _sair_para_boston(esc)
 	await _until(func() -> bool: return SceneDirector.current_level.ends_with("boston.tscn") and not SceneDirector.is_busy, 30.0)
 	await _frames(3)
 	_check(not escreveu_antes[0], "as cartas da noite só depois de Boston")
@@ -477,7 +481,13 @@ func _diario_na_ligacao_de_keene() -> void:
 	var ler: Interactable = esc.diario.get_node("Ler")
 	_check(ler.can_interact(esc.player), "ao telefone com Keene: \"Ler o diário\"")
 	ler.interact(esc.player)
-	await _until(func() -> bool: return SceneDirector.current_level.ends_with("boston.tscn") and not SceneDirector.is_busy, 120.0)
+	# Acabada a ligação, ainda folheando: nada troca de fase; ele fecha o caderno e
+	# sai a pé (playtest 11).
+	await _until(func() -> bool: return esc._pode_ir and esc.diario.lendo, 120.0)
+	_check(SceneDirector.current_level == ESCRITORIO and esc.diario.lendo, "acabado o relato de Keene, folheando: ainda no escritório")
+	esc.diario.lendo = false
+	await _sair_para_boston(esc)
+	await _until(func() -> bool: return SceneDirector.current_level.ends_with("boston.tscn") and not SceneDirector.is_busy, 30.0)
 	await _seconds(1.0)
 	var boston: Boston = root.find_child("Boston", true, false)
 	_check(boston != null and not Events.is_modal_open and boston.player.input_enabled,

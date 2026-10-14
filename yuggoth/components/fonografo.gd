@@ -135,6 +135,8 @@ func tocar(desde := 0.0) -> void:
 
 
 func _process(delta: float) -> void:
+	# Tocando, o ambiente (os grilos da noite) abaixa: o disco é o que se ouve.
+	AudioDirector.abafar(self, tocando())
 	if not tocando() or _atual == null:
 		_desdobrar(0.0, delta)
 		return
@@ -178,6 +180,7 @@ func _desdobrar(alvo: float, delta: float) -> void:
 
 
 func _exit_tree() -> void:
+	AudioDirector.abafar(self, false)
 	if _dupla > 0.0:
 		_dupla = 0.0
 		RenderingServer.global_shader_parameter_set(&"psx_dupla", 0.0)

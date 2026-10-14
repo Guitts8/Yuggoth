@@ -303,6 +303,16 @@ func _mapa_vermont() -> Image:
 	var fechado := estado_q.duplicate()
 	fechado.append(estado_q[0])
 	_linha_px(img, fechado, tinta, false)
+	# A margem fora do filete fica limpa (playtest 11: o rio e as divisas passavam
+	# da moldura impressa, no pé do mapa).
+	for y in h:
+		for x in w:
+			var borda := mini(mini(x, w - 1 - x), mini(y, h - 1 - y))
+			if borda <= 10:
+				var f := 0.96 + fibra.get_noise_2d(x, y) * 0.035 - maxf(0.0, mancha.get_noise_2d(x, y)) * 0.16
+				if borda < 6:
+					f *= 0.78 + borda * 0.035
+				img.set_pixel(x, y, _shade(Color(0.85, 0.81, 0.7), f))
 	# A moldura impressa: filete duplo.
 	for k: int in [8, 10]:
 		for x in range(k, w - k):

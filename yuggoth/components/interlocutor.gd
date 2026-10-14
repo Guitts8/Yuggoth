@@ -129,7 +129,12 @@ func _falar(l: Ligacao) -> void:
 		return
 	_em_conversa = false
 	if not l.fase_depois.is_empty():
-		SceneDirector.change_level(l.fase_depois, l.entrada_depois)
+		# A fase pode pedir que se saia a pé (o escritório, playtest 11: "não devemos
+		# simplesmente cortar para o corredor em Boston; vamos sair do escritório").
+		if owner and owner.has_method(&"sair_para"):
+			owner.sair_para(l.fase_depois, l.entrada_depois)
+		else:
+			SceneDirector.change_level(l.fase_depois, l.entrada_depois)
 
 
 ## Uma conversa, do começo ao fim (as falas e o que vem depois dela, menos a

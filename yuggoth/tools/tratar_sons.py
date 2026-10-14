@@ -187,11 +187,13 @@ def chuva_e_noite():
     # A chuva na janela (Ylmir: gravada junto a uma janela).
     salvar("chuva", laco(passa_baixa(ler("x/Rain OGG/1.ogg", 0.5, 26.5), 10000), 2.0), True, alvo=0.6)
     # A noite: grilos (Wolfgang_), duas voltas, e um vento baixo por baixo.
-    g = rms(ler("zip/crickets_1.mp3"), 0.04)
+    # Playtest 11 ("o som de grilo está MUITO alto e incomoda"): os grilos longe,
+    # abafados (o chiado agudo era o que incomodava), e a noite toda mais baixa.
+    g = rms(passa_baixa(ler("zip/crickets_1.mp3"), 4500), 0.012)
     grilos = np.concatenate([g, g[seg(1.0):]])
     v = rms(passa_baixa(ler("x/wind/wind/Wind.ogg"), 1200), 0.012)
     vento = np.tile(v, int(np.ceil(len(grilos) / len(v))) + 1)[: len(grilos)]
-    salvar("noite", laco(grilos + vento, 1.5), True, alvo=0.4)
+    salvar("noite", laco(grilos + vento, 1.5), True, alvo=0.18)
     # O vento frio pela janela entreaberta (a noite em claro).
     w = np.concatenate([ler("x/wind/wind/Wind.ogg"), ler("x/wind/wind/Wind2.ogg")])
     salvar("vento", laco(passa_baixa(w, 4000), 1.5), True, alvo=0.6)

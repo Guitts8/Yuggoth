@@ -2,10 +2,9 @@ class_name MesaDoDia
 extends Node
 ## As folhas na escrivaninha (playtest 9: "a principal folha do dia sempre deve
 ## ficar no meio e as outras próximas; as dos dias anteriores vão ficando nas
-## extremidades"). A carta que acabou de chegar vai para o meio, sobre o
-## mata-borrão; as outras do dia escorregam para os lugares em volta, da mais nova
-## à mais velha. (As dos dias anteriores são cópias numa pilha no canto da mesa,
-## feitas pelo gerador: `_mesa_do_dia`.)
+## extremidades"). As do dia em leque sobre o mata-borrão, a mais nova por cima
+## (playtest 11: sem escorregar sozinhas; `arrumar`). As dos dias anteriores são
+## cópias numa pilha no canto da mesa, feitas pelo gerador (`_mesa_do_dia`).
 ##
 ## Uma folha está na mesa quando o dia é o dela e as ConditionalNode dela e dos
 ## pais (até `raiz`) valem. Decide-se em `GameState.value_changed`, que é síncrono:
@@ -15,19 +14,17 @@ extends Node
 @export var raiz: Node
 @export var folhas: Array[Node3D] = []
 @export var dias: PackedInt32Array = []
-## O meio e os lugares em volta, do mais perto ao mais longe (globais; o y é
-## somado à altura original de cada folha).
+## A base do leque é o primeiro (global; o y é somado à altura original de cada
+## folha).
 @export var lugares: Array[Transform3D] = []
-## A pilha da ponta da mesa (a base; cada folha sobe `PASSO`): as dos dias
-## anteriores (cópias do gerador) e, quando o dia tem mais folhas que lugares, as
-## mais velhas do dia, que deixam de se ler na mesa (relê-se pelo dossiê).
+## A pilha da ponta da mesa, das cópias dos dias anteriores (do gerador).
 @export var pilha := Transform3D.IDENTITY
 
-const PASSO := 0.0032
-
-const ESCORREGAR := 0.6
-## Espera antes de escorregar: mais que o voo de uma peça saindo do envelope.
-const ESPERA := 1.0
+## O leque: quantas folhas antes de recomeçar, o passo de uma para a outra (x, z;
+## metros) e o giro de cada uma (graus).
+const LEQUE := 4
+const PASSO_LEQUE := Vector2(0.085, 0.035)
+const GIRO_LEQUE: Array[float] = [0.0, -4.0, 2.5, -6.0]
 
 var _onde: Dictionary[Node3D, int] = {}
 var _y: Dictionary[Node3D, float] = {}
@@ -52,7 +49,14 @@ func _presente(i: int) -> bool:
 	return true
 
 
-## Põe cada folha do dia no seu lugar: a mais nova no meio.
+## Põe cada folha do dia no seu lugar do leque, pela ordem de chegada.
+##
+## Playtest 11 ("um pouco incômodo a forma como fizemos essas arrumações de
+## folha"): as folhas do dia escorregavam sozinhas pela mesa a cada carta nova. Agora
+## nenhuma se mexe sozinha: a que chega pousa por cima, um pouco à frente e à direita
+## da anterior, como quem vai deixando as cartas lidas umas sobre as outras — a mais
+## nova inteira à vista, das outras o alto e a margem (e cada uma se lê pelo pedaço
+## que aparece). Passado `LEQUE`, recomeça no alto, por cima.
 func arrumar(animar: bool) -> void:
 	var presentes: Array[Node3D] = []
 	for i in folhas.size():
@@ -61,40 +65,29 @@ func arrumar(animar: bool) -> void:
 	for f in _onde.keys():
 		if f not in presentes:
 			_onde.erase(f)
-	var n := presentes.size()
-	var hoje := int(GameState.get_value(&"dia", 1))
-	var passadas := 0
-	for d in dias:
-		if d < hoje:
-			passadas += 1
-	for j in n:
-		var f := presentes[n - 1 - j]
-		var lugar := j
+	for j in presentes.size():
+		var f := presentes[j]
 		var antes: int = _onde.get(f, -1)
-		if antes == lugar:
+		if antes == j:
 			continue
-		_onde[f] = lugar
+		_onde[f] = j
 		var pai := f.get_parent_node_3d()
-		var alvo: Transform3D
-		if lugar < lugares.size():
-			alvo = pai.global_transform.affine_inverse() * lugares[lugar]
-			alvo.origin.y = _y[f] + j * 0.0015
-		else:
-			# Para a pilha, por cima das dos dias anteriores (a mais velha no fundo).
-			var na_pilha := pilha
-			na_pilha.origin.y += (passadas + (n - 1 - j)) * PASSO
-			alvo = pai.global_transform.affine_inverse() * na_pilha
-			for area in f.find_children("*", "Interactable", true, false):
-				(area as Interactable).visible = false
-				(area as Interactable).collision_layer = 0
+		var alvo := pai.global_transform.affine_inverse() * _no_leque(j)
+		alvo.origin.y = _y[f] + j * 0.0015
 		if antes < 0 or not animar:
 			f.transform = alvo
 		else:
-			# Primeiro a nova sai do envelope (e as que ainda voavam assentam); depois
-			# as outras escorregam para o lado. No fim, o lugar certo, de todo jeito.
+			# Só se a ordem do dia mudar (raro): vai à mão, sem pressa.
 			var t := f.create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-			t.tween_interval(ESPERA)
-			t.tween_property(f, ^"transform", alvo, ESCORREGAR)
-			t.tween_callback(func() -> void:
-				if _onde.get(f, -1) == lugar:
-					f.transform = alvo)
+			t.tween_property(f, ^"transform", alvo, 0.6)
+
+
+## O lugar `j` do leque (global): a base é `lugares[0]`; cada folha seguinte um
+## pouco à frente e à direita, girando de leve.
+func _no_leque(j: int) -> Transform3D:
+	var k := j % LEQUE
+	var base: Transform3D = lugares[0] if not lugares.is_empty() else Transform3D.IDENTITY
+	var t := base
+	t.origin += Vector3(PASSO_LEQUE.x * k, 0.0, PASSO_LEQUE.y * k)
+	t.basis = Basis(Vector3.UP, deg_to_rad(GIRO_LEQUE[k])) * base.basis
+	return t

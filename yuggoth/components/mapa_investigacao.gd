@@ -151,7 +151,7 @@ func _alfinete(i: int, animar: bool) -> void:
 		nome.pixel_size = 0.0002
 		nome.modulate = Color(0.12, 0.08, 0.16)
 		nome.outline_size = 0
-		nome.alpha_cut = Label3D.ALPHA_CUT_DISCARD
+		nome.alpha_cut = Label3D.ALPHA_CUT_OPAQUE_PREPASS
 		nome.double_sided = false
 		# O Label3D centra o texto no nó: meia largura para o lado do rótulo.
 		var off := rotulos[i] if i < rotulos.size() else Vector2(0.012, 0.0)

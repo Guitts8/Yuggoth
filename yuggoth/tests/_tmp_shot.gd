@@ -93,6 +93,14 @@ func _ready() -> void:
 		await _boston_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "pessoa":
+		await _pessoa_fotos()
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "migo":
+		await _migo_fotos()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "documento":
 		await _documento_fotos()
 		get_tree().quit()
@@ -509,8 +517,8 @@ func _lapso_fotos() -> void:
 	var esc := root.find_child("Escritorio", true, false) as Escritorio
 	esc.player.global_position = Vector3(0.3, 0, -1.0)
 	SceneDirector.time_skip(load("res://narrative/narration/cartao_5_setembro.tres"))
-	for k in 12:
-		await _s(1.1)
+	for k in 60:
+		await _s(0.25)
 		await _shot("%s_lapso_%02d" % [tag, k])
 
 
@@ -924,3 +932,103 @@ func _documento_fotos() -> void:
 			await _shot("%s_%s_%d" % [tag, id, k])
 		leitor.close()
 		await _s(0.3)
+
+
+## SHOT_MODO=migo: o mi-go (props/migo.gd) num palco neutro, de vários lados:
+## voando, de pé com as asas recolhidas e em silhueta.
+func _migo_fotos() -> void:
+	await _s(1.0)
+	var palco := Node3D.new()
+	root.find_child("World", true, false).add_child(palco)
+	var env := WorldEnvironment.new()
+	var e := Environment.new()
+	e.background_mode = Environment.BG_COLOR
+	e.background_color = Color(0.32, 0.34, 0.38)
+	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	e.ambient_light_color = Color(0.5, 0.5, 0.55)
+	e.ambient_light_energy = 0.6
+	env.environment = e
+	palco.add_child(env)
+	var sol := DirectionalLight3D.new()
+	sol.rotation_degrees = Vector3(-40, 30, 0)
+	sol.light_energy = 1.3
+	sol.shadow_enabled = true
+	palco.add_child(sol)
+	var m := Migo.new()
+	m.position = Vector3(0, 50.0, 0)
+	m.batida = float(OS.get_environment("SHOT_BATIDA")) if OS.has_environment("SHOT_BATIDA") else 0.0
+	palco.add_child(m)
+	var cam := Camera3D.new()
+	cam.fov = 40.0
+	cam.environment = e
+	palco.add_child(cam)
+	cam.make_current()
+	var vistas := [["lado", Vector3(3.2, 50.3, 0.0)], ["tres_quartos", Vector3(2.2, 50.8, -2.2)], ["frente", Vector3(0.2, 50.4, -3.0)],
+		["cima", Vector3(0.6, 53.0, 0.4)], ["tras", Vector3(-1.8, 50.9, 2.4)], ["cabeca", Vector3(0.7, 50.3, -1.3)]]
+	for v: Array in vistas:
+		cam.position = v[1]
+		cam.look_at(m.position + (Vector3(0, 0.05, -0.55) if v[0] == "cabeca" else Vector3.ZERO))
+		await _s(0.4)
+		await _shot("%s_%s" % [tag, v[0]])
+	m.batida = 0.45
+	for k in 4:
+		cam.position = Vector3(2.4, 50.6, -1.6)
+		cam.look_at(m.position)
+		await _s(0.11)
+		await _shot("%s_voo_%d" % [tag, k])
+	m.batida = 0.0
+	m.recolhidas = true
+	m.rotation_degrees = Vector3(-78, 0, 0)
+	m.position = Vector3(0, 50.8, 0)
+	await _s(1.2)
+	cam.position = Vector3(1.6, 50.8, -2.6)
+	cam.look_at(m.position + Vector3(0, 0.1, 0))
+	await _s(0.3)
+	await _shot("%s_de_pe" % tag)
+	m.silhueta = true
+	e.background_color = Color(0.25, 0.3, 0.4)
+	await _s(0.3)
+	await _shot("%s_silhueta" % tag)
+
+
+## SHOT_MODO=pessoa: o funcionário (Pessoa, colete) e o cultista (manto), num
+## palco neutro: de frente, a três quartos, de lado e o rosto de perto.
+func _pessoa_fotos() -> void:
+	await _s(1.0)
+	var palco := Node3D.new()
+	root.find_child("World", true, false).add_child(palco)
+	var e := Environment.new()
+	e.background_mode = Environment.BG_COLOR
+	e.background_color = Color(0.32, 0.34, 0.38)
+	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	e.ambient_light_color = Color(0.5, 0.5, 0.55)
+	e.ambient_light_energy = 0.5
+	var sol := DirectionalLight3D.new()
+	sol.rotation_degrees = Vector3(-35, -30, 0)
+	sol.light_energy = 1.2
+	sol.shadow_enabled = true
+	palco.add_child(sol)
+	var a := Pessoa.new()
+	a.position = Vector3(-0.6, 50.0, 0)
+	a.pose = Pessoa.Pose.MAO_NA_PORTA
+	palco.add_child(a)
+	var b := Pessoa.new()
+	b.position = Vector3(0.6, 50.0, 0)
+	b.manto = true
+	b.pose = Pessoa.Pose.MAOS_JUNTAS
+	b.pele = Color(0.62, 0.58, 0.55)
+	palco.add_child(b)
+	var cam := Camera3D.new()
+	cam.fov = 40.0
+	cam.environment = e
+	palco.add_child(cam)
+	cam.make_current()
+	var vistas := [["frente", Vector3(0, 51.1, -3.6), Vector3(0, 50.95, 0)], ["tres_quartos", Vector3(2.4, 51.2, -2.8), Vector3(0, 50.95, 0)],
+		["lado", Vector3(3.6, 51.1, 0.0), Vector3(0, 50.95, 0)], ["rosto", Vector3(-0.45, 51.66, -0.55), Vector3(-0.6, 51.64, 0)],
+		["rosto_lado", Vector3(-0.1, 51.66, -0.35), Vector3(-0.6, 51.64, 0)], ["capuz", Vector3(0.75, 51.6, -0.7), Vector3(0.6, 51.62, 0)],
+		["tronco", Vector3(-0.4, 51.3, -1.2), Vector3(-0.6, 51.2, 0)], ["cultista_lado", Vector3(2.0, 51.2, -0.6), Vector3(0.6, 51.0, 0)]]
+	for v: Array in vistas:
+		cam.position = v[1]
+		cam.look_at(v[2])
+		await _s(0.4)
+		await _shot("%s_%s" % [tag, v[0]])
