@@ -70,6 +70,9 @@ var _noite_alvo := 0.0
 ## A descida do céu em curso (a câmera não é a de Akeley).
 var descendo := false
 var _env: Environment
+## As luzes de rebatimento dos cômodos (gerar_fazenda._acabamento_interior) e a
+## energia de cada uma de dia.
+var _luzes_de_dentro: Dictionary[Light3D, float] = {}
 var _ceu: ProceduralSkyMaterial
 var _aplicado := -1.0
 var _camera_ceu: Camera3D
@@ -91,6 +94,10 @@ func _ready() -> void:
 	_env = we.environment.duplicate(true)
 	we.environment = _env
 	_ceu = _env.sky.sky_material as ProceduralSkyMaterial
+	var dentro := get_node_or_null(^"LuzesDeDentro")
+	if dentro:
+		for l: Light3D in dentro.get_children():
+			_luzes_de_dentro[l] = l.light_energy
 	_aplicar(0.0)
 	var akeley := GameState.has_flag(&"interludio")
 	var ambiente_som := som_passaros if akeley and som_passaros else som
@@ -144,6 +151,10 @@ func _aplicar(p: float) -> void:
 	_ceu.ground_horizon_color = _ceu.sky_horizon_color.darkened(0.5)
 	_env.fog_light_color = neblina[0].lerp(neblina[1], p).lerp(Color(0.02, 0.022, 0.03), n)
 	_env.ambient_light_energy = lerpf(ambiente.x, ambiente.y, p) * lerpf(1.0, 0.25, n)
+	# O rebatimento dentro de casa acompanha o dia que entra pelas janelas (de
+	# noite, só os lampiões).
+	for l: Light3D in _luzes_de_dentro:
+		l.light_energy = _luzes_de_dentro[l] * lerpf(1.0, 0.35, some) * lerpf(1.0, 0.04, n)
 
 
 ## O Interlúdio na demo, por enquanto: a descida do céu, um tempo no quintal ao

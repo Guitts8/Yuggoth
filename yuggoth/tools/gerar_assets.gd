@@ -88,6 +88,14 @@ func _texturas() -> void:
 	_save(_estrada(), "estrada")
 	_save(_pedra_campo(), "pedra_campo")
 	_save(_madeira(Color(0.44, 0.17, 0.12), 61, 16), "celeiro")
+	# Os interiores da casa de Akeley (playtest 11: "precisamos que fique BOM de
+	# VERDADE").
+	_save(_papel_florido(), "papel_flores")
+	_save(_papel_listrado(), "papel_listras")
+	_save(_assoalho_largo(), "assoalho_largo")
+	_save(_tapete_trancado(), "tapete_trancado")
+	_save(_colcha(), "colcha")
+	_save(_lombadas(), "lombadas")
 
 
 func _save(img: Image, name: String) -> void:
@@ -2266,3 +2274,168 @@ func _passo(seed: int) -> PackedFloat32Array:
 		for i in range(1500, 5500):
 			b[i] += sin(TAU * f * i / RATE + sin(i * 0.002) * 4.0) * 0.05 * sin(PI * (i - 1500) / 4000.0)
 	return b
+
+
+## Papel de parede de casa de fazenda: fundo creme gasto e raminhos de flor em
+## quincôncio (a florzinha de cinco pétalas, duas folhas), rosa e verde apagados.
+func _papel_florido() -> Image:
+	var tam := 128
+	var img := _img(tam, tam)
+	var n := _noise(71, 0.05)
+	var gasto := _noise(171, 0.12)
+	var fundo := Color(0.82, 0.77, 0.64)
+	var flor := Color(0.68, 0.42, 0.42)
+	var folha := Color(0.46, 0.55, 0.4)
+	for y in tam:
+		for x in tam:
+			var c := _shade(fundo, 0.97 + n.get_noise_2d(x, y) * 0.04)
+			# Duas florzinhas por casa de 32 px, a segunda deslocada.
+			for d: Vector2 in [Vector2(16, 16), Vector2(0, 0), Vector2(32, 0), Vector2(0, 32), Vector2(32, 32)]:
+				var o := Vector2(posmod(x, 32), posmod(y, 32)) - d
+				var r := o.length()
+				var ang := atan2(o.y, o.x)
+				var petala := 3.2 + 1.4 * cos(ang * 5.0)
+				if r < 1.2:
+					c = c.lerp(Color(0.8, 0.66, 0.36), 0.8)
+				elif r < petala:
+					c = c.lerp(flor, 0.75)
+				# As duas folhas, para baixo, de lado.
+				for sx in [-1.0, 1.0]:
+					var f := o - Vector2(sx * 4.5, 4.0)
+					var fr := Vector2(f.x * 0.6 - f.y * 0.5 * sx, f.y * 1.1 + f.x * 0.3 * sx)
+					if fr.length() < 2.4:
+						c = c.lerp(folha, 0.7)
+			c = c.lerp(_shade(fundo, 0.97), clampf(gasto.get_noise_2d(x, y) * 1.6, 0.0, 0.5))
+			img.set_pixel(x, y, c)
+	return img
+
+
+## Papel listrado: faixas largas de um tom e estreitas de outro, com um filete fino
+## no meio da larga (para a sala de jantar e o vestíbulo; a cor vem do material).
+func _papel_listrado() -> Image:
+	var tam := 128
+	var img := _img(tam, tam)
+	var n := _noise(72, 0.06)
+	var a := Color(0.78, 0.72, 0.6)
+	var b := Color(0.72, 0.65, 0.53)
+	for y in tam:
+		for x in tam:
+			var px := posmod(x, 32)
+			var c := a if px < 20 else b
+			if px == 10 or px == 20 or px == 31:
+				c = c.darkened(0.12)
+			img.set_pixel(x, y, _shade(c, 0.96 + n.get_noise_2d(x, y * 0.3) * 0.05))
+	return img
+
+
+## O assoalho de pinho de tábuas largas da casa de fazenda: quatro tábuas por
+## 128 px, de larguras e tons diferentes, as emendas, os pregos quadrados.
+func _assoalho_largo() -> Image:
+	var tam := 128
+	var img := _img(tam, tam)
+	var n := _noise(73, 0.04)
+	var fino := _noise(173, 0.5)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 73
+	var base := Color(0.46, 0.32, 0.2)
+	var bordas := [0, 30, 66, 94, 128]
+	for k in 4:
+		var tom := rng.randf_range(0.85, 1.12)
+		var emenda := rng.randi_range(10, 118)
+		for y in tam:
+			for x in range(bordas[k], bordas[k + 1]):
+				var g := n.get_noise_2d(x * 0.4 + k * 40, y * 2.2)
+				var veio := pow(absf(sin((x + g * 6.0) * 1.3)), 7.0)
+				var f := tom * (0.9 + g * 0.12 - veio * 0.12 + fino.get_noise_2d(x * 2.0, y) * 0.03)
+				if x == bordas[k]:
+					f *= 0.55
+				if y == emenda:
+					f *= 0.6
+				# Os pregos, dois perto de cada emenda.
+				if absi(y - emenda) == 4 and (x == bordas[k] + 4 or x == bordas[k + 1] - 5):
+					f *= 0.45
+				img.set_pixel(x, y, _shade(base, f))
+	return img
+
+
+## O tapete trançado redondo (de retalhos): anéis concêntricos de trança, cada um
+## de uma cor apagada, com o trançado em espinha. A UV vai de 0 a 1 no tapete.
+func _tapete_trancado() -> Image:
+	var tam := 128
+	var img := _img(tam, tam)
+	# Tons de lã gasta, próximos uns dos outros (playtest 11: o primeiro era um
+	# arco-íris).
+	var cores := [Color(0.36, 0.2, 0.16), Color(0.3, 0.26, 0.24), Color(0.42, 0.33, 0.24), Color(0.26, 0.26, 0.22), Color(0.4, 0.28, 0.22), Color(0.22, 0.18, 0.17)]
+	var n := _noise(74, 0.2)
+	for y in tam:
+		for x in tam:
+			var o := Vector2(x + 0.5, y + 0.5) / tam * 2.0 - Vector2.ONE
+			var r := o.length()
+			if r > 1.0:
+				img.set_pixel(x, y, Color(0, 0, 0, 0))
+				continue
+			var anel := int(r * 11.0)
+			var c: Color = cores[anel % cores.size()]
+			# A trança: a espinha que corre em volta do anel.
+			var ang := atan2(o.y, o.x)
+			var t := fposmod(ang * 26.0 + (r * 11.0 - anel) * 3.0 * (1 if anel % 2 else -1), 1.0)
+			var f := 0.82 + 0.25 * sin(t * PI) + n.get_noise_2d(x, y) * 0.05
+			if r * 11.0 - anel < 0.12:
+				f *= 0.7
+			img.set_pixel(x, y, Color(clampf(c.r * f, 0, 1), clampf(c.g * f, 0, 1), clampf(c.b * f, 0, 1), 1.0))
+	return img
+
+
+## A colcha de retalhos: quadrados de chita em cores apagadas, com a costura.
+func _colcha() -> Image:
+	var tam := 64
+	var img := _img(tam, tam)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 75
+	var cores := [Color(0.55, 0.25, 0.22), Color(0.72, 0.66, 0.5), Color(0.3, 0.36, 0.48), Color(0.42, 0.48, 0.32), Color(0.62, 0.5, 0.38)]
+	var casa := 16
+	var quadros := {}
+	for qy in tam / casa:
+		for qx in tam / casa:
+			quadros[Vector2i(qx, qy)] = cores[rng.randi_range(0, cores.size() - 1)]
+	var n := _noise(75, 0.4)
+	for y in tam:
+		for x in tam:
+			var c: Color = quadros[Vector2i(x / casa, y / casa)]
+			var f := 0.92 + n.get_noise_2d(x, y) * 0.06
+			# Uma estampa miúda (pontinhos) dentro do retalho.
+			if (x + y * 3) % 5 == 0:
+				f *= 1.12
+			if x % casa == 0 or y % casa == 0:
+				f *= 0.72
+			img.set_pixel(x, y, _shade(c, f))
+	return img
+
+
+## As lombadas de uma prateleira de livros, vistas de frente: larguras e cores
+## variadas, os frisos dourados no alto e embaixo, um ou outro tombado.
+func _lombadas() -> Image:
+	var tam := 128
+	var img := _img(tam, tam)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 76
+	var cores := [Color(0.42, 0.14, 0.12), Color(0.18, 0.24, 0.16), Color(0.3, 0.2, 0.12), Color(0.16, 0.16, 0.22), Color(0.5, 0.38, 0.22), Color(0.25, 0.12, 0.1)]
+	var x := 0
+	while x < tam:
+		var w := rng.randi_range(4, 10)
+		var c: Color = cores[rng.randi_range(0, cores.size() - 1)]
+		var alto := rng.randi_range(84, 124)
+		for xx in range(x, mini(x + w, tam)):
+			for y in tam:
+				var dentro := y >= tam - alto
+				var cor := Color(0.05, 0.04, 0.04) if not dentro else c
+				if dentro:
+					var f := 0.85 + 0.2 * sin(float(xx - x) / w * PI)
+					var friso := (y - (tam - alto)) in [6, 7, alto - 8, alto - 7] if true else false
+					if friso:
+						cor = Color(0.62, 0.5, 0.25)
+					else:
+						cor = _shade(c, f)
+				img.set_pixel(xx, y, cor)
+		x += w
+	return img

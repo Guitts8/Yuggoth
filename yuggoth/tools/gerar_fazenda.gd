@@ -112,6 +112,22 @@ func _ready() -> void:
 	# O balde de zinco (claro: o ferro_galvanizado parte do aço verde-oliva) e a ração.
 	_mat("zinco", "grao", {world = 12.0, cor = Color(0.46, 0.48, 0.5)})
 	_mat("racao", "cinzas", {world = 20.0, cor = Color(3.2, 2.5, 1.6)})
+	# Os interiores (playtest 11): o papel de cada cômodo, o teto caiado, o assoalho
+	# de tábuas largas, o tapete trançado, a colcha.
+	_mat("papel_estudo", "papel_parede", {world = 1.2, cor = Color(0.8, 0.86, 0.78)})
+	_mat("papel_sala", "papel_flores", {world = 1.3})
+	_mat("papel_jantar", "papel_listras", {world = 2.2, cor = Color(0.92, 0.84, 0.8)})
+	_mat("papel_vestibulo", "papel_listras", {world = 2.2, cor = Color(0.92, 0.92, 0.86)})
+	_mat("papel_quarto", "papel_flores", {world = 1.3, cor = Color(0.86, 0.92, 1.05)})
+	_mat("papel_quarto_akeley", "papel_flores", {world = 1.3, cor = Color(0.95, 0.95, 0.85)})
+	_mat("teto_casa", "reboco", {world = 0.8, cor = Color(1.32, 1.3, 1.24)})
+	_mat("assoalho_largo", "assoalho_largo", {world = 0.75})
+	_mat("colcha", "colcha", {world = 2.0})
+	_mat("estofado_vinho", "estofado", {world = 3.0, cor = Color(1.6, 0.75, 0.7)})
+	_mat("couro", "capa_livro", {world = 3.0, cor = Color(0.8, 0.55, 0.42)})
+	_mat("tapete_trancado", "tapete_trancado", {})
+	(m["tapete_trancado"] as ShaderMaterial).set_shader_parameter(&"alpha_cut", 0.5)
+	ResourceSaver.save(m["tapete_trancado"], MAT_DIR + "tapete_trancado.tres")
 
 	cena = Node3D.new()
 	cena.name = "Fazenda"
@@ -144,6 +160,7 @@ func _ready() -> void:
 	_muros()
 	_casa()
 	_puxado()
+	_acabamento_interior()
 	_dependencias()
 	_canil()
 	_ford()
@@ -151,6 +168,11 @@ func _ready() -> void:
 	_arvores()
 	_rotina()
 	_preparacao()
+	# A luz-guia (playtest 11): azul, fraca, sobre a próxima tarefa.
+	var guia := LuzGuia.new()
+	guia.name = "LuzGuia"
+	_add(cena, guia)
+	guia.fontes.assign([cena.get_node("Rotina"), cena.get_node("Preparacao")])
 	_fechar_obras()
 	_colisao(cena, "Colisao", _col)
 
@@ -642,7 +664,7 @@ func _pisos() -> void:
 	var x1 := CASA_X.y - E
 	var z0 := CASA_Z.x + E
 	var z1 := CASA_Z.y - E
-	_bloco("piso", Vector3(x1 - x0, 0.1, z1 - z0), Vector3((x0 + x1) / 2, T0 - 0.05, (z0 + z1) / 2))
+	_bloco("assoalho_largo", Vector3(x1 - x0, 0.1, z1 - z0), Vector3((x0 + x1) / 2, T0 - 0.05, (z0 + z1) / 2))
 	# A laje em quatro pedaços em volta do vão (x 0,2..ESCADA_X, z da escada).
 	var vao_x := Vector2(ESCADA_X - DEGRAUS * PISADA, ESCADA_X)
 	var vao_z := ESCADA_Z
@@ -656,10 +678,10 @@ func _pisos() -> void:
 		var px: Vector2 = p[0]
 		var pz: Vector2 = p[1]
 		var c := Vector3((px.x + px.y) / 2, 0, (pz.x + pz.y) / 2)
-		_bloco("piso", Vector3(px.y - px.x, 0.06, pz.y - pz.x), c + Vector3(0, T1 - 0.03, 0))
-		_bloco("teto", Vector3(px.y - px.x, LAJE - 0.06, pz.y - pz.x), c + Vector3(0, T1 - 0.06 - (LAJE - 0.06) / 2, 0), Color.WHITE, false)
+		_bloco("assoalho_largo", Vector3(px.y - px.x, 0.06, pz.y - pz.x), c + Vector3(0, T1 - 0.03, 0))
+		_bloco("teto_casa", Vector3(px.y - px.x, LAJE - 0.06, pz.y - pz.x), c + Vector3(0, T1 - 0.06 - (LAJE - 0.06) / 2, 0), Color.WHITE, false)
 	# O forro (o piso do sótão, que a demo não abre).
-	_bloco("teto", Vector3(x1 - x0, 0.08, z1 - z0), Vector3((x0 + x1) / 2, FORRO + 0.04, (z0 + z1) / 2), Color.WHITE, false)
+	_bloco("teto_casa", Vector3(x1 - x0, 0.08, z1 - z0), Vector3((x0 + x1) / 2, FORRO + 0.04, (z0 + z1) / 2), Color.WHITE, false)
 	_bloco("forro_sotao", Vector3(x1 - x0, 0.06, z1 - z0), Vector3((x0 + x1) / 2, FORRO + 0.11, (z0 + z1) / 2), Color.WHITE, false)
 
 
@@ -737,7 +759,7 @@ func _escada() -> void:
 		_bloco("pintura_branca", Vector3(0.035, 0.85, 0.035), Vector3(x, topo + 0.43, z), Color.WHITE, false)
 	_bloco("madeira_escura", Vector3(0.14, 1.15, 0.14), Vector3(ESCADA_X + 0.05, T0 + 0.575, z), Color.WHITE, true)
 	# O lado do vão, no térreo, embaixo da escada (o armário de baixo da escada).
-	_parede("parede_casa", Vector2(ESCADA_X - corre, z + 0.06), Vector2(ESCADA_X - 1.4, z + 0.06), T0, T0 + 1.0, 0.08)
+	_parede("papel_vestibulo", Vector2(ESCADA_X - corre, z + 0.06), Vector2(ESCADA_X - 1.4, z + 0.06), T0, T0 + 1.0, 0.08)
 	# Em cima: a balaustrada ao longo do vão e na ponta leste.
 	var x0 := ESCADA_X - corre
 	_bloco("madeira_escura", Vector3(corre, 0.07, 0.07), Vector3(ESCADA_X - corre / 2 + 0.2, T1 + 0.9, ESCADA_Z.y), Color.WHITE, false)
@@ -800,11 +822,12 @@ func _porta_georgiana() -> void:
 	_bloco("vidro_fazenda", Vector3(0.02, 0.3, larg - 0.1), Vector3(x - 0.06, T0 + alto - 0.17, 0), Color.WHITE, false)
 	for k in 5:
 		_bloco("pintura_branca", Vector3(0.03, 0.3, 0.025), Vector3(x - 0.05, T0 + alto - 0.17, -0.4 + k * 0.2), Color.WHITE, false, Vector3(-30.0 + k * 15.0, 0, 0))
-	# A folha: dobradiça ao sul (aberta, encosta do lado do escritório e deixa o
-	# pé da escada livre), abre para dentro (oeste).
+	# A folha: dobradiça ao sul. Playtest 11: aberta para dentro, ficava atravessada
+	# no vestíbulo e tapava a porta do escritório (o percurso da fazenda ficava
+	# preso ali); agora aberta para fora, de lado, na beira dos degraus.
 	var porta := _group(cena, "PortaFrente", Vector3(CASA_X.y - 0.08, T0, larg / 2 - 0.05), 180.0)
 	var folha := _group(porta, "Folha")
-	folha.rotation_degrees.y = 100.0
+	folha.rotation_degrees.y = -88.0
 	_folha_seis_almofadas(folha, larg - 0.1, alto - 0.35, "pintura_branca")
 
 
@@ -913,61 +936,575 @@ func _janela(g: Node3D, nome: String, c: Vector3, fora: Vector3, larg: float, al
 			_box(dob, "Ripa%d" % k, Vector3(larg / 2 - 0.06, 0.03, 0.012), Vector3(larg / 4, -alto / 3 + k * alto / 3, 0.022 * signf(base.z.dot(fora))), "veneziana")
 
 
-## Os móveis de bloco de cada cômodo (o acabamento vem depois; o que importa
-## agora é a escala e por onde se anda).
+## Os móveis de cada cômodo (playtest 11: "modelos toscos e sem nenhum acabamento
+## ou cuidado"). Peças de casa de fazenda da Nova Inglaterra dos anos 1920, feitas
+## de muitas partes (pernas torneadas, saias, gavetas com puxadores, espaldares
+## de travessas, livros um a um), e dispostas com as passagens livres: de cada
+## porta ao meio de cada cômodo e às outras portas (o percurso da fazenda,
+## `SHOT_MODO=percurso`, confere).
 func _moveis() -> void:
 	var y := T0
-	# O escritório (sudeste): a mesa grande do meio, a poltrona no canto mais
-	# escuro (sudoeste, longe da porta e das janelas), as estantes contra o
-	# vestíbulo, a escrivaninha sob a janela, o suporte do fonógrafo no canto.
-	_movel("madeira_escura", Vector3(1.6, 0.06, 0.95), Vector3(3.4, y + 0.75, 3.8))
-	for s: Vector2 in [Vector2(-0.7, -0.4), Vector2(0.7, -0.4), Vector2(-0.7, 0.4), Vector2(0.7, 0.4)]:
-		_bloco("madeira_escura", Vector3(0.07, 0.72, 0.07), Vector3(3.4 + s.x, y + 0.36, 3.8 + s.y), Color.WHITE, false)
-	_col.append([Vector3(1.6, 0.78, 0.95), Vector3(3.4, y + 0.39, 3.8)])
-	_poltrona(Vector3(1.75, y, 5.15), 135.0)
-	_movel("madeira_escura", Vector3(2.8, 2.2, 0.35), Vector3(3.2, y + 1.1, HALL_Z + 0.25))
-	_movel("madeira_escura", Vector3(0.6, 0.78, 1.2), Vector3(5.45, y + 0.39, 3.7))
-	_movel("madeira_escura", Vector3(0.5, 0.9, 0.5), Vector3(5.45, y + 0.45, 1.85))
-	# A sala de estar (nordeste): o sofá (onde Noyes ronca no Ato III), as
-	# poltronas, a mesinha, o tapete.
-	_movel("estofado", Vector3(2.0, 0.45, 0.85), Vector3(3.6, y + 0.225, -5.2))
-	_movel("estofado", Vector3(2.0, 0.5, 0.2), Vector3(3.6, y + 0.65, -5.55), Color.WHITE, false)
-	_poltrona(Vector3(2.0, y, -2.6), 45.0)
-	_poltrona(Vector3(5.0, y, -2.6), -45.0)
-	_movel("madeira_escura", Vector3(1.0, 0.45, 0.6), Vector3(3.6, y + 0.225, -3.8))
-	_bloco("tapete", Vector3(3.0, 0.01, 2.2), Vector3(3.6, y + 0.005, -3.8), Color.WHITE, false)
-	# A sala de jantar (sudoeste): a mesa e as cadeiras, o aparador.
-	_movel("madeira_escura", Vector3(2.0, 0.06, 1.0), Vector3(-1.0, y + 0.75, 3.8))
-	_col.append([Vector3(2.0, 0.78, 1.0), Vector3(-1.0, y + 0.39, 3.8)])
+	# O escritório de Akeley (sudeste): a mesa grande de trabalho no meio, com os
+	# papéis; a escrivaninha de tampo de couro sob a janela leste (o lampião); as
+	# estantes cheias contra o vestíbulo; a poltrona de orelhas junto ao fogo, no
+	# canto; o armarinho do fonógrafo; o tapete trançado.
+	_tapete_redondo(Vector3(3.4, y, 3.7), Vector2(2.6, 1.9))
+	_mesa(Vector3(3.4, y, 3.8), 0.0, Vector3(1.6, 0.76, 0.95), "madeira_escura")
+	for k in 7:
+		var papel := Vector3(3.0 + (k % 4) * 0.26, y + 0.765 + k * 0.002, 3.6 + (k / 4) * 0.3)
+		_bloco("papel", Vector3(0.21, 0.003, 0.28), papel, Color.WHITE, false, Vector3(0, -12.0 + k * 9.0, 0))
+	_cadeira_espaldar(Vector3(3.4, y, 4.45), 0.0)
+	_escrivaninha(Vector3(5.42, y, 3.7), 90.0)
+	_cadeira_espaldar(Vector3(4.85, y, 3.7), -90.0)
+	_estante(Vector3(2.45, y, HALL_Z + 0.24), 180.0, 1.3, 2.2)
+	_estante(Vector3(3.8, y, HALL_Z + 0.24), 180.0, 1.3, 2.2)
+	_poltrona_orelhas(Vector3(1.9, y, 5.05), 10.0, "estofado")
+	_mesinha(Vector3(2.55, y, 5.45), 0.0)
+	_armarinho(Vector3(5.45, y, 5.25), 90.0)
+	# A sala de estar (nordeste): o sofá de encosto curvo contra a parede norte,
+	# as duas poltronas viradas para a lareira, a mesa redonda do meio com o
+	# pano de crochê, a cadeira de balanço, o tapete. A porta (x 5,1) fica livre.
+	_tapete_redondo(Vector3(3.3, y, -3.8), Vector2(2.8, 2.2))
+	_sofa(Vector3(3.5, y, -5.35), 180.0, 2.0)
+	_poltrona_orelhas(Vector3(2.35, y, -2.35), 30.0, "estofado_vinho")
+	_poltrona_orelhas(Vector3(2.35, y, -5.0), 150.0, "estofado_vinho")
+	_mesa_redonda(Vector3(3.4, y, -3.7), 0.42)
+	_cadeira_balanco(Vector3(5.25, y, -4.7), 118.0)
+	_mesinha(Vector3(5.5, y, -3.6), 0.0)
+	# A sala de jantar (sudoeste): a mesa de seis lugares, as cadeiras de espaldar,
+	# o aparador com a louça sob a janela, o armário de canto. O caminho da porta
+	# do vestíbulo à da cozinha passa pela ponta oeste da mesa.
+	_tapete_redondo(Vector3(-0.9, y, 3.75), Vector2(2.6, 1.8))
+	_mesa(Vector3(-0.8, y, 3.75), 0.0, Vector3(1.6, 0.76, 0.9), "madeira_escura")
 	for i in 3:
 		for s: float in [-1.0, 1.0]:
-			_cadeira(Vector3(-1.7 + i * 0.7, y, 3.8 + s * 0.75), 0.0 if s > 0 else 180.0)
-	_movel("madeira_escura", Vector3(1.6, 0.9, 0.45), Vector3(-1.0, y + 0.45, 5.5))
-	# A sala dos fundos (noroeste): o armário dos rifles, a bancada, as caixas.
-	_movel("madeira_escura", Vector3(1.4, 1.9, 0.4), Vector3(-1.0, y + 0.95, -5.5))
-	_movel("madeira_clara", Vector3(1.8, 0.85, 0.7), Vector3(-2.3, y + 0.425, -3.0), Color.WHITE, true, Vector3(0, 90, 0))
-	_movel("papelao_escuro", Vector3(0.6, 0.5, 0.5), Vector3(0.2, y + 0.25, -2.2))
-	# O vestíbulo: a mesinha de entrada e o cabide.
-	_movel("madeira_escura", Vector3(0.4, 0.8, 0.9), Vector3(0.6, y + 0.4, 1.1))
-	# Primeiro andar. O quarto de hóspedes (sobre o escritório): a cama, o
-	# guarda-roupa, o lavatório, a cadeira.
+			_cadeira_espaldar(Vector3(-1.35 + i * 0.55, y, 3.75 + s * 0.68), 0.0 if s > 0 else 180.0)
+	_aparador(Vector3(-1.0, y, 5.55), 0.0, 1.6)
+	# A sala dos fundos (noroeste), a oficina: o armário dos rifles (aberto: a F6
+	# tira um), a bancada com a morsa e as ferramentas (a munição, a F6), as
+	# prateleiras de vidros, as botas e os casacos de trabalho.
+	_armario_rifles(Vector3(-1.0, y, -5.52))
+	_bancada(Vector3(-2.3, y, -3.0), -90.0)
+	_prateleiras(Vector3(0.3, y, -5.62), 180.0)
+	_bloco("papelao_escuro", Vector3(0.6, 0.5, 0.5), Vector3(0.45, y + 0.25, -2.25))
+	_bloco("papelao_escuro", Vector3(0.45, 0.35, 0.4), Vector3(0.4, y + 0.675, -2.25), Color(0.9, 0.85, 0.8), false, Vector3(0, 12, 0))
+	# O vestíbulo: a mesinha de entrada (o lampião), o cabideiro com os casacos e
+	# o chapéu, o porta-guarda-chuvas, a passadeira, o espelho.
+	_bloco("passadeira", Vector3(5.6, 0.008, 0.9), Vector3(2.0, y + 0.004, 0.35), Color.WHITE, false)
+	_mesa(Vector3(0.6, y, 1.08), 90.0, Vector3(0.9, 0.8, 0.4), "madeira_escura")
+	_cabideiro(Vector3(-2.35, y, 1.0))
+	_bloco("ferro", Vector3(0.26, 0.6, 0.26), Vector3(-2.4, y + 0.3, -0.95), Color(0.8, 0.8, 0.8))
+	_bloco("madeira_escura", Vector3(0.6, 0.85, 0.04), Vector3(0.6, y + 1.65, HALL_Z - EI / 2 - 0.03))
+	_bloco("vidro_fazenda", Vector3(0.5, 0.75, 0.01), Vector3(0.6, y + 1.65, HALL_Z - EI / 2 - 0.055), Color(1.6, 1.6, 1.7), false)
+
+	# Primeiro andar. O quarto de hóspedes (sobre o escritório; Wilmarth dorme aqui
+	# no Ato III): a cama de ferro com a colcha, o guarda-roupa, o lavatório com o
+	# jarro e a bacia, a cadeira.
 	var y1 := T1
-	_cama(Vector3(3.5, y1, 4.6), 0.0)
-	_movel("madeira_escura", Vector3(1.0, 2.0, 0.55), Vector3(1.75, y1 + 1.0, 2.0))
-	_movel("madeira_clara", Vector3(0.7, 0.8, 0.45), Vector3(5.5, y1 + 0.4, 2.3))
-	_cadeira(Vector3(5.0, y1, 3.6), -90.0)
-	# O quarto de Akeley (sobre a sala de estar): a cama, a cômoda.
-	_cama(Vector3(3.5, y1, -4.6), 180.0)
-	_movel("madeira_escura", Vector3(1.2, 1.0, 0.5), Vector3(1.75, y1 + 0.5, -2.3))
-	# O banheiro: a banheira, a pia, a privada.
-	_movel("porcelana", Vector3(0.75, 0.55, 1.6), Vector3(-2.35, y1 + 0.275, 0.4))
-	_movel("porcelana", Vector3(0.45, 0.8, 0.35), Vector3(-1.4, y1 + 0.4, -1.1))
-	_movel("porcelana", Vector3(0.4, 0.42, 0.55), Vector3(-1.45, y1 + 0.21, 1.0))
-	# Os quartos de trás: um de costura (sudoeste), um de guardados (noroeste).
-	_cama(Vector3(-1.2, y1, 4.8), 0.0)
-	_movel("papelao_escuro", Vector3(0.8, 0.6, 0.6), Vector3(-2.2, y1 + 0.3, -5.2))
-	_movel("papelao_escuro", Vector3(0.6, 0.5, 0.6), Vector3(-1.3, y1 + 0.25, -5.2))
-	_movel("madeira_clara", Vector3(0.5, 1.6, 1.2), Vector3(0.6, y1 + 0.8, -3.0))
+	_cama_ferro(Vector3(3.5, y1, 4.75), 0.0)
+	_guarda_roupa(Vector3(1.6, y1, 2.1), -90.0)
+	_lavatorio(Vector3(5.5, y1, 2.3), 90.0)
+	_cadeira_espaldar(Vector3(5.1, y1, 3.75), 90.0)
+	_tapete_redondo(Vector3(3.5, y1, 3.0), Vector2(1.6, 1.0))
+	# O quarto de Akeley (sobre a sala de estar): a cama, a cômoda com o espelho, a
+	# mesinha de cabeceira, o baú aos pés da cama.
+	_cama_ferro(Vector3(3.5, y1, -4.75), 180.0)
+	_comoda(Vector3(1.55, y1, -2.4), -90.0)
+	_mesinha(Vector3(4.6, y1, -5.4), 0.0)
+	_bloco("madeira_escura", Vector3(0.9, 0.5, 0.45), Vector3(3.5, y1 + 0.25, -3.55))
+	_tapete_redondo(Vector3(3.5, y1, -3.2), Vector2(1.6, 1.0))
+	# O banheiro: a banheira de pés, a pia de coluna, a privada de caixa alta.
+	_banheira(Vector3(-2.35, y1, 0.45))
+	_pia_coluna(Vector3(-1.45, y1, -1.0), 180.0)
+	_privada(Vector3(-1.5, y1, 1.05), 0.0)
+	# Os quartos de trás: o de costura (sudoeste) — a cama estreita, a máquina de
+	# costura de pedal, o manequim — e o de guardados (noroeste): baús e caixas.
+	_cama_ferro(Vector3(-1.2, y1, 4.85), 0.0, 0.95)
+	_maquina_costura(Vector3(-2.35, y1, 2.4), -90.0)
+	_bloco("madeira_escura", Vector3(0.9, 0.55, 0.5), Vector3(-2.2, y1 + 0.275, -5.3))
+	_bloco("couro", Vector3(0.8, 0.45, 0.48), Vector3(-1.25, y1 + 0.225, -5.3), Color.WHITE, true, Vector3(0, 8, 0))
+	_bloco("papelao_escuro", Vector3(0.6, 0.5, 0.6), Vector3(-1.3, y1 + 0.7, -5.3), Color(0.95, 0.9, 0.82), false, Vector3(0, -6, 0))
+	_guarda_roupa(Vector3(0.45, y1, -3.0), 90.0)
+
+
+# --- As peças ------------------------------------------------------------------------
+
+## Uma caixa de uma peça de móvel, em coordenadas da peça (origem no chão, o -Z é a
+## frente) posta em `p`, girada `giro` graus.
+func _parte(mat: String, tam: Vector3, local: Vector3, p: Vector3, giro: float, cor := Color.WHITE, inclina := Vector3.ZERO) -> void:
+	var b := Basis.from_euler(Vector3(0, deg_to_rad(giro), 0))
+	_bloco(mat, tam, p + b * local, cor, false, Vector3(inclina.x, giro + inclina.y, inclina.z))
+
+
+## A colisão de uma peça: uma caixa (em coordenadas da peça).
+func _colide(tam: Vector3, local: Vector3, p: Vector3, giro: float) -> void:
+	var b := Basis.from_euler(Vector3(0, deg_to_rad(giro), 0))
+	_col.append([tam, p + b * local, Vector3(0, giro, 0)])
+
+
+## Uma perna torneada: a base quadrada, o fuso com os anéis, o pé.
+func _perna_torneada(mat: String, x: float, z: float, alto: float, grossa: float, p: Vector3, giro: float) -> void:
+	_parte(mat, Vector3(grossa, alto * 0.22, grossa), Vector3(x, alto - alto * 0.11, z), p, giro)
+	_parte(mat, Vector3(grossa * 0.7, alto * 0.5, grossa * 0.7), Vector3(x, alto * 0.53, z), p, giro)
+	_parte(mat, Vector3(grossa * 0.95, alto * 0.05, grossa * 0.95), Vector3(x, alto * 0.75, z), p, giro)
+	_parte(mat, Vector3(grossa * 0.95, alto * 0.05, grossa * 0.95), Vector3(x, alto * 0.3, z), p, giro)
+	_parte(mat, Vector3(grossa * 0.6, alto * 0.25, grossa * 0.6), Vector3(x, alto * 0.14, z), p, giro)
+
+
+## Uma mesa: o tampo com a borda, a saia, as quatro pernas torneadas.
+func _mesa(p: Vector3, giro: float, tam: Vector3, mat: String) -> void:
+	var a := tam.y
+	_parte(mat, Vector3(tam.x, 0.035, tam.z), Vector3(0, a - 0.0175, 0), p, giro)
+	_parte(mat, Vector3(tam.x - 0.02, 0.012, tam.z - 0.02), Vector3(0, a - 0.041, 0), p, giro, Color(0.8, 0.8, 0.8))
+	for s: float in [-1.0, 1.0]:
+		_parte(mat, Vector3(tam.x - 0.16, 0.11, 0.022), Vector3(0, a - 0.1, s * (tam.z / 2 - 0.07)), p, giro)
+		_parte(mat, Vector3(0.022, 0.11, tam.z - 0.16), Vector3(s * (tam.x / 2 - 0.07), a - 0.1, 0), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		for sz: float in [-1.0, 1.0]:
+			_perna_torneada(mat, sx * (tam.x / 2 - 0.07), sz * (tam.z / 2 - 0.07), a - 0.035, 0.06, p, giro)
+	_colide(Vector3(tam.x, a, tam.z), Vector3(0, a / 2, 0), p, giro)
+
+
+## A mesa redonda do centro (pé de coluna com três pés), com o pano de crochê.
+func _mesa_redonda(p: Vector3, raio: float) -> void:
+	_cilindro("madeira_escura", p + Vector3(0, 0.74, 0), raio, 0.035, 14)
+	_cilindro("lencol", p + Vector3(0, 0.762, 0), raio * 0.62, 0.006, 12, Color(1.1, 1.08, 1.0))
+	_cilindro("madeira_escura", p + Vector3(0, 0.4, 0), 0.05, 0.62, 8)
+	_cilindro("madeira_escura", p + Vector3(0, 0.6, 0), 0.07, 0.05, 8)
+	for k in 3:
+		var a := TAU * k / 3.0
+		_parte("madeira_escura", Vector3(0.05, 0.05, 0.34), Vector3(0, 0.06, -0.16), p, rad_to_deg(a), Color.WHITE, Vector3(-14, 0, 0))
+	_col.append([Vector3(raio * 1.6, 0.76, raio * 1.6), p + Vector3(0, 0.38, 0)])
+
+
+## Uma cadeira de espaldar de travessas, o assento de palhinha.
+func _cadeira_espaldar(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	_parte(m, Vector3(0.42, 0.035, 0.4), Vector3(0, 0.45, 0), p, giro)
+	_parte("palha", Vector3(0.36, 0.01, 0.34), Vector3(0, 0.472, 0), p, giro, Color(0.75, 0.62, 0.42))
+	for sx: float in [-1.0, 1.0]:
+		_parte(m, Vector3(0.035, 0.45, 0.035), Vector3(sx * 0.18, 0.225, -0.17), p, giro)
+		# Os pés de trás sobem e viram os montantes do espaldar, um pouco inclinados.
+		_parte(m, Vector3(0.035, 1.0, 0.035), Vector3(sx * 0.18, 0.5, 0.18), p, giro, Color.WHITE, Vector3(-4, 0, 0))
+		_parte(m, Vector3(0.02, 0.02, 0.36), Vector3(sx * 0.18, 0.16, 0), p, giro)
+	_parte(m, Vector3(0.36, 0.02, 0.02), Vector3(0, 0.16, -0.17), p, giro)
+	for k in 3:
+		_parte(m, Vector3(0.34, 0.05, 0.018), Vector3(0, 0.62 + k * 0.13, 0.19 + k * 0.009), p, giro, Color.WHITE, Vector3(-4, 0, 0))
+	_colide(Vector3(0.44, 0.9, 0.44), Vector3(0, 0.45, 0), p, giro)
+
+
+## A cadeira de balanço: os arcos no chão, o espaldar alto de fusos.
+func _cadeira_balanco(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	for sx: float in [-1.0, 1.0]:
+		for k in 5:
+			var t := -0.4 + k * 0.2
+			_parte(m, Vector3(0.03, 0.03, 0.22), Vector3(sx * 0.22, 0.03 + t * t * 0.18, t), p, giro, Color.WHITE, Vector3(rad_to_deg(t * 0.7), 0, 0))
+		_parte(m, Vector3(0.035, 0.42, 0.035), Vector3(sx * 0.21, 0.27, -0.16), p, giro)
+		_parte(m, Vector3(0.035, 1.05, 0.035), Vector3(sx * 0.21, 0.6, 0.2), p, giro, Color.WHITE, Vector3(-10, 0, 0))
+		_parte(m, Vector3(0.04, 0.03, 0.42), Vector3(sx * 0.23, 0.68, 0.02), p, giro)
+	_parte(m, Vector3(0.44, 0.035, 0.42), Vector3(0, 0.48, 0), p, giro)
+	for k in 5:
+		_parte(m, Vector3(0.02, 0.5, 0.02), Vector3(-0.14 + k * 0.07, 0.82, 0.23), p, giro, Color.WHITE, Vector3(-10, 0, 0))
+	_parte(m, Vector3(0.44, 0.06, 0.03), Vector3(0, 1.08, 0.27), p, giro, Color.WHITE, Vector3(-10, 0, 0))
+	_colide(Vector3(0.5, 1.0, 0.8), Vector3(0, 0.5, 0), p, giro)
+
+
+## A poltrona de orelhas: o assento com a almofada, o encosto alto com as orelhas,
+## os braços enrolados, os pés curtos torneados.
+func _poltrona_orelhas(p: Vector3, giro: float, tecido: String) -> void:
+	_parte(tecido, Vector3(0.78, 0.3, 0.72), Vector3(0, 0.3, 0.0), p, giro)
+	_parte(tecido, Vector3(0.6, 0.12, 0.6), Vector3(0, 0.51, -0.04), p, giro, Color(1.08, 1.08, 1.08))
+	_parte(tecido, Vector3(0.78, 0.8, 0.16), Vector3(0, 0.82, 0.3), p, giro, Color(0.95, 0.95, 0.95), Vector3(-6, 0, 0))
+	_parte(tecido, Vector3(0.6, 0.16, 0.12), Vector3(0, 1.26, 0.32), p, giro, Color(0.95, 0.95, 0.95), Vector3(-6, 0, 0))
+	for sx: float in [-1.0, 1.0]:
+		_parte(tecido, Vector3(0.12, 0.24, 0.66), Vector3(sx * 0.36, 0.6, -0.02), p, giro)
+		_parte(tecido, Vector3(0.15, 0.08, 0.66), Vector3(sx * 0.37, 0.73, -0.02), p, giro, Color(1.05, 1.05, 1.05))
+		# A orelha: o encosto se dobra para a frente dos dois lados, no alto.
+		_parte(tecido, Vector3(0.1, 0.45, 0.28), Vector3(sx * 0.35, 1.05, 0.18), p, giro, Color(0.9, 0.9, 0.9), Vector3(0, sx * -20, 0))
+		for sz: float in [-1.0, 1.0]:
+			_parte("madeira_escura", Vector3(0.05, 0.15, 0.05), Vector3(sx * 0.33, 0.075, sz * 0.3), p, giro)
+	_colide(Vector3(0.8, 1.2, 0.8), Vector3(0, 0.6, 0), p, giro)
+
+
+## O sofá de encosto curvo (camelback): o corpo, as três almofadas, o encosto que
+## sobe no meio, os braços enrolados, os pés torneados.
+func _sofa(p: Vector3, giro: float, compr: float) -> void:
+	var t := "estofado_vinho"
+	_parte(t, Vector3(compr, 0.28, 0.78), Vector3(0, 0.3, 0), p, giro)
+	for k in 3:
+		_parte(t, Vector3(compr / 3 - 0.04, 0.11, 0.6), Vector3(-compr / 3 + k * compr / 3, 0.495, -0.05), p, giro, Color(1.08, 1.08, 1.08))
+	for k in 7:
+		var x := -compr / 2 + 0.15 + k * (compr - 0.3) / 6
+		var u := 1.0 - absf(x) / (compr / 2)
+		_parte(t, Vector3((compr - 0.3) / 6 + 0.01, 0.42 + 0.22 * u, 0.16), Vector3(x, 0.6 + 0.11 * u, 0.33), p, giro, Color(0.94, 0.94, 0.94), Vector3(-8, 0, 0))
+	for sx: float in [-1.0, 1.0]:
+		_parte(t, Vector3(0.16, 0.3, 0.72), Vector3(sx * (compr / 2 - 0.08), 0.6, 0.0), p, giro)
+		_parte(t, Vector3(0.2, 0.1, 0.72), Vector3(sx * (compr / 2 - 0.07), 0.76, 0.0), p, giro, Color(1.05, 1.05, 1.05))
+		for sz: float in [-1.0, 1.0]:
+			_parte("madeira_escura", Vector3(0.05, 0.16, 0.05), Vector3(sx * (compr / 2 - 0.08), 0.08, sz * 0.32), p, giro)
+	_colide(Vector3(compr, 1.0, 0.8), Vector3(0, 0.5, 0), p, giro)
+
+
+## Uma estante: as laterais, o fundo, o cimo com a cornija, o rodapé e as
+## prateleiras cheias de livros (um a um, de alturas, grossuras e cores
+## diferentes, um ou outro deitado ou inclinado).
+func _estante(p: Vector3, giro: float, larg: float, alto: float) -> void:
+	var m := "madeira_escura"
+	var fundo := 0.34
+	for sx: float in [-1.0, 1.0]:
+		_parte(m, Vector3(0.03, alto, fundo), Vector3(sx * (larg / 2 - 0.015), alto / 2, 0), p, giro)
+	_parte(m, Vector3(larg, alto, 0.015), Vector3(0, alto / 2, fundo / 2 - 0.008), p, giro, Color(0.7, 0.7, 0.7))
+	_parte(m, Vector3(larg + 0.08, 0.06, fundo + 0.05), Vector3(0, alto + 0.03, -0.01), p, giro)
+	_parte(m, Vector3(larg + 0.12, 0.04, fundo + 0.08), Vector3(0, alto + 0.08, -0.02), p, giro)
+	_parte(m, Vector3(larg, 0.1, fundo), Vector3(0, 0.05, 0), p, giro)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(p.x * 100 + p.z * 31)
+	var cores := [Color(0.55, 0.18, 0.14), Color(0.22, 0.32, 0.2), Color(0.36, 0.24, 0.14), Color(0.2, 0.2, 0.28), Color(0.6, 0.46, 0.26), Color(0.3, 0.14, 0.12), Color(0.15, 0.13, 0.12)]
+	var prats := 5
+	for k in prats:
+		var py := 0.1 + k * (alto - 0.12) / prats
+		_parte(m, Vector3(larg - 0.06, 0.025, fundo - 0.02), Vector3(0, py, 0), p, giro)
+		var x := -larg / 2 + 0.05
+		var limite := (alto - 0.12) / prats - 0.06
+		while x < larg / 2 - 0.08:
+			var w := rng.randf_range(0.022, 0.05)
+			var h := rng.randf_range(0.18, minf(0.3, limite))
+			var d := rng.randf_range(0.15, 0.24)
+			var c: Color = cores[rng.randi_range(0, cores.size() - 1)] * rng.randf_range(0.85, 1.2)
+			if rng.randf() < 0.05:
+				# Um deitado em cima dos outros.
+				_parte("capa_livro", Vector3(h, w, d), Vector3(x + h / 2, py + 0.0125 + w / 2, -0.02), p, giro, c)
+				x += h + 0.01
+				continue
+			var inclina := -8.0 if rng.randf() < 0.06 else 0.0
+			_parte("capa_livro", Vector3(w, h, d), Vector3(x + w / 2, py + 0.0125 + h / 2, -fundo / 2 + d / 2 + 0.03), p, giro, c, Vector3(0, 0, inclina))
+			x += w + 0.002
+			if rng.randf() < 0.04:
+				x += 0.06
+	_colide(Vector3(larg, alto, fundo), Vector3(0, alto / 2, 0), p, giro)
+
+
+## A escrivaninha de pedestal de Akeley: o tampo de couro verde, as duas colunas de
+## gavetas com puxadores de latão, a gaveta do meio, o rodapé.
+func _escrivaninha(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	var larg := 1.2
+	var fundo := 0.62
+	var a := 0.78
+	_parte(m, Vector3(larg + 0.04, 0.035, fundo + 0.04), Vector3(0, a - 0.0175, 0), p, giro)
+	_parte("feltro", Vector3(larg - 0.12, 0.004, fundo - 0.12), Vector3(0, a + 0.001, 0), p, giro, Color(0.55, 0.8, 0.55))
+	for sx: float in [-1.0, 1.0]:
+		var x := sx * (larg / 2 - 0.2)
+		_parte(m, Vector3(0.38, a - 0.05, fundo), Vector3(x, (a - 0.05) / 2 + 0.01, 0), p, giro)
+		for k in 3:
+			var gy := 0.14 + k * 0.21
+			_parte(m, Vector3(0.33, 0.18, 0.02), Vector3(x, gy, -fundo / 2 - 0.01), p, giro, Color(1.12, 1.12, 1.12))
+			_parte("latao", Vector3(0.07, 0.015, 0.02), Vector3(x, gy + 0.02, -fundo / 2 - 0.026), p, giro)
+	_parte(m, Vector3(larg - 0.82, 0.1, 0.02), Vector3(0, a - 0.09, -fundo / 2 - 0.01), p, giro, Color(1.12, 1.12, 1.12))
+	_parte("latao", Vector3(0.06, 0.015, 0.02), Vector3(0, a - 0.085, -fundo / 2 - 0.026), p, giro)
+	# Em cima: o mata-borrão, o tinteiro, os papéis.
+	_parte("papel", Vector3(0.21, 0.003, 0.28), Vector3(-0.25, a + 0.004, 0.0), p, giro, Color.WHITE, Vector3(0, 7, 0))
+	_parte("papel", Vector3(0.21, 0.003, 0.28), Vector3(-0.22, a + 0.007, 0.03), p, giro, Color.WHITE, Vector3(0, -5, 0))
+	_parte("esmalte_preto", Vector3(0.06, 0.05, 0.06), Vector3(0.12, a + 0.025, 0.12), p, giro)
+	_colide(Vector3(larg, a, fundo), Vector3(0, a / 2, 0), p, giro)
+
+
+## O armarinho do fonógrafo e dos discos (no Ato III, o fonógrafo de Akeley): as
+## portinhas, a tampa.
+func _armarinho(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	_parte(m, Vector3(0.6, 0.85, 0.48), Vector3(0, 0.45, 0), p, giro)
+	_parte(m, Vector3(0.66, 0.035, 0.54), Vector3(0, 0.89, 0), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		_parte(m, Vector3(0.27, 0.6, 0.02), Vector3(sx * 0.145, 0.43, -0.25), p, giro, Color(1.12, 1.12, 1.12))
+		_parte("latao", Vector3(0.015, 0.05, 0.02), Vector3(sx * 0.03, 0.5, -0.265), p, giro)
+	_colide(Vector3(0.6, 0.9, 0.5), Vector3(0, 0.45, 0), p, giro)
+
+
+## Uma mesinha de canto (de cabeceira): o tampo, a gaveta, as pernas finas.
+func _mesinha(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	_parte(m, Vector3(0.45, 0.03, 0.4), Vector3(0, 0.7, 0), p, giro)
+	_parte(m, Vector3(0.4, 0.12, 0.35), Vector3(0, 0.62, 0), p, giro)
+	_parte(m, Vector3(0.3, 0.08, 0.02), Vector3(0, 0.62, -0.18), p, giro, Color(1.12, 1.12, 1.12))
+	_parte("latao", Vector3(0.03, 0.02, 0.02), Vector3(0, 0.62, -0.195), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		for sz: float in [-1.0, 1.0]:
+			_parte(m, Vector3(0.035, 0.56, 0.035), Vector3(sx * 0.18, 0.28, sz * 0.15), p, giro)
+	_parte(m, Vector3(0.36, 0.02, 0.3), Vector3(0, 0.18, 0), p, giro)
+	_colide(Vector3(0.45, 0.72, 0.4), Vector3(0, 0.36, 0), p, giro)
+
+
+## O aparador: o corpo de portas e gavetas, o tampo, o espelho de trás, a louça.
+func _aparador(p: Vector3, giro: float, larg: float) -> void:
+	var m := "madeira_escura"
+	_parte(m, Vector3(larg, 0.82, 0.45), Vector3(0, 0.45, 0), p, giro)
+	_parte(m, Vector3(larg + 0.05, 0.035, 0.5), Vector3(0, 0.88, 0), p, giro)
+	for k in 3:
+		var x := -larg / 3 + k * larg / 3
+		_parte(m, Vector3(larg / 3 - 0.05, 0.14, 0.02), Vector3(x, 0.74, -0.235), p, giro, Color(1.12, 1.12, 1.12))
+		_parte("latao", Vector3(0.06, 0.015, 0.02), Vector3(x, 0.75, -0.25), p, giro)
+		_parte(m, Vector3(larg / 3 - 0.05, 0.48, 0.02), Vector3(x, 0.36, -0.235), p, giro, Color(1.12, 1.12, 1.12))
+		_parte("latao", Vector3(0.015, 0.05, 0.02), Vector3(x + larg / 6 - 0.06, 0.4, -0.25), p, giro)
+	_parte(m, Vector3(larg, 0.06, 0.45), Vector3(0, 0.03, 0), p, giro)
+	# O espaldar de trás com a prateleirinha e os pratos em pé.
+	_parte(m, Vector3(larg, 0.4, 0.03), Vector3(0, 1.1, 0.21), p, giro)
+	_parte(m, Vector3(larg, 0.025, 0.12), Vector3(0, 1.12, 0.15), p, giro)
+	for k in 5:
+		var x := -larg / 2 + 0.2 + k * (larg - 0.4) / 4
+		_cilindro_deitado("porcelana", p + Basis.from_euler(Vector3(0, deg_to_rad(giro), 0)) * Vector3(x, 1.26, 0.17), 0.11, 0.012, giro)
+	_cilindro("porcelana", p + Basis.from_euler(Vector3(0, deg_to_rad(giro), 0)) * Vector3(-larg / 4, 0.98, 0.0), 0.07, 0.16, 10)
+	_colide(Vector3(larg, 0.9, 0.5), Vector3(0, 0.45, 0), p, giro)
+
+
+## O armário dos rifles: o corpo alto, aberto na frente (as portas de vidro abertas
+## contra a parede), o cabide de rifles por dentro, a gaveta da munição embaixo.
+func _armario_rifles(p: Vector3) -> void:
+	var m := "madeira_escura"
+	# Contra a parede norte, a frente para o sul.
+	var giro := 180.0
+	_parte(m, Vector3(1.4, 1.9, 0.05), Vector3(0, 0.95, 0.18), p, giro, Color(0.75, 0.75, 0.75))
+	for sx: float in [-1.0, 1.0]:
+		_parte(m, Vector3(0.05, 1.9, 0.4), Vector3(sx * 0.68, 0.95, 0), p, giro)
+		# A porta de vidro aberta, quase encostada na parede ao lado.
+		_parte(m, Vector3(0.66, 1.4, 0.03), Vector3(sx * 0.95, 1.15, -0.42), p, giro, Color.WHITE, Vector3(0, sx * -75.0, 0))
+		_parte("vidro_fazenda", Vector3(0.54, 1.25, 0.01), Vector3(sx * 0.95, 1.15, -0.44), p, giro, Color(1.4, 1.4, 1.5), Vector3(0, sx * -75.0, 0))
+	_parte(m, Vector3(1.48, 0.08, 0.46), Vector3(0, 1.94, -0.02), p, giro)
+	_parte(m, Vector3(1.4, 0.45, 0.4), Vector3(0, 0.225, 0), p, giro)
+	_parte(m, Vector3(1.3, 0.16, 0.02), Vector3(0, 0.32, -0.205), p, giro, Color(1.12, 1.12, 1.12))
+	_parte("latao", Vector3(0.08, 0.015, 0.02), Vector3(0, 0.33, -0.22), p, giro)
+	# O cabide: a régua de baixo com os encaixes e a de cima com os entalhes.
+	_parte(m, Vector3(1.3, 0.05, 0.18), Vector3(0, 0.48, 0.05), p, giro, Color(1.15, 1.15, 1.15))
+	_parte(m, Vector3(1.3, 0.04, 0.1), Vector3(0, 1.45, 0.1), p, giro, Color(1.15, 1.15, 1.15))
+	# Dois rifles e uma espingarda que ficam (o rifle de caça grossa é o da F6).
+	for x: float in [-0.5, -0.32, 0.38, 0.55]:
+		_parte("madeira_escura", Vector3(0.045, 0.34, 0.1), Vector3(x, 0.66, 0.06), p, giro, Color(1.25, 1.1, 0.95))
+		_parte("ferro", Vector3(0.025, 0.85, 0.03), Vector3(x, 1.2, 0.08), p, giro)
+	_col.append([Vector3(1.45, 1.95, 0.45), p + Vector3(0, 0.975, 0)])
+
+
+## A bancada da oficina: o tampo grosso, as pernas com a travessa, a prateleira de
+## baixo, a morsa, as ferramentas na parede (o martelo, o serrote, as chaves).
+func _bancada(p: Vector3, giro: float) -> void:
+	var m := "madeira_clara"
+	_parte(m, Vector3(1.8, 0.07, 0.7), Vector3(0, 0.815, 0), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		for sz: float in [-1.0, 1.0]:
+			_parte(m, Vector3(0.08, 0.78, 0.08), Vector3(sx * 0.82, 0.39, sz * 0.28), p, giro)
+	_parte(m, Vector3(1.7, 0.03, 0.6), Vector3(0, 0.2, 0), p, giro, Color(0.85, 0.85, 0.85))
+	# A morsa de ferro na ponta.
+	_parte("ferro", Vector3(0.18, 0.12, 0.12), Vector3(0.7, 0.9, -0.33), p, giro)
+	_parte("ferro", Vector3(0.03, 0.03, 0.2), Vector3(0.7, 0.9, -0.48), p, giro)
+	# As ferramentas largadas: a lata de óleo, os pregos, uma plaina.
+	_parte("ferro", Vector3(0.24, 0.07, 0.07), Vector3(-0.5, 0.885, -0.15), p, giro, Color(1.2, 1.1, 1.0))
+	_parte("madeira_escura", Vector3(0.05, 0.03, 0.3), Vector3(-0.2, 0.865, 0.1), p, giro)
+	_colide(Vector3(1.8, 0.85, 0.7), Vector3(0, 0.425, 0), p, giro)
+
+
+## As prateleiras de parede da oficina, com os vidros, as latas e as caixas.
+func _prateleiras(p: Vector3, giro: float) -> void:
+	var m := "madeira_clara"
+	for k in 3:
+		var y := 1.0 + k * 0.42
+		_parte(m, Vector3(1.0, 0.025, 0.26), Vector3(0, y, 0), p, giro)
+		for j in 5:
+			var x := -0.4 + j * 0.2
+			if (j + k) % 3 == 0:
+				_parte("papelao_escuro", Vector3(0.15, 0.13, 0.16), Vector3(x, y + 0.08, 0), p, giro, Color(0.95, 0.9, 0.8))
+			else:
+				_cilindro("vidro_fazenda" if j % 2 else "ferro", p + Basis.from_euler(Vector3(0, deg_to_rad(giro), 0)) * Vector3(x, y + 0.1, 0), 0.045, 0.17, 8, Color(1.4, 1.35, 1.2))
+	for sx: float in [-1.0, 1.0]:
+		_parte(m, Vector3(0.025, 0.25, 0.22), Vector3(sx * 0.45, 0.88, 0.0), p, giro)
+
+
+## O cabideiro do vestíbulo: a haste torneada, os ganchos, um casaco pendurado e o
+## chapéu de feltro.
+func _cabideiro(p: Vector3) -> void:
+	_cilindro("madeira_escura", p + Vector3(0, 0.9, 0), 0.025, 1.8, 8)
+	for k in 4:
+		var a := TAU * k / 4.0
+		_bloco("madeira_escura", Vector3(0.28, 0.03, 0.03), p + Vector3(cos(a) * 0.1, 0.06, sin(a) * 0.1), Color.WHITE, false, Vector3(0, -rad_to_deg(a), -8))
+		_bloco("madeira_escura", Vector3(0.12, 0.02, 0.02), p + Vector3(cos(a) * 0.07, 1.72, sin(a) * 0.07), Color.WHITE, false, Vector3(0, -rad_to_deg(a), 30))
+	_bloco("la_escura", Vector3(0.42, 0.95, 0.16), p + Vector3(0.0, 1.2, -0.12), Color(0.8, 0.75, 0.7), false, Vector3(0, 10, 0))
+	_cilindro("la_escura", p + Vector3(0.1, 1.85, 0.05), 0.11, 0.025, 10, Color(0.7, 0.62, 0.55))
+	_cilindro("la_escura", p + Vector3(0.1, 1.9, 0.05), 0.075, 0.09, 10, Color(0.7, 0.62, 0.55))
+	_col.append([Vector3(0.45, 1.8, 0.45), p + Vector3(0, 0.9, 0)])
+
+
+## A cama de ferro: a cabeceira e os pés de tubos com as barras, o estrado, o
+## colchão, a colcha de retalhos dobrada no pé, o travesseiro.
+func _cama_ferro(p: Vector3, giro: float, larg := 1.25) -> void:
+	var comp := 1.95
+	var f := "ferro"
+	var preto := Color(0.45, 0.45, 0.48)
+	for lado: float in [1.0, -1.0]:
+		var z := lado * comp / 2
+		var alto := 1.15 if lado > 0 else 0.8
+		for sx: float in [-1.0, 1.0]:
+			_parte(f, Vector3(0.035, alto, 0.035), Vector3(sx * larg / 2, alto / 2, z), p, giro, preto)
+			_parte("latao", Vector3(0.05, 0.05, 0.05), Vector3(sx * larg / 2, alto + 0.02, z), p, giro)
+		_parte(f, Vector3(larg, 0.03, 0.03), Vector3(0, alto - 0.04, z), p, giro, preto)
+		_parte(f, Vector3(larg, 0.025, 0.025), Vector3(0, 0.38, z), p, giro, preto)
+		for k in 7:
+			var x := -larg / 2 + (k + 1) * larg / 8
+			_parte(f, Vector3(0.015, alto - 0.42, 0.015), Vector3(x, 0.38 + (alto - 0.42) / 2, z), p, giro, preto)
+	_parte("madeira_escura", Vector3(larg - 0.04, 0.06, comp - 0.04), Vector3(0, 0.36, 0), p, giro)
+	_parte("lencol", Vector3(larg - 0.06, 0.18, comp - 0.08), Vector3(0, 0.48, 0), p, giro)
+	_parte("colcha", Vector3(larg - 0.02, 0.05, comp * 0.62), Vector3(0, 0.595, -comp * 0.17), p, giro)
+	_parte("colcha", Vector3(larg + 0.02, 0.32, 0.03), Vector3(0, 0.46, -comp / 2 + 0.03), p, giro, Color(0.9, 0.9, 0.9))
+	for sx: float in [-1.0, 1.0]:
+		_parte("colcha", Vector3(0.03, 0.32, comp * 0.62), Vector3(sx * (larg / 2 + 0.005), 0.46, -comp * 0.17), p, giro, Color(0.9, 0.9, 0.9))
+	_parte("lencol", Vector3(larg * 0.8, 0.1, 0.36), Vector3(0, 0.62, comp / 2 - 0.3), p, giro, Color(1.1, 1.1, 1.08))
+	_colide(Vector3(larg + 0.05, 0.7, comp + 0.05), Vector3(0, 0.35, 0), p, giro)
+
+
+## O guarda-roupa: as duas portas com almofadas, a cornija, a gaveta do pé.
+func _guarda_roupa(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	_parte(m, Vector3(1.0, 1.95, 0.55), Vector3(0, 1.0, 0), p, giro)
+	_parte(m, Vector3(1.1, 0.08, 0.62), Vector3(0, 2.0, -0.02), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		_parte(m, Vector3(0.46, 1.4, 0.02), Vector3(sx * 0.24, 1.2, -0.285), p, giro, Color(1.12, 1.12, 1.12))
+		_parte(m, Vector3(0.34, 0.5, 0.01), Vector3(sx * 0.24, 1.5, -0.298), p, giro, Color(0.9, 0.9, 0.9))
+		_parte(m, Vector3(0.34, 0.5, 0.01), Vector3(sx * 0.24, 0.85, -0.298), p, giro, Color(0.9, 0.9, 0.9))
+		_parte("latao", Vector3(0.015, 0.06, 0.02), Vector3(sx * 0.03, 1.2, -0.3), p, giro)
+	_parte(m, Vector3(0.94, 0.25, 0.02), Vector3(0, 0.3, -0.285), p, giro, Color(1.12, 1.12, 1.12))
+	_colide(Vector3(1.0, 2.0, 0.55), Vector3(0, 1.0, 0), p, giro)
+
+
+## A cômoda com o espelho: as quatro gavetas de puxadores, o tampo, o espelho
+## oval na moldura.
+func _comoda(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	_parte(m, Vector3(1.1, 0.9, 0.5), Vector3(0, 0.47, 0), p, giro)
+	_parte(m, Vector3(1.16, 0.035, 0.54), Vector3(0, 0.935, 0), p, giro)
+	for k in 4:
+		var gy := 0.15 + k * 0.2
+		_parte(m, Vector3(1.0, 0.17, 0.02), Vector3(0, gy, -0.255), p, giro, Color(1.12, 1.12, 1.12))
+		for sx: float in [-1.0, 1.0]:
+			_parte("latao", Vector3(0.05, 0.015, 0.02), Vector3(sx * 0.27, gy + 0.02, -0.27), p, giro)
+	_parte(m, Vector3(0.7, 0.85, 0.04), Vector3(0, 1.4, 0.2), p, giro)
+	_parte("vidro_fazenda", Vector3(0.58, 0.72, 0.01), Vector3(0, 1.4, 0.175), p, giro, Color(1.7, 1.7, 1.8))
+	_colide(Vector3(1.1, 0.95, 0.5), Vector3(0, 0.47, 0), p, giro)
+
+
+## O lavatório: o móvel de mármore com a portinha, o jarro na bacia, a toalha.
+func _lavatorio(p: Vector3, giro: float) -> void:
+	var m := "madeira_escura"
+	_parte(m, Vector3(0.75, 0.75, 0.45), Vector3(0, 0.38, 0), p, giro)
+	_parte("granito", Vector3(0.8, 0.03, 0.5), Vector3(0, 0.775, 0), p, giro, Color(1.4, 1.38, 1.32))
+	_parte(m, Vector3(0.8, 0.18, 0.03), Vector3(0, 0.88, 0.22), p, giro)
+	_parte(m, Vector3(0.6, 0.5, 0.02), Vector3(0, 0.35, -0.225), p, giro, Color(1.12, 1.12, 1.12))
+	var b := Basis.from_euler(Vector3(0, deg_to_rad(giro), 0))
+	_cilindro("porcelana", p + b * Vector3(0, 0.82, 0), 0.19, 0.08, 14)
+	_cilindro("porcelana", p + b * Vector3(0, 0.95, 0), 0.075, 0.2, 10)
+	_cilindro("porcelana", p + b * Vector3(0, 1.07, 0), 0.055, 0.05, 10)
+	_parte("lencol", Vector3(0.03, 0.42, 0.25), Vector3(0.4, 0.5, 0), p, giro, Color(1.1, 1.1, 1.06))
+	_colide(Vector3(0.8, 0.8, 0.5), Vector3(0, 0.4, 0), p, giro)
+
+
+## A banheira de pés: o casco de bordas arredondadas, a borda, os quatro pés de
+## garra, a torneira.
+func _banheira(p: Vector3) -> void:
+	var comp := 1.55
+	_bloco("porcelana", Vector3(0.7, 0.42, comp - 0.2), p + Vector3(0, 0.38, 0), Color.WHITE, false)
+	for s: float in [-1.0, 1.0]:
+		_bloco("porcelana", Vector3(0.62, 0.42, 0.12), p + Vector3(0, 0.4, s * (comp / 2 - 0.06)), Color.WHITE, false)
+		_bloco("porcelana", Vector3(0.08, 0.07, comp - 0.1), p + Vector3(s * 0.36, 0.62, 0), Color(1.1, 1.1, 1.1), false)
+		_bloco("porcelana", Vector3(0.7, 0.07, 0.08), p + Vector3(0, 0.62, s * (comp / 2 - 0.04)), Color(1.1, 1.1, 1.1), false)
+	_bloco("agua", Vector3(0.6, 0.01, comp - 0.25), p + Vector3(0, 0.5, 0), Color(0.6, 0.65, 0.7), false)
+	for sx: float in [-1.0, 1.0]:
+		for sz: float in [-1.0, 1.0]:
+			_bloco("ferro", Vector3(0.07, 0.16, 0.07), p + Vector3(sx * 0.26, 0.08, sz * (comp / 2 - 0.2)), Color(0.5, 0.5, 0.5), false)
+	_bloco("latao", Vector3(0.04, 0.2, 0.04), p + Vector3(0, 0.75, comp / 2 - 0.05), Color.WHITE, false)
+	_col.append([Vector3(0.75, 0.65, comp), p + Vector3(0, 0.33, 0)])
+
+
+## A pia de coluna, com as torneiras.
+func _pia_coluna(p: Vector3, giro: float) -> void:
+	_cilindro("porcelana", p + Vector3(0, 0.38, 0), 0.08, 0.76, 10)
+	_parte("porcelana", Vector3(0.55, 0.12, 0.42), Vector3(0, 0.82, 0), p, giro)
+	_parte("porcelana", Vector3(0.55, 0.12, 0.05), Vector3(0, 0.94, 0.19), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		_parte("latao", Vector3(0.03, 0.06, 0.03), Vector3(sx * 0.1, 0.91, 0.12), p, giro)
+	_colide(Vector3(0.55, 0.9, 0.45), Vector3(0, 0.45, 0), p, giro)
+
+
+## A privada de caixa alta: a bacia, o assento de madeira, a caixa de descarga no
+## alto da parede, o cano e a corrente.
+func _privada(p: Vector3, giro: float) -> void:
+	_cilindro("porcelana", p + Vector3(0, 0.2, 0), 0.17, 0.4, 12)
+	_parte("madeira_escura", Vector3(0.38, 0.03, 0.45), Vector3(0, 0.415, -0.03), p, giro)
+	_parte("madeira_escura", Vector3(0.45, 0.28, 0.2), Vector3(0, 1.95, 0.18), p, giro)
+	_parte("ferro", Vector3(0.04, 1.45, 0.04), Vector3(0, 1.1, 0.2), p, giro, Color(0.8, 0.8, 0.8))
+	_parte("ferro", Vector3(0.008, 0.45, 0.008), Vector3(0.18, 1.6, 0.1), p, giro, Color(0.8, 0.8, 0.8))
+	_colide(Vector3(0.42, 0.45, 0.55), Vector3(0, 0.22, 0), p, giro)
+
+
+## A máquina de costura de pedal: o gabinete de ferro fundido, o pedal, a cabeça
+## preta da máquina.
+func _maquina_costura(p: Vector3, giro: float) -> void:
+	_parte("madeira_escura", Vector3(0.9, 0.03, 0.45), Vector3(0, 0.76, 0), p, giro)
+	for sx: float in [-1.0, 1.0]:
+		_parte("ferro", Vector3(0.04, 0.74, 0.4), Vector3(sx * 0.4, 0.38, 0), p, giro, Color(0.5, 0.5, 0.52))
+	_parte("ferro", Vector3(0.5, 0.03, 0.25), Vector3(0, 0.1, -0.02), p, giro, Color(0.5, 0.5, 0.52), Vector3(10, 0, 0))
+	_parte("esmalte_preto", Vector3(0.38, 0.12, 0.14), Vector3(0, 0.84, 0.05), p, giro)
+	_parte("esmalte_preto", Vector3(0.1, 0.28, 0.12), Vector3(0.15, 0.95, 0.05), p, giro)
+	_parte("esmalte_preto", Vector3(0.3, 0.08, 0.1), Vector3(0.02, 1.07, 0.05), p, giro)
+	_colide(Vector3(0.9, 0.8, 0.45), Vector3(0, 0.4, 0), p, giro)
+
+
+## O tapete trançado redondo (oval), no chão do cômodo.
+func _tapete_redondo(p: Vector3, tam: Vector2) -> void:
+	var t := MeshInstance3D.new()
+	t.name = "Tapete%d" % _col.size()
+	var plano := PlaneMesh.new()
+	plano.size = tam
+	plano.subdivide_width = 3
+	plano.subdivide_depth = 3
+	t.mesh = plano
+	t.material_override = m["tapete_trancado"]
+	t.position = p + Vector3(0, 0.006, 0)
+	t.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_add(_group_tapetes(), t)
+
+
+func _group_tapetes() -> Node3D:
+	if cena.has_node(^"Tapetes"):
+		return cena.get_node(^"Tapetes") as Node3D
+	return _group(cena, "Tapetes")
+
+
+## Um cilindro fixo em pé (o centro em `c`), na malha do material.
+func _cilindro(mat: String, c: Vector3, raio: float, alto: float, lados := 10, cor := Color.WHITE) -> void:
+	var mm := _obra(mat)
+	var y0 := c.y - alto / 2
+	var y1 := c.y + alto / 2
+	for i in lados:
+		var a0 := TAU * i / lados
+		var a1 := TAU * (i + 1) / lados
+		var p0 := Vector3(c.x + cos(a0) * raio, 0, c.z + sin(a0) * raio)
+		var p1 := Vector3(c.x + cos(a1) * raio, 0, c.z + sin(a1) * raio)
+		var n := Vector3(cos((a0 + a1) / 2), 0, sin((a0 + a1) / 2))
+		mm.quad(Vector3(p0.x, y0, p0.z), Vector3(p1.x, y0, p1.z), Vector3(p1.x, y1, p1.z), Vector3(p0.x, y1, p0.z), n, cor)
+		mm.tri(Vector3(c.x, y1, c.z), Vector3(p0.x, y1, p0.z), Vector3(p1.x, y1, p1.z), Vector3.UP, cor)
+		mm.tri(Vector3(c.x, y0, c.z), Vector3(p1.x, y0, p1.z), Vector3(p0.x, y0, p0.z), Vector3.DOWN, cor)
+
+
+## Um disco em pé (um prato encostado), virado para a frente da peça (`giro`).
+func _cilindro_deitado(mat: String, c: Vector3, raio: float, esp: float, giro: float) -> void:
+	var mm := _obra(mat)
+	var b := Basis.from_euler(Vector3(deg_to_rad(-12), deg_to_rad(giro), 0))
+	var frente := b * Vector3(0, 0, -1)
+	var lados := 12
+	for i in lados:
+		var a0 := TAU * i / lados
+		var a1 := TAU * (i + 1) / lados
+		var p0 := c + b * Vector3(cos(a0) * raio, sin(a0) * raio, 0)
+		var p1 := c + b * Vector3(cos(a1) * raio, sin(a1) * raio, 0)
+		mm.tri(c - frente * esp, p0 - frente * esp, p1 - frente * esp, -frente, Color.WHITE)
+		mm.tri(c, p1, p0, frente, Color(0.95, 0.95, 0.95))
 
 
 func _movel(mat: String, tam: Vector3, c: Vector3, cor := Color.WHITE, col := true, rot := Vector3.ZERO) -> void:
@@ -1028,8 +1565,8 @@ func _puxado() -> void:
 	_parede("parede_casa", Vector2(px.x + 0.14, pz.x + 0.17), Vector2(px.y, pz.x + 0.17), T0, alto, 0.06, norte, Color.WHITE, false)
 	_parede("parede_casa", Vector2(px.x + 0.14, pz.y - 0.17), Vector2(px.y, pz.y - 0.17), T0, alto, 0.06, sul, Color.WHITE, false)
 	_parede("parede_casa", Vector2(px.x + 0.17, pz.x + 0.2), Vector2(px.x + 0.17, pz.y - 0.2), T0, alto, 0.06, oeste, Color.WHITE, false)
-	_bloco("piso", Vector3(px.y - px.x - 0.2, 0.1, pz.y - pz.x - 0.2), Vector3((px.x + px.y) / 2 + 0.1, T0 - 0.05, (pz.x + pz.y) / 2))
-	_bloco("teto", Vector3(px.y - px.x - 0.2, 0.08, pz.y - pz.x - 0.2), Vector3((px.x + px.y) / 2 + 0.1, alto + 0.04, (pz.x + pz.y) / 2), Color.WHITE, false)
+	_bloco("assoalho_largo", Vector3(px.y - px.x - 0.2, 0.1, pz.y - pz.x - 0.2), Vector3((px.x + px.y) / 2 + 0.1, T0 - 0.05, (pz.x + pz.y) / 2))
+	_bloco("teto_casa", Vector3(px.y - px.x - 0.2, 0.08, pz.y - pz.x - 0.2), Vector3((px.x + px.y) / 2 + 0.1, alto + 0.04, (pz.x + pz.y) / 2), Color.WHITE, false)
 	var gj := _group(cena, "JanelasPuxado")
 	_janela(gj, "JanelaN", Vector3(-4.5, (j[0] + j[1]) / 2, pz.x), Vector3.FORWARD, 0.8, j[1] - j[0])
 	_janela(gj, "JanelaS1", Vector3(-5.0, (j[0] + j[1]) / 2, pz.y), Vector3.BACK, 0.8, j[1] - j[0])
@@ -1056,13 +1593,7 @@ func _puxado() -> void:
 	var t := Vector3(px.x, alto + sobe, meio_z)
 	_tri(_obra("tabuado"), a, b, t, Vector3.LEFT, Color.WHITE)
 	_tri(_obra("forro_sotao"), a + Vector3(0.14, 0, 0), b + Vector3(0.14, 0, 0), t + Vector3(0.14, 0, 0), Vector3.RIGHT, Color.WHITE)
-	# A cozinha: o fogão de ferro com a chaminé de lata, a pia sob a janela, a
-	# mesa, o armário.
-	_movel("esmalte_preto", Vector3(1.1, 0.8, 0.65), Vector3(-4.4, T0 + 0.4, pz.y - 0.6))
-	_bloco("ferro", Vector3(0.14, alto - T0 - 0.8, 0.14), Vector3(-4.4, (T0 + 0.8 + alto) / 2, pz.y - 0.75), Color.WHITE, false)
-	_movel("pedra_lareira", Vector3(1.0, 0.85, 0.55), Vector3(-5.0, T0 + 0.425, pz.y - 0.5))
-	_movel("madeira_clara", Vector3(1.4, 0.75, 0.8), Vector3(-5.8, T0 + 0.375, 3.2))
-	_movel("madeira_escura", Vector3(0.45, 2.0, 1.2), Vector3(-3.5, T0 + 1.0, 1.9))
+	_cozinha()
 	# Os degraus da porta do quintal (norte) e a rampa.
 	_bloco("granito", Vector3(1.2, 0.3, 0.45), Vector3(-6.5, 0.15, pz.x - 0.25), Color.WHITE, false)
 	_rampa(Vector3(-6.5, 0, pz.x - 1.1), Vector3(-6.5, T0, pz.x + 0.1), 1.1)
@@ -1939,3 +2470,269 @@ func _morta(mm: Cidade.Malha, p: Vector3) -> void:
 	mm.caixa(Vector3(0.22, alt, 0.22), p + Vector3(0, alt / 2, 0), cor)
 	mm.caixa(Vector3(1.2, 0.1, 0.1), p + Vector3(0.5, alt * 0.7, 0), cor * 0.9)
 	mm.caixa(Vector3(0.1, 0.1, 0.9), p + Vector3(0, alt * 0.5, 0.4), cor * 0.9)
+
+
+# --- O acabamento dos interiores (playtest 11) --------------------------------------
+
+## Os cômodos da casa e do puxado, para o acabamento: [nome, x (de, até), z (de,
+## até), piso, teto, papel, lambri (altura do lambri; 0 = sem), {lado: aberturas}].
+## As aberturas são as de `_parede` ([centro ao longo da parede, largura, base,
+## topo]); "n" e "s" correm em X (z fixo), "o" e "l" em Z (x fixo). As que vão ao
+## teto (a chaminé) só cortam o papel; as que vão ao piso (as portas) cortam o
+## rodapé e ganham alizar; as outras (as janelas) ganham alizar e peitoril.
+func _comodos() -> Array:
+	var p0 := func(c: float, l := 0.9) -> Array: return [c, l, T0, T0 + 2.15]
+	var p1 := func(c: float, l := 0.9) -> Array: return [c, l, T1, T1 + 2.1]
+	var j0 := func(c: float) -> Array: return [c, 0.9, T0 + 0.8, T0 + 2.3]
+	var j1 := func(c: float) -> Array: return [c, 0.9, T1 + 0.7, T1 + 2.2]
+	var cham := func(c: float) -> Array: return [c, 2 * CHAMINE_MEIA.y, -9.0, 99.0]
+	var banheiro_x := -1.0
+	var patamar := (banheiro_x + ESCADA_X - DEGRAUS * PISADA) / 2
+	var fx := Vector2(MEIO_X + EI / 2, CASA_X.y - E)   # os cômodos da frente
+	var tx := Vector2(CASA_X.x + E, MEIO_X - EI / 2)   # os de trás
+	var sz := Vector2(HALL_Z + EI / 2, CASA_Z.y - E)   # ao sul do vestíbulo
+	var nz := Vector2(CASA_Z.x + E, -HALL_Z - EI / 2)  # ao norte
+	var hz := Vector2(-HALL_Z + EI / 2, HALL_Z - EI / 2)
+	var t0 := T0 + PE0
+	return [
+		["Escritorio", fx, sz, T0, t0, "papel_estudo", 0.0,
+			{"n": [p0.call(5.1)], "o": [p0.call(2.15), cham.call(CHAMINE_Z)], "l": [j0.call(2.6), j0.call(4.8)], "s": [j0.call(4.6), j0.call(2.4)]}],
+		["SalaEstar", fx, nz, T0, t0, "papel_sala", 0.0,
+			{"s": [p0.call(5.1)], "o": [cham.call(-CHAMINE_Z)], "l": [j0.call(-4.8), j0.call(-2.6)], "n": [j0.call(4.6), j0.call(2.4)]}],
+		["SalaJantar", tx, sz, T0, t0, "papel_jantar", 0.95,
+			{"n": [p0.call(-1.5)], "l": [p0.call(2.15), cham.call(CHAMINE_Z)], "o": [[CHAMINE_Z, 0.9, T0, T0 + 2.35]], "s": [j0.call(-1.0)]}],
+		["SalaFundos", tx, nz, T0, t0, "parede_casa", 1.1,
+			{"s": [p0.call(-1.5)], "l": [cham.call(-CHAMINE_Z)], "o": [j0.call(-4.8), j0.call(-2.6)], "n": [j0.call(-1.0)]}],
+		["Vestibulo", Vector2(CASA_X.x + E, CASA_X.y - E), hz, T0, t0, "papel_vestibulo", 0.95,
+			{"n": [p0.call(5.1), p0.call(-1.5)], "s": [p0.call(5.1), p0.call(-1.5)], "l": [[0.0, 1.1, T0, T0 + 2.35]], "o": [[0.0, 1.0, T0, T0 + 2.35]]}],
+		["QuartoHospedes", fx, sz, T1, FORRO, "papel_quarto", 0.0,
+			{"n": [p1.call(3.0)], "o": [cham.call(CHAMINE_Z)], "l": [j1.call(2.6), j1.call(4.8)], "s": [j1.call(4.6), j1.call(2.4)]}],
+		["QuartoAkeley", fx, nz, T1, FORRO, "papel_quarto_akeley", 0.0,
+			{"s": [p1.call(5.1)], "o": [cham.call(-CHAMINE_Z)], "l": [j1.call(-4.8), j1.call(-2.6)], "n": [j1.call(4.6), j1.call(2.4)]}],
+		["QuartoCostura", tx, sz, T1, FORRO, "papel_sala", 0.0,
+			{"n": [p1.call(patamar, 0.8)], "l": [cham.call(CHAMINE_Z)], "o": [j1.call(2.6), j1.call(4.8)], "s": [j1.call(-1.0)]}],
+		["QuartoGuardados", tx, nz, T1, FORRO, "papel_vestibulo", 0.0,
+			{"s": [p1.call(patamar, 0.8)], "l": [cham.call(-CHAMINE_Z)], "o": [j1.call(-4.8), j1.call(-2.6)], "n": [j1.call(-1.0)]}],
+		["Banheiro", Vector2(CASA_X.x + E, banheiro_x - EI / 2), hz, T1, FORRO, "caiado", 1.2,
+			{"l": [p1.call(0.0, 0.8)], "o": [[0.0, 0.6, T1 + 1.2, T1 + 2.0]]}],
+		["CorredorDeCima", Vector2(banheiro_x + EI / 2, CASA_X.y - E), hz, T1, FORRO, "papel_vestibulo", 0.0,
+			{"n": [p1.call(5.1), p1.call(patamar, 0.8)], "s": [p1.call(3.0), p1.call(patamar, 0.8)], "l": [j1.call(0.0)], "o": [p1.call(0.0, 0.8)]}],
+		["Cozinha", Vector2(PUXADO_X.x + 0.2, CASA_X.x), Vector2(PUXADO_Z.x + 0.2, PUXADO_Z.y - 0.2), T0, PUXADO_ALTO, "caiado", 1.0,
+			{"n": [p0.call(-6.5), [-4.5, 0.8, T0 + 0.9, T0 + 2.1]], "s": [[-5.0, 0.8, T0 + 0.9, T0 + 2.1], [-7.6, 0.8, T0 + 0.9, T0 + 2.1]],
+			"o": [p0.call(4.6)], "l": [[CHAMINE_Z, 0.9, T0, T0 + 2.35]]}],
+	]
+
+
+## O acabamento de cada cômodo: o papel (um forro fino por dentro de cada parede,
+## recortado nas aberturas), o lambri com a moldura por cima (onde há), o rodapé,
+## a cimalha no teto, os alizares das portas e das janelas e os peitoris, e a luz
+## de rebatimento (os interiores ficavam quase pretos de dia).
+func _acabamento_interior() -> void:
+	var luzes := _group(cena, "LuzesDeDentro")
+	for c: Array in _comodos():
+		var x: Vector2 = c[1]
+		var z: Vector2 = c[2]
+		var y0: float = c[3]
+		var y1: float = c[4]
+		var papel: String = c[5]
+		var lambri: float = c[6]
+		var lados: Dictionary = c[7]
+		# [lado, de, até, para dentro]
+		for lado: Array in [["n", Vector2(x.x, z.x), Vector2(x.y, z.x), Vector3.BACK], ["s", Vector2(x.x, z.y), Vector2(x.y, z.y), Vector3.FORWARD],
+				["o", Vector2(x.x, z.x), Vector2(x.x, z.y), Vector3.RIGHT], ["l", Vector2(x.y, z.x), Vector2(x.y, z.y), Vector3.LEFT]]:
+			var aberturas: Array = lados.get(lado[0], [])
+			_revestir_parede(lado[1], lado[2], lado[3], y0, y1, papel, lambri, aberturas)
+		# A luz de rebatimento, sem sombra, no meio do cômodo, perto do teto.
+		var luz := OmniLight3D.new()
+		luz.name = "Luz%s" % c[0]
+		luz.position = Vector3((x.x + x.y) / 2, y1 - 0.5, (z.x + z.y) / 2)
+		luz.light_color = Color(1.0, 0.86, 0.72)
+		luz.light_energy = 0.32
+		luz.omni_range = maxf(x.y - x.x, z.y - z.x) * 0.85 + 1.0
+		luz.omni_attenuation = 0.8
+		luz.shadow_enabled = false
+		luz.light_specular = 0.0
+		_add(luzes, luz)
+
+
+## O forro de uma parede vista de dentro de um cômodo (de `de` a `ate`, com a face
+## para `dentro`): o papel, o lambri e a moldura, o rodapé, a cimalha e os
+## alizares e peitoris das aberturas.
+func _revestir_parede(de: Vector2, ate: Vector2, dentro: Vector3, y0: float, y1: float, papel: String, lambri: float, aberturas: Array) -> void:
+	const FINO := 0.006
+	var em_x := is_equal_approx(de.y, ate.y)
+	var desloca := Vector2(dentro.x, dentro.z) * (FINO / 2 + 0.002)
+	var a := de + desloca
+	var b := ate + desloca
+	# O papel (e, embaixo, o lambri), recortados nas aberturas; sem colisão.
+	if lambri > 0.0:
+		_parede("lambri", a, b, y0, y0 + lambri, FINO, aberturas, Color.WHITE, false)
+		_parede(papel, a, b, y0 + lambri, y1, FINO, aberturas, Color.WHITE, false)
+	else:
+		_parede(papel, a, b, y0, y1, FINO, aberturas, Color.WHITE, false)
+	var s0 := minf(de.x, ate.x) if em_x else minf(de.y, ate.y)
+	var s1 := maxf(de.x, ate.x) if em_x else maxf(de.y, ate.y)
+	var fixo := de.y if em_x else de.x
+	# Um sarrafo ao longo da parede, de s a t, na altura y (centro), com seção
+	# (alto, fundo) saindo da parede para dentro.
+	var sarrafo := func(mat: String, s: float, t: float, y: float, alto: float, fundo: float) -> void:
+		if t - s < 0.01:
+			return
+		var meio := (s + t) / 2
+		var c := Vector3(meio, y, fixo) if em_x else Vector3(fixo, y, meio)
+		c += dentro * (fundo / 2 + 0.004)
+		var tam := Vector3(t - s, alto, fundo) if em_x else Vector3(fundo, alto, t - s)
+		_bloco(mat, tam, c, Color.WHITE, false)
+	# Os trechos sem porta (para o rodapé e a moldura do lambri) e sem nada que vá
+	# ao teto (para a cimalha).
+	var livres := func(corta: Callable) -> Array:
+		var trechos := [Vector2(s0, s1)]
+		for ab: Array in aberturas:
+			if not corta.call(ab):
+				continue
+			var novos := []
+			for tr: Vector2 in trechos:
+				var c0: float = ab[0] - ab[1] / 2
+				var c1: float = ab[0] + ab[1] / 2
+				if c1 <= tr.x or c0 >= tr.y:
+					novos.append(tr)
+					continue
+				if c0 > tr.x:
+					novos.append(Vector2(tr.x, c0))
+				if c1 < tr.y:
+					novos.append(Vector2(c1, tr.y))
+			trechos = novos
+		return trechos
+	var e_porta := func(ab: Array) -> bool: return float(ab[2]) <= y0 + 0.02 and float(ab[3]) < y1
+	var vai_ao_teto := func(ab: Array) -> bool: return float(ab[3]) >= y1 - 0.02
+	for tr: Vector2 in livres.call(func(ab: Array) -> bool: return e_porta.call(ab) or vai_ao_teto.call(ab)):
+		sarrafo.call("madeira_escura", tr.x, tr.y, y0 + 0.09, 0.18, 0.022)
+		sarrafo.call("madeira_escura", tr.x, tr.y, y0 + 0.19, 0.025, 0.03)
+		if lambri > 0.0:
+			sarrafo.call("madeira_escura", tr.x, tr.y, y0 + lambri, 0.05, 0.035)
+	for tr: Vector2 in livres.call(vai_ao_teto):
+		sarrafo.call("pintura_branca", tr.x, tr.y, y1 - 0.05, 0.1, 0.06)
+		sarrafo.call("pintura_branca", tr.x, tr.y, y1 - 0.12, 0.03, 0.025)
+	# A espessura da parede nos vãos (o forro do batente): sem ela via-se o reboco
+	# cru. Nas paredes externas a espessura é E; nas de dentro, EI — e o forro de
+	# uma porta de dentro vem de um lado só (do cômodo que a tem ao norte ou a
+	# oeste), para os dois não brigarem no mesmo lugar.
+	var externa := absf(fixo - (CASA_X.x + E)) < 0.02 or absf(fixo - (CASA_X.y - E)) < 0.02 or absf(fixo - (CASA_Z.x + E)) < 0.02  or absf(fixo - (CASA_Z.y - E)) < 0.02 or absf(fixo - (PUXADO_X.x + 0.2)) < 0.02 or absf(fixo - (PUXADO_Z.x + 0.2)) < 0.02  or absf(fixo - (PUXADO_Z.y - 0.2)) < 0.02
+	var esp := E if externa else EI
+	var este_lado := dentro == Vector3.BACK or dentro == Vector3.RIGHT
+	for ab: Array in aberturas:
+		if vai_ao_teto.call(ab):
+			continue
+		var porta: bool = e_porta.call(ab)
+		if porta and not externa and not este_lado:
+			continue
+		if porta and externa and absf(fixo - (CASA_X.x)) < 0.02:
+			continue
+		var fundo := esp if porta else esp * 0.55
+		var v0: float = ab[0] - ab[1] / 2
+		var v1: float = ab[0] + ab[1] / 2
+		var vb: float = ab[2]
+		var vt: float = ab[3]
+		var fora := -dentro
+		var forro := func(s: float, t: float, ya: float, yb: float) -> void:
+			var meio := (s + t) / 2
+			var c := Vector3(meio, (ya + yb) / 2, fixo) if em_x else Vector3(fixo, (ya + yb) / 2, meio)
+			c += fora * (fundo / 2 - 0.002)
+			var tam := Vector3(t - s, yb - ya, fundo) if em_x else Vector3(fundo, yb - ya, t - s)
+			_bloco("pintura_branca", tam, c, Color.WHITE, false)
+		forro.call(v0, v0 + 0.02, vb, vt)
+		forro.call(v1 - 0.02, v1, vb, vt)
+		forro.call(v0, v1, vt - 0.02, vt)
+		if not porta:
+			forro.call(v0, v1, vb, vb + 0.02)
+	# Os alizares: dos dois lados e em cima de portas e janelas; o peitoril das
+	# janelas.
+	for ab: Array in aberturas:
+		if vai_ao_teto.call(ab):
+			continue
+		var c0: float = ab[0] - ab[1] / 2
+		var c1: float = ab[0] + ab[1] / 2
+		var base: float = ab[2]
+		var topo: float = ab[3]
+		var porta: bool = e_porta.call(ab)
+		var desce := base if porta else base - 0.1
+		for borda: float in [c0 - 0.045, c1 + 0.045]:
+			sarrafo.call("pintura_branca", borda - 0.045, borda + 0.045, (desce + topo + 0.09) / 2, topo + 0.09 - desce, 0.022)
+		sarrafo.call("pintura_branca", c0 - 0.11, c1 + 0.11, topo + 0.08, 0.16, 0.028)
+		sarrafo.call("pintura_branca", c0 - 0.13, c1 + 0.13, topo + 0.17, 0.03, 0.045)
+		if not porta:
+			sarrafo.call("pintura_branca", c0 - 0.08, c1 + 0.08, base - 0.015, 0.035, 0.07)
+
+
+## A cozinha do puxado (playtest 11): o fogão de ferro a lenha com o forno, a
+## chapa, a prateleira de esquentar e a chaminé de lata até o teto; a pia de
+## pedra-sabão sob a janela, com a bomba de mão; a mesa de pinho com as cadeiras;
+## o guarda-louça aberto com os pratos e as xícaras; a caixa de lenha.
+func _cozinha() -> void:
+	var y := T0
+	var pz := PUXADO_Z
+	# O fogão, contra a parede sul, a chaminé subindo até o teto.
+	var f := Vector3(-4.4, y, pz.y - 0.62)
+	var g := 0.0
+	_parte("esmalte_preto", Vector3(1.05, 0.62, 0.62), Vector3(0, 0.46, 0), f, g)
+	_parte("ferro", Vector3(1.12, 0.04, 0.68), Vector3(0, 0.79, 0), f, g, Color(0.55, 0.55, 0.58))
+	for k in 4:
+		_cilindro("ferro", f + Vector3(-0.38 + k * 0.25, 0.815, 0.05), 0.09, 0.01, 10, Color(0.4, 0.4, 0.42))
+	_parte("esmalte_preto", Vector3(1.05, 0.5, 0.06), Vector3(0, 1.06, 0.3), f, g)
+	_parte("esmalte_preto", Vector3(1.05, 0.04, 0.28), Vector3(0, 1.3, 0.17), f, g)
+	for sx: float in [-1.0, 1.0]:
+		_parte("ferro", Vector3(0.42, 0.34, 0.02), Vector3(sx * 0.24, 0.48, -0.32), f, g, Color(0.5, 0.5, 0.52))
+		_parte("latao", Vector3(0.08, 0.02, 0.03), Vector3(sx * 0.24, 0.62, -0.34), f, g)
+		for sz: float in [-1.0, 1.0]:
+			_parte("esmalte_preto", Vector3(0.06, 0.16, 0.06), Vector3(sx * 0.46, 0.08, sz * 0.25), f, g)
+	_cilindro("ferro", f + Vector3(0.25, (1.32 + PUXADO_ALTO - y) / 2, 0.22), 0.075, PUXADO_ALTO - y - 1.32, 10, Color(0.42, 0.42, 0.44))
+	# A chaleira e a frigideira.
+	_cilindro("ferro", f + Vector3(-0.15, 0.89, 0.0), 0.1, 0.13, 10, Color(0.6, 0.6, 0.62))
+	_cilindro("ferro", f + Vector3(0.3, 0.83, -0.05), 0.14, 0.03, 12, Color(0.35, 0.35, 0.37))
+	_colide(Vector3(1.1, 0.85, 0.7), Vector3(0, 0.42, 0), f, g)
+	# A caixa de lenha ao lado.
+	var lc := Vector3(-3.55, y, pz.y - 0.45)
+	_parte("madeira_clara", Vector3(0.6, 0.5, 0.5), Vector3(0, 0.25, 0), lc, 0.0)
+	var lenha := _obra("madeira_clara")
+	for k in 6:
+		_face_toras(lenha, lc + Vector3(-0.18 + (k % 3) * 0.15, 0.56 + (k / 3) * 0.12, 0.0))
+	_colide(Vector3(0.6, 0.6, 0.5), Vector3(0, 0.3, 0), lc, 0.0)
+	# A pia de pedra-sabão sob a janela sul, com a bomba de mão e o balde.
+	var pia := Vector3(-5.6, y, pz.y - 0.35)
+	_parte("pedra_lareira", Vector3(1.1, 0.12, 0.55), Vector3(0, 0.82, 0), pia, g, Color(0.75, 0.78, 0.76))
+	_parte("pedra_lareira", Vector3(0.8, 0.02, 0.38), Vector3(0, 0.885, 0), pia, g, Color(0.5, 0.52, 0.5))
+	_parte("madeira_clara", Vector3(1.05, 0.76, 0.5), Vector3(0, 0.38, 0.02), pia, g)
+	for sx: float in [-1.0, 1.0]:
+		_parte("madeira_clara", Vector3(0.48, 0.6, 0.02), Vector3(sx * 0.25, 0.38, -0.24), pia, g, Color(1.1, 1.1, 1.1))
+	var bomba := pia + Vector3(0.3, 0.88, 0.15)
+	_cilindro("ferro", bomba + Vector3(0, 0.18, 0), 0.05, 0.36, 8, Color(0.4, 0.42, 0.4))
+	_bloco("ferro", Vector3(0.03, 0.03, 0.18), bomba + Vector3(0, 0.3, -0.1), Color(0.4, 0.42, 0.4), false, Vector3(-10, 0, 0))
+	_bloco("ferro", Vector3(0.025, 0.025, 0.3), bomba + Vector3(0, 0.42, 0.1), Color(0.4, 0.42, 0.4), false, Vector3(25, 0, 0))
+	_colide(Vector3(1.1, 0.9, 0.55), Vector3(0, 0.45, 0), pia, g)
+	# A mesa de pinho, as cadeiras.
+	_mesa(Vector3(-5.8, y, 3.25), 90.0, Vector3(1.3, 0.76, 0.8), "madeira_clara")
+	for s: float in [-1.0, 1.0]:
+		_cadeira_espaldar(Vector3(-5.8 + s * 0.6, y, 3.25 + 0.25), 90.0 * s)
+	_cadeira_espaldar(Vector3(-5.8, y, 4.15), 0.0)
+	# O guarda-louça aberto contra a parede do vestíbulo... (a leste, junto da
+	# porta da sala de jantar): as prateleiras com pratos em pé e xícaras.
+	var gl := Vector3(-3.32, y, 1.9)
+	var gg := 90.0
+	_parte("madeira_escura", Vector3(1.2, 0.85, 0.45), Vector3(0, 0.43, 0), gl, gg)
+	_parte("madeira_escura", Vector3(1.26, 0.035, 0.5), Vector3(0, 0.87, 0), gl, gg)
+	for sx: float in [-1.0, 1.0]:
+		_parte("madeira_escura", Vector3(0.56, 0.6, 0.02), Vector3(sx * 0.29, 0.43, -0.23), gl, gg, Color(1.12, 1.12, 1.12))
+		_parte("madeira_escura", Vector3(0.03, 1.1, 0.28), Vector3(sx * 0.59, 1.45, 0.08), gl, gg)
+	_parte("madeira_escura", Vector3(1.2, 1.1, 0.02), Vector3(0, 1.45, 0.21), gl, gg, Color(0.75, 0.75, 0.75))
+	_parte("madeira_escura", Vector3(1.26, 0.05, 0.32), Vector3(0, 2.02, 0.07), gl, gg)
+	var b := Basis.from_euler(Vector3(0, deg_to_rad(gg), 0))
+	for k in 3:
+		var py := 1.05 + k * 0.33
+		_parte("madeira_escura", Vector3(1.16, 0.02, 0.26), Vector3(0, py, 0.08), gl, gg)
+		for j in 6:
+			var x := -0.45 + j * 0.18
+			if k == 1:
+				_cilindro("porcelana", gl + b * Vector3(x, py + 0.045, 0.06), 0.035, 0.07, 8)
+			else:
+				_cilindro_deitado("porcelana", gl + b * Vector3(x, py + 0.1, 0.14), 0.09, 0.01, gg)
+	_colide(Vector3(1.2, 2.0, 0.5), Vector3(0, 1.0, 0.0), gl, gg)

@@ -93,6 +93,14 @@ func _ready() -> void:
 		await _boston_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "guia":
+		await _guia_fotos()
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "percurso":
+		await _percurso_fazenda()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "pessoa":
 		await _pessoa_fotos()
 		get_tree().quit()
@@ -1042,4 +1050,106 @@ func _pessoa_fotos() -> void:
 		cam.position = v[1]
 		cam.look_at(v[2])
 		await _s(0.4)
+		await _shot("%s_%s" % [tag, v[0]])
+
+
+## SHOT_MODO=percurso: anda por toda a fazenda (playtest 11: "vários locais onde
+## não passamos"): cada cômodo da casa, nos dois andares, e as dependências. De
+## cada ponto de partida, anda pelos pontos; diz onde chegou e onde ficou preso.
+func _percurso_fazenda() -> void:
+	GameState.reset()
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Quintal", false)
+	await _s(1.0)
+	var faz := root.find_child("Fazenda", true, false) as Node3D
+	var p := faz.find_child("Player", true, false) as Player
+	var T0 := 0.6
+	var T1 := 3.75
+	var rotas := [
+		["porta da frente", Vector3(10, 0, 0), [Vector3(7.5, 0, 0), Vector3(4.5, 0, 0)], T0],
+		["escritorio", Vector3(4.5, T0, 0), [Vector3(5.1, 0, 0.3), Vector3(5.1, 0, 2.0), Vector3(4.2, 0, 2.6)], T0],
+		["escritorio > lareira", Vector3(4.2, T0, 2.6), [Vector3(2.5, 0, 2.6), Vector3(2.3, 0, 3.2)], T0],
+		["sala de estar", Vector3(4.5, T0, 0), [Vector3(5.1, 0, -0.3), Vector3(5.1, 0, -2.0), Vector3(4.4, 0, -2.8)], T0],
+		["sala de jantar", Vector3(0.0, T0, 0), [Vector3(-1.5, 0, 0.3), Vector3(-1.5, 0, 2.0), Vector3(-2.3, 0, 2.6)], T0],
+		["sala dos fundos", Vector3(0.0, T0, 0), [Vector3(-1.5, 0, -0.3), Vector3(-1.5, 0, -2.0), Vector3(-1.0, 0, -3.8)], T0],
+		["escritorio > jantar", Vector3(3.0, T0, 2.2), [Vector3(1.6, 0, 2.15), Vector3(0.3, 0, 2.15)], T0],
+		["jantar > cozinha", Vector3(-1.5, T0, 2.0), [Vector3(-2.4, 0, 2.6), Vector3(-2.4, 0, 3.7), Vector3(-4.0, 0, 3.7), Vector3(-4.6, 0, 2.2)], T0],
+		["cozinha > despensa", Vector3(-4.6, T0, 2.2), [Vector3(-7.0, 0, 2.0), Vector3(-8.0, 0, 2.0)], T0],
+		["cozinha > quintal de tras", Vector3(-6.5, T0, 2.2), [Vector3(-6.5, 0, 1.3), Vector3(-6.5, 0, -0.5)], 0.0],
+		["cozinha > galpao", Vector3(-6.8, T0, 4.6), [Vector3(-8.6, 0, 4.6), Vector3(-10.5, 0, 4.6)], 0.0],
+		["porta dos fundos", Vector3(0.0, T0, 0), [Vector3(-2.6, 0, 0), Vector3(-4.6, 0, 0)], 0.0],
+		["escada", Vector3(4.9, T0, -0.9), [Vector3(-0.3, 0, -0.9), Vector3(-0.3, 0, 0.6)], T1],
+		["quarto de hospedes", Vector3(-0.3, T1, 0.6), [Vector3(3.0, 0, 0.6), Vector3(3.0, 0, 2.2), Vector3(3.5, 0, 3.5)], T1],
+		["quarto de Akeley", Vector3(-0.3, T1, 0.6), [Vector3(4.9, 0, 0.6), Vector3(5.1, 0, -0.9), Vector3(5.1, 0, -2.2), Vector3(2.5, 0, -3.3)], T1],
+		["quarto de tras sul", Vector3(-0.3, T1, 0.6), [Vector3(-0.38, 0, 0.9), Vector3(-0.38, 0, 2.2), Vector3(-1.5, 0, 3.5)], T1],
+		["quarto de tras norte", Vector3(-0.3, T1, 0.6), [Vector3(-0.38, 0, -0.9), Vector3(-0.38, 0, -2.2), Vector3(-1.5, 0, -3.5)], T1],
+		["banheiro", Vector3(-0.3, T1, 0.0), [Vector3(-1.4, 0, 0.0), Vector3(-1.85, 0, -0.2)], T1],
+		["celeiro", Vector3(-15, 0, -2), [Vector3(-15, 0, -6.5), Vector3(-15, 0, -12), Vector3(-14, 0, -14)], 0.0],
+		["galinheiro", Vector3(-25.5, 0, -8), [Vector3(-25.5, 0, -10.4), Vector3(-24, 0, -15)], 0.0],
+		["galpao de lenha", Vector3(-11.9, 0, -1), [Vector3(-11.9, 0, 1.6), Vector3(-11.9, 0, 3.0)], 0.0],
+		["canil (por fora)", Vector3(8, 0, -8), [Vector3(2, 0, -6.2), Vector3(-3, 0, -6.2)], 0.0],
+		["moinho e ford", Vector3(10, 0, -5), [Vector3(14, 0, -12), Vector3(18, 0, -15)], 0.0],
+		["estrada", Vector3(10, 0, 0), [Vector3(20, 0, 1), Vector3(30.5, 0, 2)], 0.0],
+	]
+	var falhas := 0
+	for r: Array in rotas:
+		p.global_position = r[1]
+		p.velocity = Vector3.ZERO
+		await _s(0.3)
+		var t := 0.0
+		var preso := ""
+		for alvo: Vector3 in r[2]:
+			var antes := p.global_position
+			var parado := 0.0
+			while t < 25.0:
+				var q := p.global_position
+				var rumo := Vector3(alvo.x, q.y, alvo.z)
+				if q.distance_to(rumo) < 0.3:
+					break
+				p.look_at(rumo)
+				Input.action_press(&"mover_frente")
+				await get_tree().physics_frame
+				var dt := get_physics_process_delta_time()
+				t += dt
+				parado = parado + dt if p.global_position.distance_to(q) < 0.004 else 0.0
+				if parado > 1.0:
+					preso = "preso em %s indo para %s" % [p.global_position.snappedf(0.01), alvo]
+					break
+			if not preso.is_empty():
+				break
+		Input.action_release(&"mover_frente")
+		var fim: Vector3 = r[2][r[2].size() - 1]
+		var chegou: bool = preso.is_empty() and Vector2(p.global_position.x - fim.x, p.global_position.z - fim.z).length() < 0.5 and absf(p.global_position.y - float(r[3])) < 0.3
+		if not chegou:
+			falhas += 1
+		print("PERCURSO %s %s %s" % ["ok   " if chegou else "FALHA", r[0], preso if preso else str(p.global_position.snappedf(0.01))])
+		if not chegou:
+			await _shot("%s_preso_%s" % [tag, String(r[0]).replace(" ", "_").replace(">", "a")])
+	print("PERCURSO falhas: ", falhas)
+
+
+## SHOT_MODO=guia: a luz-guia da fazenda (playtest 11) na rotina e na preparação.
+func _guia_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"interludio")
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return not faz.descendo, 60.0)
+	Engine.time_scale = 1.0
+	var p := faz.player
+	var guia := faz.get_node("LuzGuia") as LuzGuia
+	for v: Array in [["racao", Vector3(9, 0, -13), Vector3(-1.35, 1.0, -7.0)], ["racao_meio", Vector3(4, 0, -11), Vector3(-1.35, 1.0, -7.0)]]:
+		p.global_position = v[1]
+		await _mirar(p, v[2])
+		await _s(1.6)
+		print("GUIA ", v[0], " vis=", guia.visible, " em ", guia.global_position)
+		await _shot("%s_%s" % [tag, v[0]])
+	faz.rotina.pular()
+	await _until(func() -> bool: return faz.preparacao._ativa, 30.0)
+	for v: Array in [["prep_quintal", Vector3(12, 0, 9), guia.global_position], ["prep_dentro", Vector3(2.4, 0.6, 3.0), guia.global_position]]:
+		p.global_position = v[1]
+		await _s(0.5)
+		await _mirar(p, guia.global_position)
+		await _s(1.6)
+		print("GUIA ", v[0], " vis=", guia.visible, " em ", guia.global_position)
 		await _shot("%s_%s" % [tag, v[0]])

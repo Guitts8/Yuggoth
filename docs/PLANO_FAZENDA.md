@@ -488,15 +488,41 @@ precisamos melhorar o modelo da fazenda, que está bastante prejudicado, vários
 onde não passamos, modelos toscos e sem nenhum acabamento ou cuidado, precisamos que
 fique BOM de VERDADE pois será o modelo mais usado durante todo o jogo."*
 
-- 🔧 **R1 — A luz-guia:** um brilho azul fraco, quase nada, sobre o lugar da próxima
-  tarefa (a rotina, a preparação, depois a noite do telhado); some ao chegar perto.
-- 🔧 **R2 — Por onde se passa:** percorrer a planta inteira (o térreo, a escada, o
-  primeiro andar, as portas, o quintal, as dependências) e abrir tudo que deveria ser
-  passável; o teste de fumaça anda os caminhos.
-- 🔧 **R3 — O acabamento da casa:** paredes com espessura, rodapés, guarnições de
-  portas e janelas, beirais, telhado com telhas e cumeeira, chaminés, varanda com
-  colunas e guarda-corpo, o interior mobiliado com cuidado (o escritório de Akeley, a
-  sala, a cozinha, os quartos).
+- ✅ **R1 — A luz-guia** (`components/luz_guia.gd`, `LuzGuia`): um brilho azul pálido
+  (uma luz fraca e um borrão em billboard) paira sobre a próxima tarefa, pulsando
+  devagar; some quando Akeley chega a 2,4 m, e numa cena. A `Rotina` e a `Preparacao`
+  dizem o que vale (`guias()`: as áreas ligadas; a caixa de correio e o telefone, que
+  são à toa, não); vale a mais perto. Visto pela janela, de fora, é um brilho frio no
+  cômodo. Capturas: `SHOT_MODO=guia`.
+- ✅ **R2 — Por onde se passa:** um percurso automático (`SHOT_MODO=percurso`) anda de
+  verdade por 24 caminhos — cada cômodo dos dois andares, a cozinha, a despensa, as
+  portas da frente e dos fundos, o galpão, o celeiro, o galinheiro, o canil, o moinho,
+  a estrada — e diz onde fica preso. Achou: a porta da frente aberta para dentro,
+  atravessada no vestíbulo (tapava a porta do escritório; agora abre para fora, de
+  lado, na beira dos degraus), uma poltrona na porta da sala de estar e o armarinho
+  do fonógrafo na do escritório (os móveis novos deixam as passagens livres). Agora,
+  0 falhas.
+- ✅ **R3 — O acabamento dos interiores:** cada cômodo com o seu papel de parede
+  (`gerar_assets`: o florido, o listrado; o damasco verde no escritório), o teto caiado
+  claro, o assoalho de pinho de tábuas largas, o rodapé, a cimalha, o lambri com a
+  moldura (jantar, vestíbulo, oficina, cozinha, banheiro), os alizares de portas e
+  janelas com o forro do batente, os peitoris (`_comodos`, `_acabamento_interior`,
+  `_revestir_parede`), e uma luz de rebatimento suave em cada cômodo, que acompanha o
+  dia (`LuzesDeDentro`; os interiores ficavam quase pretos). **Os móveis** refeitos
+  peça a peça (`_moveis` e as peças em seguida): mesas de saia e pernas torneadas,
+  cadeiras de espaldar de travessas com assento de palhinha, poltronas de orelhas,
+  o sofá de encosto curvo, a cadeira de balanço, as estantes com os livros um a um, a
+  escrivaninha de tampo de couro e gavetas, o armarinho do fonógrafo, o aparador com
+  os pratos, o armário dos rifles de portas de vidro (a F6 tira um), a bancada com a
+  morsa, as prateleiras de vidros, o cabideiro com o casaco e o chapéu, as camas de
+  ferro com a colcha de retalhos, o guarda-roupa, a cômoda com o espelho, o
+  lavatório com o jarro e a bacia, a banheira de pés, a pia de coluna, a privada de
+  caixa alta, a máquina de costura de pedal, os tapetes trançados; e a cozinha
+  (`_cozinha`): o fogão de ferro com o forno, a chapa e a chaminé, a pia de
+  pedra-sabão com a bomba de mão, a mesa de pinho, o guarda-louça. Capturas:
+  `SHOT_MODO=fazenda` com `SHOT_EXTRA`.
+- 🔧 **R3b — O exterior da casa:** beirais, telhado com telhas e cumeeira, chaminés,
+  a porta da frente, as janelas por fora.
 - 🔧 **R4 — As dependências e o quintal:** o canil, o galpão, o celeiro, a bomba, o
   moinho, as cercas, a estrada, o terreno.
 - 🔧 **R5 — Os objetos da preparação:** o lampião, o rifle, o telefone, o armário.

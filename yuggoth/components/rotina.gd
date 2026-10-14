@@ -122,6 +122,12 @@ func _falta() -> StringName:
 
 
 ## Cada área vale na sua hora; as outras saem da física (não tampam a mira).
+## O que a luz-guia pode apontar agora (LuzGuia): as tarefas da rotina (a caixa
+## de correio, que é à toa, não).
+func guias() -> Array[Interactable]:
+	return [por_racao, bombear, encher_bebedouro, pegar_lenha, por_lenha, fechar_celeiro]
+
+
 func _ligar_areas() -> void:
 	var levando := bracada != null and bracada.visible
 	_ligar(por_racao, _ativa and etapa == Etapa.RACAO)

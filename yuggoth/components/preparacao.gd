@@ -116,6 +116,16 @@ func _falta() -> StringName:
 	return &""
 
 
+## O que a luz-guia pode apontar agora (LuzGuia): o que falta da preparação (o
+## telefone, que é à toa, não).
+func guias() -> Array[Interactable]:
+	var todas: Array[Interactable] = []
+	todas.append_array(lampioes)
+	todas.append_array(venezianas)
+	todas.append_array([pegar_rifle, carregar_rifle, acender_lareira, soltar_caes])
+	return todas
+
+
 func _ligar_areas() -> void:
 	for l in lampioes:
 		_ligar(l, _ativa and not l.aceso)
