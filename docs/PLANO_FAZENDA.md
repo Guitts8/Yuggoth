@@ -475,7 +475,7 @@ fotografias do Dia 2 feitas das cenas 3D) e o playtest com 5+ pessoas (o marco D
      `SHOT_MODO=preparacao`.
    - **O que o playtest 11 pediu** muda o acabamento disto tudo (ver "O playtest 11"
      abaixo): os modelos (o lampião, o rifle, o telefone, o armário) são provisórios.
-7. ✅ **F7 — Beat 3, a noite do telhado** (2026-10-15; "A tratativa", 3 e 4). A
+7. ✅ **F7 — Beat 3, a noite do telhado** (2026-10-15; "A tratativa", 3 e 4; commit `52808bb`). A
    `NoiteTelhado` (`components/noite_telhado.gd`, peças de `gerar_fazenda._noite_telhado`)
    começa quando a preparação acaba (`Preparacao.encerrar()`: nada dela vale mais). A
    carta de segunda, **frase por frase, na letra de Akeley, quando a coisa acontece**
