@@ -112,17 +112,22 @@ func pular_dia() -> void:
 		_abrir_escritorio("(teste) Prólogo pulado: Dia 1")
 		return
 	var n := int(GameState.get_value(&"dia", 1))
-	# Na fazenda, F2 dá a rotina do entardecer por feita (F5).
+	# Na fazenda, F2 dá por feita a etapa em curso: a rotina do entardecer (F5), a
+	# preparação (F6), a noite do telhado (F7).
 	if SceneDirector.current_level == FAZENDA:
 		var faz := get_tree().root.find_child("Fazenda", true, false)
 		var rotina := faz.get("rotina") as Rotina if faz else null
 		var prep := faz.get("preparacao") as Preparacao if faz else null
+		var noite := faz.get("noite_telhado") as NoiteTelhado if faz else null
 		if rotina and rotina.etapa != Rotina.Etapa.FIM:
 			rotina.pular()
 			Events.notice_requested.emit("(teste) Rotina do entardecer pulada")
 		elif prep and not prep.feita:
 			prep.pular()
 			Events.notice_requested.emit("(teste) Preparação para a noite pulada")
+		elif noite and not noite.feita:
+			noite.pular()
+			Events.notice_requested.emit("(teste) Noite do telhado pulada")
 		return
 	if n >= ULTIMO_DIA:
 		Events.notice_requested.emit("(teste) O Dia %d é o último da demo." % n)

@@ -251,6 +251,14 @@ roteiro acima onde os dois divergirem.
 - **O fim:** os latidos param um a um; ele no escuro, respirando; *"Isso pareceu acabar
   com o assunto"*; o cartão *"Fim da demonstração. A história continua."*
 
+## Onde estamos (2026-10-15)
+O recorte do Interlúdio está **inteiro e jogável**, do céu da tinta ao cartão do fim:
+a descida (F3), os cães (F4), a rotina (F5), a preparação (F6), a noite do telhado
+(F7) e o fim (F8), sobre a fazenda reformada pelo playtest 11 (R1–R5). **Próximo:** o
+usuário joga o **playtest 12** (`docs/PLAYTEST.md`: a demo inteira, agora com a
+noite); a lista vira a fase seguinte daqui e do escritório. Depois, a F9 (as
+fotografias do Dia 2 feitas das cenas 3D) e o playtest com 5+ pessoas (o marco Demo).
+
 ## As fases (em ordem)
 1. ✅ **F1 — A planta em bloco** (2026-10-10, enquanto o usuário não podia jogar o
    playtest 10; commit `3e1c666`). `tools/gerar_fazenda.gd` (+ `.tscn`; `comandos.ps1 gerar-fazenda`)
@@ -467,16 +475,84 @@ roteiro acima onde os dois divergirem.
      `SHOT_MODO=preparacao`.
    - **O que o playtest 11 pediu** muda o acabamento disto tudo (ver "O playtest 11"
      abaixo): os modelos (o lampião, o rifle, o telefone, o armário) são provisórios.
-7. 🔧 **F7 — Beat 3, a noite do telhado** (← depois da reforma do playtest 11) (~4–5 min; "A tratativa", 3 e 4): Brutus e
-   Conan dentro; a poltrona, o cochilo, o baque; só som e poeira; o zumbido; o cheiro
-   (olhos e tosse); a vidraça anunciada; apagar o lampião; de janela em janela, o cano
-   alto, os clarões; o ganido. As legendas, a carta de segunda frase por frase.
-   Nenhum susto além dos dois do jogo. Sons e modelos novos: o rifle, o lampião, o
-   vidro, o telhado.
-8. 🔧 **F8 — O fim da demo.** Os latidos param um a um, o escuro, *"Isso pareceu
-   acabar com o assunto"*, o cartão *"Fim da demonstração. A história continua."* (no
-   lugar do fim provisório de 45 s); o checkpoint no começo do Interlúdio; o teste de
-   fumaça joga o recorte inteiro.
+7. ✅ **F7 — Beat 3, a noite do telhado** (2026-10-15; "A tratativa", 3 e 4). A
+   `NoiteTelhado` (`components/noite_telhado.gd`, peças de `gerar_fazenda._noite_telhado`)
+   começa quando a preparação acaba (`Preparacao.encerrar()`: nada dela vale mais). A
+   carta de segunda, **frase por frase, na letra de Akeley, quando a coisa acontece**
+   (cada acontecimento espera a frase anterior sair da tela, `_frase`):
+   - **A espera:** "Sentar e esperar" na poltrona de orelhas junto ao fogo (ele vai a
+     pé, senta; o rifle desce ao colo) — *"A noite passada foi de nuvens espessas..."*;
+     a noite fecha de todo, o fogo baixa a brasas, ele baixa o pavio do lampião, o
+     relógio novo do consolo bate, as pálpebras pesam e abrem (as `Palpebras` do
+     escritório) — ele cochila. **Os grilos param** (o ambiente vira só o vento);
+     Hércules rosna lá fora.
+   - **O telhado (só som e poeira):** o **baque** em cima (os olhos abrem de uma vez, a
+     câmera treme, a **poeira e a caliça caem do forro**, a chaminé do lampião tine) —
+     *"Depois da meia-noite algo pousou no telhado da casa,"*; *"e os cães todos
+     correram para ver o que era."* — os de fora correm em volta da casa latindo para
+     o telhado (`Matilha.Modo.TELHADO`), Brutus vai à porta do escritório e choraminga,
+     Conan se levanta rosnando; *"...um conseguiu subir ao telhado saltando do puxado
+     baixo."* — as unhas e as patas correm por cima do forro, do puxado à cumeeira e ao
+     alto do escritório (Kull some do quintal); *"Houve uma luta terrível lá em cima, e
+     ouvi um zumbido medonho..."* — a luta (rosnados, latidos, corpos nas telhas) e o
+     zumbido do disco, que no fim **sobe e se vai**; um ganido lá em cima e o corpo que
+     cai lá fora; *"E então veio um cheiro chocante."* — a imagem turva (`sonho`), o
+     fôlego curto, a cabeça baixa; Brutus e Conan ganem.
+   - **As balas, anunciadas (não é susto):** os latidos viram para o quintal do
+     sudeste (`Matilha.Modo.FRENTE`); um tiro de longe bate no tabuado; o seguinte
+     **estoura a vidraça** da janela sul do escritório, ao lado da poltrona (o vidro
+     some, dezoito cacos voam para dentro e ficam no assoalho, **um passa rente ao
+     rosto**; a veneziana se entreabre) — *"...balas entraram pela janela e quase me
+     pegaram de raspão."* —; ele se levanta e se abaixa; o terceiro (um clarão longe na
+     mata) **lasca a estante** atrás dele.
+   - **"Apaguei a luz,":** o jogo é dele: "Apagar o lampião" (o do escritório; o da
+     sala de estar também, para atirar de lá). Os tiros de lá continuam de tempos em
+     tempos, longe.
+   - **As seteiras:** quatro janelas (o escritório a leste e ao sul, a sala de estar a
+     leste e ao norte — *"varri toda a volta da casa"*), em qualquer ordem: "Atirar
+     pela janela" — ele vai à janela, a veneziana abre um palmo, o rifle sobe ao ombro e
+     **o cano mira alto, sozinho** (sem mira livre), o estampido, **o clarão que mostra
+     o quintal por um instante** (uma luz forte lá fora, com sombras), o coice, a
+     alavanca, **o cartucho que cai e fica no assoalho**. *"usei as janelas como
+     seteiras..."* no primeiro. **No terceiro, sempre, o ganido que corta:** o cão mais
+     perto de onde o tiro foi cai e fica deitado (`CaoIA.ferir`).
+   - **O fim (F8, abaixo):** depois do quarto, os latidos param um a um
+     (`Matilha.Modo.CALADOS`), ele no escuro, respirando; *"Isso pareceu encerrar a
+     coisa."* → a tela escurece → o cartão.
+   - **Peças novas** (`_noite_telhado`): o relógio de consolo (caixa de ombros
+     arredondados, mostrador, ponteiros, pés de latão) com o tique-taque; as
+     **vidraças** das quatro janelas do escritório (um vidro que se vê através, entre as
+     folhas da guilhotina; a lista "B" de "O que precisa ficar excelente"); os cacos; as
+     lascas da estante; a poeira e a caliça do forro; o clarão na mata; os sons que
+     andam pelo telhado e o zumbido.
+   - **Sons** (CC0, `tratar_sons.py telhado`, das fontes que já estavam aqui): o baque
+     no telhado, as unhas correndo por cima do forro (laço), a luta lá em cima, o tiro
+     do rifle dentro de casa, os tiros de longe (com o eco do vale), a vidraça que
+     estoura, a bala na estante, o cartucho no assoalho, a poeira caindo.
+   - **Outros:** `Venezianas.fresta(abrir, graus)` (a seteira abre 65°, a da bala 20°);
+     a luz-guia quase não clareia no escuro (`NoiteTelhado.escuro()`); F2 na fazenda,
+     depois da preparação, pula a noite (`NoiteTelhado.pular()`).
+   - **Testes:** o de fumaça joga a noite inteira (sentar, os grilos que param, os
+     cães em volta da casa, Kull que some, a vidraça, os cacos no chão, a luz que
+     precisa apagar antes, os quatro tiros, o cão caído no terceiro, o rifle vazio, os
+     cães calados, o fim e o menu). Capturas: `SHOT_MODO=telhado`.
+   - ❓ **Falas compostas (💭), a aprovar:** *"Agora, esperar. Junto ao fogo, com o
+     rifle no colo."* · *"A luz. Com ela acesa, eles me veem e eu não os vejo."* · *"As
+     janelas. Uma fresta na veneziana basta."* (os lembretes, parado 35 s).
+   - 🔧 **Conferir em captura** o último ajuste (a veneziana da seteira a 65°, o clarão
+     do cano já do lado de fora e a luz do quintal a 5 m da janela, a luz-guia fraca
+     no escuro): a primeira captura (`SHOT_MODO=telhado`) mostrou o clarão estourando a
+     moldura sem mostrar o quintal; a captura depois do ajuste travou (instâncias do
+     Godot presas no driver de vídeo, que só um reinício libera).
+   - **Fica para depois:** a tosse de Akeley no cheiro (não há gravação CC0 de tosse
+     nas fontes; por ora, o fôlego e a cabeça baixa); o lampião não balança (é de mesa:
+     tine e a chama pula).
+8. ✅ **F8 — O fim da demo** (2026-10-15, junto com a F7): os latidos param um a um,
+   o escuro, *"Isso pareceu encerrar a coisa"* (a nossa tradução da carta; o plano
+   dizia "acabar com o assunto"), a tela escurece e vem o cartão *"Fim da demonstração.
+   A história continua."* → menu (o fim provisório de 30 s só vale se a cena não tiver
+   a noite). O checkpoint é o começo do Interlúdio (a troca de fase da tinta salva); o
+   teste de fumaça joga o recorte inteiro, do quintal ao menu.
 9. 🔧 **Depois: as fotografias do Dia 2** feitas das nossas cenas 3D (a casa com os
    cães e Akeley, o círculo de pedras, a caverna) — playtest 10, item 4.
 

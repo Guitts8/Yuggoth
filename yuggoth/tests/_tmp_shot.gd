@@ -52,6 +52,10 @@ func _ready() -> void:
 		await _fazenda_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "telhado":
+		await _telhado_fotos()
+		get_tree().quit(0)
+		return
 	if OS.get_environment("SHOT_MODO") == "preparacao":
 		await _preparacao_fotos()
 		get_tree().quit()
@@ -752,6 +756,94 @@ func _selagem_fotos() -> void:
 	for k in 34:
 		await _s(0.5)
 		await _shot("%s_selando_%02d" % [tag, k])
+
+
+## SHOT_MODO=telhado: a noite do telhado (F7), momento a momento.
+func _telhado_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"interludio")
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return not faz.descendo, 60.0)
+	faz.rotina.pular()
+	await _until(func() -> bool: return faz.preparacao._ativa, 30.0)
+	faz.preparacao.pular()
+	var n := faz.noite_telhado
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.SENTAR, 30.0)
+	faz.teto = 1.0
+	faz.entardecer = 1.0
+	faz.noite = 0.8
+	await _s(1.0)
+	var p := faz.player
+	p.global_position = Vector3(2.7, 0.6, 4.2)
+	await _olhar(p, n.sentar.global_position)
+	p.head.rotation.x = -0.3
+	await _s(0.3)
+	print("SENTAR mira=", p._target == n.sentar)
+	await _shot("%s_0_poltrona" % tag)
+	n.sentar.interact(p)
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.ESPERA and p.seated and not p.conduzido, 20.0)
+	await _s(2.0)
+	Engine.time_scale = 1.0
+	await _shot("%s_1_sentado" % tag)
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.TELHADO, 90.0)
+	Engine.time_scale = 1.0
+	await _s(0.9)
+	p.head.rotation.x = 0.35
+	await _s(0.6)
+	await _shot("%s_2_poeira" % tag)
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.BALAS, 90.0)
+	Engine.time_scale = 1.0
+	# Olhando a janela 23 (a que estoura), de onde ele está.
+	await _until(func() -> bool: return not n.vidraca.visible, 20.0)
+	await _s(0.12)
+	await _shot("%s_3_estouro" % tag)
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.APAGAR, 30.0)
+	await _s(1.5)
+	p.global_position = Vector3(2.4, 0.6, 4.3)
+	await _olhar(p, Vector3(2.4, 0.6, 6.0))
+	p.head.rotation.x = -0.25
+	await _s(0.5)
+	await _shot("%s_4_janela_cacos" % tag)
+	p.head.rotation.x = -0.75
+	await _s(0.4)
+	await _shot("%s_5_cacos_chao" % tag)
+	p.global_position = Vector3(2.5, 0.6, 3.0)
+	await _olhar(p, Vector3(2.45, 0.6, 1.0))
+	p.head.rotation.x = 0.1
+	await _s(0.4)
+	await _shot("%s_6_estante" % tag)
+	# Apagar a luz.
+	p.global_position = Vector3(4.6, 0.6, 3.25)
+	await _olhar(p, n.apagar[0].global_position)
+	p.head.rotation.x = -0.45
+	await _s(0.3)
+	print("APAGAR mira=", p._target == n.apagar[0])
+	n.apagar[0].interact(p)
+	await _s(2.0)
+	p.global_position = Vector3(3.0, 0.6, 3.0)
+	await _olhar(p, Vector3(6.0, 0.6, 4.8))
+	await _s(0.5)
+	await _shot("%s_7_escuro" % tag)
+	# O tiro pela janela 6 (leste).
+	p.global_position = Vector3(4.55, 0.6, 4.8)
+	await _olhar(p, n.atirar[0].global_position)
+	await _s(0.3)
+	print("ATIRAR mira=", p._target == n.atirar[0])
+	n.atirar[0].interact(p)
+	await _until(func() -> bool: return n.tiros >= 1, 20.0)
+	await _shot("%s_8_clarao" % tag)
+	await _s(0.3)
+	await _shot("%s_9_depois" % tag)
+	await _until(func() -> bool: return not n._ocupado, 20.0)
+	await _s(0.5)
+	p.head.rotation.x = -0.9
+	await _s(0.3)
+	await _shot("%s_10_cartucho" % tag)
+	print("FIM ", n.etapa, " tiros ", n.tiros)
 
 
 ## SHOT_MODO=preparacao: a preparação para a noite (F6), tarefa por tarefa.

@@ -37,6 +37,15 @@ wood_squeak e metal_hit, Tinysized water-pour), agua_bebedouro (rubberduck splas
 lenha_pegar/lenha_largar (rubberduck wood_hit, wood_falling), portao_correr (Kenney creak3,
 rubberduck metal_sheet e wood_slam), caixa_correio (rubberduck metal_open).
 
+A noite do telhado (F7, `tratar_sons.py telhado`) também usa só as fontes daqui:
+baque_telhado (rubberduck explosion, wood_slam e wood_cracking, graves e abafados pelo
+forro), unhas_telhado (rubberduck wood_hit e wood_misc em galope, laço), luta_telhado
+(qubodup snarl/growl/grumble, Brandon Morris, rubberduck wood_hit), tiro_rifle (rubberduck
+shot_01 e explosion), tiro_longe (rubberduck shot_02, com o eco do vale), vidro_estoura
+(rubberduck glass_01/04/05 e hit_03), estilhaco_madeira (rubberduck wood_breaking_01 e
+hit_01), cartucho_chao (Kenney metalClick, mais agudo, quicando) e poeira (sintetizada:
+ruído filtrado e grãozinhos).
+
 Para refazer: baixe as fontes acima, extraia cada zip numa pasta `x/<nome do zip>/`
 (os arquivos soltos em `zip/`; os .7z dos cães em `x/dog_pauliuw/`, `x/dog_qubodup/`,
 e os .wav de Brandon Morris em `x/dog_morris/`) e rode `python -I tools/tratar_sons.py

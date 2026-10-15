@@ -394,10 +394,81 @@ def preparacao():
     salvar("lampiao", sala(vidro[: seg(0.5)], 0.35, 0.1, semente=75), alvo=0.4)
 
 
+def telhado():
+    """F7 da fazenda: a noite do telhado (rubberduck, Kenney, qubodup, Brandon
+    Morris; CC0). O que vem do telhado chega abafado pelo forro (passa-baixa)."""
+    rng = np.random.default_rng(1928)
+    # O baque de algo pesado pousando no telhado: o grave do estouro, a madeira
+    # que bate e as vigas que estalam, tudo pelo forro.
+    grave = pico(passa_baixa(tom(aparar(ler("x/100-CC0-SFX_0/explosion.ogg")), 0.55), 320))
+    tabua = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_slam_02.ogg")), 0.6), 700))
+    estalo = pico(passa_baixa(aparar(ler("x/100-CC0-wood-metal-SFX/wood_cracking_02.ogg")), 1500))
+    salvar("baque_telhado", sala(misturar((grave, 0.0, 1.0), (tabua, 0.01, 0.8), (estalo, 0.16, 0.35)), 0.5, 0.2, brilho=1500.0, semente=80), alvo=0.95)
+    # As unhas nas telhas: um cão correndo por cima do forro — o galope (as patas,
+    # graves) e as unhas raspando (estalos curtos e agudos), num laço.
+    pata = pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_hit_04.ogg")), 0.7), 500))
+    unhas = [pico(passa_alta(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_misc_0%d.ogg" % n))[: seg(0.06)], 1.5), 700)) for n in (1, 2, 4, 6)]
+    partes = []
+    t = 0.0
+    while t < 4.2:
+        # O galope: quatro patas, uma pausa.
+        for k, d in enumerate((0.0, 0.07, 0.19, 0.25)):
+            partes.append((pata, t + d + rng.uniform(-0.01, 0.01), 0.7 + 0.2 * rng.random()))
+            u = unhas[rng.integers(len(unhas))]
+            partes.append((u, t + d + rng.uniform(0.0, 0.03), 0.25 + 0.25 * rng.random()))
+        t += rng.uniform(0.36, 0.44)
+    corrida = passa_baixa(misturar(*partes), 2400)
+    salvar("unhas_telhado", laco(sala(corrida, 0.35, 0.15, brilho=1800.0, semente=81, cortar=False), 0.3), True, alvo=0.7)
+    # A luta lá em cima: rosnados, arreganhos e latidos uns por cima dos outros,
+    # os corpos batendo nas telhas; uns sete segundos.
+    rosnados = [pico(tom(aparar(ler("x/dog_qubodup/dog/%s.flac" % n)), f)) for n, f in (("dog-snarl", 0.9), ("dog-growl", 0.85), ("dog-snarl", 0.78), ("dog-grumble", 0.8))]
+    m = ler("x/dog_morris/dog_barking_mono.wav")
+    latidos = [pico(tom(aparar(m[seg(a):seg(b)]), 0.95)) for a, b in ((0.0, 0.3), (0.5, 0.85), (1.1, 1.45), (1.66, 2.04))]
+    batidas = [pico(passa_baixa(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_hit_0%d.ogg" % n)), 0.6), 600)) for n in (1, 6, 8)]
+    partes = []
+    for k in range(9):
+        partes.append((rosnados[k % 4], k * 0.72 + rng.uniform(0, 0.2), 0.8))
+    for k in range(14):
+        partes.append((latidos[rng.integers(4)], rng.uniform(0.2, 6.6), 0.55 + 0.3 * rng.random()))
+    for k in range(10):
+        partes.append((batidas[rng.integers(3)], rng.uniform(0.0, 6.8), 0.6 + 0.4 * rng.random()))
+    luta = passa_baixa(misturar(*partes), 1700)
+    salvar("luta_telhado", sala(luta, 0.45, 0.18, brilho=1500.0, semente=82), alvo=0.9)
+    # O tiro de rifle dentro de casa: o estampido, o corpo grave e a sala.
+    estampido = pico(tom(aparar(ler("x/100-CC0-SFX_0/shot_01.ogg")), 0.85))
+    corpo = pico(passa_baixa(tom(aparar(ler("x/100-CC0-SFX_0/explosion.ogg")), 0.8), 700))
+    salvar("tiro_rifle", sala(misturar((estampido, 0.0, 1.0), (corpo, 0.0, 0.7)), 0.7, 0.22, brilho=3000.0, semente=83), alvo=0.95)
+    # Os tiros de lá de fora, da mata: abafados, com o eco do vale.
+    longe = pico(passa_baixa(tom(aparar(ler("x/100-CC0-SFX_0/shot_02.ogg")), 0.8), 1400))
+    salvar("tiro_longe", ar_livre(longe, 2.2, 0.4, semente=84), alvo=0.6)
+    # A vidraça que estoura: o impacto, o vidro partindo, os cacos caindo.
+    impacto = pico(passa_baixa(aparar(ler("x/100-CC0-SFX_0/hit_03.ogg")), 2500))
+    v1 = pico(aparar(ler("x/100-CC0-SFX_0/glass_04.ogg")))
+    v2 = pico(aparar(ler("x/100-CC0-SFX_0/glass_01.ogg")))
+    cacos = pico(passa_alta(aparar(ler("x/100-CC0-SFX_0/glass_05.ogg")), 1200))
+    salvar("vidro_estoura", sala(misturar((impacto, 0.0, 0.5), (v1, 0.0, 1.0), (v2, 0.03, 0.6), (cacos, 0.3, 0.45)), 0.4, 0.14, semente=85), alvo=0.85)
+    # A bala na estante: a madeira que estilhaça.
+    lascas = pico(tom(aparar(ler("x/100-CC0-wood-metal-SFX/wood_breaking_01.ogg")), 1.1))
+    pancada = pico(passa_baixa(aparar(ler("x/100-CC0-SFX_0/hit_01.ogg")), 3000))
+    salvar("estilhaco_madeira", sala(misturar((pancada, 0.0, 0.6), (lascas, 0.0, 1.0)), 0.4, 0.12, semente=86), alvo=0.8)
+    # O cartucho vazio no assoalho: o latão quica três vezes.
+    latao = pico(passa_alta(tom(aparar(ler("x/RPGsounds_Kenney/OGG/metalClick.ogg")), 1.6), 1500))
+    salvar("cartucho_chao", sala(misturar((latao, 0.0, 1.0), (latao, 0.13, 0.5), (latao, 0.22, 0.28), (latao, 0.27, 0.14)), 0.3, 0.1, semente=87), alvo=0.45)
+    # A poeira do forro caindo: um chiado fino que se apaga, com grãozinhos.
+    n = seg(2.4)
+    chiado = passa_alta(passa_baixa(rng.standard_normal(n), 4000), 900) * np.exp(-np.arange(n) / RATE * 1.6)
+    graos = np.zeros(n)
+    for k in range(60):
+        a = int(rng.uniform(0, 1.8) * RATE)
+        graos[a : a + 40] += rng.uniform(0.2, 1.0) * np.hanning(40)
+    salvar("poeira", sala(misturar((pico(chiado), 0.0, 0.5), (pico(passa_alta(graos, 2000)), 0.0, 0.4)), 0.3, 0.1, semente=88), alvo=0.3)
+
+
 GRUPOS = {
     "passos": passos, "portas": portas, "fogo": fogo, "chuva_e_noite": chuva_e_noite, "relogio": relogio,
     "telefone": telefone, "papel": papel, "lama": lama, "alfinete": alfinete, "bebida": bebida,
     "calha": calha, "menu": menu, "caes": caes, "rotina": rotina, "preparacao": preparacao,
+    "telhado": telhado,
 }
 
 

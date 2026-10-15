@@ -1208,7 +1208,8 @@ a fazer · ❓ espera resposta. Os itens da fazenda (13) estão em `docs/PLANO_F
     livro"*. Fechado à noite (a sala às escuras), ele o devolve: de manhã abre outro
     volume (`LivroEstudo.VOLUMES`: a capa rubra, verde, parda, com outra largura e
     grossura).
-13. 🔧 **A fazenda** (ver `docs/PLANO_FAZENDA.md`, "O playtest 11"): uma luz azul fraca
+13. ✅ **A fazenda** (ver `docs/PLANO_FAZENDA.md`, "O playtest 11": R1–R5 feitos; depois
+    deles, a F7 e a F8 — a noite do telhado e o fim da demo): uma luz azul fraca
     sobre para onde ir; e o modelo da fazenda refeito com acabamento — lugares onde não
     se passa, peças toscas — *"precisa ficar BOM de VERDADE, será o modelo mais usado
     durante todo o jogo"*.

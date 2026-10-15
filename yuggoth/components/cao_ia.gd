@@ -25,6 +25,10 @@ const PERTO := 0.35
 var fugiu := false
 ## Correndo para a mata agora (fugir()).
 var fugindo := false
+## Atingido por um tiro na noite do telhado (ferir()): deitado, não pensa mais.
+var caido := false
+## Quantos segundos depois do "encerrar" ele se cala (Matilha.Modo.CALADOS).
+var _calar_depois := 0.0
 
 var visual: Cao
 var matilha: Matilha
@@ -47,6 +51,7 @@ func _ready() -> void:
 	_rng.seed = hash(name) + 7
 	_decidir = _rng.randf_range(0.2, 1.5)
 	_latir = _rng.randf_range(2.0, 8.0)
+	_calar_depois = _rng.randf_range(0.5, 7.0)
 	_voz = AudioStreamPlayer3D.new()
 	_voz.name = "_Voz"
 	_voz.bus = &"SFX"
@@ -135,9 +140,27 @@ func fugir(para: Vector3) -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 
+## Atingido (a noite do telhado: *"receio ter acertado um por mirar baixo
+## demais"*): o ganido que corta, e ele fica deitado, calado.
+func ferir() -> void:
+	if caido:
+		return
+	caido = true
+	_alvo = Vector3.INF
+	_som(matilha.ganido, 0.0)
+	_pose(Cao.Pose.DEITADO)
+
+
+## Sobe ao telhado pelo puxado (a noite do telhado): sai da cena, fora da vista.
+func sumir() -> void:
+	fugiu = true
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+
+
 ## A decisão do momento, pelo modo da matilha e pelo papel.
 func _pensar() -> void:
-	if fugindo or fugiu:
+	if fugindo or fugiu or caido:
 		return
 	var akeley := matilha.akeley()
 	match matilha.modo:
@@ -184,6 +207,92 @@ func _pensar() -> void:
 				_vigiar_a_mata(true)
 			else:
 				_vagar(matilha.quintal)
+		Matilha.Modo.TELHADO:
+			if papel == Papel.SEGUIR:
+				_arranhar_a_porta()
+			elif papel == Papel.FOGO:
+				_rosnar_parado(matilha.porta_do_fogo)
+			else:
+				_latir_em_volta()
+		Matilha.Modo.FRENTE:
+			if papel == Papel.SEGUIR and akeley:
+				_seguir(akeley)
+			elif papel == Papel.FOGO:
+				_rosnar_parado(matilha.porta_do_fogo)
+			else:
+				_latir_na_frente()
+		Matilha.Modo.CALADOS:
+			if matilha.calados_ha < _calar_depois and papel != Papel.SEGUIR and papel != Papel.FOGO:
+				_latir_na_frente()
+				return
+			_alvo = Vector3.INF
+			_latir = 999.0
+			if papel == Papel.SEGUIR and akeley:
+				_olhar_para = akeley.global_position
+			_pose(Cao.Pose.SENTADO if _rng.randf() < 0.5 else Cao.Pose.PARADO)
+			_decidir += 4.0
+
+
+## A noite do telhado, de fora: um lugar em volta da casa, latindo para o telhado.
+func _latir_em_volta() -> void:
+	var c := matilha.casa
+	_olhar_para = c.get_center()
+	if _alvo == Vector3.INF and global_position.distance_to(_olhar_para) > c.size.length() * 0.5 + 3.5 or _rng.randf() < 0.25:
+		# Um ponto na volta da casa, a uns dois metros das paredes.
+		var g := c.grow(2.0)
+		var lado := _rng.randi() % 4
+		var u := _rng.randf()
+		var p := Vector3(lerpf(g.position.x, g.end.x, u), 0, g.position.z if lado == 0 else g.end.z) if lado < 2 \
+			else Vector3(g.position.x if lado == 2 else g.end.x, 0, lerpf(g.position.z, g.end.z, u))
+		_ir(p, CORRIDA if _rng.randf() < 0.5 else TROTE)
+	_latir_rajada(1.5, 4.0)
+
+
+## Antes das balas: correndo pelo quintal da frente, latindo para a mata.
+func _latir_na_frente() -> void:
+	var f := matilha.frente
+	_olhar_para = matilha.frente_alvo
+	if not f.grow(1.0).has_point(Vector3(global_position.x, 0.5, global_position.z)) or _rng.randf() < 0.35:
+		_ir(Vector3(_rng.randf_range(f.position.x, f.end.x), 0, _rng.randf_range(f.position.z, f.end.z)), CORRIDA if _rng.randf() < 0.6 else TROTE)
+	_latir_rajada(1.2, 3.5)
+
+
+func _latir_rajada(de: float, ate: float) -> void:
+	if _latir <= 0.0:
+		_latir = _rng.randf_range(de, ate)
+		_pose(Cao.Pose.LATINDO)
+		_latidos(_rng.randi_range(2, 4))
+	elif _alvo == Vector3.INF:
+		_pose(Cao.Pose.PARADO)
+
+
+## Brutus, dentro, na noite do telhado: na porta do escritório, choramingando e
+## arranhando para sair.
+func _arranhar_a_porta() -> void:
+	var porta := matilha.porta_do_fogo
+	if porta == Vector3.INF:
+		return
+	_olhar_para = porta + Vector3(0, 0, -2.0)
+	if global_position.distance_to(porta) > 0.6:
+		_ir(porta, TROTE)
+		_pose(Cao.Pose.PARADO)
+		return
+	_alvo = Vector3.INF
+	if _rng.randf() < 0.4:
+		_pose(Cao.Pose.LATINDO)
+		_latidos(1)
+	else:
+		_pose(Cao.Pose.PARADO)
+		_som(matilha.choramingo, -8.0)
+
+
+## Conan, de pé junto ao fogo, rosnando baixo para `para`.
+func _rosnar_parado(para: Vector3) -> void:
+	_alvo = Vector3.INF
+	_olhar_para = para
+	_pose(Cao.Pose.ROSNANDO)
+	if _rng.randf() < 0.5:
+		_som(matilha.rosnado if _rng.randf() < 0.6 else matilha.arreganho, -8.0)
 
 
 ## Brutus: a dois passos de Akeley, do lado; quando ele para, senta junto.

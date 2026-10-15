@@ -180,11 +180,12 @@ func _ready() -> void:
 	_arbustos_e_capim()
 	_rotina()
 	_preparacao()
+	_noite_telhado()
 	# A luz-guia (playtest 11): azul, fraca, sobre a próxima tarefa.
 	var guia := LuzGuia.new()
 	guia.name = "LuzGuia"
 	_add(cena, guia)
-	guia.fontes.assign([cena.get_node("Rotina"), cena.get_node("Preparacao")])
+	guia.fontes.assign([cena.get_node("Rotina"), cena.get_node("Preparacao"), cena.get_node("NoiteTelhado")])
 	_fechar_obras()
 	_colisao(cena, "Colisao", _col)
 
@@ -2343,6 +2344,275 @@ func _preparacao() -> void:
 	p.linha_telefone = load("res://narrative/narration/akeley_telefone.tres")
 	p.linha_lua = load("res://narrative/narration/akeley_lua.tres")
 
+
+## A noite do telhado (F7; "A tratativa", 3 e 4): a poltrona do escritório, o
+## relógio do consolo, a poeira do forro, as vidraças do escritório (uma estoura:
+## os cacos), as lascas da estante, o clarão na mata, as seteiras (o escritório e a
+## sala de estar) e os sons do telhado.
+func _noite_telhado() -> void:
+	var g := _group(cena, "NoiteTelhadoPecas")
+	var caes := cena.get_node("Caes") as Matilha
+	var prep := cena.get_node("Preparacao") as Preparacao
+	var pecas := cena.get_node("PreparacaoPecas")
+	# De onde vêm as balas: o sudeste, do outro lado da estrada; os cães correm
+	# por ali latindo para lá.
+	caes.frente = AABB(Vector3(6.5, 0, 1.0), Vector3(12.0, 1, 14.0))
+	caes.frente_alvo = Vector3(34.0, 1.0, 30.0)
+
+	# A poltrona de orelhas junto ao fogo (gerar_fazenda._moveis).
+	var assento := Vector3(1.9, T0, 5.05)
+	var boca := Vector3(MEIO_X + CHAMINE_MEIA.x + 0.1, T0 + 0.75, CHAMINE_Z)
+	# Maior que a poltrona (a colisão dela tapava a mira).
+	var sentar := _area(g, Interactable.new(), "Sentar", Vector3(1.3, 1.4, 1.3), assento + Vector3(0, 0.7, 0)) as Interactable
+	sentar.prompt = "Sentar e esperar"
+
+	# O relógio do consolo da lareira, de frente para a sala: a caixa de madeira
+	# de ombros arredondados, o mostrador, os ponteiros, os pés.
+	var rel := _group(g, "RelogioConsolo", Vector3(MEIO_X + CHAMINE_MEIA.x + 0.1, T0 + 1.28, CHAMINE_Z - 0.35))
+	rel.rotation_degrees.y = -90.0
+	_box(rel, "Caixa", Vector3(0.24, 0.2, 0.1), Vector3(0, 0.11, 0), "madeira_escura")
+	var topo := _cyl(rel, "Ombros", 0.12, 0.12, 0.1, Vector3(0, 0.21, 0), "madeira_escura", 12)
+	topo.rotation_degrees.x = 90.0
+	topo.scale = Vector3(1.0, 1.0, 0.45)
+	var mostrador := _cyl(rel, "Mostrador", 0.07, 0.07, 0.01, Vector3(0, 0.17, -0.051), "papel", 14)
+	mostrador.rotation_degrees.x = 90.0
+	_cyl(rel, "Aro", 0.078, 0.078, 0.008, Vector3(0, 0.17, -0.049), "latao", 14).rotation_degrees.x = 90.0
+	var horas := _box(rel, "Horas", Vector3(0.006, 0.04, 0.002), Vector3(0.008, 0.18, -0.058), "ferro")
+	horas.rotation_degrees.z = -20.0
+	var minutos := _box(rel, "Minutos", Vector3(0.004, 0.06, 0.002), Vector3(-0.004, 0.196, -0.059), "ferro")
+	minutos.rotation_degrees.z = 8.0
+	for sx: float in [-1.0, 1.0]:
+		_box(rel, "Pe%d" % int(sx + 1), Vector3(0.04, 0.015, 0.08), Vector3(sx * 0.1, 0.008, 0), "latao")
+	var tique := AudioStreamPlayer3D.new()
+	tique.name = "Tique"
+	tique.stream = _sfx("relogio.wav")
+	tique.bus = &"SFX"
+	tique.volume_db = -8.0
+	tique.unit_size = 2.0
+	tique.max_distance = 14.0
+	tique.position = Vector3(0, 0.15, 0)
+	_add(rel, tique)
+
+	# Os sons do telhado: o que anda por cima (o baque, as unhas, a luta) e o
+	# zumbido — o mesmo do disco.
+	var alto := Vector3(3.5, 8.8, 3.8)
+	var som_telhado := AudioStreamPlayer3D.new()
+	som_telhado.name = "SomTelhado"
+	som_telhado.bus = &"SFX"
+	som_telhado.unit_size = 9.0
+	som_telhado.max_distance = 90.0
+	som_telhado.position = alto
+	_add(g, som_telhado)
+	var zumbido := AudioStreamPlayer3D.new()
+	zumbido.name = "Zumbido"
+	zumbido.stream = _sfx("zumbido.wav")
+	zumbido.bus = &"SFX"
+	zumbido.unit_size = 10.0
+	zumbido.max_distance = 120.0
+	zumbido.position = alto
+	_add(g, zumbido)
+
+	# A poeira do forro do escritório: o pó fino que desce devagar e as lascas de
+	# caiação, que caem de uma vez.
+	var poeira: Array[CPUParticles3D] = []
+	for fina: bool in [true, false]:
+		var e := CPUParticles3D.new()
+		e.name = "Poeira" if fina else "Calica"
+		e.position = Vector3(3.45, T0 + PE0 - 0.04, 3.7)
+		e.emitting = false
+		e.one_shot = true
+		e.explosiveness = 0.55 if fina else 0.8
+		e.amount = 160 if fina else 18
+		e.lifetime = 4.0 if fina else 1.2
+		e.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+		e.emission_box_extents = Vector3(2.0, 0.02, 1.9)
+		e.direction = Vector3.DOWN
+		e.spread = 15.0
+		e.initial_velocity_min = 0.05
+		e.initial_velocity_max = 0.3 if fina else 0.6
+		e.gravity = Vector3(0, -0.45, 0) if fina else Vector3(0, -9.8, 0)
+		e.damping_min = 0.2 if fina else 0.0
+		e.damping_max = 0.6 if fina else 0.0
+		e.scale_amount_min = 0.5
+		e.scale_amount_max = 1.4
+		var q := QuadMesh.new()
+		q.size = Vector2(0.018, 0.018) if fina else Vector2(0.03, 0.022)
+		var mt := StandardMaterial3D.new()
+		mt.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mt.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+		mt.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mt.albedo_color = Color(0.5, 0.47, 0.42, 0.7) if fina else Color(0.62, 0.6, 0.55, 1.0)
+		q.material = mt
+		e.mesh = q
+		_add(g, e)
+		poeira.append(e)
+
+	# As vidraças do escritório (as janelas eram sem vidro): um vidro que se vê
+	# através, entre as duas folhas da guilhotina, em cada uma das quatro.
+	var mat_vidro := StandardMaterial3D.new()
+	mat_vidro.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_vidro.albedo_color = Color(0.62, 0.68, 0.72, 0.1)
+	mat_vidro.roughness = 0.06
+	mat_vidro.metallic_specular = 0.9
+	mat_vidro.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var vidracas := {}
+	for n: int in [4, 6, 21, 23]:
+		var jn := cena.get_node("Janelas/Janela%d" % n) as Node3D
+		var fora := Vector3.RIGHT if n < 9 else Vector3.BACK
+		var ao_longo := Vector3(-fora.z, 0, fora.x).abs()
+		var v := MeshInstance3D.new()
+		v.name = "Vidraca%d" % n
+		var bm := BoxMesh.new()
+		bm.size = ao_longo * 0.9 + Vector3.UP * 1.5 + fora.abs() * 0.006
+		v.mesh = bm
+		v.material_override = mat_vidro
+		v.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		v.position = jn.position - fora * (E / 2)
+		_add(g, v)
+		vidracas[n] = v
+	# Os cacos da que estoura (a 23, ao sul, junto à poltrona): triângulos de
+	# vidro achatados (deitam no assoalho onde caem).
+	var mat_caco := StandardMaterial3D.new()
+	mat_caco.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_caco.albedo_color = Color(0.78, 0.84, 0.86, 0.5)
+	mat_caco.roughness = 0.05
+	mat_caco.metallic_specular = 1.0
+	mat_caco.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var v23: Node3D = vidracas[23]
+	var cacos := _group(g, "Estilhacos")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 23
+	for k in 18:
+		var mi := MeshInstance3D.new()
+		mi.name = "Caco%d" % k
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		st.set_normal(Vector3.UP)
+		var r := rng.randf_range(0.025, 0.07) * (1.6 if k == 0 else 1.0)
+		for j in 3:
+			var a := TAU * j / 3.0 + rng.randf_range(-0.6, 0.6)
+			st.add_vertex(Vector3(cos(a), 0, sin(a)) * r * rng.randf_range(0.6, 1.3))
+		mi.mesh = st.commit()
+		mi.material_override = mat_caco
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.position = v23.position + Vector3(rng.randf_range(-0.4, 0.4), rng.randf_range(-0.7, 0.7), 0)
+		mi.set_meta(&"chao", T0 + 0.004 + rng.randf() * 0.004)
+		_add(cacos, mi)
+
+	# As lascas da estante, onde a terceira bala bate.
+	var estante := Vector3(2.42, T0 + 1.5, HALL_Z + 0.4)
+	var lascas := CPUParticles3D.new()
+	lascas.name = "Lascas"
+	lascas.position = estante
+	lascas.emitting = false
+	lascas.one_shot = true
+	lascas.explosiveness = 0.95
+	lascas.amount = 26
+	lascas.lifetime = 1.4
+	lascas.direction = Vector3(0, 0.3, 1)
+	lascas.spread = 55.0
+	lascas.initial_velocity_min = 1.2
+	lascas.initial_velocity_max = 3.2
+	lascas.gravity = Vector3(0, -9.8, 0)
+	lascas.scale_amount_min = 0.5
+	lascas.scale_amount_max = 1.5
+	var qb := BoxMesh.new()
+	qb.size = Vector3(0.02, 0.006, 0.05)
+	var ml := StandardMaterial3D.new()
+	ml.albedo_color = Color(0.55, 0.38, 0.22)
+	qb.material = ml
+	lascas.mesh = qb
+	_add(g, lascas)
+
+	# O clarão longe, na mata do sudeste: uma luz e um brilho (sem névoa).
+	var clarao := _group(g, "Clarao", Vector3(22.0, 1.8, 30.0))
+	var lc := _omni(clarao, "Luz", Vector3.ZERO, Color(1.0, 0.78, 0.45), 9.0, 14.0)
+	lc.omni_attenuation = 1.0
+	var bq := QuadMesh.new()
+	bq.size = Vector2(1.6, 1.6)
+	var mb := StandardMaterial3D.new()
+	mb.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mb.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mb.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mb.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	mb.disable_fog = true
+	mb.albedo_color = Color(1.0, 0.8, 0.5)
+	mb.albedo_texture = LuzGuia._textura()
+	bq.material = mb
+	var brilho := MeshInstance3D.new()
+	brilho.name = "Brilho"
+	brilho.mesh = bq
+	brilho.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_add(clarao, brilho)
+
+	# As seteiras: o escritório (a leste e ao sul) e a sala de estar (a leste e
+	# ao norte) — "varri toda a volta da casa". O lampião do cômodo apagado antes.
+	var lamp_esc := pecas.get_node("LampiaoEscritorio") as Lampiao
+	var lamp_sala := pecas.get_node("LampiaoSalaEstar") as Lampiao
+	var seteiras: Array[Venezianas] = []
+	var atirar: Array[Interactable] = []
+	var lampiao_de: Array[Lampiao] = []
+	for par: Array in [[6, Vector3.RIGHT, lamp_esc], [21, Vector3.BACK, lamp_esc], [2, Vector3.RIGHT, lamp_sala], [15, Vector3.FORWARD, lamp_sala]]:
+		var v := pecas.get_node("FecharJanela%d" % par[0]) as Venezianas
+		var fora: Vector3 = par[1]
+		var ao_longo := Vector3(-fora.z, 0, fora.x).abs()
+		var a := _area(g, Interactable.new(), "Atirar%d" % par[0], ao_longo * 1.0 + fora.abs() * 0.4 + Vector3.UP * 1.4, v.position) as Interactable
+		a.prompt = "Atirar pela janela"
+		a.set_meta(&"fora", fora)
+		seteiras.append(v)
+		atirar.append(a)
+		lampiao_de.append(par[2])
+
+	var n := NoiteTelhado.new()
+	n.name = "NoiteTelhado"
+	_add(cena, n)
+	n.matilha = caes
+	n.preparacao = prep
+	n.sentar = sentar
+	n.assento = assento
+	n.diante = boca
+	n.relogio = tique
+	n.som_telhado = som_telhado
+	n.som_zumbido = zumbido
+	# Quem sobe: da beira do puxado baixo (a oeste) ao telhado da casa, por cima da
+	# cumeeira, até o alto do escritório.
+	n.caminho_telhado = PackedVector3Array([Vector3(-6.5, PUXADO_ALTO + 0.4, 3.6), Vector3(-2.6, BEIRAL + 0.6, 3.6),
+		Vector3(CUMEEIRA.x, CUMEEIRA.y + 0.1, 3.8), alto])
+	n.poeira = poeira
+	n.janela_bala = pecas.get_node("FecharJanela23") as Venezianas
+	n.vidraca = v23
+	n.estilhacos = cacos
+	n.para_dentro = Vector3.FORWARD
+	n.bate_tabuado = Vector3(3.5, T0 + 1.2, CASA_Z.y + 0.15)
+	n.bate_estante = estante
+	n.lascas = lascas
+	n.clarao = clarao
+	n.mata_frente = Vector3(24.0, 2.0, 32.0)
+	n.seteiras = seteiras
+	n.atirar = atirar
+	n.lampiao_de = lampiao_de
+	var apagar: Array[Lampiao] = [lamp_esc, lamp_sala]
+	n.apagar = apagar
+	n.som_noite = _sfx("noite.wav")
+	n.som_sem_grilos = _sfx("vento.wav")
+	n.som_baque = _sfx("baque_telhado.wav")
+	n.som_unhas = _sfx("unhas_telhado.wav")
+	n.som_luta = _sfx("luta_telhado.wav")
+	n.som_poeira = _sfx("poeira.wav")
+	n.som_tiro = _sfx("tiro_rifle.wav")
+	n.som_tiro_longe = _sfx("tiro_longe.wav")
+	n.som_vidro = _sfx("vidro_estoura.wav")
+	n.som_lascas = _sfx("estilhaco_madeira.wav")
+	n.som_alavanca = _sfx("alavanca_rifle.wav")
+	n.som_cartucho = _sfx("cartucho_chao.wav")
+	var frases: Dictionary[StringName, NarrationLine] = {}
+	for id: String in ["nuvens", "pousou", "correram", "subiu", "luta", "cheiro", "balas", "apaguei", "seteiras", "encerrar"]:
+		frases[StringName(id)] = load("res://narrative/narration/akeley_%s.tres" % id)
+	n.frases = frases
+	var lembretes: Dictionary[StringName, NarrationLine] = {}
+	for id: String in ["sentar", "apagar", "atirar"]:
+		lembretes[StringName(id)] = load("res://narrative/narration/akeley_%s.tres" % id)
+	n.lembretes = lembretes
 
 ## O rifle de repetição de alavanca (provisório em primitivas, ao longo de -Z): a
 ## coronha, a caixa da culatra, a alavanca em argola, o depósito tubular e o cano.

@@ -52,9 +52,12 @@ func fechar_ja() -> void:
 		_pose(i, 0.0)
 
 
-## Entreabre (a seteira da noite do telhado) ou volta a fechar.
-func fresta(abrir: bool) -> void:
-	await _girar(fresta_graus if abrir else 0.0, 0.4)
+## Entreabre (a seteira da noite do telhado; `graus` < 0 = `fresta_graus`) ou
+## volta a fechar.
+func fresta(abrir: bool, graus := -1.0) -> void:
+	if abrir and som:
+		AudioDirector.play_sfx(som, -10.0)
+	await _girar((fresta_graus if graus < 0.0 else graus) if abrir else 0.0, 0.4)
 
 
 func _girar(alvo: float, segundos: float) -> void:

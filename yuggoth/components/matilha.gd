@@ -16,6 +16,15 @@ enum Modo {
 	DEPOIS,
 	## Soltos no quintal, de guarda (a noite: rodada 2 da tratativa).
 	SOLTOS,
+	## A noite do telhado (F7): algo pousou lá em cima; os de fora correm em volta
+	## da casa latindo para o telhado; dentro, Brutus arranha a porta e Conan
+	## rosna para o forro.
+	TELHADO,
+	## Os latidos viram para a frente da casa (F7, antes das balas): os de fora
+	## correm pelo quintal da frente, latindo para a mata do outro lado.
+	FRENTE,
+	## "Isso pareceu encerrar a coisa" (F7): os latidos param um a um.
+	CALADOS,
 }
 
 ## Onde Conan deita diante do fogo aceso (INF = o fogo apagado). A Preparacao o põe.
@@ -23,6 +32,12 @@ var fogo := Vector3.INF
 ## Por onde Conan entra no escritório (a casa não tem navegação: ele aparece ali,
 ## fora da vista, e anda até o fogo).
 @export var porta_do_fogo := Vector3.INF
+## A casa (a planta, com o puxado), para correrem em volta dela na noite do
+## telhado.
+@export var casa := AABB(Vector3(-9.0, 0, -6.0), Vector3(15.0, 1, 12.0))
+## O quintal da frente (de onde vêm as balas) e para onde latem lá.
+@export var frente := AABB(Vector3(7.5, 0, -6.0), Vector3(12.0, 1, 18.0))
+@export var frente_alvo := Vector3(40.0, 1.0, 14.0)
 ## Onde Rambo fica, de fora, rosnando para a janela do escritório (à noite).
 @export var diante_da_janela := Vector3(4.6, 0, 7.6)
 
@@ -85,6 +100,12 @@ func akeley() -> Player:
 ## O balde de ração na mão de Akeley (a fazenda o põe aqui).
 var balde: Node3D
 var _akeley: Player
+## Segundos desde que o modo virou CALADOS (cada cão se cala na sua vez).
+var calados_ha := 0.0
+
+
+func _process(delta: float) -> void:
+	calados_ha = calados_ha + delta if modo == Modo.CALADOS else 0.0
 
 
 func com_balde() -> bool:

@@ -9,8 +9,9 @@ extends Node3D
 ## (`entardecer`, 0 → 1 em `duracao_entardecer`). Vinda do escritório (a flag
 ## `interludio`, posta quando a última carta é postada), a tinta da carta cai no
 ## quintal (TintaTransicao.revelar): Akeley está diante do canil com o balde de
-## ração. F5: a rotina do entardecer (`Rotina`); feita, o sol se põe e, até os
-## beats seguintes (F6–F8), a demo acaba aqui `fim_provisorio` segundos depois.
+## ração. F5: a rotina do entardecer (`Rotina`); feita, o sol se põe. F6: a
+## preparação para a noite (`Preparacao`). F7: a noite do telhado (`NoiteTelhado`),
+## e no escuro, com os cães calados, a demo acaba (`linha_fim`).
 ## Pelo Shift+F4 de teste, a fazenda é só para andar.
 ##
 ## Cena gerada por tools/gerar_fazenda.gd.
@@ -22,7 +23,7 @@ extends Node3D
 @export var linha_fim: NarrationLine
 ## A primeira fala de Akeley, quando o corpo se mexe (ou logo depois da descida).
 @export var linha_inicio: NarrationLine
-## Segundos depois da rotina antes do fim provisório da demo (só no Interlúdio).
+## Sem a noite do telhado na cena: segundos depois da preparação antes do fim.
 @export var fim_provisorio := 30.0
 ## Segundos do sol baixo ao crepúsculo.
 @export var duracao_entardecer := 180.0
@@ -84,6 +85,7 @@ var _desvio := Vector2.ZERO
 @onready var balde: NaMao = $Balde
 @onready var rotina: Rotina = get_node_or_null(^"Rotina") as Rotina
 @onready var preparacao: Preparacao = get_node_or_null(^"Preparacao") as Preparacao
+@onready var noite_telhado: NoiteTelhado = get_node_or_null(^"NoiteTelhado") as NoiteTelhado
 
 
 func _ready() -> void:
@@ -117,6 +119,8 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	Narrator.voz = Narrator.Voz.WILMARTH
+	# Saindo no meio do cheiro da noite do telhado, a imagem não fica turva.
+	GameState.set_value(&"sonho", 0.0)
 
 
 ## O corpo é outro (GDD §5.1a): mais lento, ofegante; sem dossiê; quem narra é ele.
@@ -182,11 +186,19 @@ func _interludio() -> void:
 		await preparacao.terminou
 		if not is_inside_tree():
 			return
-	# Parado na pausa (o timer não corre com a árvore pausada).
-	await get_tree().create_timer(fim_provisorio, false).timeout
-	if not is_inside_tree():
-		return
-	await SceneDirector.fade_out(2.0)
+	# A noite do telhado (F7): a espera, o telhado, as balas, os tiros; acaba no
+	# escuro, com os cães calados.
+	if noite_telhado:
+		noite_telhado.comecar(self)
+		await noite_telhado.terminou
+		if not is_inside_tree():
+			return
+	else:
+		# Parado na pausa (o timer não corre com a árvore pausada).
+		await get_tree().create_timer(fim_provisorio, false).timeout
+		if not is_inside_tree():
+			return
+	await SceneDirector.fade_out(3.0)
 	if not is_inside_tree():
 		return
 	SceneDirector.hold_black = true

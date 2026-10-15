@@ -206,7 +206,17 @@ func _lareira() -> void:
 	_depois_de(&"lareira")
 
 
+## Acabou a preparação e começou a noite (NoiteTelhado): nada mais vale aqui (os
+## lampiões que se apagam são da noite).
+func encerrar() -> void:
+	_ativa = false
+	set_process(false)
+	_ligar_areas()
+
+
 func _depois_de(o_que: StringName) -> void:
+	if not _ativa:
+		return
 	if o_que == &"lampiao" and linha_lampiao and lampioes.filter(func(l: Lampiao) -> bool: return l.aceso).size() == 1:
 		Narrator.say(linha_lampiao)
 	_ligar_areas()
@@ -266,6 +276,7 @@ func pular() -> void:
 	if porteira:
 		porteira.rotation_degrees.y = -100.0
 	matilha.modo = Matilha.Modo.SOLTOS
+	_ativa = true
 	_depois_de(&"")
 
 

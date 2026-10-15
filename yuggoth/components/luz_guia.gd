@@ -72,8 +72,10 @@ func _process(delta: float) -> void:
 	if not visible:
 		return
 	var pulso := 0.78 + 0.22 * sin(_t * 2.1)
-	_luz.light_energy = energia * _k * pulso
-	_brilho.modulate.a = 0.75 * _k * pulso
+	# No escuro (as luzes da casa apagadas), quase não clareia: só o brilho.
+	var escuro := fontes.any(func(f: Node) -> bool: return f != null and f.has_method(&"escuro") and f.escuro())
+	_luz.light_energy = energia * _k * pulso * (0.15 if escuro else 1.0)
+	_brilho.modulate.a = 0.75 * _k * pulso * (0.55 if escuro else 1.0)
 
 
 ## Um borrão redondo, claro no meio e sumindo para a borda.

@@ -553,7 +553,7 @@ com o balde (F3; ver o Interlúdio abaixo). (`TintaTransicao.revelar`,
 `Fazenda._descida`.) O checkpoint passa a ser o começo do Interlúdio.
 
 ## Interlúdio — "O Cerco" ⏳ (como Akeley, 2–6 de setembro)
-**Jogável agora (F2–F3, 2026-10-11):** a tinta da última carta vira o céu e a câmera
+**Jogável agora (F2–F8, até 2026-10-15; o recorte inteiro da demo):** a tinta da última carta vira o céu e a câmera
 desce dele até Akeley, diante do canil, com o balde de ração diante dos olhos, no
 entardecer de domingo, 2 de setembro. **O corpo é outro:** mais lento, ofegante (a
 câmera respira), sem dossiê; quem narra é ele, na letra das cartas (*"Meus grandes cães
@@ -575,9 +575,26 @@ acesa com a lenha da rotina (Conan vem deitar diante do fogo), o telefone mudo s
 tentar (*"Cortam os fios sempre que tento telefonar à noite."*) e a porteira do
 cercado aberta (os cães soltos no quintal, Rambo rosnando para a janela do escritório).
 A lua cheia nasce sobre os morros do leste e as nuvens a engolem. Parado, Akeley
-lembra o que falta. Feita a preparação, uns 30 segundos depois, a tela escurece e vem o
-cartão *"Fim da demonstração. A história continua."* → menu (até a F7, a noite do telhado). Continuar volta ao
-começo do Interlúdio.
+lembra o que falta. **A noite do telhado (F7)** — a carta de segunda, frase por frase,
+na letra dele, quando cada coisa acontece: "Sentar e esperar" na poltrona junto ao
+fogo, o rifle no colo (*"A noite passada foi de nuvens espessas..."*); o fogo baixa, o
+lampião baixa, o relógio do consolo bate, ele cochila; **os grilos param**. O **baque**
+no telhado o acorda — a poeira cai do forro (*"Depois da meia-noite algo pousou no
+telhado da casa,"*); os cães correm em volta da casa latindo para cima, Brutus
+choraminga na porta, Conan rosna; um sobe pelo puxado baixo e corre por cima do forro;
+a **luta** lá em cima e o **zumbido** do disco, que sobe e se vai; o **cheiro** (a
+imagem turva, o fôlego curto). Só som e poeira: nada visto. **As balas**, anunciadas:
+os latidos viram para o sudeste, um tiro bate no tabuado, o seguinte **estoura a
+vidraça** junto à poltrona (os cacos ficam no assoalho, um passa rente ao rosto), o
+terceiro lasca a estante. Então é com o jogador: **"Apagar o lampião"** (o do
+escritório, e o da sala para atirar de lá) e, **de janela em janela** (quatro: o
+escritório e a sala de estar), "Atirar pela janela" — a fresta da veneziana, o cano
+que sobe sozinho, alto, o clarão que mostra o quintal por um instante, a alavanca, o
+cartucho no chão; **no terceiro tiro, sempre, o ganido que corta** (um cão fica caído
+no quintal). Depois do quarto, os latidos param um a um; ele no escuro, respirando;
+*"Isso pareceu encerrar a coisa."* → a tela escurece e vem o cartão *"Fim da
+demonstração. A história continua."* → menu (F8). Continuar volta ao começo do
+Interlúdio.
 
 **Na demo (decidido em 2026-10-09; `docs/PLANO_FAZENDA.md`):** os beats 1–3 — a
 rotina do entardecer, a preparação e a noite do telhado (2 de setembro) —, e o

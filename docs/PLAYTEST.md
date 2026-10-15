@@ -1,11 +1,13 @@
 # Playtest — o que verificar
 
-Lista de conferência do **playtest 11** (do Prólogo ao fim da demo). Os testes
+Lista de conferência do **playtest 12** (do Prólogo ao fim da demo — que agora vai
+até a noite do telhado, na fazenda). Os testes
 automáticos (`smoke_test`, `caminhos_test`, o macaco) garantem que **tudo se joga
 até o fim sem travar**. Eles não julgam se está **bonito, claro, assustador ou fiel
 ao livro**, e não usam o mouse no menu. Esta lista é para isso.
 
-O que o playtest encontrar vira a **Fase 3l** em `docs/PLANO_ESCRITORIO.md`
+O que o playtest encontrar vira a **Fase 3m** em `docs/PLANO_ESCRITORIO.md` (e o que
+for da fazenda, a fase seguinte de `docs/PLANO_FAZENDA.md`)
 (✅ feito · 🔧 claro, a fazer · ❓ espera resposta). Atualize este arquivo a cada
 playtest: o que foi conferido sai, e entra o que mudou.
 
@@ -21,7 +23,8 @@ powershell -ExecutionPolicy Bypass -File .\comandos.ps1 jogar-log  # com o conso
 | Tecla | O quê (só no build de teste) |
 |---|---|
 | **F** (segurar) | tudo 8× mais rápido |
-| **F2** | pula para o dia seguinte |
+| **F2** | pula para o dia seguinte; na fazenda, pula a etapa em curso (a rotina, a preparação, a noite) |
+| **F4** | direto ao Interlúdio, como Akeley (também do menu); na fazenda, volta ao escritório |
 | **F3** | recarrega o dia (destrava; uma carta selada volta à mão) |
 | **C** | troca a janela entre a cidade 3D e o painel antigo |
 | **Espaço** | pula a fala |
@@ -39,7 +42,62 @@ o que esperava.
 
 ---
 
-## 0. Prioridade máxima: o que mudou desde o playtest 10 (a Fase 3k)
+## 0. Prioridade máxima: o que mudou desde o playtest 11
+**F4** leva direto à fazenda; **F2** lá pula a etapa em curso.
+
+### A noite do telhado (nova: F7 e F8) — a carta de segunda, vivida
+Depois da preparação (todos os lampiões, as venezianas, o rifle carregado, a lareira,
+a porteira), a luz-guia aponta a poltrona junto ao fogo do escritório.
+- [ ] **A espera:** "Sentar e esperar" — ele vai a pé e senta, o rifle no colo; o fogo
+      e o lampião baixam, o relógio do consolo bate, as pálpebras pesam. Longa ou curta
+      demais (uns 30 s)? Dá para sentir o cochilo? Os grilos param — percebe-se?
+- [ ] **O telhado (só som e poeira):** o baque que o acorda (a poeira e a caliça caindo
+      do forro), os cães correndo em volta da casa, as unhas correndo por cima do forro,
+      a luta e o zumbido (o do disco), que sobe e se vai; o cheiro (a imagem turva).
+      Os sons convencem vindo de cima? Assusta sem ser susto?
+- [ ] **As balas:** um tiro no tabuado, a vidraça que estoura ao lado da poltrona (os
+      cacos no chão; um passa rente ao rosto), a estante lascada. Ficou anunciado o
+      bastante (não pode ser um jumpscare: os dois do jogo são do Ato III)?
+- [ ] **Apagar a luz e atirar:** "Apagar o lampião" (o do escritório; o da sala, para
+      atirar de lá) e "Atirar pela janela" em quatro janelas (o escritório a leste e ao
+      sul, a sala de estar a leste e ao norte): a veneziana que abre, o cano que sobe
+      sozinho, alto, o clarão que mostra o quintal por um instante, o coice, a alavanca,
+      o cartucho no assoalho. No escuro, dá para achar as janelas (a luz-guia fica bem
+      fraca)? O clarão mostra o bastante — as árvores, a cerca, os cães correndo?
+- [ ] **O ganido no terceiro tiro** — o cão que fica caído. Lê-se, sem explicar?
+- [ ] **O fim:** os latidos param um a um, o escuro, *"Isso pareceu encerrar a coisa"*,
+      o cartão. É o ponto alto certo para cortar a demo?
+- [ ] **As frases da carta:** cada uma aparece quando a coisa acontece (a seguinte
+      espera a anterior sair da tela). O ritmo fica bom, ou as frases atrasam a ação?
+- [ ] **As falas novas de Akeley** (compostas, a aprovar; parado uns 35 s): *"Agora,
+      esperar. Junto ao fogo, com o rifle no colo."* · *"A luz. Com ela acesa, eles me
+      veem e eu não os vejo."* · *"As janelas. Uma fresta na veneziana basta."*
+- [ ] Falta (anotado): a tosse de Akeley no cheiro (não há gravação boa ainda).
+
+### A fazenda reformada (o playtest 11) e a preparação (F6)
+- [ ] **A luz-guia:** um brilho azul pálido sobre a próxima tarefa, que some quando você
+      chega. Fraca o bastante? Ajuda?
+- [ ] **Por dentro:** o papel de parede de cada cômodo, o assoalho largo, o lambri, os
+      alizares, os móveis refeitos peça a peça (poltronas, estantes, a escrivaninha, as
+      camas de ferro, a cozinha com o fogão). Algum cômodo ainda tosco?
+- [ ] **Por fora:** as árvores (olmos, bordos, macieiras, cicutas), os lilases, o capim
+      alto, o canil com a tela de arame, o galpão de lenha, o celeiro por dentro e a
+      carroça, o moinho, as cercas, a estrada, a linha do telefone, o pântano.
+- [ ] **A preparação (F6):** os quatro lampiões, as venezianas, o rifle (pegar no
+      armário, carregar cartucho a cartucho), a lareira (Conan vem deitar), o telefone
+      mudo, a porteira, a lua engolida pelas nuvens. O rifle diante dos olhos, o lampião
+      torneado, o telefone de manivela — estão bons?
+
+### O escritório (a Fase 3l)
+- [ ] O mapa sem cintilar; a soleira da porta sem a faixa; o diário (a capa que cai com
+      o próprio peso, as folhas que vergam, a escrita que continua na página certa); a
+      segunda carta legível; a transcrição do disco; os grilos da noite 3 mais baixos; o
+      mi-go de pé, recortado; as folhas da mesa em leque; o livro dos lapsos com as
+      páginas impressas e outro volume a cada manhã; Boston saindo pela porta e pela
+      escada; o cultista, o funcionário e os mi-go refeitos (`docs/PLANO_ESCRITORIO.md`,
+      Fase 3l).
+
+## Conferido no playtest 11 (a Fase 3k, para não se perder)
 - [ ] **Dia 6, escrever a Akeley:** a pena sempre pega a carta do dia (as áreas já
       usadas tampavam). Alguma outra coisa no Dia 6 ainda não pega ou não avança?
 - [ ] **O diário fechando:** a capa sobe e cai sobre o miolo, com um baque leve; sem o

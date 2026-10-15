@@ -909,7 +909,7 @@ func _ready() -> void:
 			"Brutus junto de Akeley, de pé no chão")
 		await _rotina(faz)
 	await _until(func() -> bool: return main_menu.visible, 120.0)
-	_check(main_menu.visible and SceneDirector.current_level.is_empty() and not tinta_na_tela.call(), "fim da demo, no quintal: o cartão e o menu")
+	_check(main_menu.visible and SceneDirector.current_level.is_empty() and not tinta_na_tela.call(), "fim da demo, depois dos tiros: o cartão e o menu")
 	_check(Narrator.voz == Narrator.Voz.WILMARTH, "fora da fazenda, quem narra volta a ser Wilmarth")
 	_check(not SceneDirector.hold_black, "depois da demo, a tela preta não fica presa")
 	Engine.time_scale = 1.0
@@ -1313,6 +1313,69 @@ func _preparacao(faz: Fazenda) -> void:
 	var conan := matilha.cao("Conan")
 	await _until(func() -> bool: return conan.global_position.distance_to(matilha.fogo) < 0.8, 40.0)
 	_check(conan.global_position.distance_to(matilha.fogo) < 0.8, "Conan deitado diante do fogo %s" % conan.global_position)
+	await _noite(faz)
+
+
+## A noite do telhado (F7): sentar e esperar; o cochilo, os grilos que param, o
+## baque; os cães em volta da casa; um sobe pelo puxado; as balas (a vidraça, os
+## cacos); apagar a luz; de janela em janela, os quatro tiros, o ganido no terceiro;
+## os cães calados, e o fim.
+func _noite(faz: Fazenda) -> void:
+	var n := faz.noite_telhado
+	var p := faz.player
+	var matilha := faz.get_node("Caes") as Matilha
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.SENTAR, 20.0)
+	_check(n.etapa == NoiteTelhado.Etapa.SENTAR and n.sentar.collision_layer != 0 and AudioDirector.get_ambience() == n.som_noite
+		and n.atirar.all(func(a: Interactable) -> bool: return a.collision_layer == 0),
+		"a noite: os grilos; a poltrona junto ao fogo à espera (as seteiras ainda não)")
+	var fazer := func(area: Interactable, de: Vector3) -> bool:
+		p.global_position = de
+		p.velocity = Vector3.ZERO
+		await _mirar(p, area.global_position)
+		var mirou := p._target == area
+		if not mirou:
+			print("   (a mira em %s pegou %s)" % [area.name, p.ray.get_collider()])
+		area.interact(p)
+		return mirou
+	var mirou: bool = await fazer.call(n.sentar, Vector3(2.7, 0.6, 4.2))
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.ESPERA and p.seated and not p.conduzido, 20.0)
+	await _seconds(1.0)
+	_check(mirou and p.seated and Vector2(p.global_position.x - n.assento.x, p.global_position.z - n.assento.z).length() < 0.15,
+		"sentado na poltrona junto ao fogo, o rifle no colo")
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.TELHADO, 90.0)
+	_check(AudioDirector.get_ambience() == n.som_sem_grilos and faz.noite > 0.8, "os grilos param; passa da meia-noite; o baque no telhado")
+	await _until(func() -> bool: return matilha.modo == Matilha.Modo.TELHADO, 20.0)
+	await _seconds(6.0)
+	var em_volta := matilha.caes().filter(func(c: CaoIA) -> bool:
+		return c.visible and matilha.casa.grow(5.0).has_point(Vector3(c.global_position.x, 0.5, c.global_position.z)) and c.global_position.y < 0.3)
+	_check(em_volta.size() >= 5, "os cães correm em volta da casa, latindo para o telhado (%d)" % em_volta.size())
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.APAGAR, 90.0)
+	_check(not matilha.cao("Kull").visible, "um subiu pelo puxado baixo (Kull, fora da vista)")
+	_check(not n.vidraca.visible and n.estilhacos.visible and p.input_enabled and not p.seated and matilha.modo == Matilha.Modo.FRENTE,
+		"as balas: a vidraça estourada; de pé, e o jogo é dele")
+	await _seconds(1.0)
+	var no_chao := n.estilhacos.get_children().all(func(c: Node3D) -> bool: return c.global_position.y < 0.65)
+	_check(no_chao and GameState.get_value(&"sonho") < 0.05, "os cacos no assoalho; a imagem já não turva")
+	_check(n.atirar.all(func(a: Interactable) -> bool: return a.collision_layer == 0), "com a luz acesa, ainda não se atira")
+	# "Apaguei a luz,": o lampião do escritório.
+	var lamp := n.apagar[0]
+	mirou = await fazer.call(lamp, Vector3(4.6, 0.6, 3.25))
+	await _until(func() -> bool: return not lamp.aceso and p.input_enabled, 10.0)
+	_check(mirou and not lamp.aceso and n.etapa == NoiteTelhado.Etapa.TIROS and n.atirar[0].collision_layer != 0 and n.atirar[2].collision_layer == 0,
+		"apagada a luz: as seteiras do escritório valem; as da sala esperam a luz de lá")
+	var de_pe := [Vector3(4.55, 0.6, 4.8), Vector3(4.6, 0.6, 4.55), Vector3(4.55, 0.6, -2.6), Vector3(4.6, 0.6, -4.55)]
+	for i in 4:
+		if i == 2:
+			mirou = await fazer.call(n.apagar[1], Vector3(3.4, 0.6, -2.6))
+			await _until(func() -> bool: return not n.apagar[1].aceso and p.input_enabled, 10.0)
+			_check(mirou and n.atirar[2].collision_layer != 0, "a luz da sala apagada também")
+		mirou = await fazer.call(n.atirar[i], de_pe[i])
+		await _until(func() -> bool: return not n._ocupado and p.input_enabled or n.etapa == NoiteTelhado.Etapa.FIM, 30.0)
+		_check(mirou and n.tiros == i + 1 and n.atirar[i].get_meta(&"atirou", false) and n.atirar[i].collision_layer == 0, "o tiro %d, pela fresta da veneziana" % (i + 1))
+	var caidos := matilha.caes().filter(func(c: CaoIA) -> bool: return c.caido)
+	_check(caidos.size() == 1 and faz.preparacao.cartuchos == 0, "no terceiro tiro, o ganido: um cão caído; o rifle vazio")
+	await _until(func() -> bool: return matilha.modo == Matilha.Modo.CALADOS, 10.0)
+	_check(n.etapa == NoiteTelhado.Etapa.FIM and not p.input_enabled, "os latidos param um a um; ele no escuro")
 
 
 ## O botão de testes (F4): do menu, direto ao Interlúdio como Akeley, pulando o
