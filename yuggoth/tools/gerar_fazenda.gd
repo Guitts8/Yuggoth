@@ -282,14 +282,62 @@ func _guardar(r: Resource, nome: String) -> Resource:
 	return load(caminho)
 
 
+## O lado (m) dos pedaços em que a malha de cada material é partida. Uma malha só
+## para a fazenda inteira não deixava o motor descartar nada: fora da vista, fora
+## do alcance de um lampião, fora de uma faixa da sombra do sol — cada luz com
+## sombra redesenhava a fazenda toda (2026-10-16: a placa integrada travava).
+const PEDACO := 12.0
+
+
+## Cada material vira uma cena (`obra_<mat>.scn`, binária) com um MeshInstance3D
+## por pedaço de PEDACO × PEDACO, instanciada em Obras.
 func _fechar_obras() -> void:
 	var g := _group(cena, "Obras")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(MALHAS))
 	for mat in _obras:
-		var mi := MeshInstance3D.new()
-		mi.name = mat.to_pascal_case()
-		mi.mesh = _guardar(_obras[mat].fechar(), "obra_" + mat)
-		mi.material_override = m[mat]
-		_add(g, mi)
+		var arr := (_obras[mat].fechar() as ArrayMesh).surface_get_arrays(0)
+		var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
+		var cor: PackedColorArray = arr[Mesh.ARRAY_COLOR]
+		var baldes: Dictionary[Vector2i, PackedInt32Array] = {}
+		for t in range(0, v.size(), 3):
+			var c := (v[t] + v[t + 1] + v[t + 2]) / 3.0
+			var k := Vector2i(floori(c.x / PEDACO), floori(c.z / PEDACO))
+			if not baldes.has(k):
+				baldes[k] = PackedInt32Array()
+			baldes[k].append(t)
+		var raiz := Node3D.new()
+		raiz.name = mat.to_pascal_case()
+		for k in baldes:
+			var pv := PackedVector3Array()
+			var pn := PackedVector3Array()
+			var pc := PackedColorArray()
+			for t in baldes[k]:
+				for i in 3:
+					pv.append(v[t + i])
+					pn.append(nrm[t + i])
+					pc.append(cor[t + i])
+			var a := []
+			a.resize(Mesh.ARRAY_MAX)
+			a[Mesh.ARRAY_VERTEX] = pv
+			a[Mesh.ARRAY_NORMAL] = pn
+			a[Mesh.ARRAY_COLOR] = pc
+			var am := ArrayMesh.new()
+			am.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, a)
+			var mi := MeshInstance3D.new()
+			mi.name = "P%d_%d" % [k.x, k.y]
+			mi.mesh = am
+			mi.material_override = m[mat]
+			raiz.add_child(mi)
+			mi.owner = raiz
+		var packed := PackedScene.new()
+		packed.pack(raiz)
+		raiz.free()
+		var caminho := MALHAS + "obra_" + mat + ".scn"
+		ResourceSaver.save(packed, caminho, ResourceSaver.FLAG_COMPRESS)
+		var inst := (ResourceLoader.load(caminho, "", ResourceLoader.CACHE_MODE_REPLACE) as PackedScene).instantiate()
+		g.add_child(inst)
+		inst.owner = cena
 
 
 ## Um retângulo de `o`, com lados `eu` e `ev`, em células de até CEL.

@@ -152,6 +152,17 @@ func _ready() -> void:
 	Settings.load_settings()
 	_check(is_equal_approx(Settings.get_value(&"volume_Master"), 0.5), "preferências gravadas e relidas")
 	Settings.reset_to_defaults()
+	# A qualidade da imagem: aplicada por cima do que a fase pediu, e reversível.
+	Settings.set_value(&"qualidade", 0)
+	var sol := DirectionalLight3D.new()
+	sol.directional_shadow_max_distance = 90.0
+	add_child(sol)
+	await get_tree().process_frame
+	_check(is_equal_approx(sol.directional_shadow_max_distance, 27.0), "qualidade baixa: a sombra do sol encurta")
+	Settings.set_value(&"qualidade", 2)
+	_check(is_equal_approx(sol.directional_shadow_max_distance, 90.0), "qualidade alta: o alcance da fase volta")
+	sol.queue_free()
+	Settings.reset_to_defaults()
 
 	# --- AudioDirector ---
 	var chuva := AudioStreamGenerator.new()

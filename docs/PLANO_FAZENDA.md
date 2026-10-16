@@ -259,6 +259,38 @@ usuário joga o **playtest 12** (`docs/PLAYTEST.md`: a demo inteira, agora com a
 noite); a lista vira a fase seguinte daqui e do escritório. Depois, a F9 (as
 fotografias do Dia 2 feitas das cenas 3D) e o playtest com 5+ pessoas (o marco Demo).
 
+## O desempenho (2026-10-16)
+O usuário: *"O modelo da fazenda tem travado muito a máquina, será que está pesado?"*
+A máquina dele tem placa integrada (Intel UHD Graphics). Medido no jogo
+(`SHOT_MODO=perf` em `tests/_tmp_shot.gd`; `QUALIDADE=0/1/2`, `PERF_LOG` grava cada
+linha no disco):
+- o escritório a 60 fps; a fazenda ao entardecer a **26–36 fps**, com ~350 mil
+  triângulos desenhados e **1,0–1,4 milhão na sombra do sol** por quadro (90 m de
+  alcance, 4 faixas). À noite (sem o sol) voltava aos 60.
+- O gerador juntava cada material da fazenda **inteira** numa malha só (`_obra`): o
+  motor não descartava nada — nem fora da vista, nem fora do alcance de um lampião.
+  Cada luz com sombra (os lampiões, a lareira, o clarão do quintal) redesenhava a
+  fazenda toda, até 6 vezes (a sombra em cubo).
+- Medindo em Alta, com a noite do telhado, **o driver de vídeo travou**: o processo
+  ficou preso no driver, não se deixou encerrar, e nenhum outro programa abria mais o
+  D3D12 ou o Vulkan até reiniciar. É o travamento que o usuário via.
+
+Feito:
+- ✅ **As obras em pedaços** — `_fechar_obras` parte a malha de cada material em
+  quadrados de `PEDACO` (12 m), um MeshInstance3D por pedaço, salvos como
+  `levels/fazenda/malhas/obra_<mat>.scn` (binário; instanciados em `Obras`). Saíram os
+  `obra_*.res`.
+- ✅ **A qualidade da imagem** (`Settings`, chave `qualidade`; Opções → "Qualidade da
+  imagem"): Baixa / Média / Alta mudam o atlas das sombras, o alcance da sombra do sol
+  (30% / 55% / 100% do que a fase pede) e as faixas (2 / 2 / as da fase), o filtro, a
+  sombra dos lampiões (duplo paraboloide, 2 passadas, nas duas mais baixas; cubo na
+  Alta) e a qualidade do SSAO. Sem escolha gravada, começa pela placa: integrada ou
+  CPU → Baixa.
+- 🔧 **Medir de novo** depois de reiniciar a máquina (as três qualidades, a noite do
+  telhado incluída) e, se a Baixa ainda não chegar perto dos 60 fps: o bosque (129 mil
+  triângulos, 37% da fazenda; copas sem sombra ou mais simples de longe) e a física
+  dos cães (5–7 ms por passo).
+
 ## As fases (em ordem)
 1. ✅ **F1 — A planta em bloco** (2026-10-10, enquanto o usuário não podia jogar o
    playtest 10; commit `3e1c666`). `tools/gerar_fazenda.gd` (+ `.tscn`; `comandos.ps1 gerar-fazenda`)

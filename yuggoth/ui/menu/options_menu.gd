@@ -25,9 +25,15 @@ const TOGGLES := [
 	[&"inverter_y", "Inverter eixo vertical"],
 	[&"tela_cheia", "Tela cheia"],
 ]
+## [chave em Settings, rótulo, nomes dos valores 0, 1, 2...]: um botão que passa ao
+## próximo (setas: o anterior e o próximo).
+const ESCOLHAS := [
+	[&"qualidade", "Qualidade da imagem", preload("res://autoload/settings.gd").QUALIDADES],
+]
 
 var _sliders: Dictionary[StringName, HSlider] = {}
 var _toggles: Dictionary[StringName, Button] = {}
+var _escolhas: Dictionary[StringName, Button] = {}
 ## A página esquerda como estava ao fechar (para quem abriu virar a folha de volta).
 var foto_saida: Texture2D
 
@@ -46,6 +52,8 @@ func _ready() -> void:
 		_add_slider(s[0], s[1], s[2], s[3], s[4], s[5], pagina)
 	for t: Array in TOGGLES:
 		_add_toggle(t[0], t[1])
+	for e: Array in ESCOLHAS:
+		_add_escolha(e[0], e[1], e[2])
 	back_button.pressed.connect(close)
 	reset_button.pressed.connect(func() -> void:
 		Settings.reset_to_defaults()
@@ -80,6 +88,8 @@ func _refresh() -> void:
 	for key in _toggles:
 		_toggles[key].set_pressed_no_signal(Settings.get_value(key))
 		_toggles[key].toggled.emit(_toggles[key].button_pressed)
+	for key in _escolhas:
+		_escolhas[key].text = _escolhas[key].get_meta(&"nomes")[Settings.get_value(key)]
 
 
 func _add_slider(key: StringName, label: String, min_value: float, max_value: float, step: float, format: String, pagina: VBoxContainer) -> void:
@@ -121,6 +131,27 @@ func _add_toggle(key: StringName, label: String) -> void:
 	for style: StringName in [&"pressed", &"hover_pressed"]:
 		toggle.add_theme_stylebox_override(style, toggle.get_theme_stylebox(&"normal"))
 	_toggles[key] = toggle
+
+
+func _add_escolha(key: StringName, label: String, nomes: Array) -> void:
+	var row := _add_row(label, rows)
+	var botao := Button.new()
+	botao.custom_minimum_size.x = 80
+	botao.add_theme_font_override(&"font", load(Livro.FONTE_TEXTO))
+	botao.add_theme_font_size_override(&"font_size", 25)
+	botao.set_meta(&"nomes", nomes)
+	var mudar := func(passo: int) -> void:
+		var v := posmod(int(Settings.get_value(key)) + passo, nomes.size())
+		Settings.set_value(key, v)
+		botao.text = nomes[v]
+	botao.pressed.connect(mudar.bind(1))
+	botao.gui_input.connect(func(event: InputEvent) -> void:
+		for acao: Array in [[&"ui_left", -1], [&"ui_right", 1]]:
+			if event.is_action_pressed(acao[0]):
+				mudar.call(acao[1])
+				botao.accept_event())
+	row.add_child(botao)
+	_escolhas[key] = botao
 
 
 func _add_row(label: String, pagina: VBoxContainer) -> HBoxContainer:

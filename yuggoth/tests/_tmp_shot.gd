@@ -48,6 +48,10 @@ func _ready() -> void:
 		await _entardecer_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "perf":
+		await _perf_fazenda()
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "fazenda":
 		await _fazenda_fotos()
 		get_tree().quit()
@@ -1281,3 +1285,111 @@ func _queda_fazenda() -> void:
 		var q := PhysicsRayQueryParameters3D.create(Vector3(pt.x, 60, pt.z), Vector3(pt.x, -60, pt.z), 1)
 		var r := space.intersect_ray(q)
 		print("SOLTO em ", pt, " parou em ", p.global_position.snappedf(0.01), " chao ", r.get("position", "nada"), " ", r.get("collider", null))
+
+
+## SHOT_MODO=perf: o custo da fazenda em vários pontos (quadros, picos, draw calls).
+## QUALIDADE=0/1/2 escolhe a qualidade da imagem (sem ela, a padrão da placa).
+func _perf_fazenda() -> void:
+	GameState.reset()
+	if OS.get_environment("QUALIDADE") != "":
+		Settings.set_value(&"qualidade", int(OS.get_environment("QUALIDADE")))
+	_plog("PERF qualidade: %s, placa %s" % [Settings.QUALIDADES[Settings.get_value(&"qualidade")], RenderingServer.get_video_adapter_name()])
+	await _perf_janela("antes da fazenda")
+	GameState.set_flag(&"interludio")
+	var t0 := Time.get_ticks_msec()
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+	_plog("PERF carregar fazenda: %d ms" % (Time.get_ticks_msec() - t0))
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	Engine.time_scale = 6.0
+	await _until(func() -> bool: return not faz.descendo, 60.0)
+	Engine.time_scale = 1.0
+	var p := faz.player
+	var pontos := [
+		["entardecer (canil)", null, 0.0],
+		["quintal olhando a casa", Vector3(12, 0.1, 0), 90.0],
+		["quintal olhando o vale", Vector3(-10, 0.1, -4), -90.0],
+		["dentro: escritorio", Vector3(4.2, 0.7, 2.6), 0.0],
+		["dentro: sala", Vector3(4.4, 0.7, -2.8), 180.0],
+		["celeiro", Vector3(-15, 0.1, -12), 180.0],
+		["pantano olhando a montanha", Vector3(-35, 0.1, 0), -90.0],
+	]
+	for pt: Array in pontos:
+		if pt[1] != null:
+			p.global_position = pt[1]
+			p.velocity = Vector3.ZERO
+			p.rotation.y = deg_to_rad(pt[2])
+		await _s(1.0)
+		await _perf_janela(pt[0])
+	faz.rotina.pular()
+	await _until(func() -> bool: return faz.preparacao._ativa, 30.0)
+	faz.preparacao.pular()
+	var n := faz.noite_telhado
+	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.SENTAR, 30.0)
+	faz.teto = 1.0
+	faz.entardecer = 1.0
+	faz.noite = 0.8
+	p.global_position = Vector3(2.7, 0.6, 4.2)
+	await _olhar(p, n.sentar.global_position)
+	await _s(2.0)
+	await _perf_janela("noite: junto ao fogo")
+	p.global_position = Vector3(4.4, 0.7, -2.8)
+	p.rotation.y = 0.0
+	await _s(1.0)
+	await _perf_janela("noite: sala")
+	p.global_position = Vector3(12, 0.1, 0)
+	p.rotation.y = deg_to_rad(90.0)
+	await _s(1.0)
+	await _perf_janela("noite: quintal")
+
+
+func _perf_janela(nome: String) -> void:
+	var n := 0
+	var pior := 0.0
+	var soma := 0.0
+	var acima := 0
+	var ini := Time.get_ticks_usec()
+	var ult := ini
+	while Time.get_ticks_usec() - ini < 3_000_000:
+		await get_tree().process_frame
+		var agora := Time.get_ticks_usec()
+		var dt := (agora - ult) / 1000.0
+		ult = agora
+		n += 1
+		soma += dt
+		pior = maxf(pior, dt)
+		if dt > 50.0:
+			acima += 1
+	_plog("PERF %-28s media %5.1f ms (%3.0f fps)  pior %6.1f ms  quadros>50ms %d" % [nome, soma / n, 1000.0 * n / soma, pior, acima])
+	_perf_amostra(nome, 1)
+
+
+func _perf_amostra(nome: String, _k: int) -> void:
+	var vp := root.find_child("World", true, false) as SubViewport
+	var rid := vp.get_viewport_rid() if vp else get_viewport().get_viewport_rid()
+	var rs := RenderingServer
+	_plog("PERF   %s: draw calls %d, objetos %d, primitivas %d | vram %.0f MB, mem estatica %.0f MB, nos %d, fisica %.2f ms, processo %.2f ms" % [
+		nome,
+		rs.viewport_get_render_info(rid, RenderingServer.VIEWPORT_RENDER_INFO_TYPE_VISIBLE, RenderingServer.VIEWPORT_RENDER_INFO_DRAW_CALLS_IN_FRAME),
+		rs.viewport_get_render_info(rid, RenderingServer.VIEWPORT_RENDER_INFO_TYPE_VISIBLE, RenderingServer.VIEWPORT_RENDER_INFO_OBJECTS_IN_FRAME),
+		rs.viewport_get_render_info(rid, RenderingServer.VIEWPORT_RENDER_INFO_TYPE_VISIBLE, RenderingServer.VIEWPORT_RENDER_INFO_PRIMITIVES_IN_FRAME),
+		Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
+		Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
+		Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
+		Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
+		Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+	])
+	var sombra := rs.viewport_get_render_info(rid, RenderingServer.VIEWPORT_RENDER_INFO_TYPE_SHADOW, RenderingServer.VIEWPORT_RENDER_INFO_DRAW_CALLS_IN_FRAME)
+	_plog("PERF   %s: draw calls de sombra %d, primitivas de sombra %d" % [nome, sombra, rs.viewport_get_render_info(rid, RenderingServer.VIEWPORT_RENDER_INFO_TYPE_SHADOW, RenderingServer.VIEWPORT_RENDER_INFO_PRIMITIVES_IN_FRAME)])
+
+
+## O print fica no buffer quando a saída vai para um arquivo; se o jogo travar,
+## perde-se. Aqui cada linha vai já para o disco.
+func _plog(texto: String) -> void:
+	print(texto)
+	var caminho := OS.get_environment("PERF_LOG")
+	if caminho.is_empty():
+		return
+	var f := FileAccess.open(caminho, FileAccess.READ_WRITE if FileAccess.file_exists(caminho) else FileAccess.WRITE)
+	f.seek_end()
+	f.store_line("%7.1f s  %s" % [Time.get_ticks_msec() / 1000.0, texto])
+	f.close()

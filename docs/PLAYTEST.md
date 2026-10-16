@@ -45,6 +45,20 @@ o que esperava.
 ## 0. Prioridade máxima: o que mudou desde o playtest 11
 **F4** leva direto à fazenda; **F2** lá pula a etapa em curso.
 
+### O desempenho da fazenda e a qualidade da imagem (2026-10-16)
+A fazenda travava a máquina (a placa integrada Intel UHD: a sombra do sol e a dos
+lampiões redesenhavam a fazenda inteira a cada quadro, e o driver de vídeo chegou a
+travar). A malha da fazenda agora é partida em pedaços e há uma opção nova.
+- [ ] **Se a máquina já travou com o jogo hoje, reinicie antes de jogar** — o driver
+      de vídeo travado não volta sozinho (nem o Godot abre).
+- [ ] **Opções → "Qualidade da imagem"** (Baixa / Média / Alta; Enter ou as setas
+      trocam). Sem escolha gravada, ela começa pela placa: numa integrada, **Baixa**.
+      A diferença se vê nas sombras (o alcance da do sol, a nitidez); o resto é igual.
+- [ ] **A fazenda em Baixa:** anda liso? Trava em algum lugar (diga onde: o quintal
+      ao entardecer, o pântano, a noite do telhado com os lampiões e a lareira)?
+- [ ] **E em Média e Alta:** até onde a máquina aguenta? A sombra curta da Baixa
+      incomoda (as sombras somem a uns 27 m)?
+
 ### A noite do telhado (nova: F7 e F8) — a carta de segunda, vivida
 Depois da preparação (todos os lampiões, as venezianas, o rifle carregado, a lareira,
 a porteira), a luz-guia aponta a poltrona junto ao fogo do escritório.
