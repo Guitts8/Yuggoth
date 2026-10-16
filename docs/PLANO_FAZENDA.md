@@ -285,7 +285,7 @@ Feito:
   (30% / 55% / 100% do que a fase pede) e as faixas (2 / 2 / as da fase), o filtro, a
   sombra dos lampiões (duplo paraboloide, 2 passadas, nas duas mais baixas; cubo na
   Alta) e a qualidade do SSAO. Sem escolha gravada, começa pela placa: integrada ou
-  CPU → Baixa.
+  CPU → Baixa. Commit `bb93a51`.
 - 🔧 **Medir de novo** depois de reiniciar a máquina (as três qualidades, a noite do
   telhado incluída) e, se a Baixa ainda não chegar perto dos 60 fps: o bosque (129 mil
   triângulos, 37% da fazenda; copas sem sombra ou mais simples de longe) e a física
