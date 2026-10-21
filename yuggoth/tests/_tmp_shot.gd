@@ -1311,7 +1311,10 @@ func _perf_fazenda() -> void:
 		["dentro: escritorio", Vector3(4.2, 0.7, 2.6), 0.0],
 		["dentro: sala", Vector3(4.4, 0.7, -2.8), 180.0],
 		["celeiro", Vector3(-15, 0.1, -12), 180.0],
-		["pantano olhando a montanha", Vector3(-35, 0.1, 0), -90.0],
+		["pantano olhando a montanha", Vector3(-35, 0.1, 0), 90.0],
+		["canil olhando a montanha", Vector3(-6, 0.1, -24), 90.0],
+		["junto ao muro oeste", Vector3(-60, 0.1, -10), 90.0],
+		["estrada olhando a montanha", Vector3(30.5, 0.1, -20), 90.0],
 	]
 	for pt: Array in pontos:
 		if pt[1] != null:
@@ -1320,6 +1323,8 @@ func _perf_fazenda() -> void:
 			p.rotation.y = deg_to_rad(pt[2])
 		await _s(1.0)
 		await _perf_janela(pt[0])
+	if OS.get_environment("PERF_SO_TARDE") != "":
+		return
 	faz.rotina.pular()
 	await _until(func() -> bool: return faz.preparacao._ativa, 30.0)
 	faz.preparacao.pular()

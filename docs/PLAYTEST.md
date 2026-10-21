@@ -56,6 +56,12 @@ travar). A malha da fazenda agora é partida em pedaços e há uma opção nova.
       A diferença se vê nas sombras (o alcance da do sol, a nitidez); o resto é igual.
 - [ ] **A fazenda em Baixa:** anda liso? Trava em algum lugar (diga onde: o quintal
       ao entardecer, o pântano, a noite do telhado com os lampiões e a lareira)?
+- [ ] **Olhando a Dark Mountain** (do quintal, do canil, do pântano, junto ao muro
+      oeste), ao entardecer, com o sol baixo atrás dela — foi onde a máquina travou em
+      2026-10-21. A mata de longe agora não faz sombra e é mais simples: ainda trava?
+      Salve antes (o checkpoint é a entrada da fazenda). A mata ao longe parece pior?
+      Se travar, depois de reiniciar teste com o Vulkan:
+      `& $godot --path yuggoth --rendering-driver vulkan`.
 - [ ] **E em Média e Alta:** até onde a máquina aguenta? A sombra curta da Baixa
       incomoda (as sombras somem a uns 27 m)?
 

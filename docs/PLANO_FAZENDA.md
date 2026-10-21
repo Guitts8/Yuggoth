@@ -286,8 +286,25 @@ Feito:
   sombra dos lampiões (duplo paraboloide, 2 passadas, nas duas mais baixas; cubo na
   Alta) e a qualidade do SSAO. Sem escolha gravada, começa pela placa: integrada ou
   CPU → Baixa. Commit `bb93a51`.
-- 🔧 **Medir de novo** depois de reiniciar a máquina (as três qualidades, a noite do
-  telhado incluída) e, se a Baixa ainda não chegar perto dos 60 fps: o bosque (129 mil
+- ✅ **Medido de novo** (2026-10-21, em Baixa): 50–60 fps no canil, no quintal (para a
+  casa e para o vale) e dentro da casa, ~170–265 mil triângulos e ~250–310 mil na
+  sombra. Mas olhando a Dark Mountain do quintal **a máquina travou de novo** (e outra
+  vez numa segunda medição, logo depois de "dentro: sala", indo ao celeiro/pântano —
+  o PC inteiro, foi preciso reiniciar). Suspeita: com o sol baixo atrás da montanha, a
+  mata da encosta inteira entrava na vista e na sombra de cada faixa (a sombra do sol
+  pega o que está entre a câmera e o sol, por longe que esteja).
+- ✅ **O longe sem sombra** — o que fica além de `PERTO_X`/`PERTO_Z` (uns 50 m além dos
+  muros; a sombra do sol não chega lá nem na Alta) vira `obra_bosque_longe` (pedaços de
+  `PEDACO_LONGE`, 48 m, `cast_shadow` desligado), com árvores mais simples
+  (`_abeto_longe`: três cones de cinco lados, sem tronco; `_betula_longe`), tirando os
+  mesmos números do sorteio para o resto não mudar de lugar; o chão de longe também
+  (`ChaoLonge`, sem sombra; a colisão continua a malha inteira). Contado sem desenhar
+  (headless): junto ao muro oeste, olhando a montanha, 45 instâncias e só 19 com
+  sombra. Teste de fumaça ok. **Não medido na placa** (o usuário preferiu não arriscar
+  outro travamento): conferir no playtest 12.
+- 🔧 Se ainda travar olhando a montanha: rodar com `--rendering-driver vulkan` para ver
+  se é o D3D12 da Intel; depois, a física dos cães (4–6 ms por passo).
+- (antes) Se a Baixa ainda não chegar perto dos 60 fps: o bosque (129 mil
   triângulos, 37% da fazenda; copas sem sombra ou mais simples de longe) e a física
   dos cães (5–7 ms por passo).
 

@@ -287,10 +287,24 @@ func _guardar(r: Resource, nome: String) -> Resource:
 ## do alcance de um lampião, fora de uma faixa da sombra do sol — cada luz com
 ## sombra redesenhava a fazenda toda (2026-10-16: a placa integrada travava).
 const PEDACO := 12.0
+## O que fica além disto (x, z) é "de longe": a sombra do sol não chega lá nem na
+## Alta (90 m da câmera, que não sai dos muros). Olhando a Dark Mountain do quintal,
+## a mata da encosta inteira entrava na vista e, com o sol baixo atrás dela, também
+## na sombra de cada faixa: a placa integrada travava (2026-10-21).
+const PERTO_X := Vector2(-110.0, 70.0)
+const PERTO_Z := Vector2(-100.0, 80.0)
+## As obras de longe e o material de cada uma: pedaços de PEDACO_LONGE, sem sombra.
+const LONGE: Dictionary[String, String] = {"bosque_longe": "bosque"}
+const PEDACO_LONGE := 48.0
+
+
+func _perto(x: float, z: float) -> bool:
+	return x > PERTO_X.x and x < PERTO_X.y and z > PERTO_Z.x and z < PERTO_Z.y
 
 
 ## Cada material vira uma cena (`obra_<mat>.scn`, binária) com um MeshInstance3D
-## por pedaço de PEDACO × PEDACO, instanciada em Obras.
+## por pedaço de PEDACO × PEDACO, instanciada em Obras (as de LONGE, por pedaço de
+## PEDACO_LONGE e sem sombra).
 func _fechar_obras() -> void:
 	var g := _group(cena, "Obras")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(MALHAS))
@@ -299,10 +313,11 @@ func _fechar_obras() -> void:
 		var v: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
 		var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
 		var cor: PackedColorArray = arr[Mesh.ARRAY_COLOR]
+		var lado := PEDACO_LONGE if LONGE.has(mat) else PEDACO
 		var baldes: Dictionary[Vector2i, PackedInt32Array] = {}
 		for t in range(0, v.size(), 3):
 			var c := (v[t] + v[t + 1] + v[t + 2]) / 3.0
-			var k := Vector2i(floori(c.x / PEDACO), floori(c.z / PEDACO))
+			var k := Vector2i(floori(c.x / lado), floori(c.z / lado))
 			if not baldes.has(k):
 				baldes[k] = PackedInt32Array()
 			baldes[k].append(t)
@@ -327,7 +342,9 @@ func _fechar_obras() -> void:
 			var mi := MeshInstance3D.new()
 			mi.name = "P%d_%d" % [k.x, k.y]
 			mi.mesh = am
-			mi.material_override = m[mat]
+			mi.material_override = m[LONGE.get(mat, mat)]
+			if LONGE.has(mat):
+				mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			raiz.add_child(mi)
 			mi.owner = raiz
 		var packed := PackedScene.new()
@@ -496,7 +513,11 @@ func _cor_chao(x: float, z: float) -> Color:
 func _terreno() -> void:
 	var xs := _passos([-700.0, -260.0, -70.0, 46.0, 210.0, 700.0], [40.0, 10.0, 2.0, 8.0, 40.0])
 	var zs := _passos([-700.0, -230.0, -66.0, 46.0, 230.0, 700.0], [40.0, 10.0, 2.0, 10.0, 40.0])
+	# A colisão segue a malha inteira; a de se ver parte em perto (com sombra) e
+	# longe (sem: os morros em volta e a encosta além da sombra).
+	var todo := Cidade.Malha.new()
 	var mm := Cidade.Malha.new()
+	var longe := Cidade.Malha.new()
 	for i in xs.size() - 1:
 		for j in zs.size() - 1:
 			var x0 := xs[i]
@@ -510,18 +531,26 @@ func _terreno() -> void:
 			var n := (c - a).cross(b - d).normalized()
 			if n.y < 0.0:
 				n = -n
-			mm.quad(a, b, c, d, n, _cor_chao((x0 + x1) / 2, (z0 + z1) / 2))
+			var cor := _cor_chao((x0 + x1) / 2, (z0 + z1) / 2)
+			todo.quad(a, b, c, d, n, cor)
+			(mm if _perto((x0 + x1) / 2, (z0 + z1) / 2) else longe).quad(a, b, c, d, n, cor)
 	var mi := MeshInstance3D.new()
 	mi.name = "Chao"
 	mi.mesh = _guardar(mm.fechar(), "chao")
 	mi.material_override = m["grama"]
 	_add(cena, mi)
+	var mi_longe := MeshInstance3D.new()
+	mi_longe.name = "ChaoLonge"
+	mi_longe.mesh = _guardar(longe.fechar(), "chao_longe")
+	mi_longe.material_override = m["grama"]
+	mi_longe.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_add(cena, mi_longe)
 	var corpo := StaticBody3D.new()
 	corpo.name = "ColisaoChao"
 	_add(cena, corpo)
 	var forma := CollisionShape3D.new()
 	forma.name = "Forma"
-	forma.shape = _guardar(mi.mesh.create_trimesh_shape(), "chao_colisao")
+	forma.shape = _guardar((todo.fechar() as ArrayMesh).create_trimesh_shape(), "chao_colisao")
 	_add(corpo, forma)
 	# As poças do pântano.
 	# Playtest 11 (R4): cada poça é um polígono torto na altura do ponto mais baixo
@@ -2953,18 +2982,34 @@ func _arvores() -> void:
 				mm.caixa(Vector3(0.012, h * 0.95, 0.012), q + Vector3(0.05, h * 0.47, 0), Color(0.4, 0.38, 0.2))
 				mm.caixa(Vector3(0.045, 0.17, 0.045), q + Vector3(0.05, h * 0.95, 0), Color(0.3, 0.19, 0.1))
 	# A mata da encosta: cicutas e bétulas, densa, até a crista (o fim do terreno).
+	# A de longe (além de PERTO_X/PERTO_Z) mais simples e sem sombra.
+	var mata_longe := _obra("bosque_longe")
 	for i in 1100:
 		var p := Vector3(_rng.randf_range(-258.0, -66.0), 0, _rng.randf_range(-228.0, 228.0))
 		p.y = _altura(p.x, p.z) - 0.2
+		var perto := _perto(p.x, p.z)
 		if _rng.randf() < 0.22:
-			_betula(mm, p, _rng.randf_range(8.0, 12.0), false)
+			if perto:
+				_betula(mm, p, _rng.randf_range(8.0, 12.0), false)
+			else:
+				_betula_longe(mata_longe, p, _rng.randf_range(8.0, 12.0))
 		else:
-			_vistas._abeto(mm, p, _rng.randf_range(9.0, 16.0), Color(0.08, 0.13, 0.09) * _rng.randf_range(0.8, 1.25), _rng)
+			var alt := _rng.randf_range(9.0, 16.0)
+			var cor := Color(0.08, 0.13, 0.09) * _rng.randf_range(0.8, 1.25)
+			if perto:
+				_vistas._abeto(mm, p, alt, cor, _rng)
+			else:
+				_abeto_longe(mata_longe, p, alt, cor)
 	# Do outro lado do vale (leste), bosques nos morros, mais ralos.
 	for i in 260:
 		var p := Vector3(_rng.randf_range(60.0, 205.0), 0, _rng.randf_range(-228.0, 228.0))
 		p.y = _altura(p.x, p.z) - 0.2
-		_vistas._abeto(mm, p, _rng.randf_range(8.0, 13.0), Color(0.1, 0.15, 0.09) * _rng.randf_range(0.8, 1.2), _rng)
+		var alt := _rng.randf_range(8.0, 13.0)
+		var cor := Color(0.1, 0.15, 0.09) * _rng.randf_range(0.8, 1.2)
+		if _perto(p.x, p.z):
+			_vistas._abeto(mm, p, alt, cor, _rng)
+		else:
+			_abeto_longe(mata_longe, p, alt, cor)
 	# Os troncos do quintal e do pântano barram o corpo.
 	for p in troncos:
 		_col.append([Vector3(0.5, 3.0, 0.5), p + Vector3(0, 1.5, 0)])
@@ -2993,6 +3038,27 @@ func _betula(mm: Cidade.Malha, p: Vector3, alt: float, perto: bool) -> void:
 	else:
 		mm.bipiramide(alt * 0.13, alt * 0.45, p + Vector3(0, alt * 0.74, 0), 5, folha, _rng.randf() * TAU)
 		mm.bipiramide(alt * 0.1, alt * 0.3, p + Vector3(0.3, alt * 0.52, 0), 5, folha * 0.9, _rng.randf() * TAU)
+
+
+## Uma cicuta de longe: três cones de cinco lados, sem o tronco (escondido pelos
+## de baixo). Tira do sorteio os mesmos números de Vistas._abeto, para o resto da
+## fazenda não mudar de lugar.
+func _abeto_longe(mm: Cidade.Malha, p: Vector3, alt: float, cor: Color) -> void:
+	for k in 4:
+		var r := alt * (0.18 - k * 0.04) * _rng.randf_range(0.9, 1.1)
+		if k < 3:
+			mm.piramide(r, alt * 0.36, p + Vector3(0, alt * (0.12 + k * 0.24), 0), 5, cor * (1.0 + k * 0.08))
+
+
+## Uma bétula de longe: o tronco pálido num fuso de três lados e a copa num só.
+## O mesmo sorteio de _betula (sem `perto`).
+func _betula_longe(mm: Cidade.Malha, p: Vector3, alt: float) -> void:
+	mm.piramide(0.12, alt, p, 3, Color(0.74, 0.72, 0.66))
+	for k in 3:
+		_rng.randf_range(0.8, alt - 1.0)
+	var folha := Color(0.26, 0.34, 0.15) if _rng.randf() < 0.85 else Color(0.5, 0.46, 0.18)
+	mm.bipiramide(alt * 0.14, alt * 0.6, p + Vector3(0, alt * 0.68, 0), 4, folha, _rng.randf() * TAU)
+	_rng.randf()
 
 
 ## Um tronco morto do pântano, sem casca, com dois galhos quebrados.
