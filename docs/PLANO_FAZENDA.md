@@ -301,7 +301,7 @@ Feito:
   (`ChaoLonge`, sem sombra; a colisão continua a malha inteira). Contado sem desenhar
   (headless): junto ao muro oeste, olhando a montanha, 45 instâncias e só 19 com
   sombra. Teste de fumaça ok. **Não medido na placa** (o usuário preferiu não arriscar
-  outro travamento): conferir no playtest 12.
+  outro travamento): conferir no playtest 12. Commit `ad0bf50`.
 - 🔧 Se ainda travar olhando a montanha: rodar com `--rendering-driver vulkan` para ver
   se é o D3D12 da Intel; depois, a física dos cães (4–6 ms por passo).
 - (antes) Se a Baixa ainda não chegar perto dos 60 fps: o bosque (129 mil
