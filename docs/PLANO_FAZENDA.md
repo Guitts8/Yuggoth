@@ -913,7 +913,7 @@ primeiro só em som, de onde vem e por onde anda, e a frase aparece depois
   tiro; no fim, no silêncio dos latidos, o relógio do consolo chega mais perto e só
   então *"Isso pareceu encerrar a coisa"*.
 - O teste de fumaça confere o abafamento no cochilo e o filtro fora do bus depois do
-  baque.
+  baque. Commit `3aafb75`.
 - **Fica para depois** (se a noite convencer): o mesmo princípio no entardecer e na
   preparação; uma tosse e uma respiração gravadas (não há CC0 boa de tosse em
   `audio/foley/FONTES.md`).
