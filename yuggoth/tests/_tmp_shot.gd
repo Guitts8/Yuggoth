@@ -56,6 +56,35 @@ func _ready() -> void:
 		await _fazenda_fotos()
 		get_tree().quit()
 		return
+	if OS.get_environment("SHOT_MODO") == "vista":
+		await _vista_fotos()
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "anima":
+		await _anima_fotos()
+		get_tree().quit()
+		return
+	if OS.get_environment("SHOT_MODO") == "conan":
+		GameState.reset()
+		GameState.set_flag(&"interludio")
+		await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+		var faz := root.find_child("Fazenda", true, false) as Fazenda
+		Engine.time_scale = 8.0
+		await _until(func() -> bool: return not faz.descendo, 60.0)
+		faz.rotina.pular()
+		await _until(func() -> bool: return faz.preparacao._ativa, 30.0)
+		faz.preparacao.pular()
+		Engine.time_scale = 1.0
+		var p := faz.player
+		p.global_position = Vector3(3.6, 0.6, -2.5)
+		p.look_at(Vector3(3.6, 0.6, -6.0))
+		var conan := faz.get_node("Caes/Conan") as CaoIA
+		conan.global_position = Vector3(3.0, 0.65, 0.9)
+		for k in 30:
+			await _s(1.0)
+			print("CONAN %d %s alvo=%s pose=%d passou=%s" % [k, conan.global_position.snappedf(0.01), conan._alvo, conan.visual.pose, conan._passou])
+		get_tree().quit()
+		return
 	if OS.get_environment("SHOT_MODO") == "telhado":
 		await _telhado_fotos()
 		get_tree().quit(0)
@@ -630,6 +659,145 @@ func _fazenda_fotos() -> void:
 		p.head.rotation.x = atan2(alvo.y - olho.y, Vector2(alvo.x - olho.x, alvo.z - olho.z).length())
 		await _s(0.5)
 		await _shot("%s_%s" % [tag, pt[0]])
+
+
+## SHOT_MODO=vista, SHOT_EXTRA="ox,oy,oz>ax,ay,az|...": a fazenda vista de uma
+## câmera solta (do alto, para a planta), sem o jogador.
+func _vista_fotos() -> void:
+	GameState.reset()
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Quintal", false)
+	await _s(1.0)
+	var faz := root.find_child("Fazenda", true, false) as Node3D
+	var cam := Camera3D.new()
+	cam.far = 2000.0
+	cam.fov = float(OS.get_environment("SHOT_FOV")) if OS.get_environment("SHOT_FOV") else 70.0
+	faz.add_child(cam)
+	cam.current = true
+	var i := 0
+	for par in OS.get_environment("SHOT_EXTRA").split("|"):
+		var oa := par.split(">")
+		var o := oa[0].split_floats(",")
+		var a := oa[1].split_floats(",")
+		var de := Vector3(o[0], o[1], o[2])
+		var para := Vector3(a[0], a[1], a[2])
+		var cima := Vector3.UP if absf((para - de).normalized().y) < 0.99 else Vector3.FORWARD
+		cam.global_transform = Transform3D.IDENTITY.looking_at(para - de, cima).translated(de)
+		await _s(0.8)
+		await _shot("%s_v%d" % [tag, i])
+		i += 1
+
+
+## SHOT_MODO=anima: as animações do Interlúdio (playtest 12, "melhore TODAS as
+## animações"), quadro a quadro: SHOT_EXTRA lista quais (racao, bomba, bebedouro,
+## lenha, lareira_lenha, celeiro, caixa, lampiao, veneziana, rifle, carregar,
+## telefone, porteira, apagar, atirar); SHOT_PASSO os segundos entre quadros.
+func _anima_fotos() -> void:
+	GameState.reset()
+	GameState.set_flag(&"interludio")
+	await SceneDirector.change_level("res://levels/fazenda/fazenda.tscn", &"Entardecer", false)
+	var faz := root.find_child("Fazenda", true, false) as Fazenda
+	Engine.time_scale = 8.0
+	await _until(func() -> bool: return not faz.descendo, 60.0)
+	Engine.time_scale = 1.0
+	var p := faz.player
+	var r := faz.rotina
+	var pr := faz.preparacao
+	var passo := float(OS.get_environment("SHOT_PASSO")) if OS.get_environment("SHOT_PASSO") else 0.5
+	var quais := OS.get_environment("SHOT_EXTRA").split(",", false)
+	var filmar := func(area: Interactable, de: Vector3, nome: String, quadros: int, alvo := Vector3.INF) -> void:
+		p.global_position = de
+		p.velocity = Vector3.ZERO
+		var c := area.global_position if alvo == Vector3.INF else alvo
+		p.look_at(Vector3(c.x, p.global_position.y, c.z))
+		await _s(0.2)
+		var olho := p.camera.global_position
+		p.head.rotation.x = atan2(c.y - olho.y, Vector2(c.x - olho.x, c.z - olho.z).length())
+		await _s(0.3)
+		print("ALVO ", nome, " mira=", p._target == area)
+		area.interact(p)
+		for k in quadros:
+			await _s(passo)
+			print("QUADRO %s %d corpo=%s olhos=%s" % [nome, k, p.global_position.snappedf(0.01), p.camera.global_position.snappedf(0.01)])
+			await _shot("%s_%s_%02d" % [tag, nome, k])
+	var quer := func(n: String) -> bool: return quais.is_empty() or n in quais
+	if quer.call("racao"):
+		await filmar.call(r.por_racao, r.por_racao.global_position + Vector3(1.5, -0.5, 1.0), "racao", 16)
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+	else:
+		r.etapa = Rotina.Etapa.AGUA
+		r.racao_balde.visible = false
+		r._ligar_areas()
+	if quer.call("bomba"):
+		await filmar.call(r.bombear, r.bombear.global_position + Vector3(0, -0.9, 1.0), "bomba", 18)
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+	else:
+		r.etapa = Rotina.Etapa.BEBEDOURO
+		r._ligar_areas()
+	if quer.call("bebedouro"):
+		await filmar.call(r.encher_bebedouro, r.encher_bebedouro.global_position + Vector3(1.0, -0.45, 0.2), "bebedouro", 14)
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+	r.etapa = Rotina.Etapa.LIVRE
+	r._ligar_areas()
+	if quer.call("lenha"):
+		await filmar.call(r.pegar_lenha, r.pegar_lenha.global_position + Vector3(0, -0.7, -1.2), "lenha", 12)
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+		if quer.call("lareira_lenha"):
+			await filmar.call(r.por_lenha, Vector3(3.0, 0.6, 3.7), "lareira_lenha", 12)
+			await _until(func() -> bool: return not r._ocupado, 30.0)
+	if quer.call("celeiro"):
+		await filmar.call(r.fechar_celeiro, r.fechar_celeiro.global_position + Vector3(0, -1.4, 2.6), "celeiro", 14)
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+	if quer.call("caixa"):
+		await filmar.call(r.abrir_caixa, r.abrir_caixa.global_position + Vector3(-1.2, -1.25, 0.1), "caixa", 12)
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+	if quer.call("yautja"):
+		r.lenha_feita = true
+		r.celeiro_feito = true
+		r.etapa = Rotina.Etapa.LIVRE
+		(faz.get_node("Caes") as Matilha).modo = Matilha.Modo.DEPOIS
+		await _s(3.0)
+		p.global_position = Vector3(-12.5, 0, -12.5)
+		await _olhar(p, Vector3(-8.0, 0.4, -19.0))
+		p.head.rotation.x = -0.15
+		r._yautja()
+		for k in 28:
+			await _s(0.2)
+			await _shot("%s_yautja_%02d" % [tag, k])
+		return
+	r.pular()
+	await _until(func() -> bool: return pr._ativa, 30.0)
+	if quer.call("lampiao"):
+		await filmar.call(pr.lampioes[0], Vector3(4.6, 0.6, 3.25), "lampiao", 14)
+		await _until(func() -> bool: return not pr._ocupado and p.input_enabled, 30.0)
+	if quer.call("veneziana"):
+		await filmar.call(pr.venezianas[4], Vector3(4.9, 0.6, 2.6), "veneziana", 12)
+		await _until(func() -> bool: return p.input_enabled, 30.0)
+	if quer.call("rifle"):
+		await filmar.call(pr.pegar_rifle, Vector3(-1.0, 0.6, -4.2), "rifle", 12)
+		await _until(func() -> bool: return not pr._ocupado, 30.0)
+		if quer.call("carregar"):
+			for k in 4:
+				await filmar.call(pr.carregar_rifle, Vector3(-1.4, 0.6, -3.2), "carregar%d" % k, 8 if k < 3 else 14)
+				await _until(func() -> bool: return not pr._ocupado, 30.0)
+	if quer.call("telefone"):
+		await filmar.call(pr.telefone, Vector3(2.4, 0.6, 0.3), "telefone", 14)
+		await _until(func() -> bool: return not pr._ocupado, 30.0)
+	if quer.call("porteira"):
+		await filmar.call(pr.soltar_caes, pr.soltar_caes.global_position + Vector3(0.3, -0.7, 1.2), "porteira", 16, pr.soltar_caes.global_position + Vector3(0, -0.1, 0))
+		await _until(func() -> bool: return not pr._ocupado, 30.0)
+	if quer.call("apagar") or quer.call("atirar"):
+		pr.pular()
+		var n := faz.noite_telhado
+		n.comecar(faz)
+		faz.noite = 1.0
+		faz._aplicar(1.0)
+		n.etapa = NoiteTelhado.Etapa.APAGAR
+		n._ligar_areas()
+		await _s(0.5)
+		await filmar.call(n.apagar[0], Vector3(4.6, 0.6, 3.25), "apagar", 10)
+		await _until(func() -> bool: return p.input_enabled, 10.0)
+		if quer.call("atirar"):
+			await filmar.call(n.atirar[0], Vector3(4.55, 0.6, 4.8), "atirar", 14)
 
 
 ## SHOT_MODO=entardecer: a passagem da tinta para o quintal (F2) e o quintal em

@@ -1217,8 +1217,8 @@ func _fazenda() -> void:
 	await _andar(p, [Vector3(4.9, 0, -0.9), Vector3(-0.3, 0, -0.9), Vector3(-0.3, 0, 0.6), Vector3(3.0, 0, 0.6), Vector3(3.0, 0, 3.0)], 60.0)
 	_check(absf(p.global_position.y - 3.75) < 0.15 and p.global_position.z > 2.0, "fazenda: a escada, o quarto de hóspedes %s" % p.global_position)
 	await _andar(p, [Vector3(3.0, 0, 0.6), Vector3(-0.3, 0, 0.6), Vector3(-0.3, 0, -0.9), Vector3(5.0, 0, -0.9), Vector3(5.0, 0, 0.2),
-		Vector3(-2.0, 0, 0.2), Vector3(-5.0, 0, 0.0), Vector3(-15.0, 0, -6.0), Vector3(-15.0, 0, -12.0)], 120.0)
-	_check(p.global_position.y < 0.3 and p.global_position.z < -10.0, "fazenda: a escada abaixo, a porta dos fundos, o celeiro %s" % p.global_position)
+		Vector3(-2.0, 0, 0.2), Vector3(-5.0, 0, 0.0), Vector3(-12.0, 0, -12.0), Vector3(-19.0, 0, -22.5), Vector3(-19.0, 0, -27.5)], 140.0)
+	_check(p.global_position.y < 0.3 and p.global_position.z < -26.5, "fazenda: a escada abaixo, a porta dos fundos, o terreiro, dentro do celeiro %s" % p.global_position)
 	SceneDirector.clear_level()
 
 
@@ -1241,14 +1241,14 @@ func _rotina(faz: Fazenda) -> void:
 		await _until(func() -> bool: return not r._ocupado, 40.0)
 		await _frames(2)
 		return mirou
-	var mirou: bool = await fazer.call(r.por_racao, Vector3(1.9, 0, -6.45), Vector3(1.7, 0.4, -7.2))
+	var mirou: bool = await fazer.call(r.por_racao, Vector3(-1.0, 0, -15.45), Vector3(-2.4, 0.4, -16.2))
 	_check(mirou and r.racao_gamela.scale.x > 0.9 and not r.racao_balde.visible and matilha.modo == Matilha.Modo.COMENDO, "a ração na gamela; os cães vêm comer")
 	await _seconds(6.0)
 	var comendo := matilha.caes().filter(func(c: CaoIA) -> bool: return c.visual.pose == Cao.Pose.COMENDO)
 	_check(comendo.size() >= 6 and matilha.cao("Rambo").visual.pose != Cao.Pose.COMENDO, "lado a lado na gamela (%d); Rambo não come" % comendo.size())
-	mirou = await fazer.call(r.bombear, Vector3(5.4, 0, -11.6))
+	mirou = await fazer.call(r.bombear, r.diante_da_bomba)
 	_check(mirou and r.agua_balde.visible, "a bomba do poço enche o balde")
-	mirou = await fazer.call(r.encher_bebedouro, Vector3(3.5, 0, -9.85), Vector3(2.9, 0.5, -9.85))
+	mirou = await fazer.call(r.encher_bebedouro, r.diante_do_bebedouro, r.agua_bebedouro.global_position + Vector3(0.6, 0.5, 0))
 	_check(mirou and r.agua_bebedouro.scale.y > 0.9 and not faz.balde.visible and r.balde_no_chao.visible, "a água no bebedouro; o balde fica no chão")
 	mirou = await fazer.call(r.pegar_lenha, Vector3(-11.0, 0, 3.6))
 	_check(mirou and r.bracada.visible and r.por_lenha.can_interact(p) and not r.fechar_celeiro.can_interact(p), "a braçada de lenha (com ela, só a lareira)")
@@ -1256,7 +1256,7 @@ func _rotina(faz: Fazenda) -> void:
 	_check(mirou and r.lenha_lareira.visible and not r.bracada.visible, "a lenha na lareira do escritório")
 	mirou = await fazer.call(r.abrir_caixa, Vector3(26.6, 0, 2.4))
 	_check(mirou and r.caixa_feita, "a caixa de correio, vazia")
-	mirou = await fazer.call(r.fechar_celeiro, Vector3(-15.0, 0, -5.5))
+	mirou = await fazer.call(r.fechar_celeiro, r.fechar_celeiro.global_position + Vector3(0, -1.4, 2.2))
 	_check(mirou and r.portao[0].position.is_equal_approx(r.portao_fechado[0]), "o portão do celeiro, fechado")
 	await _until(func() -> bool: return r.etapa == Rotina.Etapa.CHAMAR, 30.0)
 	_check(r.etapa == Rotina.Etapa.CHAMAR and AudioDirector.get_ambience() == r.som_sem_passaros, "os pássaros param de uma vez; Yautja dispara para a mata")
@@ -1305,7 +1305,7 @@ func _preparacao(faz: Fazenda) -> void:
 	mirou = await fazer.call(pr.acender_lareira, Vector3(3.0, 0.6, 2.9))
 	await _until(func() -> bool: return pr.lareira_acesa, 30.0)
 	_check(mirou and pr.lareira_acesa and matilha.fogo != Vector3.INF, "a lareira acesa (com a lenha da rotina)")
-	mirou = await fazer.call(pr.soltar_caes, Vector3(-0.3, 0, -6.2), Vector3(-0.35, 0.6, -7.0))
+	mirou = await fazer.call(pr.soltar_caes, pr.soltar_caes.global_position + Vector3(0.05, -0.7, 0.65), pr.soltar_caes.global_position + Vector3(0, -0.1, -0.15))
 	_check(mirou and pr.caes_soltos and matilha.modo == Matilha.Modo.SOLTOS, "a porteira aberta: os cães soltos")
 	# Os outros lampiões e venezianas, de uma vez (o resto da casa).
 	for l in pr.lampioes:

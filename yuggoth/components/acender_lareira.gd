@@ -22,7 +22,7 @@ const PEGAR := 6.0
 ## Ajoelhado, quanto os olhos descem.
 const AJOELHADO := 0.9
 ## O fósforo na mão, no espaço da câmera.
-const NA_MAO := Vector3(0.05, -0.05, -0.2)
+const NA_MAO := Vector3(0.06, -0.07, -0.3)
 
 var _acendendo := false
 var _fosforo: Node3D
@@ -166,7 +166,7 @@ func _montar_fosforo() -> void:
 	pau.mesh = caixa
 	pau.position = Vector3(0, 0, 0.025)
 	var madeira := StandardMaterial3D.new()
-	madeira.albedo_color = Color(0.78, 0.66, 0.45)
+	madeira.albedo_color = Color(0.5, 0.42, 0.3)
 	pau.material_override = madeira
 	_fosforo.add_child(pau)
 	var ponta := MeshInstance3D.new()

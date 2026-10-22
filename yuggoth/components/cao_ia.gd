@@ -33,6 +33,10 @@ var _calar_depois := 0.0
 var visual: Cao
 var matilha: Matilha
 var _alvo := Vector3.INF
+## Os pontos seguintes do caminho (a porteira), depois de `_alvo`.
+var _fila: Array[Vector3] = []
+## O quanto abana o rabo agora (o visual chega aos poucos).
+var _abana := 0.0
 var _velocidade := PASSO
 ## Para onde olhar parado (INF = para onde estava indo).
 var _olhar_para := Vector3.INF
@@ -74,7 +78,7 @@ func _physics_process(delta: float) -> void:
 	if _alvo != Vector3.INF:
 		var para := Vector3(_alvo.x - global_position.x, 0, _alvo.z - global_position.z)
 		if para.length() < PERTO:
-			_alvo = Vector3.INF
+			_alvo = _fila.pop_front() if not _fila.is_empty() else Vector3.INF
 		else:
 			plano = para.normalized() * _velocidade
 	var k := 1.0 - exp(-6.0 * delta)
@@ -94,6 +98,7 @@ func _physics_process(delta: float) -> void:
 	_virar(delta, anda)
 	if visual:
 		visual.andar = anda / PASSO if anda < TROTE * 0.8 else 1.2 + anda / CORRIDA
+		visual.abana = move_toward(visual.abana, _abana, delta * 1.5)
 	_latir -= delta
 
 
@@ -126,7 +131,14 @@ func fugir(para: Vector3) -> void:
 	if not is_inside_tree():
 		return
 	_pose(Cao.Pose.PARADO)
+	# Preso no cercado (a porteira fechada): corre até a tela e pula por cima dela
+	# (playtest 12: em linha reta, ele empacava na tela até sumir).
+	if matilha.no_cercado(global_position) and not matilha.porteira_aberta:
+		await _pular_a_tela(para)
+		if not is_inside_tree():
+			return
 	_ir(para, CORRIDA)
+	_fila.clear()
 	collision_mask = 1
 	var t := 0.0
 	while t < 25.0 and _alvo != Vector3.INF:
@@ -140,6 +152,65 @@ func fugir(para: Vector3) -> void:
 	fugiu = true
 	visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED
+
+
+## Corre até a tela do cercado no rumo de `para` e salta por cima dela: o impulso
+## (o focinho sobe, as patas de trás empurram), o arco por cima da régua, a chegada
+## (o focinho desce, as patas da frente esticadas) e segue correndo.
+func _pular_a_tela(para: Vector3) -> void:
+	var c := matilha.cercado
+	# A tela fica um pouco além da borda do `cercado` (ver Matilha.no_cercado).
+	var x0 := c.position.x - 0.4
+	var x1 := c.end.x + 0.4
+	var z1 := c.end.z + 0.45
+	var de := Vector3(global_position.x, 0, global_position.z)
+	var dir := Vector3(para.x - de.x, 0, para.z - de.z).normalized()
+	# Onde a reta sai do retângulo (oeste, leste ou a frente).
+	var s := INF
+	if dir.x < -0.01:
+		s = minf(s, (x0 - de.x) / dir.x)
+	if dir.x > 0.01:
+		s = minf(s, (x1 - de.x) / dir.x)
+	if dir.z > 0.01:
+		s = minf(s, (z1 - de.z) / dir.z)
+	if s == INF or s < 0.0:
+		return
+	var borda := de + dir * s
+	var antes := borda - dir * 1.1
+	antes.y = global_position.y
+	_ir(antes, CORRIDA)
+	var t := 0.0
+	while _alvo != Vector3.INF and t < 6.0:
+		await get_tree().physics_frame
+		if not is_inside_tree():
+			return
+		t += get_physics_process_delta_time()
+	# O salto: sem colisão enquanto voa (a tela), o arco e as patas.
+	_alvo = Vector3.INF
+	collision_mask = 0
+	velocity = Vector3.ZERO
+	var y0 := global_position.y
+	var ini := global_position
+	var fim := borda + dir * 1.3
+	fim.y = y0
+	set_physics_process(false)
+	rotation.y = atan2(-dir.x, -dir.z)
+	var dur := 0.62
+	var tw := create_tween()
+	tw.tween_method(func(u: float) -> void:
+		global_position = ini.lerp(fim, u) + Vector3.UP * (sin(u * PI) * 1.75)
+		if visual:
+			visual.salto = clampf(sin(u * PI) * 1.6, 0.0, 1.0)
+			visual.salto_inclina = cos(u * PI)
+			visual.andar = 2.0, 0.0, 1.0, dur)
+	await tw.finished
+	if not is_inside_tree():
+		return
+	if visual:
+		visual.salto = 0.0
+		visual.salto_inclina = 0.0
+	set_physics_process(true)
+	collision_mask = 1
 
 
 ## Atingido (a noite do telhado: *"receio ter acertado um por mirar baixo
@@ -164,6 +235,7 @@ func sumir() -> void:
 func _pensar() -> void:
 	if fugindo or fugiu or caido:
 		return
+	_abana = 0.0
 	var akeley := matilha.akeley()
 	match matilha.modo:
 		Matilha.Modo.COMENDO:
@@ -178,6 +250,7 @@ func _pensar() -> void:
 				_alvo = Vector3.INF
 				_olhar_para = lugar + matilha.gamela_frente
 				_pose(Cao.Pose.COMENDO)
+				_abana = 0.6
 		Matilha.Modo.DEPOIS:
 			if papel == Papel.SEGUIR and akeley:
 				_seguir(akeley)
@@ -349,12 +422,24 @@ func _ve(cam: Camera3D, ponto: Vector3) -> bool:
 func _ir_deitar(p: Vector3, akeley: Player) -> void:
 	_olhar_para = p + Vector3(-1, 0, 0)
 	var porta := matilha.porta_do_fogo
-	var dentro := absf(global_position.y - p.y) < 0.3 and global_position.distance_to(p) < 4.5
+	var mesmo_piso := absf(global_position.y - p.y) < 0.3
+	# No escritório (playtest 12: com o canil longe, ele às vezes entrava pela porta
+	# dos fundos; do vestíbulo, "perto do fogo" em linha reta era atravessar a parede).
+	var sala := matilha.comodo_do_fogo
+	var dentro := sala.has_point(global_position + Vector3.UP * 0.2) if sala.has_volume() \
+		else mesmo_piso and global_position.distance_to(p) < 4.5
 	if porta != Vector3.INF and not dentro and global_position.distance_to(porta) > 0.6:
 		_passou = false
-		if _chegar(porta, akeley):
+		# Dentro de casa, do lado de cá da porta do escritório: primeiro até ela.
+		var antes := matilha.porta_do_fogo_fora
+		if antes != Vector3.INF and mesmo_piso and global_position.distance_to(porta) > antes.distance_to(porta) + 0.3:
+			_chegar(antes, akeley, 0.4)
 			_pose(Cao.Pose.PARADO)
 			return
+		# Andando até a porta (ou chegou agora): a passagem é da próxima vez.
+		_chegar(porta, akeley)
+		_pose(Cao.Pose.PARADO)
+		return
 	# Da porta, contorna a mesa grande pela passagem (playtest 12: em linha reta,
 	# empacava na quina da mesa e não deitava).
 	var passagem := matilha.passagem_do_fogo
@@ -398,6 +483,7 @@ func _pedir_racao(akeley: Player) -> void:
 		_ir(junto, TROTE if global_position.distance_to(junto) > 3.0 else PASSO)
 		_pose(Cao.Pose.PARADO)
 		return
+	_abana = 1.0
 	var r := _rng.randf()
 	if r < 0.35 and _latir <= 0.0:
 		_latir = _rng.randf_range(2.5, 6.0)
@@ -448,8 +534,21 @@ func _perto_do_cercado(p: Vector3) -> bool:
 
 
 func _ir(p: Vector3, velocidade: float) -> void:
-	_alvo = p
 	_velocidade = velocidade
+	_fila.clear()
+	# Da porteira aberta (playtest 12): quem está de um lado da tela e vai para o
+	# outro passa pelo vão — de dentro, o ponto de dentro e o de fora; de fora, ao
+	# contrário.
+	if matilha and matilha.porteira_aberta and matilha.porteira_dentro != Vector3.INF:
+		var dentro := matilha.no_cercado(global_position)
+		if dentro != matilha.no_cercado(p):
+			var a := matilha.porteira_dentro if dentro else matilha.porteira_fora
+			var b := matilha.porteira_fora if dentro else matilha.porteira_dentro
+			_alvo = a
+			_fila.append(b)
+			_fila.append(p)
+			return
+	_alvo = p
 
 
 func _pose(p: Cao.Pose) -> void:

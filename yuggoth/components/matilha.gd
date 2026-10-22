@@ -34,6 +34,10 @@ var fogo := Vector3.INF
 @export var porta_do_fogo := Vector3.INF
 ## Por onde Conan passa da porta ao fogo, contornando a mesa grande (INF: direto).
 @export var passagem_do_fogo := Vector3.INF
+## O lado de cá da porta do escritório (o vestíbulo), e o escritório (o cômodo do
+## fogo): de dentro de casa, Conan passa pela porta (playtest 12).
+@export var porta_do_fogo_fora := Vector3.INF
+@export var comodo_do_fogo := AABB()
 ## A casa (a planta, com o puxado), para correrem em volta dela na noite do
 ## telhado.
 @export var casa := AABB(Vector3(-9.0, 0, -6.0), Vector3(15.0, 1, 12.0))
@@ -51,6 +55,12 @@ var fogo := Vector3.INF
 @export var modo := Modo.ESPERANDO
 ## O chão do cercado (onde andam esperando), em coordenadas do mundo.
 @export var cercado := AABB(Vector3(-7.6, 0, -9.9), Vector3(10.0, 1, 2.4))
+## A porteira do cercado: um ponto logo dentro e um logo fora do vão. Aberta
+## (`porteira_aberta`, a Preparacao abre), quem cruza a cerca passa por ela
+## (playtest 12: soltos, eles saíam em linha reta e empacavam na tela).
+@export var porteira_dentro := Vector3.INF
+@export var porteira_fora := Vector3.INF
+var porteira_aberta := false
 ## O quintal, onde andam soltos à noite.
 @export var quintal := AABB(Vector3(-14, 0, -16), Vector3(36, 1, 30))
 ## Para onde fica a mata (o pântano e a Dark Mountain, a oeste).
@@ -108,6 +118,13 @@ var calados_ha := 0.0
 
 func _process(delta: float) -> void:
 	calados_ha = calados_ha + delta if modo == Modo.CALADOS else 0.0
+
+
+## `p` (do mundo) fica dentro do cercado (a tela em volta).
+func no_cercado(p: Vector3) -> bool:
+	# Até a tela (a borda do `cercado` fica um pouco para dentro) e as baias do canil.
+	return p.x > cercado.position.x - 0.45 and p.x < cercado.end.x + 0.45 \
+		and p.z > cercado.position.z - 1.6 and p.z < cercado.end.z + 0.45
 
 
 func com_balde() -> bool:

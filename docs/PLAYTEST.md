@@ -45,6 +45,31 @@ o que esperava.
 ## 0. Prioridade máxima: o que mudou desde o playtest 11
 **F4** leva direto à fazenda; **F2** lá pula a etapa em curso.
 
+### As animações, a fazenda espaçada e as portas (2026-10-22, depois do playtest 12)
+Pedido: *"Melhore TODAS as animações... a fazenda está MUITO aglomerada... Algumas
+portas só funcionam para sair e não para entrar."* (`docs/PLANO_FAZENDA.md`, "O
+playtest 12: as animações, o reespaçamento, as portas".)
+- [ ] **A fazenda espaçada:** o canil uns dez metros atrás da casa, o celeiro mais
+      longe a noroeste, o terreiro com as trilhas e o varal, a bomba do poço ao sol.
+      Ficou agradável? Longe demais para andar (Akeley é lento)? Vazio?
+- [ ] **As portas:** entre e saia por todas — principalmente as duas da cozinha (a do
+      quintal e a do galpão de lenha), que só deixavam sair. O teste agora atravessa
+      cada uma nos dois sentidos; o chiqueiro ganhou uma cancela, e a porteira do
+      cercado fechada agora barra.
+- [ ] **A rotina, gesto a gesto:** a ração (o balde por cima da tela, os grãos caindo,
+      a sacudida), a bomba (o balde na bica, os golpes, o jato), o bebedouro (o balde
+      sobre ele, depois no chão), a lenha (as achas uma a uma, da pilha e para a
+      lareira), o portão do celeiro (uma folha de cada vez, a tranca), a caixa de
+      correio (a portinhola). Alguma ainda fraca, longa demais, estranha sem mãos?
+- [ ] **A preparação, gesto a gesto:** o lampião (a chaminé, o fósforo, a rodinha), as
+      venezianas (debruçado, uma folha de cada vez, a tramela), o rifle (do cabide;
+      **carregar:** deitado diante do peito, cada cartucho entrando pela portinhola, a
+      alavanca no último), o telefone (o fone, a manivela, o gancho), a porteira (o
+      trinco; os cães saindo pelo vão).
+- [ ] **A noite:** apagar o lampião (a rodinha, o sopro, a fumaça); os tiros (o clarão
+      na boca do cano, a fumaça na fresta, a alavanca, o estojo que salta).
+- [ ] **Os cães:** abanam o rabo pedindo a ração; Yautja **pula a tela** para fugir.
+
 ### O alcance na casa de Akeley (2026-10-22: o começo do playtest 12 parou aqui)
 Não se chegava às venezianas da janela sul do escritório (os móveis fechavam a faixa
 entre a mesa e a parede). O escritório foi rearrumado: a mesa um pouco menor e mais

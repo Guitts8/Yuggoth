@@ -47,7 +47,7 @@ extends Node3D
 ## Para onde se olha no começo (o céu do poente, alto) e no meio (a fazenda ao pé
 ## da montanha).
 @export var olhar_inicio := Vector3(-400.0, 540.0, -40.0)
-@export var olhar_meio := Vector3(-30.0, 4.0, -9.0)
+@export var olhar_meio := Vector3(-24.0, 3.0, -18.0)
 
 @export_group("Entardecer: começo e fim")
 @export var sol_energia := Vector2(1.3, 0.0)

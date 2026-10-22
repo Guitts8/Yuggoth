@@ -26,6 +26,13 @@ const FOCINHO := Color(0.12, 0.09, 0.08)
 @export_range(0.0, 3.0, 0.05) var andar := 0.0
 ## Para onde a cabeça olha (graus, em torno da vertical; + para a esquerda).
 @export_range(-70.0, 70.0) var olhar := 0.0
+## O salto (Yautja por cima da tela, playtest 12): 0 = no chão; 1 = no ar, as
+## patas da frente estendidas para a frente e as de trás para trás. `salto_inclina`
+## é o corpo: + o focinho para cima (a partida), - para baixo (a chegada).
+var salto := 0.0
+var salto_inclina := 0.0
+## Abanando o rabo (0 a 1): esperando a ração com o balde à vista, comendo.
+var abana := 0.0
 ## Variação de cor (cada cão um pouco diferente): mais preto ou mais castanho.
 @export_range(-1.0, 1.0) var pelagem := 0.0:
 	set(v):
@@ -220,13 +227,14 @@ func _animar() -> void:
 		var rx_deit := 1.35 if frente else 1.4
 		var bx_sent := 0.0 if frente else -2.1
 		var bx_deit := 0.6 if frente else -2.4
-		cima.rotation.x = balanca * de_pe + rx_sent * sentado + rx_deit * deitado - 0.08 * rosnando * (1.0 if frente else -1.0)
-		baixo.rotation.x = dobra * de_pe + bx_sent * sentado + bx_deit * deitado
+		cima.rotation.x = balanca * de_pe * (1.0 - salto) + rx_sent * sentado + rx_deit * deitado - 0.08 * rosnando * (1.0 if frente else -1.0) \
+			+ salto * (1.15 if frente else -1.05)
+		baixo.rotation.x = dobra * de_pe * (1.0 - salto) + bx_sent * sentado + bx_deit * deitado + salto * (-0.35 if frente else 0.25)
 	# O corpo: o balanço do passo; sentado, inclina para trás em volta do
 	# quadril; deitado, desce até o chão.
 	var bob := absf(sin(fase)) * 0.018 * anda * (1.0 + correndo)
 	_corpo.position.y = 0.47 + bob - 0.06 * sentado - 0.31 * deitado - 0.04 * rosnando - 0.03 * comendo
-	_corpo.rotation.x = 0.55 * sentado - 0.04 * comendo + sin(fase * 2.0) * 0.015 * anda
+	_corpo.rotation.x = 0.55 * sentado - 0.04 * comendo + sin(fase * 2.0) * 0.015 * anda + 0.4 * salto_inclina
 	# A cabeça: olhando; latindo, erguida, a mandíbula batendo em rajadas;
 	# rosnando, baixa e para a frente; comendo, no chão.
 	# O latido: abre rápido, fecha em ~0,25 s.
@@ -235,7 +243,8 @@ func _animar() -> void:
 		latido = sin(_desde_latido / 0.28 * PI) if _desde_latido > 0.03 else _desde_latido / 0.03
 	latindo = maxf(latindo, latido * 0.6)
 	# (Sentado, o corpo já inclina 0,55 para trás: o pescoço desfaz quase tudo.)
-	_pescoco.rotation.x = 0.18 * latindo - 0.35 * rosnando - 1.15 * comendo - 0.4 * sentado - 0.25 * deitado - 0.12 * correndo + sin(fase) * 0.04 * anda
+	_pescoco.rotation.x = 0.18 * latindo - 0.35 * rosnando - 1.15 * comendo - 0.4 * sentado - 0.25 * deitado - 0.12 * correndo + sin(fase) * 0.04 * anda \
+		+ comendo * (0.1 * sin(_t * TAU * 0.55) + 0.25 * maxf(0.0, sin(_t * 0.37 + _semente % 7) - 0.8) * 5.0) - 0.1 * salto
 	_pescoco.rotation.y = deg_to_rad(olhar) * 0.5
 	_cabeca.rotation.y = deg_to_rad(olhar) * 0.5
 	_cabeca.rotation.x = 0.15 * latindo * latido + 0.12 * rosnando + 0.25 * deitado
@@ -247,7 +256,9 @@ func _animar() -> void:
 		_orelhas[i].rotation.z = lado * (-0.18 - 0.2 * rosnando) + sin(_t * 0.9 + i * 2.0) * 0.04
 	# A cauda: baixa, balança andando; rosnando, dura e reta; sentado, no chão.
 	_cauda.rotation.x = 0.05 - 0.35 * rosnando + 0.6 * sentado + 0.45 * deitado - 0.25 * correndo
-	_cauda.rotation.z = sin(_t * TAU * (0.6 + anda)) * (0.12 + 0.18 * anda) * (1.0 - rosnando)
+	# Abanando (a ração à vista, comendo): mais depressa, mais largo, a cauda mais alta.
+	_cauda.rotation.x -= 0.25 * abana
+	_cauda.rotation.z = sin(_t * TAU * (0.6 + anda + 2.2 * abana)) * (0.12 + 0.18 * anda + 0.3 * abana) * (1.0 - rosnando)
 
 
 func _material() -> Material:

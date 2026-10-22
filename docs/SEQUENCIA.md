@@ -561,19 +561,30 @@ policiais sempre os seguram, porque ainda há muito poucos deles por aqui"*, qua
 se mexe). **Os cães (F4):** os doze no cercado diante do canil; com o balde perto,
 juntam-se na tela do lado dele, olham, sentam e latem pedindo a ração; Brutus o segue
 por toda parte; Hércules late para a mata; Rambo, calado, fica olhando a mata e rosna
-baixo. **A rotina (F5):** a ração despejada ao longo da gamela comprida (os cães comem
-lado a lado; Rambo não), o balde cheio na bomba do poço e despejado no bebedouro (e
+baixo. **A fazenda espaçada (playtest 12):** o canil e o cercado uns dez metros atrás
+da casa, o celeiro mais longe, a noroeste, fechando o terreiro de trilhas batidas, com
+o varal; a bomba do poço ao sol, junto à ponta do cercado. **A rotina (F5),** cada
+tarefa um gesto inteiro (sem mãos — os grãos caem da boca do balde onde ela passa, a
+sacudida no fim; o balde pendurado na bica e a alavanca golpe a golpe, o jato; a água
+por cima da tela e o balde pousado no chão; as achas uma a uma, da pilha à braçada e da
+braçada à lareira; as folhas do portão uma de cada vez e a tranca que cai atravessada;
+a portinhola da caixa que cai e o olhar lá dentro): a ração despejada ao longo da
+gamela comprida (os cães abanam o rabo e comem lado a lado; Rambo não), o balde cheio
+na bomba do poço e despejado no bebedouro (e
 deixado no chão), a braçada de lenha do galpão até a lareira do escritório, o portão
 de correr do celeiro, a caixa de correio vazia (*"É domingo."*); o sol espera por ela.
-Feita, os pássaros se calam de uma vez e Yautja dispara latindo para a mata; Akeley o
-chama — *"Não voltou."* — e o crepúsculo vem. **A preparação (F6),** em qualquer
-ordem, enquanto a noite cai: os quatro lampiões de querosene do térreo (o fósforo, a
-chaminé, a chama que cresce; *"Mandaria pôr luz elétrica na casa..."* — não há), as
-venezianas do escritório e da sala fechadas por dentro, o rifle tirado do armário da
-sala dos fundos e carregado na bancada cartucho por cartucho, a lareira do escritório
-acesa com a lenha da rotina (Conan vem deitar diante do fogo), o telefone mudo se ele
-tentar (*"Cortam os fios sempre que tento telefonar à noite."*) e a porteira do
-cercado aberta (os cães soltos no quintal, Rambo rosnando para a janela do escritório).
+Feita, os pássaros se calam de uma vez e Yautja pula a tela e dispara latindo para a
+mata; Akeley o chama — *"Não voltou."* — e o crepúsculo vem. **A preparação (F6),** em
+qualquer ordem, enquanto a noite cai: os quatro lampiões de querosene do térreo (a
+chaminé erguida, o fósforo no pavio, a rodinha que sobe a chama; *"Mandaria pôr luz
+elétrica na casa..."* — não há), as venezianas do escritório e da sala, ele debruçado
+na janela, uma folha de cada vez, e a tramela passada, o rifle tirado do cabide do
+armário da sala dos fundos e carregado na bancada cartucho por cartucho (cada um entra
+pela portinhola com o estalo; no último, a alavanca), a lareira do escritório acesa
+com a lenha da rotina (Conan vem deitar diante do fogo), o telefone mudo se ele tentar
+(o fone junto ao rosto, a manivela, o gancho; *"Cortam os fios sempre que tento
+telefonar à noite."*) e a porteira do cercado aberta (o trinco, a porteira pesada; os
+cães saem pelo vão, soltos no quintal, Rambo rosnando para a janela do escritório).
 A lua cheia nasce sobre os morros do leste e as nuvens a engolem. Parado, Akeley
 lembra o que falta. **A noite do telhado (F7)** — a carta de segunda, frase por frase,
 na letra dele, quando cada coisa acontece: "Sentar e esperar" na poltrona junto ao
@@ -589,8 +600,9 @@ vidraça** junto à poltrona (os cacos ficam no assoalho, um passa rente ao rost
 terceiro lasca a estante. Então é com o jogador: **"Apagar o lampião"** (o do
 escritório, e o da sala para atirar de lá) e, **de janela em janela** (quatro: o
 escritório e a sala de estar), "Atirar pela janela" — a fresta da veneziana, o cano
-que sobe sozinho, alto, o clarão que mostra o quintal por um instante, a alavanca, o
-cartucho no chão; **no terceiro tiro, sempre, o ganido que corta** (um cão fica caído
+que sobe sozinho, alto, o clarão na boca do cano e no quintal por um instante, a
+fumaça da pólvora na fresta, a alavanca, o estojo que salta da culatra para o chão;
+**no terceiro tiro, sempre, o ganido que corta** (um cão fica caído
 no quintal). Depois do quarto, os latidos param um a um; ele no escuro, respirando;
 *"Isso pareceu encerrar a coisa."* → a tela escurece e vem o cartão *"Fim da
 demonstração. A história continua."* → menu (F8). Continuar volta ao começo do

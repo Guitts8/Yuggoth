@@ -71,6 +71,9 @@ var fov_forcado := 0.0
 ## Quanto a cabeça desce além da altura de sempre (uma cena: ajoelhado diante da
 ## lareira, playtest 7).
 var abaixar := 0.0
+## Quanto a cabeça vai à frente, de pé (m): debruçado na janela para puxar as
+## venezianas, inclinado sobre a bancada (playtest 12: as animações da fazenda).
+var inclinar := 0.0
 
 var _target: Interactable
 var _target_prompt := ""
@@ -335,7 +338,7 @@ func _update_head(delta: float, crouching: bool) -> void:
 		target_height = seated_eye_height - DEBRUCAR_DESCE * debrucado
 	target_height -= abaixar
 	head.position.y = lerpf(head.position.y, target_height, 1.0 - exp(-10.0 * delta))
-	head.position.z = -DEBRUCAR_AVANCA * debrucado if seated else 0.0
+	head.position.z = (-DEBRUCAR_AVANCA * debrucado if seated else 0.0) - inclinar
 	var zoom := input_enabled and Input.is_action_pressed(&"zoom_visao")
 	var fov := fov_forcado if fov_forcado > 0.0 else (zoom_fov if zoom else _fov_base)
 	camera.fov = lerpf(camera.fov, fov, 1.0 - exp(-8.0 * delta))

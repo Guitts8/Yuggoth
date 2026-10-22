@@ -84,6 +84,12 @@ func _ready() -> void:
 	for s in OS.get_environment("SONDA").split(";", false):
 		var v := s.split(",")
 		_sondar(Vector3(float(v[0]), float(v[1]), float(v[2])))
+	# As portas, nos dois sentidos (playtest 12: "algumas portas só funcionam para
+	# sair e não para entrar"). PORTAS=so roda só elas.
+	await _portas(faz)
+	if OS.get_environment("PORTAS") == "so":
+		get_tree().quit(_failures)
+		return
 	var so := OS.get_environment("ALCANCE").split(",", false)
 	for a: Interactable in faz.find_children("*", "Interactable", true, false):
 		if so.is_empty() or a.name in so:
@@ -268,6 +274,96 @@ func _cabe(chao: Vector3) -> bool:
 	var folga := maxf(SOBE_CAPSULA, 0.05 + 0.3 * (1.0 / maxf(_normal_y, 0.5) - 1.0))
 	_consulta.transform = Transform3D(Basis.IDENTITY, chao + Vector3.UP * folga) * _forma.transform
 	return _space.intersect_shape(_consulta, 1).is_empty()
+
+
+# --- As portas ---------------------------------------------------------------------
+
+## Cada porta da fazenda: [nome, de fora, o vão, de dentro] (x, z; a altura vem do
+## chão achado perto de `y`, que é a do andar). O mapa do passo 1 sai do quintal e
+## só precisa de UMA entrada para chegar a cada cômodo: uma porta que só se desce
+## (sem rampa de verdade do lado de fora) passava despercebida.
+func _lista_portas(faz: Fazenda) -> Array:
+	var t0 := 0.6
+	var t1 := 3.75
+	var lista := [
+		["a porta da frente", Vector3(9.0, 0, 0.0), Vector3(6.0, t0, 0.0), Vector3(4.2, t0, 0.0)],
+		["a porta dos fundos", Vector3(-5.6, 0, -0.3), Vector3(-3.0, t0, 0.0), Vector3(-1.6, t0, 0.0)],
+		["a porta da cozinha (quintal)", Vector3(-6.5, 0, -1.6), Vector3(-6.5, t0, 1.0), Vector3(-6.2, t0, 2.4)],
+		["a porta da cozinha (galpão)", Vector3(-10.8, 0, 4.6), Vector3(-9.0, t0, 4.6), Vector3(-7.6, t0, 4.4)],
+		["a sala de jantar e a cozinha", Vector3(-4.6, t0, 3.7), Vector3(-3.0, t0, 3.7), Vector3(-2.2, t0, 2.6)],
+		["o escritório", Vector3(5.1, t0, 0.3), Vector3(5.1, t0, 1.4), Vector3(5.1, t0, 2.5)],
+		["a sala de estar", Vector3(5.1, t0, -0.3), Vector3(5.1, t0, -1.4), Vector3(5.1, t0, -2.5)],
+		["a sala de jantar", Vector3(-1.5, t0, 0.3), Vector3(-1.5, t0, 1.4), Vector3(-1.5, t0, 2.5)],
+		["a sala dos fundos", Vector3(-1.5, t0, -0.3), Vector3(-1.5, t0, -1.4), Vector3(-1.5, t0, -2.5)],
+		["o escritório e a sala de jantar", Vector3(1.9, t0, 2.15), Vector3(1.0, t0, 2.15), Vector3(0.0, t0, 2.15)],
+		["o quarto de hóspedes", Vector3(3.0, t1, 0.4), Vector3(3.0, t1, 1.4), Vector3(3.0, t1, 2.5)],
+		["o quarto de Akeley", Vector3(5.1, t1, 0.2), Vector3(5.1, t1, -1.4), Vector3(5.1, t1, -2.5)],
+		["o quarto do sul, de trás", Vector3(-0.38, t1, 0.4), Vector3(-0.38, t1, 1.4), Vector3(-0.38, t1, 2.5)],
+		["o quarto do norte, de trás", Vector3(-0.38, t1, 0.0), Vector3(-0.38, t1, -1.4), Vector3(-0.38, t1, -2.5)],
+		["o banheiro", Vector3(-0.3, t1, 0.0), Vector3(-1.0, t1, 0.0), Vector3(-1.55, t1, 0.0)],
+	]
+	# As das dependências: de onde o gerador as pôs (metas da cena).
+	for n: Node3D in faz.find_children("*", "Node3D", true, false):
+		if n.has_meta(&"porta_teste"):
+			var p: Array = n.get_meta(&"porta_teste")
+			lista.append([p[0], p[1], p[2], p[3]])
+	return lista
+
+
+func _portas(faz: Fazenda) -> void:
+	var p := _player
+	# A porteira do cercado só se passa aberta (a preparação a abre).
+	var porteira := faz.get_node_or_null(^"Porteira") as Node3D
+	if porteira:
+		porteira.rotation_degrees.y = 100.0
+		await _frames(2)
+	for porta: Array in _lista_portas(faz):
+		var nome: String = porta[0]
+		for sentido in 2:
+			var de: Vector3 = porta[1] if sentido == 0 else porta[3]
+			var ate: Vector3 = porta[3] if sentido == 0 else porta[1]
+			var chao := _chao(de.x, de.z, de.y)
+			if chao == Vector3.INF:
+				_check(false, "%s: sem chão em %s" % [nome, de])
+				continue
+			p.global_position = chao + Vector3.UP * 0.05
+			p.velocity = Vector3.ZERO
+			p.look_at(Vector3(porta[2].x, p.global_position.y, porta[2].z))
+			await _frames(3)
+			var erro: String = await _andar_reto(p, [porta[2], ate])
+			var verbo := "entrar" if sentido == 0 else "sair"
+			_check(erro.is_empty(), "PORTA %s: %s%s" % [nome, verbo, "" if erro.is_empty() else " — " + erro])
+	Input.action_release(&"mover_frente")
+	if porteira:
+		porteira.rotation_degrees.y = 0.0
+		await _frames(2)
+
+
+## Anda pelos `pontos` (x, z; y é o andar esperado) como o jogador, com a física;
+## "" se chega ao último no andar certo.
+func _andar_reto(p: Player, pontos: Array) -> String:
+	var t := 0.0
+	var parado := 0.0
+	for alvo: Vector3 in pontos:
+		while true:
+			var q := p.global_position
+			if Vector2(q.x - alvo.x, q.z - alvo.z).length() < 0.2:
+				break
+			p.look_at(Vector3(alvo.x, q.y, alvo.z))
+			Input.action_press(&"mover_frente")
+			await get_tree().physics_frame
+			var dt := get_physics_process_delta_time()
+			t += dt
+			parado = parado + dt if p.global_position.distance_to(q) < 0.004 else 0.0
+			if parado > 1.2 or t > 25.0:
+				Input.action_release(&"mover_frente")
+				return "preso em %s indo para %s" % [p.global_position.snappedf(0.01), alvo.snappedf(0.01)]
+	Input.action_release(&"mover_frente")
+	await _frames(4)
+	var fim: Vector3 = pontos[-1]
+	if absf(p.global_position.y - fim.y) > 0.2:
+		return "chegou na altura errada (%.2f, esperava %.2f)" % [p.global_position.y, fim.y]
+	return ""
 
 
 # --- 2. De onde se alcança cada área -----------------------------------------------

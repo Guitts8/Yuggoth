@@ -263,6 +263,12 @@ fotografias do Dia 2 feitas das cenas 3D) e o playtest com 5+ pessoas (o marco D
 alcance no escritório de Akeley. O escritório foi rearrumado e há um teste de alcance
 novo ("O playtest 12", abaixo); o usuário retoma o playtest 12 da fazenda.
 
+**2026-10-22, depois:** o playtest 12 foi até o fim da demo. Os pedidos — melhorar
+todas as animações, espaçar a fazenda (o canil e o celeiro perto demais da casa), as
+portas que só deixavam sair — viraram "O playtest 12: as animações, o reespaçamento,
+as portas", abaixo, todos feitos. **Próximo:** o usuário confere (`docs/PLAYTEST.md`,
+seção 0); depois a F9 e o playtest com 5+ pessoas.
+
 ## O desempenho (2026-10-16)
 O usuário: *"O modelo da fazenda tem travado muito a máquina, será que está pesado?"*
 A máquina dele tem placa integrada (Intel UHD Graphics). Medido no jogo
@@ -734,6 +740,88 @@ inacessiveis por conta do modelo 3d."*
   pela `Matilha.passagem_do_fogo` (ao norte dela) e deita no meio da boca da lareira,
   e `_chegar` aceita um raio por alvo. O teste de fumaça confere a pose deitada a
   menos de 0,5 m. Commit `dc3196c`.
+
+## O playtest 12 (2026-10-22): as animações, o reespaçamento, as portas
+Jogada a demo inteira, do começo ao fim: *"Há alguns requintes visuais que precisamos
+prestar atenção. Algumas animações estão fracas, como a de pôr ração para os
+cachorros, recarregar a arma, tirar água do poço e etc. Melhore TODAS as animações.
+Tendo em vista isso, a fazenda está MUITO aglomerada, o canil fica perto demais da
+casa, e o celeiro também. Espalhe de uma maneira mais agradável. Algumas portas só
+funcionam para sair e não para entrar."*
+
+- ✅ **As portas** (`tests/alcance_test`, a parte nova "PORTA"; `PORTAS=so` roda só
+  ela): o mapa do alcance sai do quintal e só precisava de uma entrada para chegar a
+  cada cômodo — uma porta que só se desce passava. Agora cada porta da fazenda é
+  atravessada com a física **nos dois sentidos** (a frente, os fundos, as duas da
+  cozinha, as de dentro, as de cima, o portão e a porta leste do celeiro, a cancela do
+  chiqueiro, a porta do galinheiro, a porteira do cercado — as das dependências vêm
+  da meta `porta_teste` do gerador). **A causa:** as duas portas da cozinha (a do
+  quintal e a do galpão de lenha) tinham a rampa de colisão curta, terminando no meio
+  da fundação de pedra — descia-se por ela, mas subindo o corpo empacava na quina da
+  pedra, 8 cm acima da rampa. As rampas agora chegam ao piso na face de fora da
+  fundação, com três degraus de granito de verdade (a do galpão nem tinha degraus). E:
+  o chiqueiro não tinha por onde entrar (a cancela, aberta, no lado sul) e a porteira
+  do cercado não barrava o corpo (agora barra, e abre para dentro).
+- ✅ **O reespaçamento** (`CANIL_D`, `CELEIRO_D`, `FORD_D` no gerador; `_deslocado`
+  leva as malhas, a colisão e os nós de uma parte inteira): o **canil** e o cercado
+  foram 9 m para o norte (a uns dez metros dos fundos da casa, era 1 m); o **celeiro**,
+  com o galinheiro e o chiqueiro, foi para o noroeste (x −25..−13, z −38..−25),
+  fechando o terreiro; o **abrigo do Ford** um pouco para nordeste, com a entrada de
+  carro. A **arcada** ficou um alpendre na frente do galpão de lenha. Entre eles, o
+  **terreiro** de terra gasta, com **trilhas** batidas (`_trilhas`: da porta da
+  cozinha à porteira e ao celeiro, do galpão, da porteira à bomba, da entrada de carro
+  ao canil) e um **varal** com a roupa de cama. A **bomba do poço** saiu da sombra do
+  canil (ficava no escuro): a uns passos da ponta do cercado, ao sol. A gamela vai da
+  ponta oeste até perto da porteira (que ficou livre). O começo do Interlúdio
+  (`Entardecer`) e a descida do céu acompanham: Akeley diante do cercado, o celeiro ao
+  fundo. Os cães **saem e entram pela porteira** aberta (`Matilha.porteira_dentro` /
+  `porteira_fora`, `CaoIA._fila`; soltos, empacavam na tela), e **Yautja pula a tela**
+  para fugir (`CaoIA._pular_a_tela`: o impulso, o arco, as patas esticadas — `Cao.salto`).
+  Conan, que às vezes entrava pela porta dos fundos, passa do vestíbulo ao escritório
+  pela porta (`Matilha.porta_do_fogo_fora`, `comodo_do_fogo`).
+- ✅ **As animações** (`SHOT_MODO=anima` filma cada uma quadro a quadro; uma folha de
+  contato por gesto). Sem mãos, como sempre: os objetos se movem diante dos olhos e no
+  mundo (`NaMao.gesto`, `pousar`, `mover`, `pegar`, `peso`; `Player.inclinar`, para
+  debruçar-se).
+  - **A ração:** o balde sobe por cima da tela e inclina para a direita; os grãos caem
+    da borda (partículas) e a gamela enche **onde a boca passa**; o monte do balde
+    baixa; ele anda devagar ao longo da tela, o balde balançando; no fim, a sacudida
+    para os últimos grãos. Os cães abanam o rabo pedindo e comendo, e erguem a cabeça
+    de vez em quando, mastigando.
+  - **A bomba do poço:** o balde pendurado pelo gancho da bica; seis golpes da
+    alavanca (a haste sobe e desce, a cabeça vai junto); a água vem no segundo, um
+    jato que pulsa com os golpes e respinga, e o nível sobe no balde; parado o braço,
+    míngua. O balde volta à mão, pesado (desce e balança mais).
+  - **O bebedouro:** o balde vai por cima da tela, sobre o bebedouro, e inclina devagar
+    até a água cair; ele se abaixa e pousa o balde vazio no chão.
+  - **A lenha:** abaixado na pilha, as achas vêm uma a uma para a braçada; na lareira,
+    ajoelhado, saem uma a uma — três na boca, duas de reserva na pedra.
+  - **O portão do celeiro:** uma folha de cada vez, ele andando com ela (o peso no
+    começo), a batida no meio e o repique; e a **tranca** de carvalho, que estava
+    encostada, cai atravessada nos suportes. As folhas ganharam roldanas e puxador.
+  - **A caixa de correio:** a portinhola (nova, em D) cai para a estrada, ele se
+    inclina e olha lá dentro — vazia —, e a fecha com o estalo do trinco.
+  - **Os lampiões:** a chaminé de vidro sobe, o fósforo (`Fosforo`, novo, o mesmo das
+    lareiras) é riscado e levado ao pavio, a chama pega pequena, a chaminé desce e a
+    rodinha sobe o pavio até a luz encher o cômodo. **Apagar:** a rodinha baixa a
+    chama, ele sopra, e sobe um fio de fumaça.
+  - **As venezianas:** ele chega à janela, se debruça, puxa uma folha e depois a outra
+    (cada uma bate e repica) e passa a **tramela** de ferro por cima da junta (nova, na
+    folha B; sai e volta na seteira da noite).
+  - **O rifle** (`Rifle`, novo): sai do cabide do armário, sobe e vem à mão; ele
+    entreabre a **alavanca** (agora um pivô, como o **cão**) para conferir. **Carregar:**
+    o rifle deita atravessado diante do peito, a **portinhola** de latão para cima; cada
+    cartucho (estojo e bala) sai da caixa, gira, encosta na portinhola e entra com o
+    estalo e o tranco; no quarto, a alavanca abre e fecha (o cão engatilha) e o rifle
+    volta. Afastando-se no meio, ele volta a ser levado.
+  - **O telefone:** ele vai até o aparelho; o fone sai do gancho (que sobe) para junto
+    do rosto; duas voltas na manivela do magneto; nada; o gancho apertado duas vezes;
+    nada; o fone volta.
+  - **A porteira:** ele ergue a lingueta do trinco (o estalo), empurra a porteira, que
+    vai pesada e repica, e recua um passo; os cães saem pelo vão, um atrás do outro.
+  - **Os tiros:** o clarão na boca do cano, a fumaça branca da pólvora que sai pela
+    fresta e se desfaz, a alavanca de verdade e o estojo que salta da culatra.
+  Commit: (ver abaixo).
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no

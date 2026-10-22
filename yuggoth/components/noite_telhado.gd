@@ -480,13 +480,14 @@ func _atirar(i: int) -> void:
 		if ferido:
 			ferido.ferir()
 	await _esperar(0.5)
-	# A alavanca, o cartucho vazio que cai.
-	_tocar(som_alavanca, -2.0)
+	# A alavanca (playtest 12: abre e fecha de verdade): o estojo vazio salta da
+	# culatra e cai no assoalho.
 	if rifle:
-		var a := create_tween().set_trans(Tween.TRANS_SINE)
-		a.tween_property(rifle, ^"rotacao:x", -9.0, 0.18)
-		a.tween_property(rifle, ^"rotacao:x", 1.0, 0.22)
-	_cartucho(p)
+		rifle.ciclar(som_alavanca)
+		await _esperar(0.09)
+	else:
+		_tocar(som_alavanca, -2.0)
+	_cartucho(p, rifle)
 	await _esperar(0.9)
 	await v.fresta(false)
 	if rifle:
@@ -523,9 +524,60 @@ func _disparar(p: Player, v: Venezianas, fora: Vector3) -> void:
 	quintal.shadow_enabled = true
 	add_child(quintal)
 	quintal.global_position = v.global_position + fora * 5.0 + Vector3.UP * 1.5
+	# O clarão na boca do cano e a fumaça que fica na fresta (playtest 12).
+	var rifle := preparacao.rifle if preparacao else null
+	var flash := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(0.32, 0.32)
+	var mf := StandardMaterial3D.new()
+	mf.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mf.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mf.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mf.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	mf.albedo_color = Color(1.0, 0.75, 0.4)
+	mf.albedo_texture = LuzGuia._textura()
+	q.material = mf
+	flash.mesh = q
+	flash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(flash)
+	flash.global_position = rifle.boca() if rifle else v.global_position + fora * 0.4
+	_fumaca(flash.global_position, fora)
 	await _esperar(0.07)
 	cano.queue_free()
 	quintal.queue_free()
+	flash.queue_free()
+
+
+## A fumaça da pólvora negra, branca e espessa, que sai pela fresta e se desfaz.
+func _fumaca(onde: Vector3, fora: Vector3) -> void:
+	var e := CPUParticles3D.new()
+	e.one_shot = true
+	e.explosiveness = 0.85
+	e.amount = 26
+	e.lifetime = 2.6
+	e.direction = fora + Vector3.UP * 0.2
+	e.spread = 22.0
+	e.initial_velocity_min = 0.6
+	e.initial_velocity_max = 1.6
+	e.damping_min = 1.2
+	e.damping_max = 2.0
+	e.gravity = Vector3(0, 0.12, 0)
+	e.scale_amount_min = 1.0
+	e.scale_amount_max = 2.6
+	var q := QuadMesh.new()
+	q.size = Vector2(0.12, 0.12)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(0.7, 0.7, 0.68, 0.22)
+	m.albedo_texture = LuzGuia._textura()
+	q.material = m
+	e.mesh = q
+	add_child(e)
+	e.global_position = onde
+	e.emitting = true
+	get_tree().create_timer(3.0, false).timeout.connect(e.queue_free)
 
 
 ## O cão do ganido: o mais perto de onde o tiro foi, dos que estão lá fora.
@@ -543,7 +595,7 @@ func _cao_ferido(onde: Vector3) -> CaoIA:
 
 
 ## O cartucho vazio: sai da culatra, cai no assoalho, quica e fica.
-func _cartucho(p: Player) -> void:
+func _cartucho(p: Player, rifle: Rifle = null) -> void:
 	var c := MeshInstance3D.new()
 	var cil := CylinderMesh.new()
 	cil.top_radius = 0.006
@@ -559,13 +611,17 @@ func _cartucho(p: Player) -> void:
 	c.material_override = mat
 	add_child(c)
 	var de := p.camera.global_position - p.camera.global_basis.z * 0.3 + p.camera.global_basis.x * 0.08 - Vector3.UP * 0.12
+	if rifle:
+		de = rifle.global_transform * Vector3(0.0, 0.05, 0.07)
 	var chao := Vector3(de.x, p.global_position.y + 0.007, de.z) + p.global_basis.x * _rng.randf_range(0.25, 0.55)
 	c.global_position = de
+	# Salta para cima e para a direita, gira, e cai.
 	var t := create_tween()
 	t.tween_method(func(u: float) -> void:
 		if is_instance_valid(c):
-			c.global_position = de.lerp(chao, u) + Vector3.UP * (sin(u * PI) * 0.18)
-			c.rotation = Vector3(u * 9.0, u * 4.0, 0.0), 0.0, 1.0, 0.45)
+			var alto := sin(u * PI) * 0.22 + (1.0 - u) * 0.05
+			c.global_position = de.lerp(chao, u) + Vector3.UP * alto
+			c.rotation = Vector3(u * 14.0, u * 6.0, 0.0), 0.0, 1.0, 0.55)
 	t.tween_callback(func() -> void:
 		if is_instance_valid(c):
 			c.rotation = Vector3(0.0, _rng.randf() * TAU, PI / 2.0)
