@@ -861,6 +861,7 @@ no meio da sessão; o trabalho foi retomado e terminado na seguinte.)
   cercado, e os cães do lado da dobradiça (onde a gamela acaba) empacavam nela e não
   saíam para a noite do telhado. `Matilha.porteira_volta`, além da ponta da folha:
   quem sai passa por ali antes do vão, e quem entra, depois.
+  Commit `7cab774`.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
