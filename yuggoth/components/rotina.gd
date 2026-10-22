@@ -1,4 +1,4 @@
-class_name Rotina
+﻿class_name Rotina
 extends Node
 ## O entardecer na fazenda (docs/PLANO_FAZENDA.md, F5; "A tratativa", 1): a rotina
 ## de Akeley antes da noite, na ordem do balde — a ração na gamela comprida (os
@@ -109,6 +109,13 @@ const NIVEL_VAZIO := -0.1
 const TOPO_TELA := 1.5
 const ACIMA_DENTRO := 0.07
 const ACIMA_ALTO := 0.18
+## De dentro do cercado: a borda da gamela e a do bebedouro (do chão), o meio do
+## balde acima delas, e quanto ele fica atrás da gamela.
+const GAMELA_TOPO := 0.27
+const GAMELA_ALTO := 0.36
+const BEBEDOURO_TOPO := 0.26
+const BEBEDOURO_ALTO := 0.36
+const RECUO_GAMELA := 0.72
 
 var etapa := Etapa.RACAO
 var lenha_feita := false
@@ -129,6 +136,15 @@ var _haste_repouso := 0.0
 var _tela_seguida := Vector3.INF
 var _dentro_seguido := Vector3.FORWARD
 var _borda_seguida := Vector3.RIGHT
+## A altura do que ele transpõe (a régua da tela, ou a borda da gamela e do
+## bebedouro, de dentro do cercado) e onde fica o meio do balde em relação a ela.
+var _topo_seguido := TOPO_TELA
+var _para_seguido := ACIMA_DENTRO
+var _alto_seguido := ACIMA_ALTO
+## Para onde a boca inclina (ZERO: para o lado de `_dentro_seguido`). De dentro do
+## cercado, também um pouco para trás de onde ele anda: a boca fica de frente para os
+## olhos, e os grãos caem à vista (inclinado para a frente, o balde os tapava).
+var _inclina_seguido := Vector3.ZERO
 var _graus := 0.0
 var _balanca := 0.0
 var _t_balanca := 0.0
@@ -172,13 +188,15 @@ func _process(delta: float) -> void:
 		_t_balanca += delta * _balanca
 		var bal := sin(_t_balanca * 7.5) * 6.0 * _balanca
 		var sobe := absf(sin(_t_balanca * 3.75)) * 0.015 * _balanca
-		balde.no_mundo = _derramar(_sobre_a_tela(_tela_seguida, _dentro_seguido, matilha.akeley().global_position, ACIMA_DENTRO, ACIMA_ALTO + sobe),
-			_dentro_seguido, _graus + bal, _borda_seguida)
+		balde.no_mundo = _derramar(_sobre_a_tela(_tela_seguida, _dentro_seguido, matilha.akeley().global_position, _para_seguido, _alto_seguido + sobe, _topo_seguido),
+			_dentro_seguido if _inclina_seguido == Vector3.ZERO else _inclina_seguido, _graus + bal, _borda_seguida)
 	# A ração cai onde a boca do balde passa (a gamela enche de leste a oeste).
 	if _despejando and balde and racao_gamela:
 		var boca := balde.global_transform * Vector3(0.16, 0.05, 0.0)
 		var u := clampf((_gamela_leste - boca.x + 0.25) / _gamela_compr, 0.0, 1.0)
 		racao_gamela.scale.x = maxf(racao_gamela.scale.x, u)
+		if matilha:
+			matilha.racao_ate = minf(matilha.racao_ate, _gamela_leste - racao_gamela.scale.x * _gamela_compr)
 	var p := matilha.akeley() if matilha else null
 	if p == null or not p.input_enabled or _ocupado:
 		_ocioso = 0.0
@@ -273,7 +291,10 @@ func _on_area(_by: Node, a: Interactable) -> void:
 ## leva para dentro da tela.
 func _racao(p: Player) -> void:
 	etapa = Etapa.AGUA
-	var de := caminho_racao[0] if caminho_racao.size() >= 2 else p.global_position
+	if matilha.no_cercado(p.global_position):
+		await _racao_de_dentro(p)
+		return
+	var de :=caminho_racao[0] if caminho_racao.size() >= 2 else p.global_position
 	var ate := caminho_racao[1] if caminho_racao.size() >= 2 else p.global_position
 	var dentro := dentro_racao
 	var anda := (ate - de).normalized()
@@ -296,12 +317,72 @@ func _racao(p: Player) -> void:
 		return
 	# Inclina: a boca para dentro do cercado.
 	_seguir_balde(tela_racao, dentro, Vector3.RIGHT)
+	if not await _despejar_racao(p, ate, olhar.call(ate)):
+		return
+	# Volta por cima da tela para a mão.
+	_seguir_balde(Vector3.INF, dentro, Vector3.RIGHT)
+	var volta := balde.mover(_derramar(_sobre_a_tela(tela_racao, dentro, p.global_position, -0.3, 0.26), dentro, 0.0, Vector3.RIGHT), 0.6, 0.05)
+	await p.conduzir([p.global_position - dentro * 0.35], olhar.call(p.global_position) - dentro * 0.3, 0.6)
+	if volta.is_running():
+		await volta.finished
+	balde.arco = 0.18
+	await balde.pegar(0.55).finished
+	# Comem uns vinte segundos; então, à toa no cercado.
+	get_tree().create_timer(22.0, false).timeout.connect(_fim_de_comer)
+
+
+## De dentro do cercado (playtest 12, depois: "quando estiver dentro do cercado, a
+## água e a ração devem ser postas dali de dentro mesmo, não sair para colocar por
+## cima da cerca"): ele vai à ponta leste da gamela, por trás dela, debruça-se, põe
+## o balde sobre a borda e anda devagar para o oeste despejando; os cães esperam um
+## passo atrás e vêm comer onde a ração já caiu e ele já passou. No fim, o balde
+## volta à mão e ele dá um passo para trás, abrindo a gamela para eles.
+func _racao_de_dentro(p: Player) -> void:
+	var gz := racao_gamela.global_position.z
+	var linha := Vector3(_gamela_leste, 0, gz)
+	# De Akeley para a gamela (para a tela da frente).
+	var para := -dentro_racao
+	var de := Vector3(_gamela_leste - 0.3, 0, gz) - para * RECUO_GAMELA
+	var ate := Vector3(_gamela_leste - _gamela_compr + 0.4, 0, gz) - para * RECUO_GAMELA
+	var anda := (ate - de).normalized()
+	var olhar := func(pos: Vector3) -> Vector3: return Vector3(pos.x, GAMELA_TOPO, pos.z) + para * RECUO_GAMELA + anda * 0.55
+	await p.conduzir([de], olhar.call(de))
+	if not is_inside_tree():
+		return
+	var debruca := create_tween().set_trans(Tween.TRANS_SINE)
+	debruca.tween_property(p, ^"inclinar", 0.12, 0.5)
+	balde.arco = 0.1
+	await balde.pousar(_derramar(_sobre_a_tela(linha, para, de, -0.14, GAMELA_ALTO, GAMELA_TOPO), para, 0.0, Vector3.RIGHT), 0.6).finished
+	if not is_inside_tree():
+		return
+	_seguir_balde(linha, para, Vector3.RIGHT, GAMELA_TOPO, -0.14, GAMELA_ALTO)
+	_inclina_seguido = (para - anda * 0.8).normalized()
+	if not await _despejar_racao(p, ate, olhar.call(ate)):
+		return
+	_seguir_balde(Vector3.INF, para, Vector3.RIGHT)
+	var ergue := create_tween().set_trans(Tween.TRANS_SINE)
+	ergue.tween_property(p, ^"inclinar", 0.0, 0.5)
+	balde.arco = 0.18
+	await balde.pegar(0.55).finished
+	if not is_inside_tree():
+		return
+	# Um passo para trás: a gamela é deles.
+	await p.conduzir([ate - para * 0.65], olhar.call(ate), 0.7)
+	get_tree().create_timer(22.0, false).timeout.connect(_fim_de_comer)
+
+
+## O balde já sobre a gamela (`_seguir_balde`): inclina, e os grãos caem; ele anda
+## devagar até `ate` despejando, o balde balançando; no fim, a sacudida para os
+## últimos grãos, e o balde endireita. Falso se a fase saiu no meio.
+func _despejar_racao(p: Player, ate: Vector3, olhar: Vector3) -> bool:
 	var inclina := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	inclina.tween_property(self, ^"_graus", 82.0, 0.45)
 	await inclina.finished
 	_tocar(som_racao, -2.0)
 	_jorro(true)
 	_despejando = true
+	# Os cães vêm, cada um quando a ração chega ao seu lugar.
+	matilha.racao_ate = INF
 	matilha.modo = Matilha.Modo.COMENDO
 	var mais := create_tween().set_trans(Tween.TRANS_SINE)
 	mais.tween_property(self, ^"_graus", 106.0, 0.35)
@@ -314,9 +395,9 @@ func _racao(p: Player) -> void:
 			_tocar(som_racao, -5.0, 0.92))
 	# Anda devagar, despejando; o balde balança um pouco a cada passo.
 	_balanca = 1.0
-	await p.conduzir([ate], olhar.call(ate), 0.85)
+	await p.conduzir([ate], olhar, 0.85)
 	if not is_inside_tree():
-		return
+		return false
 	_balanca = 0.0
 	# O resto: a gamela inteira, e a sacudida para os últimos grãos.
 	var resto := create_tween()
@@ -328,30 +409,22 @@ func _racao(p: Player) -> void:
 	await sacode.finished
 	_jorro(false)
 	_despejando = false
+	matilha.racao_ate = -INF
 	if racao_balde:
 		racao_balde.visible = false
-	# Endireita, e volta por cima da tela para a mão.
 	var endireita := create_tween().set_trans(Tween.TRANS_SINE)
 	endireita.tween_property(self, ^"_graus", 0.0, 0.45)
 	await endireita.finished
-	_seguir_balde(Vector3.INF, dentro, Vector3.RIGHT)
-	var volta := balde.mover(_derramar(_sobre_a_tela(tela_racao, dentro, p.global_position, -0.3, 0.26), dentro, 0.0, Vector3.RIGHT), 0.6, 0.05)
-	await p.conduzir([p.global_position - dentro * 0.35], olhar.call(p.global_position) - dentro * 0.3, 0.6)
-	if volta.is_running():
-		await volta.finished
-	balde.arco = 0.18
-	await balde.pegar(0.55).finished
-	# Comem uns vinte segundos; então, à toa no cercado.
-	get_tree().create_timer(22.0, false).timeout.connect(_fim_de_comer)
+	return is_inside_tree()
 
 
 ## Um ponto acima da tela (`tela`: um ponto nela; `dentro`: para o lado de dentro do
 ## cercado), na altura de `pos` ao longo dela, `para_dentro` metros para dentro e
 ## `alto` metros acima da régua de cima.
-func _sobre_a_tela(tela: Vector3, dentro: Vector3, pos: Vector3, para_dentro: float, alto: float) -> Vector3:
+func _sobre_a_tela(tela: Vector3, dentro: Vector3, pos: Vector3, para_dentro: float, alto: float, topo := TOPO_TELA) -> Vector3:
 	var ao_longo := dentro.cross(Vector3.UP).normalized()
 	var q := tela + ao_longo * ao_longo.dot(pos - tela) + dentro * para_dentro
-	q.y = TOPO_TELA + alto
+	q.y = topo + alto
 	return q
 
 
@@ -370,8 +443,12 @@ func _derramar(c: Vector3, dentro: Vector3, graus: float, borda: Vector3) -> Tra
 
 ## Enquanto `tela` não for INF, o balde fica por cima dela na altura de Akeley,
 ## inclinado `_graus` (e balançando com `_balanca`).
-func _seguir_balde(tela: Vector3, dentro: Vector3, borda: Vector3) -> void:
+func _seguir_balde(tela: Vector3, dentro: Vector3, borda: Vector3, topo := TOPO_TELA, para := ACIMA_DENTRO, alto := ACIMA_ALTO) -> void:
 	_tela_seguida = tela
+	_topo_seguido = topo
+	_para_seguido = para
+	_alto_seguido = alto
+	_inclina_seguido = Vector3.ZERO
 	_dentro_seguido = dentro
 	_borda_seguida = borda
 	_graus = 0.0
@@ -483,8 +560,12 @@ func _jato(forca: float, segundos: float) -> void:
 ## passa por cima da régua; inclina a boca para dentro, devagar até a água chegar à
 ## borda, e ela cai no bebedouro (o nível do balde desce, o do bebedouro sobe);
 ## então o balde volta por cima da tela, e ele se abaixa e o pousa no chão, ao lado.
+## De dentro do cercado, direto: ele chega ao bebedouro, debruça-se e despeja.
 func _bebedouro(p: Player) -> void:
 	etapa = Etapa.LIVRE
+	if matilha.no_cercado(p.global_position):
+		await _bebedouro_de_dentro(p)
+		return
 	var dentro := dentro_bebedouro
 	var aqui := diante_do_bebedouro
 	var olhar := agua_bebedouro.global_position + Vector3(0, 0.55, 0)
@@ -501,8 +582,56 @@ func _bebedouro(p: Player) -> void:
 		await passa.finished
 	if not is_inside_tree():
 		return
-	# Inclina: devagar até a água chegar à borda, e então ela cai.
 	_seguir_balde(tela_bebedouro, dentro, Vector3.FORWARD)
+	if not await _despejar_agua():
+		return
+	_seguir_balde(Vector3.INF, dentro, Vector3.FORWARD)
+	# De volta por cima da tela, e um passo para trás.
+	var volta := balde.mover(_derramar(_sobre_a_tela(tela_bebedouro, dentro, aqui, -0.3, 0.26), dentro, 0.0, Vector3.FORWARD), 0.6, 0.05)
+	await p.conduzir([aqui - dentro * 0.35], olhar - dentro * 0.3, 0.6)
+	if volta.is_running():
+		await volta.finished
+	if not is_inside_tree():
+		return
+	await _balde_no_chao(p)
+
+
+## De dentro do cercado (playtest 12, depois): ele vai até o bebedouro, debruça-se,
+## põe o balde sobre a borda e despeja; o balde vazio fica no chão ali, à esquerda.
+func _bebedouro_de_dentro(p: Player) -> void:
+	var beb := agua_bebedouro.global_position
+	beb.y = 0.0
+	# De Akeley para o bebedouro (para a tela do leste).
+	var para := -dentro_bebedouro
+	var aqui := beb - para * 0.85
+	var olhar := beb + Vector3(0, 0.4, 0)
+	await p.conduzir([aqui], olhar)
+	if not is_inside_tree():
+		return
+	var debruca := create_tween().set_trans(Tween.TRANS_SINE)
+	debruca.tween_property(p, ^"inclinar", 0.12, 0.5)
+	balde.arco = 0.1
+	await balde.pousar(_derramar(_sobre_a_tela(beb, para, aqui, -0.16, BEBEDOURO_ALTO, BEBEDOURO_TOPO), para, 0.0, Vector3.FORWARD), 0.6).finished
+	if not is_inside_tree():
+		return
+	_seguir_balde(beb, para, Vector3.FORWARD, BEBEDOURO_TOPO, -0.16, BEBEDOURO_ALTO)
+	if not await _despejar_agua():
+		return
+	_seguir_balde(Vector3.INF, para, Vector3.FORWARD)
+	var ergue := create_tween().set_trans(Tween.TRANS_SINE)
+	ergue.tween_property(p, ^"inclinar", 0.0, 0.4)
+	# O balde vazio, no chão do cercado: à frente e à direita (do lado aberto, longe
+	# da parede do canil).
+	if balde_no_chao:
+		var direita := Vector3(-para.z, 0, para.x)
+		balde_no_chao.global_position = aqui + direita * 0.45 + para * 0.3
+	await _balde_no_chao(p)
+
+
+## O balde já sobre o bebedouro (`_seguir_balde`): inclina devagar até a água chegar
+## à borda, e então ela cai (o nível do balde desce, o do bebedouro sobe); o balde
+## endireita. Falso se a fase saiu no meio.
+func _despejar_agua() -> bool:
 	var t0 := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	t0.tween_property(self, ^"_graus", 85.0, 0.55)
 	await t0.finished
@@ -521,15 +650,11 @@ func _bebedouro(p: Player) -> void:
 	var t1 := create_tween().set_trans(Tween.TRANS_SINE)
 	t1.tween_property(self, ^"_graus", 0.0, 0.5)
 	await t1.finished
-	_seguir_balde(Vector3.INF, dentro, Vector3.FORWARD)
-	# De volta por cima da tela, e um passo para trás.
-	var volta := balde.mover(_derramar(_sobre_a_tela(tela_bebedouro, dentro, aqui, -0.3, 0.26), dentro, 0.0, Vector3.FORWARD), 0.6, 0.05)
-	await p.conduzir([aqui - dentro * 0.35], olhar - dentro * 0.3, 0.6)
-	if volta.is_running():
-		await volta.finished
-	if not is_inside_tree():
-		return
-	# Abaixa-se e pousa o balde no chão, à frente e à esquerda.
+	return is_inside_tree()
+
+
+## Abaixa-se e pousa o balde vazio no chão, em `balde_no_chao`.
+func _balde_no_chao(p: Player) -> void:
 	var chao := balde_no_chao.global_position + Vector3(0, 0.13, 0)
 	var abaixa := create_tween().set_trans(Tween.TRANS_SINE)
 	abaixa.tween_property(p, ^"abaixar", 0.45, 0.6)
@@ -810,6 +935,7 @@ func pular() -> void:
 	celeiro_feito = true
 	_despejando = false
 	_tela_seguida = Vector3.INF
+	matilha.racao_ate = -INF
 	racao_gamela.scale.x = 1.0
 	racao_balde.visible = false
 	agua_balde.visible = false

@@ -56,7 +56,7 @@ func _on_interact(by: Node) -> void:
 		await p.conduzir([lugar], global_position + fora * 3.0)
 		if not is_inside_tree():
 			return
-	elif fora != Vector3.ZERO:
+	elif lugar != Vector3.INF:
 		await p.olhar_para(global_position + fora * 3.0, 0.5).finished
 	# Debruçado para fora, de olho em cada folha enquanto a puxa.
 	var debruca := create_tween().set_trans(Tween.TRANS_SINE)
@@ -94,23 +94,17 @@ func _on_interact(by: Node) -> void:
 	fechou.emit()
 
 
-## Onde ele fica para fechar: diante da janela, onde o corpo cabe e aonde se chega
-## em linha reta de onde está (`conduzir` passa por cima da física: playtest 12,
-## depois — "trancar as venezianas te deixa preso entre os móveis"; na sala de
-## estar ele ia parar entre o sofá, a mesinha e a parede). INF: fica onde está (a
-## mira já alcança).
-func junto(p: Player, recuos: Array = [0.3, 0.2, 0.4, 0.55]) -> Vector3:
+## Onde ele fica para fechar: diante da janela, no meio dela, `recuo` metros para
+## dentro da área (playtest 12, depois: "tire os móveis da frente dos locais... não
+## contorne o ficar trancado simplesmente fechando as persianas de longe"). O lugar
+## diante de cada janela fica livre de móveis no gerador, e o `alcance_test` confere
+## que o corpo cabe ali e sai dali andando.
+func junto(p: Player, recuo := 0.3) -> Vector3:
 	if fora == Vector3.ZERO:
 		return Vector3.INF
-	var lado := fora.cross(Vector3.UP).normalized()
-	var de := p.global_position
-	for recua: float in recuos:
-		for desvio: float in [0.0, -0.25, 0.25, -0.5, 0.5]:
-			var q := global_position - fora * recua + lado * desvio
-			q.y = de.y
-			if p.caminho_livre(de, q):
-				return q
-	return Vector3.INF
+	var q := global_position - fora * recuo
+	q.y = p.global_position.y
+	return q
 
 
 ## Fecha de uma vez, sem animar (pular, testes).

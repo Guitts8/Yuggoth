@@ -1265,8 +1265,23 @@ func _rotina(faz: Fazenda) -> void:
 			("pela porteira, para fora do cercado; os cães ficam" if de_dentro else "pela porteira, para dentro do cercado; ela fecha atrás") + " (%s)" % p.global_position.snappedf(0.01))
 	mirou = await fazer.call(r.bombear, r.diante_da_bomba)
 	_check(mirou and r.agua_balde.visible, "a bomba do poço enche o balde")
-	mirou = await fazer.call(r.encher_bebedouro, r.diante_do_bebedouro, r.agua_bebedouro.global_position + Vector3(0.6, 0.5, 0))
-	_check(mirou and r.agua_bebedouro.scale.y > 0.9 and not faz.balde.visible and r.balde_no_chao.visible, "a água no bebedouro; o balde fica no chão")
+	# De dentro do cercado (playtest 12, depois: "a água e a ração devem ser postas
+	# dali de dentro mesmo"): ele não sai para despejar por cima da tela.
+	var beb := r.agua_bebedouro.global_position
+	mirou = await fazer.call(r.encher_bebedouro, Vector3(beb.x - 1.1, 0, beb.z), r.encher_bebedouro.global_position)
+	_check(mirou and r.agua_bebedouro.scale.y > 0.9 and not faz.balde.visible and r.balde_no_chao.visible
+		and matilha.no_cercado(p.global_position) and matilha.no_cercado(r.balde_no_chao.global_position),
+		"de dentro do cercado, a água no bebedouro; ele e o balde ficam lá dentro (%s)" % p.global_position.snappedf(0.01))
+	# E sai pela porteira (a lenha é fora).
+	var sair := faz.get_node("PreparacaoPecas/SairDoCercado") as PassarPorteira
+	p.global_position = sair.global_position + Vector3(0.0, -0.7, -1.2)
+	p.velocity = Vector3.ZERO
+	await _frames(3)
+	await _mirar(p, sair.global_position)
+	sair.interact(p)
+	await _frames(2)
+	await _until(func() -> bool: return p.input_enabled, 20.0)
+	_check(not matilha.no_cercado(p.global_position), "e sai pela porteira")
 	mirou = await fazer.call(r.pegar_lenha, Vector3(-11.0, 0, 3.6))
 	_check(mirou and r.bracada.visible and r.por_lenha.can_interact(p) and not r.fechar_celeiro.can_interact(p), "a braçada de lenha (com ela, só a lareira)")
 	mirou = await fazer.call(r.por_lenha, Vector3(2.5, 0.6, 3.7))

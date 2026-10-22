@@ -65,6 +65,9 @@ var fogo := Vector3.INF
 ## depois). Quem sai passa por aqui antes do vão; quem entra, depois.
 @export var porteira_volta := Vector3.INF
 var porteira_aberta := false
+## Até onde a ração já caiu na gamela (x do mundo; ela enche de leste para oeste):
+## a Rotina o move enquanto despeja. -INF: a gamela inteira.
+var racao_ate := -INF
 ## O quintal, onde andam soltos à noite.
 @export var quintal := AABB(Vector3(-14, 0, -16), Vector3(36, 1, 30))
 ## Para onde fica a mata (o pântano e a Dark Mountain, a oeste).
@@ -92,6 +95,21 @@ func caes() -> Array[CaoIA]:
 
 func cao(nome: String) -> CaoIA:
 	return get_node_or_null(NodePath(nome)) as CaoIA
+
+
+## Onde um cão espera, um passo atrás, em vez de comer no `lugar` da gamela: a
+## ração ainda não chegou ali (`racao_ate`), ou Akeley está ali, dentro do cercado,
+## despejando (playtest 12, depois). INF: pode comer.
+func esperar_na_gamela(lugar: Vector3) -> Vector3:
+	var a := akeley()
+	var dentro := a != null and no_cercado(a.global_position)
+	var perto := dentro and Vector2(a.global_position.x - lugar.x, a.global_position.z - lugar.z).length() < 1.3
+	if lugar.x >= racao_ate and not perto:
+		return Vector3.INF
+	var p := lugar - gamela_frente * 1.15
+	if dentro and absf(a.global_position.z - p.z) < 0.9 and absf(a.global_position.x - p.x) < 1.0:
+		p.x = a.global_position.x + (1.0 if p.x >= a.global_position.x else -1.0)
+	return p
 
 
 ## O lugar na gamela de `c` (os que comem, na ordem), ou INF.

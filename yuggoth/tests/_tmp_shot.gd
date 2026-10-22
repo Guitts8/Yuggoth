@@ -720,7 +720,10 @@ func _anima_fotos() -> void:
 			print("QUADRO %s %d corpo=%s olhos=%s" % [nome, k, p.global_position.snappedf(0.01), p.camera.global_position.snappedf(0.01)])
 			await _shot("%s_%s_%02d" % [tag, nome, k])
 	var quer := func(n: String) -> bool: return quais.is_empty() or n in quais
-	if quer.call("racao"):
+	if quer.call("racao_dentro"):
+		await filmar.call(r.por_racao, Vector3(-1.3, 0, -17.3), "racao_dentro", 18, Vector3(-1.7, 0.3, -16.3))
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+	elif quer.call("racao"):
 		await filmar.call(r.por_racao, r.por_racao.global_position + Vector3(1.5, -0.5, 1.0), "racao", 16)
 		await _until(func() -> bool: return not r._ocupado, 30.0)
 	else:
@@ -733,7 +736,11 @@ func _anima_fotos() -> void:
 	else:
 		r.etapa = Rotina.Etapa.BEBEDOURO
 		r._ligar_areas()
-	if quer.call("bebedouro"):
+	if quer.call("bebedouro_dentro"):
+		var beb := r.agua_bebedouro.global_position
+		await filmar.call(r.encher_bebedouro, Vector3(beb.x - 1.1, 0, beb.z), "bebedouro_dentro", 14, r.encher_bebedouro.global_position)
+		await _until(func() -> bool: return not r._ocupado, 30.0)
+	elif quer.call("bebedouro"):
 		await filmar.call(r.encher_bebedouro, r.encher_bebedouro.global_position + Vector3(1.0, -0.45, 0.2), "bebedouro", 14)
 		await _until(func() -> bool: return not r._ocupado, 30.0)
 	r.etapa = Rotina.Etapa.LIVRE

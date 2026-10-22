@@ -53,8 +53,13 @@ o que esperava.
       balde.
 - [ ] **O cercado:** "Entrar no cercado" / "Sair do cercado" na porteira fechada (ele
       abre, passa e fecha atrás de si; os cães não fogem).
-- [ ] **As venezianas:** feche todas, principalmente as da sala de estar; você
-      continua livre para andar depois?
+- [ ] **Dentro do cercado:** entre com o balde e ponha a ração e a água dali de
+      dentro (ele despeja direto, sem sair; os cães esperam atrás dele). De fora,
+      continua por cima da tela.
+- [ ] **As venezianas e os móveis:** ele fecha cada uma **de junto da janela**. A sala
+      de estar foi rearrumada (o sofá na parede sul, as poltronas viradas para o fogo,
+      a cadeira de balanço entre as janelas do leste) e, no escritório, a poltrona do
+      fogo foi para o canto. Ficou natural? Algum móvel ainda atrapalha?
 - [ ] **As árvores** encostam no chão, longe também (a mata da encosta, os morros a
       leste, o pântano)?
 - [ ] **Na preparação, abrindo a porteira:** todos os cães saem (os do canto oeste do

@@ -848,11 +848,19 @@ no meio da sessão; o trabalho foi retomado e terminado na seguinte.)
   fora, quando a preparação pede para soltar os cães, cede o lugar à área dela.
 - ✅ *"Trancar as venezianas te deixa preso entre os móveis"* — `conduzir` passa por
   cima da física, e a cena o levava a um ponto fixo diante da janela (na sala de
-  estar, entre o sofá, a mesinha e a parede). `Venezianas.junto` procura diante da
-  janela um lugar onde o corpo cabe e aonde se chega em linha reta
-  (`Player.caminho_livre`); sem nenhum, ele fica onde está e só se vira. A seteira da
-  noite usa o mesmo. O `alcance_test` agora fecha cada veneziana e confere que ele
-  sai dali andando.
+  estar, entre o sofá, a cadeira de balanço e a parede). Na primeira tentativa,
+  `Venezianas.junto` procurava outro lugar de onde a mira alcançasse; o usuário
+  recusou (*"tire os móveis da frente dos locais e construa de forma inteligente o
+  cenário. Não contorne o ficar trancado simplesmente fechando as persianas de
+  longe"*). Refeito: ele vai sempre para a frente da janela, e **os móveis saíram dali**.
+  Na **sala de estar**, o sofá foi para a parede sul (a única sem janela), uma
+  poltrona para o canto ao lado da lareira, a outra virada para o fogo, a mesa
+  redonda com o lampião no meio, a cadeira de balanço e a mesinha na parede leste,
+  entre as janelas. No **escritório**, a poltrona e a mesinha foram para o canto do
+  fogo, contra a parede oeste, e saíram da frente da janela sul (a 23, a da bala).
+  A seteira da noite usa o mesmo lugar, um pouco mais para dentro. O `alcance_test`
+  confere que o corpo cabe diante de cada janela (a 0,30 m e a 0,55 m da área),
+  fecha cada uma e anda para longe dali.
 - ✅ *"Algumas árvores não estão encostando o chão"* — elas eram postas na curva de
   `_altura`, mas o chão de verdade é a malha da grade (células planas de 10 a 40 m
   longe da casa), e as duas se afastam metros. `_chao_em` dá a altura da malha, e
@@ -862,6 +870,18 @@ no meio da sessão; o trabalho foi retomado e terminado na seguinte.)
   saíam para a noite do telhado. `Matilha.porteira_volta`, além da ponta da folha:
   quem sai passa por ali antes do vão, e quem entra, depois.
   Commit `7cab774`.
+- ✅ *"Quando estiver dentro do cercado, a água e a ração devem ser postas dali de
+  dentro mesmo, não sair para colocar por cima da cerca"* — `conduzir` o levava para
+  fora através da tela. De dentro (`Matilha.no_cercado`), `Rotina._racao_de_dentro`:
+  ele vai à ponta leste da gamela, por trás dela, debruça-se e põe o balde sobre a
+  borda, a boca inclinada para a gamela e um pouco para trás (inclinada para a
+  frente, o próprio balde tapava os grãos), e anda para o oeste despejando; no fim,
+  um passo para trás. `_bebedouro_de_dentro`: direto no bebedouro, e o balde vazio
+  fica no chão do cercado. Os cães: com ele dentro e o balde na mão, pedem a ração
+  atrás dele (não entre ele e a gamela); comendo, cada um espera um passo atrás até
+  a ração chegar ao seu lugar e ele sair dali (`Matilha.racao_ate`,
+  `esperar_na_gamela`; vale também de fora). O teste de fumaça agora faz o bebedouro
+  de dentro e sai pela porteira.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no

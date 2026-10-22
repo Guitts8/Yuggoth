@@ -53,6 +53,10 @@ const BEIRAL := FORRO + 0.15  ## o alto das paredes
 const CUMEEIRA := Vector2(1.5, BEIRAL + 4.2)  ## (x, y) da cumeeira, de norte a sul
 ## O vestíbulo, no meio, de leste a oeste.
 const HALL_Z := 1.4
+## A poltrona de orelhas junto ao fogo do escritório (a noite do telhado senta nela)
+## e a mesa redonda da sala de estar (o lampião).
+const POLTRONA_FOGO := Vector3(1.55, 0.6, 5.2)
+const MESA_SALA := Vector3(3.65, 0.6, -3.6)
 ## A parede que separa os cômodos da frente dos de trás.
 const MEIO_X := 1.0
 ## A escada: sobe para oeste ao longo do lado norte do vestíbulo.
@@ -1274,19 +1278,25 @@ func _moveis() -> void:
 	_cadeira_espaldar(Vector3(5.08, y, 3.7), -90.0)
 	_estante(Vector3(2.45, y, HALL_Z + 0.24), 180.0, 1.3, 2.2)
 	_estante(Vector3(3.8, y, HALL_Z + 0.24), 180.0, 1.3, 2.2)
-	_poltrona_orelhas(Vector3(1.9, y, 5.05), 10.0, "estofado")
-	_mesinha(Vector3(2.55, y, 5.45), 0.0)
+	# A poltrona e a mesinha no canto do fogo, contra a parede oeste: a frente da
+	# janela sul fica livre (playtest 12, depois: "tire os móveis da frente").
+	_poltrona_orelhas(POLTRONA_FOGO, -6.0, "estofado")
+	_mesinha(Vector3(1.33, y, 4.63), -90.0)
 	_armarinho(Vector3(3.5, y, CASA_Z.y - E - 0.26), 0.0)
-	# A sala de estar (nordeste): o sofá de encosto curvo contra a parede norte,
-	# as duas poltronas viradas para a lareira, a mesa redonda do meio com o
-	# pano de crochê, a cadeira de balanço, o tapete. A porta (x 5,1) fica livre.
-	_tapete_redondo(Vector3(3.3, y, -3.8), Vector2(2.8, 2.2))
-	_sofa(Vector3(3.5, y, -5.35), 180.0, 2.0)
-	_poltrona_orelhas(Vector3(2.35, y, -2.35), 30.0, "estofado_vinho")
-	_poltrona_orelhas(Vector3(2.35, y, -5.0), 150.0, "estofado_vinho")
-	_mesa_redonda(Vector3(3.4, y, -3.7), 0.42)
-	_cadeira_balanco(Vector3(5.25, y, -4.7), 118.0)
-	_mesinha(Vector3(5.5, y, -3.6), 0.0)
+	# A sala de estar (nordeste): o sofá de encosto curvo contra a parede sul (a única
+	# sem janela), as duas poltronas viradas para a lareira, a mesa redonda do meio
+	# com o pano de crochê, a cadeira de balanço e a mesinha na parede leste, entre as
+	# janelas; o tapete. Playtest 12, depois ("tire os móveis da frente dos locais"):
+	# o sofá ficava entre as janelas do norte e a cadeira de balanço diante da do
+	# leste — fechar as venezianas o deixava preso entre eles. Diante de cada janela,
+	# o lugar de quem fecha fica livre (`tests/alcance_test`). A porta (x 5,1) também.
+	_tapete_redondo(Vector3(3.4, y, -3.6), Vector2(2.8, 2.2))
+	_sofa(Vector3(3.2, y, -1.95), 0.0, 2.0)
+	_poltrona_orelhas(Vector3(1.68, y, -2.08), 0.0, "estofado_vinho")
+	_poltrona_orelhas(Vector3(2.7, y, -4.35), 121.0, "estofado_vinho")
+	_mesa_redonda(MESA_SALA, 0.42)
+	_cadeira_balanco(Vector3(5.25, y, -3.95), 90.0)
+	_mesinha(Vector3(5.55, y, -3.35), 90.0)
 	# A sala de jantar (sudoeste): a mesa de seis lugares, as cadeiras de espaldar,
 	# o aparador com a louça sob a janela, o armário de canto. O caminho da porta
 	# do vestíbulo à da cozinha passa pela ponta oeste da mesa.
@@ -2483,7 +2493,7 @@ func _preparacao() -> void:
 	# chama no pavio e a luz quente.
 	var lampioes: Array[Lampiao] = []
 	var lugares := [["Escritorio", Vector3(5.45, T0 + 0.78, 3.25), true], ["Vestibulo", Vector3(0.6, T0 + 0.8, 1.0), false],
-		["SalaEstar", Vector3(3.4, T0 + 0.765, -3.7), false], ["Cozinha", Vector3(-5.8, T0 + 0.76, 3.2), false]]
+		["SalaEstar", MESA_SALA + Vector3(0, 0.765, 0), false], ["Cozinha", Vector3(-5.8, T0 + 0.76, 3.2), false]]
 	for l: Array in lugares:
 		var lp := _area(g, Lampiao.new(), "Lampiao%s" % l[0], Vector3(0.3, 0.5, 0.3), l[1] + Vector3(0, 0.22, 0)) as Lampiao
 		var forma := lp.get_child(0) as Node3D
@@ -2780,7 +2790,7 @@ func _noite_telhado() -> void:
 	caes.frente_alvo = Vector3(34.0, 1.0, 30.0)
 
 	# A poltrona de orelhas junto ao fogo (gerar_fazenda._moveis).
-	var assento := Vector3(1.9, T0, 5.05)
+	var assento := POLTRONA_FOGO
 	var boca := Vector3(MEIO_X + CHAMINE_MEIA.x + 0.1, T0 + 0.75, CHAMINE_Z)
 	# Maior que a poltrona (a colisão dela tapava a mira).
 	var sentar := _area(g, Interactable.new(), "Sentar", Vector3(1.3, 1.4, 1.3), assento + Vector3(0, 0.7, 0)) as Interactable

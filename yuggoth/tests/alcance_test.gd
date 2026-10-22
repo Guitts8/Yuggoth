@@ -121,6 +121,11 @@ func _ready() -> void:
 			# Playtest 12, depois: "trancar as venezianas te deixa preso entre os
 			# móveis". A cena o leva até a janela sem a física: depois, ele ainda sai dali?
 			if a is Venezianas:
+				# O lugar fixo diante da janela, o de fechar e o de atirar pela fresta: sem
+				# móveis (playtest 12, depois: "tire os móveis da frente dos locais").
+				for recuo: float in [0.3, 0.55]:
+					var q := (a as Venezianas).junto(_player, recuo)
+					_check(_player.livre(q), "%s: o corpo cabe diante da janela, a %.2f m (%s)" % [nome, recuo, q.snappedf(0.01)])
 				var preso: String = await _depois_de_usar(a)
 				_check(preso.is_empty(), "%s: depois de fechar, %s" % [nome, "sai dali andando" if preso.is_empty() else preso])
 		else:

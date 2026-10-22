@@ -240,8 +240,19 @@ func _pensar() -> void:
 	match matilha.modo:
 		Matilha.Modo.COMENDO:
 			var lugar := matilha.lugar_na_gamela(self)
+			var espera := matilha.esperar_na_gamela(lugar) if lugar != Vector3.INF else Vector3.INF
 			if lugar == Vector3.INF:
 				_vigiar_a_mata(false)
+			elif espera != Vector3.INF:
+				# Um passo atrás, de olho na gamela, até a ração chegar (e Akeley sair).
+				_olhar_para = lugar
+				if global_position.distance_to(espera) > PERTO * 1.5:
+					_ir(espera, TROTE)
+					_pose(Cao.Pose.PARADO)
+				else:
+					_alvo = Vector3.INF
+					_pose(Cao.Pose.PARADO)
+					_abana = 1.0
 			elif global_position.distance_to(lugar) > PERTO * 1.5:
 				_olhar_para = lugar + matilha.gamela_frente
 				_ir(lugar, TROTE)
@@ -477,6 +488,16 @@ func _pedir_racao(akeley: Player) -> void:
 	junto += Vector3(_rng.randf_range(-1.6, 1.6), 0, _rng.randf_range(-1.2, 1.2))
 	junto.x = clampf(junto.x, c.position.x + 0.3, c.end.x - 0.3)
 	junto.z = clampf(junto.z, c.position.z + 0.3, c.end.z - 0.3)
+	# Com ele dentro do cercado, em volta dele, não em cima — e atrás dele, não entre
+	# ele e a gamela (tapavam o balde despejando).
+	if matilha.no_cercado(de):
+		var adiante := (junto - de).dot(matilha.gamela_frente)
+		if adiante > -0.6:
+			junto -= matilha.gamela_frente * (adiante + 0.6)
+			junto.z = clampf(junto.z, c.position.z + 0.3, c.end.z - 0.3)
+	var longe := Vector3(junto.x - de.x, 0, junto.z - de.z)
+	if longe.length() < 0.9:
+		junto = Vector3(de.x, 0, de.z) + (longe.normalized() if longe.length() > 0.05 else Vector3.BACK) * 0.9
 	_olhar_para = de
 	if global_position.distance_to(junto) > 1.0:
 		_ir(junto, TROTE if global_position.distance_to(junto) > 3.0 else PASSO)
