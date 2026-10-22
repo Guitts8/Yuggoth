@@ -70,6 +70,12 @@ enum Etapa { RACAO, AGUA, BEBEDOURO, LIVRE, YAUTJA, CHAMAR, FIM }
 @export var lenha_pilha: PackedVector3Array = []
 ## O caminho de Akeley ao longo da gamela, despejando (do mundo).
 @export var caminho_racao: PackedVector3Array = []
+## As telas por cima das quais ele despeja (playtest 12, depois: o balde passava
+## por dentro da tela): um ponto em cada uma e o lado de dentro do cercado.
+@export var tela_racao := Vector3.ZERO
+@export var dentro_racao := Vector3.FORWARD
+@export var tela_bebedouro := Vector3.ZERO
+@export var dentro_bebedouro := Vector3.LEFT
 @export var mata := Vector3(-58.0, 0, -6.0)
 @export_group("Sons")
 @export var som_racao: AudioStream
@@ -98,6 +104,11 @@ enum Etapa { RACAO, AGUA, BEBEDOURO, LIVRE, YAUTJA, CHAMAR, FIM }
 ## Quanto a ração e a água do balde cabem (a escala y do monte e o nível).
 const NIVEL_CHEIO := 0.1
 const NIVEL_VAZIO := -0.1
+## A régua de cima da tela (do chão), e onde fica o meio do balde ao despejar por
+## cima dela: um pouco para dentro e acima (o fundo passa por cima da régua).
+const TOPO_TELA := 1.5
+const ACIMA_DENTRO := 0.07
+const ACIMA_ALTO := 0.18
 
 var etapa := Etapa.RACAO
 var lenha_feita := false
@@ -113,9 +124,20 @@ var _gamela_compr := 1.0
 var _despejando := false
 var _alavanca_repouso := 0.0
 var _haste_repouso := 0.0
+## O balde por cima de uma tela, indo com Akeley (`_seguir_balde`): a tela (INF:
+## nenhuma), a inclinação da boca e o balanço do passo.
+var _tela_seguida := Vector3.INF
+var _dentro_seguido := Vector3.FORWARD
+var _borda_seguida := Vector3.RIGHT
+var _graus := 0.0
+var _balanca := 0.0
+var _t_balanca := 0.0
 
 
 func _ready() -> void:
+	# Antes do NaMao: o balde por cima da tela vai para onde a rotina o põe no mesmo
+	# quadro.
+	process_priority = -1
 	for a: Interactable in [por_racao, bombear, encher_bebedouro, pegar_lenha, por_lenha, fechar_celeiro, abrir_caixa]:
 		if a:
 			a.interacted.connect(_on_area.bind(a))
@@ -145,6 +167,13 @@ func comecar() -> void:
 
 
 func _process(delta: float) -> void:
+	# O balde por cima da tela, na altura de Akeley (antes do NaMao, que o põe lá).
+	if _tela_seguida != Vector3.INF and balde and matilha and matilha.akeley():
+		_t_balanca += delta * _balanca
+		var bal := sin(_t_balanca * 7.5) * 6.0 * _balanca
+		var sobe := absf(sin(_t_balanca * 3.75)) * 0.015 * _balanca
+		balde.no_mundo = _derramar(_sobre_a_tela(_tela_seguida, _dentro_seguido, matilha.akeley().global_position, ACIMA_DENTRO, ACIMA_ALTO + sobe),
+			_dentro_seguido, _graus + bal, _borda_seguida)
 	# A ração cai onde a boca do balde passa (a gamela enche de leste a oeste).
 	if _despejando and balde and racao_gamela:
 		var boca := balde.global_transform * Vector3(0.16, 0.05, 0.0)
@@ -235,57 +264,130 @@ func _on_area(_by: Node, a: Interactable) -> void:
 
 # --- A ração ---------------------------------------------------------------------
 
-## Ao longo da gamela, por fora da tela: o balde sobe por cima dela e inclina para
-## a direita; os grãos caem onde a boca passa e a gamela enche atrás dele; os cães
-## correm cada um para o seu lugar; no fim, a sacudida, e o balde vazio desce.
+## Ao longo da gamela, por fora da tela (playtest 12, depois: "a ração está sendo
+## posta através da grade"): ele chega perto da tela, ergue o balde acima da régua
+## de cima e o passa por cima dela; inclina a boca para dentro do cercado e anda
+## devagar ao longo da tela, o balde indo com ele por cima da régua, os grãos caindo
+## na gamela onde a boca passa; no fim, a sacudida, e o balde volta por cima da tela
+## para a mão. O balde fica no mundo (não segue a câmera): olhar em volta não o
+## leva para dentro da tela.
 func _racao(p: Player) -> void:
 	etapa = Etapa.AGUA
 	var de := caminho_racao[0] if caminho_racao.size() >= 2 else p.global_position
 	var ate := caminho_racao[1] if caminho_racao.size() >= 2 else p.global_position
-	# Os olhos na gamela, uns passos à frente (por cima da tela, à direita).
-	var olhar_gamela := Vector3(-2.6, 0.35, -0.97)
-	await p.conduzir([de], de + olhar_gamela)
+	var dentro := dentro_racao
+	var anda := (ate - de).normalized()
+	# Os olhos na gamela, uns passos à frente, por cima da tela.
+	var olhar := func(pos: Vector3) -> Vector3: return _sobre_a_tela(tela_racao, dentro, pos + anda * 0.6, 0.45, -0.38)
+	await p.conduzir([de - dentro * 0.35], olhar.call(de))
 	if not is_inside_tree():
 		return
-	# Ergue por cima da tela e inclina: a boca para a gamela.
-	await balde.gesto(Vector3(0.2, 0.36, -0.14), Vector3(-10.0, 0.0, -35.0), 0.5).finished
-	await balde.gesto(Vector3(0.32, 0.42, -0.24), Vector3(-16.0, 0.0, -96.0), 0.4, Tween.TRANS_QUAD, Tween.EASE_IN).finished
+	# Ergue o balde acima da tela, um passo antes dela; chega à tela com ele no alto
+	# e o passa por cima da régua.
+	balde.arco = 0.08
+	await balde.pousar(_derramar(_sobre_a_tela(tela_racao, dentro, de, -0.3, 0.26), dentro, 0.0, Vector3.RIGHT), 0.55).finished
 	if not is_inside_tree():
 		return
+	var passa := balde.mover(_derramar(_sobre_a_tela(tela_racao, dentro, de, ACIMA_DENTRO, ACIMA_ALTO), dentro, 0.0, Vector3.RIGHT), 0.75, 0.05)
+	await p.conduzir([de], olhar.call(de), 0.6)
+	if passa.is_running():
+		await passa.finished
+	if not is_inside_tree():
+		return
+	# Inclina: a boca para dentro do cercado.
+	_seguir_balde(tela_racao, dentro, Vector3.RIGHT)
+	var inclina := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	inclina.tween_property(self, ^"_graus", 82.0, 0.45)
+	await inclina.finished
 	_tocar(som_racao, -2.0)
 	_jorro(true)
 	_despejando = true
 	matilha.modo = Matilha.Modo.COMENDO
+	var mais := create_tween().set_trans(Tween.TRANS_SINE)
+	mais.tween_property(self, ^"_graus", 106.0, 0.35)
 	# O monte do balde baixa enquanto ele anda.
 	var monte := create_tween().set_trans(Tween.TRANS_SINE)
 	if racao_balde:
 		monte.tween_property(racao_balde, ^"scale:y", 0.15, 6.0)
-	# Anda devagar, despejando; o balde balança um pouco a cada passo.
-	var balanca := create_tween().set_loops(8)
-	balanca.tween_property(balde, ^"girar:z", -104.0, 0.35).set_trans(Tween.TRANS_SINE)
-	balanca.tween_property(balde, ^"girar:z", -92.0, 0.35).set_trans(Tween.TRANS_SINE)
 	get_tree().create_timer(3.0, false).timeout.connect(func() -> void:
 		if _despejando:
 			_tocar(som_racao, -5.0, 0.92))
-	await p.conduzir([ate], ate + olhar_gamela, 0.85)
+	# Anda devagar, despejando; o balde balança um pouco a cada passo.
+	_balanca = 1.0
+	await p.conduzir([ate], olhar.call(ate), 0.85)
 	if not is_inside_tree():
 		return
-	balanca.kill()
+	_balanca = 0.0
 	# O resto: a gamela inteira, e a sacudida para os últimos grãos.
 	var resto := create_tween()
 	resto.tween_property(racao_gamela, ^"scale:x", 1.0, 0.5)
 	var sacode := create_tween()
 	for k in 3:
-		sacode.tween_property(balde, ^"girar:z", -118.0, 0.09)
-		sacode.tween_property(balde, ^"girar:z", -88.0, 0.11)
+		sacode.tween_property(self, ^"_graus", 124.0, 0.09)
+		sacode.tween_property(self, ^"_graus", 100.0, 0.11)
 	await sacode.finished
 	_jorro(false)
 	_despejando = false
 	if racao_balde:
 		racao_balde.visible = false
-	await balde.gesto(Vector3.ZERO, Vector3.ZERO, 0.6).finished
+	# Endireita, e volta por cima da tela para a mão.
+	var endireita := create_tween().set_trans(Tween.TRANS_SINE)
+	endireita.tween_property(self, ^"_graus", 0.0, 0.45)
+	await endireita.finished
+	_seguir_balde(Vector3.INF, dentro, Vector3.RIGHT)
+	var volta := balde.mover(_derramar(_sobre_a_tela(tela_racao, dentro, p.global_position, -0.3, 0.26), dentro, 0.0, Vector3.RIGHT), 0.6, 0.05)
+	await p.conduzir([p.global_position - dentro * 0.35], olhar.call(p.global_position) - dentro * 0.3, 0.6)
+	if volta.is_running():
+		await volta.finished
+	balde.arco = 0.18
+	await balde.pegar(0.55).finished
 	# Comem uns vinte segundos; então, à toa no cercado.
 	get_tree().create_timer(22.0, false).timeout.connect(_fim_de_comer)
+
+
+## Um ponto acima da tela (`tela`: um ponto nela; `dentro`: para o lado de dentro do
+## cercado), na altura de `pos` ao longo dela, `para_dentro` metros para dentro e
+## `alto` metros acima da régua de cima.
+func _sobre_a_tela(tela: Vector3, dentro: Vector3, pos: Vector3, para_dentro: float, alto: float) -> Vector3:
+	var ao_longo := dentro.cross(Vector3.UP).normalized()
+	var q := tela + ao_longo * ao_longo.dot(pos - tela) + dentro * para_dentro
+	q.y = TOPO_TELA + alto
+	return q
+
+
+## O balde no mundo com o meio em `c` e a boca inclinada `graus` do alto para
+## `dentro`; `borda` (local) é a borda que fica mais baixa, por onde cai o que está
+## dentro: +X os grãos (o `Jorro`), -Z a água (o `JorroAgua`).
+func _derramar(c: Vector3, dentro: Vector3, graus: float, borda: Vector3) -> Transform3D:
+	var a := deg_to_rad(graus)
+	var boca := Vector3.UP * cos(a) + dentro * sin(a)
+	var baixo := Vector3.DOWN - boca * Vector3.DOWN.dot(boca)
+	baixo = baixo.normalized() if baixo.length() > 0.001 else dentro
+	if borda == Vector3.RIGHT:
+		return Transform3D(Basis(baixo, boca, baixo.cross(boca)), c)
+	return Transform3D(Basis(boca.cross(-baixo), boca, -baixo), c)
+
+
+## Enquanto `tela` não for INF, o balde fica por cima dela na altura de Akeley,
+## inclinado `_graus` (e balançando com `_balanca`).
+func _seguir_balde(tela: Vector3, dentro: Vector3, borda: Vector3) -> void:
+	_tela_seguida = tela
+	_dentro_seguido = dentro
+	_borda_seguida = borda
+	_graus = 0.0
+
+
+## A água do balde na altura `y` (local): o disco estreita com o balde, que é mais
+## fino embaixo (playtest 12, depois: "a agua está sendo vista de fora do balde").
+func _nivel_agua(y: float) -> void:
+	if agua_balde == null:
+		return
+	agua_balde.position.y = y
+	# O corpo: 0,26 de altura, raio 0,12 no fundo e 0,15 na boca; o disco, 0,03 de
+	# altura e 0,135 de raio.
+	var parede := 0.12 + 0.03 * clampf((y - 0.015 + 0.13) / 0.26, 0.0, 1.0)
+	var k := (parede - 0.008) / 0.135
+	agua_balde.scale = Vector3(k, 1.0, k)
 
 
 func _fim_de_comer() -> void:
@@ -316,7 +418,7 @@ func _bombear(p: Player) -> void:
 	_tocar(som_trinco, -12.0, 1.3)
 	if agua_balde:
 		agua_balde.visible = true
-		agua_balde.position.y = NIVEL_VAZIO
+		_nivel_agua(NIVEL_VAZIO)
 	# Os olhos entre a bica e o balde (a alavanca sobe e desce à direita).
 	p.olhar_para(balde_na_bica + Vector3(0.0, 0.18, -0.12), 0.5)
 	await _esperar(0.35)
@@ -328,7 +430,7 @@ func _bombear(p: Player) -> void:
 		# A água vem no segundo golpe; cada golpe enche um pouco.
 		if k >= 1 and agua_balde:
 			var sobe := create_tween()
-			sobe.tween_property(agua_balde, ^"position:y", lerpf(NIVEL_VAZIO, NIVEL_CHEIO, float(k) / (golpes - 1)), 0.5)
+			sobe.tween_method(_nivel_agua, agua_balde.position.y, lerpf(NIVEL_VAZIO, NIVEL_CHEIO, float(k) / (golpes - 1)), 0.5)
 	_jato(0.0, 0.7)
 	await _esperar(0.8)
 	# De volta à mão, cheio.
@@ -376,45 +478,57 @@ func _jato(forca: float, segundos: float) -> void:
 
 # --- O bebedouro -----------------------------------------------------------------
 
-## Por cima da tela: o balde sobe e inclina para a frente, a água cai no bebedouro
-## (o nível do balde desce, o do bebedouro sobe); então ele se abaixa e pousa o
-## balde vazio no chão, ao lado.
+## Por cima da tela (playtest 12, depois: "está sendo possível por a agua através
+## das grades também"): ele ergue o balde um passo antes da tela, chega a ela e o
+## passa por cima da régua; inclina a boca para dentro, devagar até a água chegar à
+## borda, e ela cai no bebedouro (o nível do balde desce, o do bebedouro sobe);
+## então o balde volta por cima da tela, e ele se abaixa e o pousa no chão, ao lado.
 func _bebedouro(p: Player) -> void:
 	etapa = Etapa.LIVRE
-	var beb := agua_bebedouro.global_position
-	await p.conduzir([diante_do_bebedouro], beb + Vector3(0.2, 0.55, 0))
+	var dentro := dentro_bebedouro
+	var aqui := diante_do_bebedouro
+	var olhar := agua_bebedouro.global_position + Vector3(0, 0.55, 0)
+	await p.conduzir([aqui - dentro * 0.35], olhar)
 	if not is_inside_tree():
 		return
-	# Por cima da tela, sobre o bebedouro: a boca virada para ele.
-	var de_frente := Basis(Vector3.UP, atan2(-(beb.x - diante_do_bebedouro.x), -(beb.z - diante_do_bebedouro.z)))
-	var eixo := de_frente * Vector3.RIGHT
-	var sobre := beb + Vector3(0, 0.82, 0) + (diante_do_bebedouro - beb).normalized() * 0.32
-	sobre.y = beb.y + 0.82
-	balde.arco = 0.25
-	await balde.pousar(Transform3D(de_frente, sobre), 0.7).finished
+	balde.arco = 0.08
+	await balde.pousar(_derramar(_sobre_a_tela(tela_bebedouro, dentro, aqui, -0.3, 0.26), dentro, 0.0, Vector3.FORWARD), 0.55).finished
+	if not is_inside_tree():
+		return
+	var passa := balde.mover(_derramar(_sobre_a_tela(tela_bebedouro, dentro, aqui, ACIMA_DENTRO, ACIMA_ALTO), dentro, 0.0, Vector3.FORWARD), 0.75, 0.05)
+	await p.conduzir([aqui], olhar, 0.6)
+	if passa.is_running():
+		await passa.finished
 	if not is_inside_tree():
 		return
 	# Inclina: devagar até a água chegar à borda, e então ela cai.
-	var inclinar := func(graus: float) -> void:
-		balde.no_mundo = Transform3D(Basis(eixo, deg_to_rad(-graus)) * de_frente, sobre)
+	_seguir_balde(tela_bebedouro, dentro, Vector3.FORWARD)
 	var t0 := create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	t0.tween_method(inclinar, 0.0, 85.0, 0.55)
+	t0.tween_property(self, ^"_graus", 85.0, 0.55)
 	await t0.finished
 	_tocar(som_bebedouro, -2.0)
 	_jorro(true, "JorroAgua")
 	var t := create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
 	t.tween_property(agua_bebedouro, ^"scale:y", 1.0, 1.8)
 	if agua_balde:
-		t.tween_property(agua_balde, ^"position:y", NIVEL_VAZIO, 1.6)
-	t.tween_method(inclinar, 85.0, 140.0, 1.8)
+		t.tween_method(_nivel_agua, agua_balde.position.y, NIVEL_VAZIO, 1.6)
+	t.tween_property(self, ^"_graus", 140.0, 1.8)
 	await t.finished
 	_jorro(false, "JorroAgua")
 	if agua_balde:
 		agua_balde.visible = false
 	balde.peso = 0.0
 	var t1 := create_tween().set_trans(Tween.TRANS_SINE)
-	t1.tween_method(inclinar, 140.0, 0.0, 0.5)
+	t1.tween_property(self, ^"_graus", 0.0, 0.5)
 	await t1.finished
+	_seguir_balde(Vector3.INF, dentro, Vector3.FORWARD)
+	# De volta por cima da tela, e um passo para trás.
+	var volta := balde.mover(_derramar(_sobre_a_tela(tela_bebedouro, dentro, aqui, -0.3, 0.26), dentro, 0.0, Vector3.FORWARD), 0.6, 0.05)
+	await p.conduzir([aqui - dentro * 0.35], olhar - dentro * 0.3, 0.6)
+	if volta.is_running():
+		await volta.finished
+	if not is_inside_tree():
+		return
 	# Abaixa-se e pousa o balde no chão, à frente e à esquerda.
 	var chao := balde_no_chao.global_position + Vector3(0, 0.13, 0)
 	var abaixa := create_tween().set_trans(Tween.TRANS_SINE)
@@ -695,6 +809,7 @@ func pular() -> void:
 	lenha_feita = true
 	celeiro_feito = true
 	_despejando = false
+	_tela_seguida = Vector3.INF
 	racao_gamela.scale.x = 1.0
 	racao_balde.visible = false
 	agua_balde.visible = false

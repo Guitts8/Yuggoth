@@ -92,6 +92,10 @@ func _ready() -> void:
 		return
 	var so := OS.get_environment("ALCANCE").split(",", false)
 	for a: Interactable in faz.find_children("*", "Interactable", true, false):
+		# A porteira de passar (no mesmo lugar que a de soltar os cães, que se alcança)
+		# liga-se sozinha conforme o lado de Akeley; o teste de fumaça a usa.
+		if a is PassarPorteira:
+			continue
 		if so.is_empty() or a.name in so:
 			_todas.append(a)
 	# Todas valem para o teste (cada uma só vale na sua hora: fora dela, sai da física).
@@ -114,6 +118,11 @@ func _ready() -> void:
 			_check(false, "%s (\"%s\"): só da beira do alcance — o mais perto é a %.2f m, de %s" % [nome, a.prompt, achado[5], achado[0].snappedf(0.01)])
 		elif de_verdade.is_empty():
 			_check(true, "%s (\"%s\")%s de %s, a %.2f m (o mais perto a %.2f m)" % [nome, a.prompt, agachado, achado[0].snappedf(0.01), achado[3], achado[5]])
+			# Playtest 12, depois: "trancar as venezianas te deixa preso entre os
+			# móveis". A cena o leva até a janela sem a física: depois, ele ainda sai dali?
+			if a is Venezianas:
+				var preso: String = await _depois_de_usar(a)
+				_check(preso.is_empty(), "%s: depois de fechar, %s" % [nome, "sai dali andando" if preso.is_empty() else preso])
 		else:
 			fora.append(nome)
 			_check(false, "%s (\"%s\"): achado de %s, mas andando: %s" % [nome, a.prompt, achado[0].snappedf(0.01), de_verdade])
@@ -451,6 +460,44 @@ func _achar(a: Interactable) -> Array:
 
 
 # --- 3. Com a física de verdade -----------------------------------------------------
+
+## Usa `a` (o Player já diante dela) e espera a cena devolver o controle; "" se ele
+## fica num lugar do mapa, cabe ali e anda 1,5 m pelo caminho do mapa até o quintal.
+func _depois_de_usar(a: Interactable) -> String:
+	var p := _player
+	p.input_enabled = true
+	a.interact(p)
+	var t := 0.0
+	while not p.input_enabled and t < 20.0:
+		await get_tree().physics_frame
+		t += get_physics_process_delta_time()
+	if not p.input_enabled:
+		return "a cena não devolveu o controle"
+	await _frames(3)
+	var aqui := p.global_position
+	if not p.livre(aqui):
+		return "parou dentro de algo em %s" % aqui.snappedf(0.01)
+	var k := _chave(aqui)
+	var achou := Vector3i.MAX
+	for dx in range(-1, 2):
+		for dz in range(-1, 2):
+			var kk := k + Vector3i(dx, dz, 0)
+			if _andavel.has(kk):
+				achou = kk
+	if achou == Vector3i.MAX:
+		return "parou fora do que se anda (num canto fechado) em %s" % aqui.snappedf(0.01)
+	var pontos := []
+	for passo in 15:
+		var c: Array = _andavel[achou]
+		if c[1] == achou:
+			break
+		achou = c[1]
+		if passo % 3 == 2:
+			pontos.append(_andavel[achou][0])
+	if pontos.is_empty():
+		return ""
+	var erro: String = await _andar_reto(p, pontos)
+	return "" if erro.is_empty() else "não sai dali: " + erro
 
 ## Põe o Player TRECHO metros antes pelo caminho achado, anda até o lugar e mira;
 ## "" se o raio do Player pega a área, senão o que deu errado.

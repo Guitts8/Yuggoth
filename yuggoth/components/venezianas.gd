@@ -51,13 +51,13 @@ func _on_interact(by: Node) -> void:
 		return
 	p.input_enabled = false
 	# Até a janela, de frente para ela.
-	if fora != Vector3.ZERO:
-		var junto := global_position - fora * 0.3
-		junto.y = p.global_position.y
-		if Vector2(junto.x - p.global_position.x, junto.z - p.global_position.z).length() > 0.25:
-			await p.conduzir([junto], global_position + fora * 3.0)
-			if not is_inside_tree():
-				return
+	var lugar := junto(p)
+	if lugar != Vector3.INF and Vector2(lugar.x - p.global_position.x, lugar.z - p.global_position.z).length() > 0.25:
+		await p.conduzir([lugar], global_position + fora * 3.0)
+		if not is_inside_tree():
+			return
+	elif fora != Vector3.ZERO:
+		await p.olhar_para(global_position + fora * 3.0, 0.5).finished
 	# Debruçado para fora, de olho em cada folha enquanto a puxa.
 	var debruca := create_tween().set_trans(Tween.TRANS_SINE)
 	debruca.tween_property(p, ^"inclinar", 0.16, 0.45)
@@ -92,6 +92,25 @@ func _on_interact(by: Node) -> void:
 	if is_instance_valid(p):
 		p.input_enabled = true
 	fechou.emit()
+
+
+## Onde ele fica para fechar: diante da janela, onde o corpo cabe e aonde se chega
+## em linha reta de onde está (`conduzir` passa por cima da física: playtest 12,
+## depois — "trancar as venezianas te deixa preso entre os móveis"; na sala de
+## estar ele ia parar entre o sofá, a mesinha e a parede). INF: fica onde está (a
+## mira já alcança).
+func junto(p: Player, recuos: Array = [0.3, 0.2, 0.4, 0.55]) -> Vector3:
+	if fora == Vector3.ZERO:
+		return Vector3.INF
+	var lado := fora.cross(Vector3.UP).normalized()
+	var de := p.global_position
+	for recua: float in recuos:
+		for desvio: float in [0.0, -0.25, 0.25, -0.5, 0.5]:
+			var q := global_position - fora * recua + lado * desvio
+			q.y = de.y
+			if p.caminho_livre(de, q):
+				return q
+	return Vector3.INF
 
 
 ## Fecha de uma vez, sem animar (pular, testes).

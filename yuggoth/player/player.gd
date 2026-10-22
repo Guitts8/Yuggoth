@@ -173,6 +173,24 @@ func livre(ponto: Vector3) -> bool:
 	return get_world_3d().direct_space_state.intersect_shape(consulta, 1).is_empty()
 
 
+## O corpo vai de `de` a `ate` (globais, no chão) em linha reta sem tocar no mundo:
+## o caminho de `conduzir`, que passa por cima da física (playtest 12, depois: as
+## venezianas o levavam por entre os móveis da sala, e ele ficava preso lá).
+func caminho_livre(de: Vector3, ate: Vector3) -> bool:
+	if not livre(ate):
+		return false
+	var forma := get_node(^"CollisionShape3D") as CollisionShape3D
+	var consulta := PhysicsShapeQueryParameters3D.new()
+	consulta.shape = forma.shape
+	consulta.collision_mask = 1
+	consulta.exclude = [get_rid()]
+	# Um pouco acima do chão (um tapete, uma soleira não barram o passo).
+	consulta.transform = Transform3D(Basis.IDENTITY, de + Vector3.UP * 0.08) * forma.transform
+	consulta.motion = Vector3(ate.x - de.x, 0.0, ate.z - de.z)
+	var r := get_world_3d().direct_space_state.cast_motion(consulta)
+	return r[0] >= 0.999
+
+
 ## Onde ficam os olhos com o corpo em `de` (global), sentado ou de pé e
 ## debruçado o quanto `debrucado` diz, virado para `yaw`.
 func olhos_em(de: Vector3, yaw: float) -> Vector3:

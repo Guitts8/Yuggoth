@@ -93,6 +93,10 @@ var _rng := RandomNumberGenerator.new()
 var _vistas = Vistas.new()
 var _cidade = Cidade.new()
 var _relevo := FastNoiseLite.new()
+## A grade do terreno (`_terreno`): o chão de verdade entre os pontos dela é plano
+## (dois triângulos por célula), não a curva de `_altura`.
+var _xs := PackedFloat32Array()
+var _zs := PackedFloat32Array()
 
 
 func _ready() -> void:
@@ -643,6 +647,8 @@ func _cor_chao(x: float, z: float) -> Color:
 func _terreno() -> void:
 	var xs := _passos([-700.0, -260.0, -70.0, 46.0, 210.0, 700.0], [40.0, 10.0, 2.0, 8.0, 40.0])
 	var zs := _passos([-700.0, -230.0, -66.0, 46.0, 230.0, 700.0], [40.0, 10.0, 2.0, 10.0, 40.0])
+	_xs = xs
+	_zs = zs
 	# A colisão segue a malha inteira; a de se ver parte em perto (com sombra) e
 	# longe (sem: os morros em volta e a encosta além da sombra).
 	var todo := Cidade.Malha.new()
@@ -700,6 +706,42 @@ func _terreno() -> void:
 		var tom := Color(1, 1, 1) * _rng.randf_range(0.9, 1.1)
 		for i in 12:
 			agua.tri(Vector3(p.x, y + 0.06, p.z), borda[i] + Vector3(0, y + 0.06, 0), borda[(i + 1) % 12] + Vector3(0, y + 0.06, 0), Vector3.UP, tom)
+
+
+
+## A altura do chão de verdade em (x, z): a malha do terreno (as células da grade
+## são planas, partidas em dois triângulos como `Cidade.Malha.quad`), não a curva de
+## `_altura` — longe, entre pontos a 10 e a 40 m, as duas se afastam metros
+## (playtest 12, depois: "algumas arvores não estão encostando o chão").
+func _chao_em(x: float, z: float) -> float:
+	if _xs.size() < 2 or _zs.size() < 2:
+		return _altura(x, z)
+	var i := clampi(_xs.bsearch(x) - 1, 0, _xs.size() - 2)
+	var j := clampi(_zs.bsearch(z) - 1, 0, _zs.size() - 2)
+	var x0 := _xs[i]
+	var x1 := _xs[i + 1]
+	var z0 := _zs[j]
+	var z1 := _zs[j + 1]
+	var u := clampf((x - x0) / (x1 - x0), 0.0, 1.0)
+	var v := clampf((z - z0) / (z1 - z0), 0.0, 1.0)
+	var ha := _altura(x0, z0)
+	var hb := _altura(x1, z0)
+	var hc := _altura(x1, z1)
+	var hd := _altura(x0, z1)
+	# Os triângulos (a, b, c) e (a, c, d).
+	if u >= v:
+		return ha + u * (hb - ha) + v * (hc - hb)
+	return ha + v * (hd - ha) + u * (hc - hd)
+
+
+## Onde assenta um tronco de `raio` em (x, z): o ponto mais baixo do chão em volta
+## dele, um pouco enterrado (numa encosta, o lado de baixo não fica no ar).
+func _pe(x: float, z: float, raio: float) -> Vector3:
+	var y := _chao_em(x, z)
+	for k in 6:
+		var a := TAU * k / 6.0
+		y = minf(y, _chao_em(x + cos(a) * raio, z + sin(a) * raio))
+	return Vector3(x, y - 0.12, z)
 
 
 ## Os pontos de uma grade de `marcos[0]` a `marcos[-1]`, com o passo `passos[i]`
@@ -2202,6 +2244,9 @@ func _canil() -> void:
 	var matilha := cena.get_node("Caes") as Matilha
 	matilha.porteira_dentro = Vector3((vao.x + vao.y) / 2, 0, fz - 0.9)
 	matilha.porteira_fora = Vector3((vao.x + vao.y) / 2, 0, fz + 1.0)
+	# A porteira aberta (100°) vai da dobradiça até uns 1,3 m para dentro: a volta
+	# fica além da ponta dela.
+	matilha.porteira_volta = Vector3(vao.x - 0.2, 0, fz - 2.1)
 
 
 ## A rotina do entardecer (F5; docs/PLANO_FAZENDA.md, "A tratativa", 1): a gamela
@@ -2210,7 +2255,7 @@ func _canil() -> void:
 ## numa laje de pedra, perto do canil; o balde que fica no chão; a braçada de lenha
 ## diante dos olhos (NaMao); a lenha arrumada na lareira do escritório; as áreas; e
 ## a `Rotina`, que dá a ordem.
-const GAMELA_Z := -7.42 + CANIL_D.z
+const GAMELA_Z := -7.29 + CANIL_D.z
 const GAMELA_X := Vector2(-7.6, -1.4)
 
 
@@ -2238,7 +2283,8 @@ func _rotina() -> void:
 	caes.gamela = lugares
 	caes.gamela_frente = Vector3(0, 0, 1)
 	# O bebedouro de zinco, no canto leste do cercado, e a água que sobe nele.
-	var beb := Vector3(2.3, 0, -9.85) + CANIL_D
+	# Rente à tela (playtest 12, depois: a água vai por cima dela).
+	var beb := Vector3(2.42, 0, -9.85) + CANIL_D
 	_cyl(g, "Bebedouro", 0.32, 0.28, 0.26, beb + Vector3(0, 0.13, 0), "zinco", 12)
 	var agua := _group(g, "AguaBebedouro", beb + Vector3(0, 0.03, 0))
 	_cyl(agua, "Agua", 0.29, 0.29, 0.2, Vector3(0, 0.1, 0), "agua", 12)
@@ -2296,7 +2342,7 @@ func _rotina() -> void:
 	_add(bomba, respingos)
 	# O balde deixado no chão, ao lado do bebedouro, por fora da tela (de pé diante
 	# do bebedouro, Akeley o pousa à frente e à esquerda).
-	var no_chao := _group(g, "BaldeNoChao", Vector3(3.2, 0, -9.25) + CANIL_D)
+	var no_chao := _group(g, "BaldeNoChao", Vector3(3.3, 0, -9.3) + CANIL_D)
 	_cyl(no_chao, "Corpo", 0.15, 0.12, 0.26, Vector3(0, 0.13, 0), "zinco", 12)
 	_cyl(no_chao, "Aro", 0.155, 0.155, 0.025, Vector3(0, 0.26, 0), "ferro", 12)
 	no_chao.visible = false
@@ -2336,9 +2382,9 @@ func _rotina() -> void:
 		return a
 	# A gamela e o bebedouro ficam dentro do cercado; Akeley, fora: as áreas passam
 	# por cima da tela (a colisão dela tampava a mira).
-	var por_racao: Interactable = area.call("PorRacao", "Pôr a ração", Vector3(gl, 0.9, 1.0), Vector3(gx, 0.5, GAMELA_Z + 0.35))
+	var por_racao: Interactable = area.call("PorRacao", "Pôr a ração", Vector3(gl, 0.9, 1.0), Vector3(gx, 0.5, GAMELA_Z + 0.22))
 	var bombear: Interactable = area.call("Bombear", "Encher o balde na bomba", Vector3(0.6, 1.2, 0.6), poco + Vector3(0, 0.9, 0))
-	var encher: Interactable = area.call("EncherBebedouro", "Encher o bebedouro", Vector3(1.2, 0.9, 0.9), beb + Vector3(0.45, 0.45, 0))
+	var encher: Interactable = area.call("EncherBebedouro", "Encher o bebedouro", Vector3(0.9, 0.9, 0.9), beb + Vector3(0.3, 0.45, 0))
 	var pegar: Interactable = area.call("PegarLenha", "Pegar a lenha", Vector3(3.6, 1.2, 0.8), Vector3(-11.0, 0.7, PUXADO_Z.y - 0.9))
 	var por_lenha: Interactable = area.call("PorLenha", "Pôr a lenha na lareira", Vector3(0.6, 0.8, 1.0), boca + Vector3(0, 0.35, 0))
 	var celeiro: Interactable = area.call("FecharCeleiro", "Fechar o portão do celeiro", Vector3(3.6, 2.4, 0.8), Vector3(-15.0, 1.4, -7.6) + CELEIRO_D)
@@ -2380,7 +2426,12 @@ func _rotina() -> void:
 	r.balde_na_bica = poco + Vector3(0, 0.64, 0.37)
 	# De pé do lado leste da bomba: a alavanca à direita, a bica à esquerda.
 	r.diante_da_bomba = poco + Vector3(0.7, 0, -0.05)
-	r.diante_do_bebedouro = beb + Vector3(1.45, 0, 0)
+	# Junto da tela do leste, por fora (o corpo encosta nela a 0,36 m).
+	r.diante_do_bebedouro = Vector3(2.8 + 0.45, 0, beb.z) + Vector3(CANIL_D.x, 0, 0)
+	r.tela_bebedouro = Vector3(2.8, 0, beb.z) + Vector3(CANIL_D.x, 0, 0)
+	r.dentro_bebedouro = Vector3.LEFT
+	r.tela_racao = Vector3(GAMELA_X.x, 0, -7.0 + CANIL_D.z)
+	r.dentro_racao = Vector3.FORWARD
 	# O alto das pilhas de lenha do galpão (de onde ele tira as achas).
 	r.lenha_pilha = PackedVector3Array([Vector3(-10.7, 1.2, 5.45), Vector3(-10.25, 1.18, 5.42), Vector3(-10.95, 1.0, 5.45),
 		Vector3(-9.9, 1.22, 5.45), Vector3(-10.5, 1.0, 5.4)])
@@ -2388,8 +2439,9 @@ func _rotina() -> void:
 	r.ajoelhar_lareira = boca + Vector3(0.85, -0.11, 0)
 	r.portao = portao
 	r.portao_fechado = fechado
-	# Ao longo da tela, por fora (entre a tela e a parede norte da casa).
-	r.caminho_racao = PackedVector3Array([Vector3(GAMELA_X.y + 0.3, 0, GAMELA_Z + 0.97), Vector3(GAMELA_X.x + 0.4, 0, GAMELA_Z + 0.97)])
+	# Ao longo da tela, por fora, junto dela (o balde vai por cima da régua).
+	var ao_longo := -7.0 + CANIL_D.z + 0.45
+	r.caminho_racao = PackedVector3Array([Vector3(GAMELA_X.y + 0.3, 0, ao_longo), Vector3(GAMELA_X.x + 0.4, 0, ao_longo)])
 	r.som_racao = _sfx("racao.wav")
 	r.som_bomba = _sfx("bomba_poco.wav")
 	r.som_bebedouro = _sfx("agua_bebedouro.wav")
@@ -2600,6 +2652,19 @@ func _preparacao() -> void:
 	# A porteira do cercado.
 	var soltar := _area(g, Interactable.new(), "AbrirPorteira", Vector3(1.4, 1.2, 0.6), Vector3(-0.35, 0.7, -6.85) + CANIL_D) as Interactable
 	soltar.prompt = "Abrir a porteira (soltar os cães)"
+	# Entrar no cercado e sair dele (playtest 12, depois: a porteira fechada barrava
+	# o corpo e não se entrava mais), uma área de cada lado.
+	var porteira := cena.get_node("Porteira") as Node3D
+	for de_dentro: bool in [false, true]:
+		var passar := _area(g, PassarPorteira.new(), "SairDoCercado" if de_dentro else "EntrarNoCercado", Vector3(1.4, 1.2, 0.3),
+			porteira.position + Vector3(0.7, 0.7, -0.2 if de_dentro else 0.2)) as PassarPorteira
+		passar.de_dentro = de_dentro
+		passar.porteira = porteira
+		passar.trinco = porteira.get_node("Trinco")
+		passar.matilha = caes
+		passar.soltar = soltar
+		passar.som_trinco = _sfx("porta_trinco.wav")
+		passar.som_porteira = _sfx("porteira.wav")
 
 	# A lua cheia (longe, a leste, atrás dos morros) e as nuvens que a engolem: sem
 	# névoa (estão no céu), sem luz.
@@ -3057,12 +3122,12 @@ func _caes(x: Vector2, z: Vector2) -> void:
 		c.pelagem = rng.randf_range(-0.7, 0.7)
 		c.porte = rng.randf_range(0.92, 1.08)
 		c.olhar = rng.randf_range(-15.0, 15.0)
-		# Espalhados pelo cercado, os da frente mais perto da tela; Brutus, fora,
-		# junto de Akeley (ele o segue).
+		# Espalhados pelo cercado, os da frente mais perto da tela (Brutus também:
+		# só segue Akeley depois de solto).
 		var px := lerpf(x.x + 0.8, x.y - 0.6, (i + rng.randf_range(-0.3, 0.3)) / (CAES.size() - 1))
 		var pz := lerpf(z.x, z.y, rng.randf())
 		_add(g, corpo)
-		corpo.position = Vector3(5.5, 0.0, -12.8) if nome == "Brutus" else Vector3(px, 0.0, pz)
+		corpo.position = Vector3(px, 0.0, pz)
 		# 0° = de frente para o leste (+X); a frente do cão é o -Z.
 		corpo.rotation_degrees.y = -90.0 + p[1] + rng.randf_range(-8.0, 8.0)
 		_add(corpo, c)
@@ -3230,19 +3295,22 @@ func _arvores() -> void:
 	var troncos: Array[Vector3] = []
 	# Os olmos do gramado (altos, de copa em vaso) e os bordos ao longo da
 	# estrada, com as primeiras folhas de setembro amarelando.
-	for p: Vector3 in [Vector3(12.0, 0, 9.0), Vector3(22.0, 0, -9.0), Vector3(-6.0, 0, 11.0)]:
+	for p0: Vector3 in [Vector3(12.0, 0, 9.0), Vector3(22.0, 0, -9.0), Vector3(-6.0, 0, 11.0)]:
+		var p := _pe(p0.x, p0.z, 0.4)
 		_arvore(mm, p, _rng.randf_range(13.0, 15.0), 4.6, Color(0.2, 0.3, 0.14), true)
 		troncos.append(p)
 	var z := -56.0
 	while z < 38.0:
 		if absf(z) > 2.5 and absf(z + 15.0 - FORD_D.z) > 3.0:
 			var p := Vector3(ESTRADA_X.x - 1.6 + _rng.randf_range(-0.4, 0.4), 0, z)
+			p = _pe(p.x, p.z, 0.3)
 			var folha := Color(0.24, 0.32, 0.14) if _rng.randf() < 0.7 else Color(0.5, 0.4, 0.14)
 			_arvore(mm, p, _rng.randf_range(8.0, 10.5), 3.0, folha)
 			troncos.append(p)
 		z += _rng.randf_range(9.0, 14.0)
 	for i in 8:
 		var p := Vector3(16.0 + (i % 4) * 4.0 + _rng.randf_range(-0.6, 0.6), 0, -32.0 - (i / 4) * 5.0)
+		p = _pe(p.x, p.z, 0.2)
 		_macieira(mm, p)
 		troncos.append(p)
 	# Na beira do pântano, uma fileira de cicutas de perto (playtest 11).
@@ -3250,13 +3318,13 @@ func _arvores() -> void:
 		var p := Vector3(_rng.randf_range(-36.0, -31.0), 0, -44.0 + i * 7.0 + _rng.randf_range(-2.0, 2.0))
 		if _ocupado(p.x, p.z):
 			p.x -= 3.5
-		p.y = _altura(p.x, p.z)
+		p = _pe(p.x, p.z, 0.3)
 		_abeto_perto(mm, p, _rng.randf_range(9.0, 14.0))
 		troncos.append(p)
 	# O pântano: bétulas ralas e troncos mortos, touceiras de juncos.
 	for i in 45:
 		var p := Vector3(_rng.randf_range(-62.0, -34.0), 0, _rng.randf_range(-58.0, 38.0))
-		p.y = _altura(p.x, p.z)
+		p = _pe(p.x, p.z, 0.2)
 		if _rng.randf() < 0.6:
 			_betula(mm, p, _rng.randf_range(6.0, 9.0), true)
 		else:
@@ -3264,7 +3332,7 @@ func _arvores() -> void:
 		troncos.append(p)
 	for i in 140:
 		var p := Vector3(_rng.randf_range(-63.0, -30.0), 0, _rng.randf_range(-58.0, 38.0))
-		p.y = _altura(p.x, p.z)
+		p = _pe(p.x, p.z, 0.25)
 		var taboa := _rng.randf() < 0.4
 		for k in 6:
 			var q := p + Vector3(_rng.randf_range(-0.25, 0.25), 0, _rng.randf_range(-0.25, 0.25))
@@ -3279,7 +3347,7 @@ func _arvores() -> void:
 	var mata_longe := _obra("bosque_longe")
 	for i in 1100:
 		var p := Vector3(_rng.randf_range(-258.0, -66.0), 0, _rng.randf_range(-228.0, 228.0))
-		p.y = _altura(p.x, p.z) - 0.2
+		p = _pe(p.x, p.z, 0.35) - Vector3(0, 0.08, 0)
 		var perto := _perto(p.x, p.z)
 		if _rng.randf() < 0.22:
 			if perto:
@@ -3296,7 +3364,7 @@ func _arvores() -> void:
 	# Do outro lado do vale (leste), bosques nos morros, mais ralos.
 	for i in 260:
 		var p := Vector3(_rng.randf_range(60.0, 205.0), 0, _rng.randf_range(-228.0, 228.0))
-		p.y = _altura(p.x, p.z) - 0.2
+		p = _pe(p.x, p.z, 0.35) - Vector3(0, 0.08, 0)
 		var alt := _rng.randf_range(8.0, 13.0)
 		var cor := Color(0.1, 0.15, 0.09) * _rng.randf_range(0.8, 1.2)
 		if _perto(p.x, p.z):
@@ -3913,7 +3981,7 @@ func _arbustos_e_capim() -> void:
 			continue  # o caminho da frente
 		var esc := _rng.randf_range(0.5, 1.1)
 		var b := Basis(Vector3.UP, _rng.randf() * TAU).scaled(Vector3(esc, esc * _rng.randf_range(0.7, 1.3), esc))
-		pontos.append(Transform3D(b, Vector3(x, _altura(x, z) - 0.02, z)))
+		pontos.append(Transform3D(b, Vector3(x, _chao_em(x, z) - 0.02, z)))
 	# Sem tela (o gerador roda headless), o MultiMesh não guarda as posições: elas
 	# vão na meta e a fase as põe ao carregar (Fazenda._capim).
 	var dados := PackedFloat32Array()

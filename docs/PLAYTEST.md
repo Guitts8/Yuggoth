@@ -45,6 +45,21 @@ o que esperava.
 ## 0. Prioridade máxima: o que mudou desde o playtest 11
 **F4** leva direto à fazenda; **F2** lá pula a etapa em curso.
 
+### A conferência das animações (2026-10-22, os sete pedidos)
+(`docs/PLANO_FAZENDA.md`, "O playtest 12, depois".)
+- [ ] **Brutus** fica no cercado com os outros até a porteira abrir; só depois te segue.
+- [ ] **A ração e o bebedouro:** o balde passa **por cima** da tela, não através dela;
+      olhe em volta enquanto despeja: o balde fica lá. A água não aparece mais fora do
+      balde.
+- [ ] **O cercado:** "Entrar no cercado" / "Sair do cercado" na porteira fechada (ele
+      abre, passa e fecha atrás de si; os cães não fogem).
+- [ ] **As venezianas:** feche todas, principalmente as da sala de estar; você
+      continua livre para andar depois?
+- [ ] **As árvores** encostam no chão, longe também (a mata da encosta, os morros a
+      leste, o pântano)?
+- [ ] **Na preparação, abrindo a porteira:** todos os cães saem (os do canto oeste do
+      cercado empacavam na porteira aberta)?
+
 ### As animações, a fazenda espaçada e as portas (2026-10-22, depois do playtest 12)
 Pedido: *"Melhore TODAS as animações... a fazenda está MUITO aglomerada... Algumas
 portas só funcionam para sair e não para entrar."* (`docs/PLANO_FAZENDA.md`, "O

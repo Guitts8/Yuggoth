@@ -60,6 +60,10 @@ var fogo := Vector3.INF
 ## (playtest 12: soltos, eles saíam em linha reta e empacavam na tela).
 @export var porteira_dentro := Vector3.INF
 @export var porteira_fora := Vector3.INF
+## Além da ponta da porteira aberta, dentro do cercado: aberta para dentro, ela é
+## uma parede, e quem estava do lado da dobradiça empacava nela (playtest 12,
+## depois). Quem sai passa por aqui antes do vão; quem entra, depois.
+@export var porteira_volta := Vector3.INF
 var porteira_aberta := false
 ## O quintal, onde andam soltos à noite.
 @export var quintal := AABB(Vector3(-14, 0, -16), Vector3(36, 1, 30))

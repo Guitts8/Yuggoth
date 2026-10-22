@@ -823,6 +823,45 @@ funcionam para sair e não para entrar."*
     fresta e se desfaz, a alavanca de verdade e o estojo que salta da culatra.
   Commit `d806f8e`.
 
+## O playtest 12, depois (2026-10-22): a conferência das animações
+O usuário conferiu as animações novas e trouxe sete pedidos. (O computador desligou
+no meio da sessão; o trabalho foi retomado e terminado na seguinte.)
+
+- ✅ *"Tem um cachorro te seguindo desde o início"* — Brutus, solto desde o começo, ia
+  comer do lado de fora da tela. Agora fica no cercado com os outros (ESPERANDO,
+  DEPOIS) e só segue Akeley depois que a porteira abre.
+- ✅ *"A ração está sendo posta através da grade"* — o balde passava por dentro da
+  tela. Agora ele chega à tela, ergue o balde acima da régua de cima (`TOPO_TELA`) e o
+  passa por cima dela; a boca inclina para dentro do cercado e o balde vai com ele ao
+  longo da tela (`Rotina._seguir_balde`, `_sobre_a_tela`, `_derramar`; fica no mundo:
+  olhar em volta não o leva para dentro da grade). No fim volta por cima da régua para
+  a mão. A gamela foi para junto da tela.
+- ✅ *"Está sendo possível pôr a água através das grades também"* — o bebedouro, do
+  mesmo jeito: o bebedouro rente à tela leste, Akeley de pé junto dela, por fora.
+- ✅ *"A água está sendo vista de fora do balde"* — o disco de água tinha o raio da
+  boca, mas o balde afunila: agora estreita com a altura (`Rotina._nivel_agua`).
+- ✅ *"Não consigo mais entrar para dentro do canil pois a porta está sendo fechada"* —
+  desde que a porteira barra o corpo, só a preparação a abria. `PassarPorteira`
+  (`components/passar_porteira.gd`), uma área de cada lado ("Entrar no cercado",
+  "Sair do cercado"): ele ergue o trinco, abre a porteira para dentro, passa, sai do
+  arco dela e a fecha atrás de si; os cães ficam (só saem com `porteira_aberta`). De
+  fora, quando a preparação pede para soltar os cães, cede o lugar à área dela.
+- ✅ *"Trancar as venezianas te deixa preso entre os móveis"* — `conduzir` passa por
+  cima da física, e a cena o levava a um ponto fixo diante da janela (na sala de
+  estar, entre o sofá, a mesinha e a parede). `Venezianas.junto` procura diante da
+  janela um lugar onde o corpo cabe e aonde se chega em linha reta
+  (`Player.caminho_livre`); sem nenhum, ele fica onde está e só se vira. A seteira da
+  noite usa o mesmo. O `alcance_test` agora fecha cada veneziana e confere que ele
+  sai dali andando.
+- ✅ *"Algumas árvores não estão encostando o chão"* — elas eram postas na curva de
+  `_altura`, mas o chão de verdade é a malha da grade (células planas de 10 a 40 m
+  longe da casa), e as duas se afastam metros. `_chao_em` dá a altura da malha, e
+  `_pe` assenta o tronco no ponto mais baixo em volta dele; o capim também.
+- ✅ **Achado no teste:** com a porteira aberta para dentro, a folha vira uma parede no
+  cercado, e os cães do lado da dobradiça (onde a gamela acaba) empacavam nela e não
+  saíam para a noite do telhado. `Matilha.porteira_volta`, além da ponta da folha:
+  quem sai passa por ali antes do vão, e quem entra, depois.
+
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
   escritório, sem mãos (a recomendação, aceita). O rifle é o caso mais difícil

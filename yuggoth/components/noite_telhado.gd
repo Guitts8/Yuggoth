@@ -437,10 +437,14 @@ func _atirar(i: int) -> void:
 	p.input_enabled = false
 	var v := seteiras[i]
 	var fora := atirar[i].get_meta(&"fora", Vector3.FORWARD) as Vector3
-	var junto := v.global_position - fora * 0.55
-	junto.y = p.global_position.y
 	var longe := v.global_position + fora * 14.0
-	await p.conduzir([junto], longe)
+	# Onde o corpo cabe e se chega em linha reta (a cena passa por cima da física:
+	# playtest 12, depois, o preso entre os móveis).
+	var junto := v.junto(p, [0.55, 0.4, 0.7, 0.3])
+	if junto != Vector3.INF:
+		await p.conduzir([junto], longe)
+	else:
+		await p.olhar_para(longe, 0.5).finished
 	if not is_inside_tree():
 		return
 	await v.fresta(true, 65.0)

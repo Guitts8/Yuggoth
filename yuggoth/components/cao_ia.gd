@@ -1,7 +1,7 @@
 class_name CaoIA
 extends CharacterBody3D
 ## Um cão de Akeley com corpo e vontade (docs/PLANO_FAZENDA.md, F4; GDD §5.1a):
-## quatro têm o seu jeito — Brutus segue Akeley, Conan deita junto ao fogo,
+## quatro têm o seu jeito — Brutus segue Akeley (solto), Conan deita junto ao fogo,
 ## Hércules late para a mata, Rambo rosna para a janela (e não come) —; os outros
 ## são a matilha. Decide de tempos em tempos a partir do `modo` da `Matilha` (o
 ## pai); anda até um ponto (sem navegação: o cercado e o quintal são abertos), vira
@@ -252,18 +252,17 @@ func _pensar() -> void:
 				_pose(Cao.Pose.COMENDO)
 				_abana = 0.6
 		Matilha.Modo.DEPOIS:
-			if papel == Papel.SEGUIR and akeley:
-				_seguir(akeley)
-			elif papel == Papel.JANELA:
+			if papel == Papel.JANELA:
 				_vigiar_a_mata(false)
 			elif papel == Papel.MATA and _rng.randf() < 0.25:
 				_vigiar_a_mata(true)
 			else:
 				_vagar(matilha.cercado)
 		Matilha.Modo.ESPERANDO:
-			if papel == Papel.SEGUIR and akeley:
-				_seguir(akeley)
-			elif papel == Papel.JANELA:
+			# Brutus também fica no cercado até a porteira abrir (playtest 12, depois:
+			# "tem um cachorro te seguindo desde o inicio" — solto, ele ia comer do lado
+			# de fora da tela); depois, segue Akeley.
+			if papel == Papel.JANELA:
 				_vigiar_a_mata(false)
 			elif papel == Papel.MATA and _rng.randf() < 0.3:
 				_vigiar_a_mata(true)
@@ -542,11 +541,13 @@ func _ir(p: Vector3, velocidade: float) -> void:
 	if matilha and matilha.porteira_aberta and matilha.porteira_dentro != Vector3.INF:
 		var dentro := matilha.no_cercado(global_position)
 		if dentro != matilha.no_cercado(p):
-			var a := matilha.porteira_dentro if dentro else matilha.porteira_fora
-			var b := matilha.porteira_fora if dentro else matilha.porteira_dentro
-			_alvo = a
-			_fila.append(b)
-			_fila.append(p)
+			var caminho: Array[Vector3] = [matilha.porteira_volta, matilha.porteira_dentro, matilha.porteira_fora]
+			if not dentro:
+				caminho.reverse()
+			caminho.erase(Vector3.INF)
+			caminho.append(p)
+			_alvo = caminho.pop_front()
+			_fila = caminho
 			return
 	_alvo = p
 

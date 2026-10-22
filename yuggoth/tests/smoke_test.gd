@@ -910,14 +910,14 @@ func _ready() -> void:
 			"o corpo é outro: mais lento, ofegante; quem narra é Akeley")
 		_check(get_tree().get_first_node_in_group(&"sem_dossie") == faz, "como Akeley, sem dossiê")
 		# A matilha (F4): os doze; com o balde perto, juntam-se na tela do lado dele;
-		# Brutus o segue.
+		# Brutus fica no cercado com os outros até a porteira abrir (playtest 12, depois).
 		var matilha := faz.get_node("Caes") as Matilha
 		await _seconds(6.0)
 		var junto := matilha.caes().filter(func(c: CaoIA) -> bool: return c.global_position.x > -1.5)
 		_check(matilha.caes().size() == 12 and junto.size() >= 6, "os doze cães; com o balde, juntam-se na tela do lado de Akeley (%d)" % junto.size())
 		var brutus := matilha.cao("Brutus")
-		_check(brutus and brutus.global_position.distance_to(faz.player.global_position) < 3.5 and absf(brutus.global_position.y) < 0.05,
-			"Brutus junto de Akeley, de pé no chão")
+		_check(brutus and matilha.no_cercado(brutus.global_position) and absf(brutus.global_position.y) < 0.05,
+			"Brutus no cercado com os outros (só segue Akeley depois de solto), de pé no chão")
 		await _rotina(faz)
 	await _until(func() -> bool: return main_menu.visible, 120.0)
 	_check(main_menu.visible and SceneDirector.current_level.is_empty() and not tinta_na_tela.call(), "fim da demo, depois dos tiros: o cartão e o menu")
@@ -1246,6 +1246,23 @@ func _rotina(faz: Fazenda) -> void:
 	await _seconds(6.0)
 	var comendo := matilha.caes().filter(func(c: CaoIA) -> bool: return c.visual.pose == Cao.Pose.COMENDO)
 	_check(comendo.size() >= 6 and matilha.cao("Rambo").visual.pose != Cao.Pose.COMENDO, "lado a lado na gamela (%d); Rambo não come" % comendo.size())
+	# A porteira fechada (playtest 12, depois: "não consigo mais entrar para dentro
+	# do canil"): entra-se no cercado e sai-se dele por ela, e os cães ficam.
+	var porteira := faz.get_node("Porteira") as Node3D
+	for de_dentro: bool in [false, true]:
+		var passar := faz.get_node("PreparacaoPecas/SairDoCercado" if de_dentro else "PreparacaoPecas/EntrarNoCercado") as PassarPorteira
+		if not de_dentro:
+			p.global_position = passar.global_position + Vector3(0.2, -0.7, 1.4)
+			p.velocity = Vector3.ZERO
+		await _frames(3)
+		await _mirar(p, passar.global_position)
+		var na_mira := p._target == passar
+		passar.interact(p)
+		await _frames(2)
+		await _until(func() -> bool: return p.input_enabled, 20.0)
+		await _frames(3)
+		_check(na_mira and matilha.no_cercado(p.global_position) != de_dentro and absf(porteira.rotation_degrees.y) < 1.0 and not matilha.porteira_aberta,
+			("pela porteira, para fora do cercado; os cães ficam" if de_dentro else "pela porteira, para dentro do cercado; ela fecha atrás") + " (%s)" % p.global_position.snappedf(0.01))
 	mirou = await fazer.call(r.bombear, r.diante_da_bomba)
 	_check(mirou and r.agua_balde.visible, "a bomba do poço enche o balde")
 	mirou = await fazer.call(r.encher_bebedouro, r.diante_do_bebedouro, r.agua_bebedouro.global_position + Vector3(0.6, 0.5, 0))
@@ -1307,6 +1324,10 @@ func _preparacao(faz: Fazenda) -> void:
 	_check(mirou and pr.lareira_acesa and matilha.fogo != Vector3.INF, "a lareira acesa (com a lenha da rotina)")
 	mirou = await fazer.call(pr.soltar_caes, pr.soltar_caes.global_position + Vector3(0.05, -0.7, 0.65), pr.soltar_caes.global_position + Vector3(0, -0.1, -0.15))
 	_check(mirou and pr.caes_soltos and matilha.modo == Matilha.Modo.SOLTOS, "a porteira aberta: os cães soltos")
+	var brutus := matilha.cao("Brutus")
+	var com_ele := func() -> bool: return brutus.global_position.distance_to(p.global_position) < 3.5
+	await _until(com_ele, 20.0)
+	_check(com_ele.call(), "solto, Brutus vem para junto de Akeley")
 	# Os outros lampiões e venezianas, de uma vez (o resto da casa).
 	for l in pr.lampioes:
 		if not l.aceso:
@@ -1361,6 +1382,10 @@ func _noite(faz: Fazenda) -> void:
 	await _seconds(6.0)
 	var em_volta := matilha.caes().filter(func(c: CaoIA) -> bool:
 		return c.visible and matilha.casa.grow(5.0).has_point(Vector3(c.global_position.x, 0.5, c.global_position.z)) and c.global_position.y < 0.3)
+	if em_volta.size() < 5:
+		for c: CaoIA in matilha.caes():
+			if not c in em_volta:
+				print("   (%s longe da casa: %s, visível %s, cercado %s)" % [c.name, c.global_position.snappedf(0.01), c.visible, matilha.no_cercado(c.global_position)])
 	_check(em_volta.size() >= 5, "os cães correm em volta da casa, latindo para o telhado (%d)" % em_volta.size())
 	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.APAGAR, 90.0)
 	_check(not matilha.cao("Kull").visible, "um subiu pelo puxado baixo (Kull, fora da vista)")
