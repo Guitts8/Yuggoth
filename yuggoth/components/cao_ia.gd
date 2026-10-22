@@ -39,6 +39,8 @@ var _olhar_para := Vector3.INF
 var _decidir := 0.0
 var _latir := 0.0
 var _empacado := 0.0
+## Conan já passou pela `passagem_do_fogo` (volta a falso quando sai da casa).
+var _passou := false
 var _voz: AudioStreamPlayer3D
 var _rng := RandomNumberGenerator.new()
 
@@ -318,8 +320,8 @@ func _seguir(akeley: Player) -> void:
 
 ## Chega a `p` sem ser visto se estiver longe (a casa tem paredes; não há
 ## navegação): fora da vista de Akeley, aparece lá. Devolve se já chegou.
-func _chegar(p: Vector3, akeley: Player) -> bool:
-	if global_position.distance_to(p) < 0.6:
+func _chegar(p: Vector3, akeley: Player, raio := 0.6) -> bool:
+	if global_position.distance_to(p) < raio:
 		return true
 	if akeley and global_position.distance_to(p) > 4.0:
 		var cam := akeley.camera
@@ -349,10 +351,19 @@ func _ir_deitar(p: Vector3, akeley: Player) -> void:
 	var porta := matilha.porta_do_fogo
 	var dentro := absf(global_position.y - p.y) < 0.3 and global_position.distance_to(p) < 4.5
 	if porta != Vector3.INF and not dentro and global_position.distance_to(porta) > 0.6:
+		_passou = false
 		if _chegar(porta, akeley):
 			_pose(Cao.Pose.PARADO)
 			return
-	if _chegar(p, akeley):
+	# Da porta, contorna a mesa grande pela passagem (playtest 12: em linha reta,
+	# empacava na quina da mesa e não deitava).
+	var passagem := matilha.passagem_do_fogo
+	if passagem != Vector3.INF and not _passou:
+		if _chegar(passagem, akeley, 0.45):
+			_passou = true
+		_pose(Cao.Pose.PARADO)
+		return
+	if _chegar(p, akeley, 0.4):
 		_alvo = Vector3.INF
 		_pose(Cao.Pose.DEITADO)
 	else:

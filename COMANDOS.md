@@ -29,6 +29,7 @@ O `comandos.ps1` importa sozinho na primeira vez; à mão, abra o editor uma vez
 | `jogar-log` | Abre o jogo com o console junto (os erros aparecem nele) |
 | `editor` | Abre o projeto no editor do Godot |
 | `teste` | Teste de fumaça (~5 min). O código de saída é o número de falhas |
+| `alcance` | A fazenda (playtest 12): mapeia por onde o corpo de Akeley anda e confere que se chega a pé a tudo o que se usa (as venezianas, os lampiões, o rifle, as seteiras...) — anda até lá com a física e mira — e que não há cômodo fechado por móveis (~3 min). O código de saída é o número de falhas |
 | `caminhos` | Os caminhos fora do roteiro (~5 min): a pausa e o dossiê no meio das cenas, sair para o menu e continuar no meio do dia e do sonho, descer a escada com a carta, o diário vazio, a noite do Dia 5 sem fogo, continuar em Boston, os textos em todo tom; a legenda que ficava na tela ao trocar de fase, F2/F3 no meio das cenas, sair para o menu no cartão do fim, o menu só pelo teclado, o diário aberto na ida a Boston; o menu pelo mouse, o Prólogo fora do roteiro, Boston em todas as ordens (~10 min) |
 | `macaco [semente] [tom]` | Um jogador ao acaso joga a demo inteira (~15 min): ações em qualquer ordem, telas no meio das cenas, cartas amassadas. Acusa travamentos (com as últimas ações), quedas do mapa e erros no log. Com a semente, repete (quase sempre) as mesmas escolhas; com o tom (-1, 0 ou 1), toda resposta a Akeley sai nesse tom |
 | `exportar` | Exporta a demo para Windows em `build\windows\Yuggoth.exe` (o preset `Windows`; sem os atalhos de teste) |
@@ -91,6 +92,7 @@ cd yuggoth
 & $godot -e --path .                                # editor
 & $godot --headless --path . res://tests/smoke_test.tscn   # teste de fumaça (~5 min)
 & $godot --headless --path . res://tests/caminhos_test.tscn   # caminhos fora do roteiro (~5 min)
+& $godot --headless --path . res://tests/alcance_test.tscn    # a fazenda: chega-se a tudo? (~3 min; MAPA=x0,z0,x1,z1,y desenha o que se anda)
 $env:CAMINHOS = "macaco"; $env:SEMENTE = "1"                  # o macaco: a demo inteira ao acaso
 $env:TOM = "-1"                                               # (opcional) toda resposta nesse tom
 & $godot --headless --path . res://tests/caminhos_test.tscn   # (~15 min; sem SEMENTE, uma nova)

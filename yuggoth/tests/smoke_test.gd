@@ -1322,8 +1322,10 @@ func _preparacao(faz: Fazenda) -> void:
 	p.global_position = Vector3(3.6, 0.6, -2.5)
 	p.look_at(Vector3(3.6, p.global_position.y, -6.0))
 	var conan := matilha.cao("Conan")
-	await _until(func() -> bool: return conan.global_position.distance_to(matilha.fogo) < 0.8, 40.0)
-	_check(conan.global_position.distance_to(matilha.fogo) < 0.8, "Conan deitado diante do fogo %s" % conan.global_position)
+	# Deitado de fato (playtest 12: a 0,77 m, empacado na quina da mesa, contava).
+	var deitado := func() -> bool: return conan.visual.pose == Cao.Pose.DEITADO and conan.global_position.distance_to(matilha.fogo) < 0.5
+	await _until(deitado, 40.0)
+	_check(deitado.call(), "Conan deitado diante do fogo %s" % conan.global_position)
 	await _noite(faz)
 
 

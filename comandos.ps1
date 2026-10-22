@@ -12,8 +12,12 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-# Noutra máquina, aponte $env:GODOT_DIR para a pasta com os dois executáveis do Godot 4.7.2.
+# Noutra máquina, aponte $env:GODOT_DIR para a pasta com os dois executáveis do Godot 4.7.2;
+# sem ele, vale a pasta da máquina de sempre ou, faltando ela, a dos Downloads do usuário.
 $godotDir = if ($env:GODOT_DIR) { $env:GODOT_DIR } else { "C:\Users\raul.silva\Downloads\Godot_v4.7.2-stable_win64.exe" }
+if (-not $env:GODOT_DIR -and -not (Test-Path $godotDir)) {
+	$godotDir = Join-Path $env:USERPROFILE "Downloads\Godot_v4.7.2-stable_win64.exe"
+}
 $godot = Join-Path $godotDir "Godot_v4.7.2-stable_win64_console.exe"
 $godotJanela = Join-Path $godotDir "Godot_v4.7.2-stable_win64.exe"
 $raiz = $PSScriptRoot
@@ -61,6 +65,8 @@ Ações (powershell -ExecutionPolicy Bypass -File .\comandos.ps1 <ação>):
     teste              teste de fumaça (~5 min; código = número de falhas)
     caminhos           os caminhos fora do roteiro (pausa no meio das cenas, menu e
                        continuar, a noite sem fogo, Boston...; ~5 min)
+    alcance            a fazenda: chega-se a pé a tudo o que se usa (as venezianas,
+                       os lampiões, as seteiras...) e a todo cômodo? (~3 min)
     macaco [semente] [tom]
                        um jogador ao acaso joga a demo inteira (~15 min); acusa
                        travamentos, quedas do mapa e erros no log. Com o tom
@@ -149,6 +155,7 @@ switch ($acao) {
 	"editor" { Start-Process $godotJanela -ArgumentList "-e", "--path", "`"$projeto`"" }
 	"teste" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/smoke_test.tscn") 600 "teste") }
 	"caminhos" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/caminhos_test.tscn") 1500 "caminhos") }
+	"alcance" { exit (Godot-Com-Limite @("--headless", "--path", ".", "res://tests/alcance_test.tscn") 900 "alcance") }
 	"macaco" {
 		$env:CAMINHOS = "macaco"
 		if ($arg) { $env:SEMENTE = $arg }

@@ -32,6 +32,8 @@ var fogo := Vector3.INF
 ## Por onde Conan entra no escritório (a casa não tem navegação: ele aparece ali,
 ## fora da vista, e anda até o fogo).
 @export var porta_do_fogo := Vector3.INF
+## Por onde Conan passa da porta ao fogo, contornando a mesa grande (INF: direto).
+@export var passagem_do_fogo := Vector3.INF
 ## A casa (a planta, com o puxado), para correrem em volta dela na noite do
 ## telhado.
 @export var casa := AABB(Vector3(-9.0, 0, -6.0), Vector3(15.0, 1, 12.0))

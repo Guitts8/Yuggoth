@@ -1071,22 +1071,27 @@ func _janela(g: Node3D, nome: String, c: Vector3, fora: Vector3, larg: float, al
 func _moveis() -> void:
 	var y := T0
 	# O escritório de Akeley (sudeste): a mesa grande de trabalho no meio, com os
-	# papéis; a escrivaninha de tampo de couro sob a janela leste (o lampião); as
-	# estantes cheias contra o vestíbulo; a poltrona de orelhas junto ao fogo, no
-	# canto; o armarinho do fonógrafo; o tapete trançado.
+	# papéis; a escrivaninha de tampo de couro contra a parede leste, entre as
+	# janelas (o lampião); as estantes cheias contra o vestíbulo; a poltrona de
+	# orelhas junto ao fogo, no canto; o armarinho do fonógrafo contra a parede sul,
+	# entre as janelas; o tapete trançado. Playtest 12: a mesa ia até perto da parede
+	# sul, as cadeiras ficavam no meio da passagem e o armarinho no canto sudeste —
+	# não se chegava às venezianas da janela sul nem ao canto das seteiras. Agora as
+	# cadeiras ficam enfiadas na mesa e na escrivaninha, e há passagem em volta da
+	# mesa e ao longo da parede sul (`tests/alcance_test`).
 	_tapete_redondo(Vector3(3.4, y, 3.7), Vector2(2.6, 1.9))
-	_mesa(Vector3(3.4, y, 3.8), 0.0, Vector3(1.6, 0.76, 0.95), "madeira_escura")
+	_mesa(Vector3(3.45, y, 3.45), 0.0, Vector3(1.2, 0.76, 0.85), "madeira_escura")
 	for k in 7:
-		var papel := Vector3(3.0 + (k % 4) * 0.26, y + 0.765 + k * 0.002, 3.6 + (k / 4) * 0.3)
+		var papel := Vector3(3.07 + (k % 4) * 0.26, y + 0.765 + k * 0.002, 3.25 + (k / 4) * 0.3)
 		_bloco("papel", Vector3(0.21, 0.003, 0.28), papel, Color.WHITE, false, Vector3(0, -12.0 + k * 9.0, 0))
-	_cadeira_espaldar(Vector3(3.4, y, 4.45), 0.0)
+	_cadeira_espaldar(Vector3(3.45, y, 4.02), 0.0)
 	_escrivaninha(Vector3(5.42, y, 3.7), 90.0)
-	_cadeira_espaldar(Vector3(4.85, y, 3.7), -90.0)
+	_cadeira_espaldar(Vector3(5.08, y, 3.7), -90.0)
 	_estante(Vector3(2.45, y, HALL_Z + 0.24), 180.0, 1.3, 2.2)
 	_estante(Vector3(3.8, y, HALL_Z + 0.24), 180.0, 1.3, 2.2)
 	_poltrona_orelhas(Vector3(1.9, y, 5.05), 10.0, "estofado")
 	_mesinha(Vector3(2.55, y, 5.45), 0.0)
-	_armarinho(Vector3(5.45, y, 5.25), 90.0)
+	_armarinho(Vector3(3.5, y, CASA_Z.y - E - 0.26), 0.0)
 	# A sala de estar (nordeste): o sofá de encosto curvo contra a parede norte,
 	# as duas poltronas viradas para a lareira, a mesa redonda do meio com o
 	# pano de crochê, a cadeira de balanço, o tapete. A porta (x 5,1) fica livre.
@@ -2392,9 +2397,13 @@ func _preparacao() -> void:
 	p.soltar_caes = soltar
 	p.porteira = cena.get_node("Porteira")
 	p.telefone = telefone
-	p.diante_do_fogo = boca + Vector3(0.75, -0.11, -0.45)
-	# Por dentro da porta do escritório (do vestíbulo): por onde Conan entra.
+	# Diante da boca, na pedra da lareira (ele para a ~0,35 m do alvo: o alvo fica
+	# além, ao sul, e ele deita no meio da boca, entre a lareira e a mesa).
+	p.diante_do_fogo = Vector3(2.4, T0, CHAMINE_Z + 0.25)
+	# Por dentro da porta do escritório (do vestíbulo): por onde Conan entra; e a
+	# passagem ao norte da mesa grande, por onde ele a contorna até o fogo.
 	caes.porta_do_fogo = Vector3(5.1, T0, HALL_Z + 0.6)
+	caes.passagem_do_fogo = Vector3(2.45, T0, 2.6)
 	p.lua = lua
 	p.nuvens = nuvens
 	# A leste, longe: nasce por trás da crista dos morros do outro lado do vale (a

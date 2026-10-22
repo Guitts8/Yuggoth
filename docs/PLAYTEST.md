@@ -45,6 +45,20 @@ o que esperava.
 ## 0. Prioridade máxima: o que mudou desde o playtest 11
 **F4** leva direto à fazenda; **F2** lá pula a etapa em curso.
 
+### O alcance na casa de Akeley (2026-10-22: o começo do playtest 12 parou aqui)
+Não se chegava às venezianas da janela sul do escritório (os móveis fechavam a faixa
+entre a mesa e a parede). O escritório foi rearrumado: a mesa um pouco menor e mais
+ao norte, as cadeiras enfiadas na mesa e na escrivaninha, o armarinho do fonógrafo na
+parede sul, entre as janelas. Um teste novo (`comandos.ps1 alcance`) anda até cada
+coisa da rotina, da preparação e da noite e mira nela.
+- [ ] **A preparação inteira a pé:** as oito venezianas (o escritório e a sala de
+      estar), os quatro lampiões, o rifle, a lareira, a porteira. Alguma ainda difícil
+      de alcançar ou de mirar? Diga qual e de onde tentou.
+- [ ] **O escritório rearrumado:** a passagem em volta da mesa, o canto sudeste livre
+      (onde se atira na noite do telhado). Ficou estranho, vazio, apertado?
+- [ ] **Algum outro lugar da casa ou do quintal** onde se fica preso ou aonde não se
+      chega? (O teste diz que não — o olho humano confirma.)
+
 ### O desempenho da fazenda e a qualidade da imagem (2026-10-16)
 A fazenda travava a máquina (a placa integrada Intel UHD: a sombra do sol e a dos
 lampiões redesenhavam a fazenda inteira a cada quadro, e o driver de vídeo chegou a

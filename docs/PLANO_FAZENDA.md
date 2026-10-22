@@ -259,6 +259,10 @@ usuário joga o **playtest 12** (`docs/PLAYTEST.md`: a demo inteira, agora com a
 noite); a lista vira a fase seguinte daqui e do escritório. Depois, a F9 (as
 fotografias do Dia 2 feitas das cenas 3D) e o playtest com 5+ pessoas (o marco Demo).
 
+**2026-10-22:** o começo do playtest 12 travou na preparação — venezianas fora de
+alcance no escritório de Akeley. O escritório foi rearrumado e há um teste de alcance
+novo ("O playtest 12", abaixo); o usuário retoma o playtest 12 da fazenda.
+
 ## O desempenho (2026-10-16)
 O usuário: *"O modelo da fazenda tem travado muito a máquina, será que está pesado?"*
 A máquina dele tem placa integrada (Intel UHD Graphics). Medido no jogo
@@ -692,6 +696,44 @@ fique BOM de VERDADE pois será o modelo mais usado durante todo o jogo."*
   feltro verde, o frontão, a travessa das portas de vidro, dois rifles e uma espingarda
   de dois canos que ficam (`_arma_de_pe`) e uma caixa de cartuchos esquecida.
   Capturas: `SHOT_MODO=preparacao`; o teste de fumaça passa.
+
+## O playtest 12 (2026-10-22): o alcance
+O começo do playtest 12 parou na preparação: *"o inicio do playtest 12 deu errado por
+conta da incapacidade de chegar até algumas venezianas e etc. A casa tem alguns locais
+inacessiveis por conta do modelo 3d."*
+
+- ✅ **A causa:** no escritório de Akeley, a faixa entre a mesa grande e a parede sul
+  (1,7 m² de chão livre) estava fechada por móveis — a poltrona junto ao fogo a oeste,
+  a cadeira da mesa no meio, a cadeira da escrivaninha e o armarinho do fonógrafo a
+  leste. Ficavam fora de alcance as venezianas da janela sul (`FecharJanela21`) e a
+  seteira dela na noite do telhado (`Atirar21`); as da janela leste do canto
+  (`FecharJanela6`, `Atirar6`) só se alcançavam da beira do raio (1,86 m), por cima do
+  armarinho. O teste de fumaça não via: põe Akeley diante de cada tarefa
+  (teletransportado) e fecha as outras venezianas de uma vez.
+- ✅ **O teste novo** (`tests/alcance_test.tscn`, `comandos.ps1 alcance`, ~3 min):
+  mapeia por onde o corpo anda a partir do quintal (uma grade de 0,1 m; cada passo
+  precisa de chão e da cápsula do Player livre, com as rampas e as soleiras como o
+  CharacterBody3D as vence); para cada Interactable da fazenda (a rotina, a preparação,
+  a noite), procura um lugar alcançável de onde o raio da mira (2 m) chega até ela sem
+  o mundo no meio, e falha se não há ou se o mais perto passa de 1,6 m; e confere com
+  a física: anda os últimos 7 m pelo caminho achado e mira com o raio do Player.
+  Depois, procura os bolsões da casa (chão livre aonde não se chega; maior que 0,5 m²
+  é falha). `MAPA=x0,z0,x1,z1,y` desenha o que se anda; `SONDA=x,y,z` diz o que não
+  deixa o corpo caber; `ALCANCE=Nome` limita às áreas com esse nome.
+- ✅ **O escritório rearrumado** (`_moveis`): a mesa grande um pouco menor e mais ao
+  norte (1,3 × 0,85 m em (3,25; 3,45)), a cadeira dela enfiada sob o lado sul, a
+  cadeira da escrivaninha enfiada na escrivaninha, e o armarinho do fonógrafo contra a
+  parede sul, entre as duas janelas (saiu do canto sudeste). Há passagem de ~1 m em
+  volta da mesa e ao longo da parede sul; o canto das seteiras fica livre. Agora as 29
+  áreas se alcançam, todas a pé e com a mira; nenhum bolsão — só cantinhos atrás de
+  móveis (até 0,3 m²). A cozinha, o primeiro andar e as dependências já se alcançavam.
+  Depois, a mesa foi 20 cm para leste (1,2 m de comprimento, em x 2,85..4,05).
+- ✅ **Conan e a mesa:** com a mesa mais ao norte, Conan, que andava em linha reta da
+  porta até o fogo, empacava na quina dela e não deitava. O teste de fumaça deixava
+  passar: aceitava 0,8 m do lugar, e ele parava a 0,77 m. Agora ele contorna a mesa
+  pela `Matilha.passagem_do_fogo` (ao norte dela) e deita no meio da boca da lareira,
+  e `_chegar` aceita um raio por alvo. O teste de fumaça confere a pose deitada a
+  menos de 0,5 m.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
