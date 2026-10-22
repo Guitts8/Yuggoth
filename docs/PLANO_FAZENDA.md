@@ -733,7 +733,7 @@ inacessiveis por conta do modelo 3d."*
   passar: aceitava 0,8 m do lugar, e ele parava a 0,77 m. Agora ele contorna a mesa
   pela `Matilha.passagem_do_fogo` (ao norte dela) e deita no meio da boca da lareira,
   e `_chegar` aceita um raio por alvo. O teste de fumaça confere a pose deitada a
-  menos de 0,5 m.
+  menos de 0,5 m. Commit `dc3196c`.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
