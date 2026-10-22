@@ -821,7 +821,7 @@ funcionam para sair e não para entrar."*
     vai pesada e repica, e recua um passo; os cães saem pelo vão, um atrás do outro.
   - **Os tiros:** o clarão na boca do cano, a fumaça branca da pólvora que sai pela
     fresta e se desfaz, a alavanca de verdade e o estojo que salta da culatra.
-  Commit: (ver abaixo).
+  Commit `d806f8e`.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
