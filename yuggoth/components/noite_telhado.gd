@@ -1,8 +1,12 @@
 class_name NoiteTelhado
 extends Node
 ## A noite do telhado (docs/PLANO_FAZENDA.md, F7; "A tratativa", 3 e 4): a carta de
-## segunda-feira, vivida. Cada frase da carta aparece na letra de Akeley quando a
-## coisa acontece.
+## segunda-feira, vivida. **O som conta** (playtest 12, depois: "construir a
+## narrativa dos fatos de uma forma mais envolvente... o astro aqui deve ser os efeitos
+## sonoros"): cada coisa acontece primeiro só em som — de onde vem, por onde anda —, e
+## a frase da carta aparece um pouco depois, na letra de Akeley, como eco (`_eco`). O
+## cochilo abafa o mundo (`_abafar`) e o baque o devolve de uma vez; antes dos golpes,
+## silêncios: os grilos que param de uma vez, os cães que se calam (`Matilha.mudos`).
 ##
 ## A espera: "Sentar e esperar" na poltrona junto ao fogo, o rifle no colo; o fogo
 ## e o lampião baixam, o relógio bate, as pálpebras pesam — ele cochila. Os grilos
@@ -29,6 +33,10 @@ enum Etapa { ANTES, SENTAR, ESPERA, TELHADO, BALAS, APAGAR, TIROS, FIM }
 
 ## Quantos tiros (as janelas de `seteiras`; o rifle tem quatro cartuchos).
 const TIRO_DO_GANIDO := 2
+## Quanto a frase da carta espera depois do som que ela conta.
+const ECO := 1.4
+## O cochilo: até onde o mundo abafa (Hz).
+const ABAFADO := 650.0
 
 @export var matilha: Matilha
 @export var preparacao: Preparacao
@@ -104,6 +112,9 @@ var _tremor_t := 0.0
 ## Os tiros de lá, de tempos em tempos, enquanto Akeley atira.
 var _tiros_de_la := false
 var _rng := RandomNumberGenerator.new()
+## O filtro do cochilo, no bus Master enquanto dura.
+var _abafa: AudioEffectLowPassFilter
+var _abafa_tw: Tween
 
 
 func _ready() -> void:
@@ -231,6 +242,8 @@ func _sentar() -> void:
 	var rifle := preparacao.rifle if preparacao else null
 	if rifle:
 		create_tween().tween_property(rifle, ^"erguer", 0.45, 1.2)
+	# Primeiro a noite em volta (o fogo, o relógio, os grilos); a frase, depois.
+	await _esperar(2.5)
 	await _frase(&"nuvens")
 	await _espera(p)
 	if not is_inside_tree():
@@ -261,43 +274,52 @@ func _espera(p: Player) -> void:
 	_palpebras = Palpebras.new()
 	add_child(_palpebras)
 	await _esperar(6.0)
+	# Cochilando, o mundo abafa: os grilos, o fogo, o relógio, cada vez mais de longe.
+	_abafar(true, 18.0)
 	for passo: Vector2 in [Vector2(0.55, 5.0), Vector2(0.3, 2.0), Vector2(0.78, 5.0), Vector2(0.5, 1.6), Vector2(0.93, 5.0)]:
 		await _palpebras.fechar(passo.x, passo.y)
 		if not is_inside_tree():
 			return
-	# Os grilos param; lá fora, um rosnado.
+	# Os grilos param — de uma vez, todos: só o relógio. Lá fora, um rosnado baixo.
 	if som_sem_grilos:
-		AudioDirector.play_ambience(som_sem_grilos, 1.2)
-	await _esperar(2.5)
+		AudioDirector.play_ambience(som_sem_grilos, 0.25)
+	await _esperar(3.5)
 	var hercules := matilha.cao("Hércules")
 	if hercules:
 		hercules._som(matilha.rosnado, -6.0)
-	await _esperar(3.0)
+	await _esperar(4.0)
 
 
 ## O telhado: o baque, a poeira, os cães em volta, um sobe pelo puxado, a luta e o
 ## zumbido, o cheiro.
 func _telhado(p: Player) -> void:
 	etapa = Etapa.TELHADO
-	# O baque: os olhos abrem de uma vez.
+	# O baque: os olhos abrem de uma vez, e o mundo volta nítido.
 	_tocar_em(som_telhado, som_baque, caminho_telhado[caminho_telhado.size() - 1], 6.0)
+	_abafar(false, 0.12)
 	_tremer(1.0)
 	_palpebras.fechar(0.0, 0.25)
 	await _esperar(0.25)
 	_poeira(1.0)
 	_tinir_lampiao()
-	await _frase(&"pousou")
-	await _esperar(1.5)
-	await _frase(&"correram")
-	matilha.modo = Matilha.Modo.TELHADO
-	await _esperar(3.0)
-	# Um sobe pelo puxado baixo e corre por cima do forro.
-	await _frase(&"subiu")
+	# Um silêncio: só a poeira caindo. Então a frase.
+	await _eco(&"pousou", 1.6)
 	if not is_inside_tree():
 		return
+	# Os cães disparam latindo em volta da casa (os latidos rodeiam); a frase, depois.
+	matilha.modo = Matilha.Modo.TELHADO
+	await _eco(&"correram", 3.0)
+	await _esperar(2.5)
+	if not is_inside_tree():
+		return
+	# Um sobe pelo puxado baixo: o pulo na beira do telhado de trás, e as unhas
+	# correndo por cima do forro, de lá para cá; a poeira cai quando passam por cima.
 	var kull := matilha.cao("Kull")
 	if kull:
 		kull.sumir()
+	if caminho_telhado.size() >= 2:
+		_tocar_em(som_telhado, som_baque, caminho_telhado[0], -6.0)
+		await _esperar(0.5)
 	if som_telhado and som_unhas and caminho_telhado.size() >= 2:
 		som_telhado.stream = som_unhas
 		som_telhado.volume_db = 2.0
@@ -306,15 +328,15 @@ func _telhado(p: Player) -> void:
 		var t := create_tween()
 		for k in range(1, caminho_telhado.size()):
 			t.tween_property(som_telhado, ^"global_position", caminho_telhado[k], 1.1)
+			# A poeira do forro na passada por cima do escritório (a segunda metade).
+			if k >= caminho_telhado.size() / 2:
+				t.tween_callback(_poeira.bind(0.3))
+		_eco(&"subiu", 1.8)
 		await t.finished
 		if not is_inside_tree():
 			return
-	_poeira(0.4)
-	await _esperar(1.0)
-	# A luta lá em cima, e o zumbido.
-	await _frase(&"luta")
-	if not is_inside_tree():
-		return
+	await _esperar(0.6)
+	# A luta lá em cima, e o zumbido: o som primeiro, a frase quando já se ouviu.
 	if som_telhado:
 		som_telhado.stop()
 	var alto := caminho_telhado[caminho_telhado.size() - 1]
@@ -325,6 +347,7 @@ func _telhado(p: Player) -> void:
 		som_zumbido.volume_db = -30.0
 		som_zumbido.play()
 		create_tween().tween_property(som_zumbido, ^"volume_db", 4.0, 2.5).set_trans(Tween.TRANS_SINE)
+	_eco(&"luta", 2.2)
 	for k in 4:
 		await _esperar(1.6)
 		if not is_inside_tree():
@@ -332,6 +355,11 @@ func _telhado(p: Player) -> void:
 		_poeira(0.35)
 		_tremer(0.5)
 		_tinir_lampiao()
+		# No auge do zumbido, os cães lá embaixo se calam de uma vez; depois, voltam.
+		if k == 1:
+			matilha.mudos = true
+		elif k == 3:
+			matilha.mudos = false
 	# O ganido lá em cima, as unhas escorregando, o corpo que cai lá fora; o
 	# zumbido sobe e se vai.
 	_tocar_em(som_telhado, matilha.ganido, alto, 2.0)
@@ -343,10 +371,9 @@ func _telhado(p: Player) -> void:
 	await _esperar(0.7)
 	_tocar_em(som_telhado, som_baque, alto + Vector3(0.0, -6.0, 4.0), -4.0)
 	await _esperar(2.0)
-	# O cheiro: a imagem lacrimeja e turva, o fôlego curto; os cães ganem.
-	await _frase(&"cheiro")
-	if not is_inside_tree():
-		return
+	# O cheiro: a imagem lacrimeja e turva, o fôlego curto; os cães ganem. A frase,
+	# quando já se sente.
+	_eco(&"cheiro", 2.0)
 	var sonho := create_tween().set_trans(Tween.TRANS_SINE)
 	sonho.tween_method(func(v: float) -> void: GameState.set_value(&"sonho", v), 0.0, 0.55, 2.5)
 	sonho.tween_interval(2.0)
@@ -377,14 +404,21 @@ func _balas(p: Player) -> void:
 	matilha.modo = Matilha.Modo.FRENTE
 	p.olhar_para(diante + Vector3.UP * 0.4, 1.0)
 	await _esperar(3.5)
+	# Os latidos param de uma vez — só o relógio —, e então o tiro.
+	matilha.mudos = true
+	await _esperar(1.6)
+	if not is_inside_tree():
+		return
 	_tiro_de_la()
 	await _esperar(0.18)
 	_tocar_em(som_telhado, som_lascas, bate_tabuado, -6.0)
-	await _esperar(1.8)
+	await _esperar(0.5)
+	matilha.mudos = false
+	await _esperar(1.3)
 	_tiro_de_la()
 	await _esperar(0.14)
 	_estourar()
-	Narrator.say(frases.get(&"balas"))
+	_eco(&"balas", 0.9)
 	# De pé, e abaixado, fora da poltrona.
 	p.stand()
 	p._desencaixar()
@@ -417,7 +451,8 @@ func _balas(p: Player) -> void:
 ## Um lampião apagado (o do escritório primeiro: "Apaguei a luz,").
 func _apagou(l: Lampiao) -> void:
 	if etapa == Etapa.APAGAR and l == apagar[0]:
-		Narrator.say(frases.get(&"apaguei"))
+		# O escuro primeiro; a frase, nele.
+		_eco(&"apaguei", 1.2)
 		etapa = Etapa.TIROS
 	_ligar_areas()
 
@@ -476,7 +511,7 @@ func _atirar(i: int) -> void:
 	if preparacao:
 		preparacao.cartuchos = maxi(preparacao.cartuchos - 1, 0)
 	if tiros == 1:
-		Narrator.say(frases.get(&"seteiras"))
+		_eco(&"seteiras", 1.6)
 	# Num dos tiros, sempre, o ganido que corta.
 	if tiros == TIRO_DO_GANIDO + 1:
 		await _esperar(0.3)
@@ -711,6 +746,12 @@ func _encerrar(p: Player) -> void:
 	await _esperar(8.5)
 	if not is_inside_tree():
 		return
+	# No silêncio que fica, o relógio do consolo chega mais perto; a frase, nele.
+	if relogio:
+		create_tween().tween_property(relogio, ^"volume_db", relogio.volume_db + 5.0, 3.0)
+	await _esperar(2.0)
+	if not is_inside_tree():
+		return
 	await Narrator.say(frases.get(&"encerrar"))
 	if not is_inside_tree():
 		return
@@ -728,6 +769,8 @@ func _fim() -> void:
 
 ## Tudo de uma vez (testes; F2 na fazenda): os tiros dados, os cães calados.
 func pular() -> void:
+	_tirar_abafa()
+	matilha.mudos = false
 	if preparacao:
 		preparacao.encerrar()
 	etapa = Etapa.FIM
@@ -761,11 +804,52 @@ func _calar(teto: float) -> void:
 		t += get_process_delta_time()
 
 
-## A frase seguinte da carta, quando a anterior acabar: a coisa acontece com ela.
+## A frase seguinte da carta, quando a anterior acabar.
 func _frase(id: StringName) -> void:
 	await _calar(9.0)
 	if is_inside_tree():
 		Narrator.say(frases.get(id))
+
+
+## A frase da carta como eco do som que ela conta: `depois` segundos depois dele (e
+## a anterior já fora da tela). Sem `await`, a cena segue enquanto ela espera.
+func _eco(id: StringName, depois := ECO) -> void:
+	await _esperar(depois)
+	if is_inside_tree():
+		await _frase(id)
+
+
+## O mundo abafado do cochilo: um passa-baixa no bus Master que desce até `ABAFADO`
+## em `segundos`; desfeito, abre de novo (o baque: de uma vez) e sai do bus.
+func _abafar(sim: bool, segundos: float) -> void:
+	if _abafa_tw:
+		_abafa_tw.kill()
+	if sim:
+		if _abafa == null:
+			_abafa = AudioEffectLowPassFilter.new()
+			_abafa.cutoff_hz = 20000.0
+			AudioServer.add_bus_effect(0, _abafa)
+		_abafa_tw = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		_abafa_tw.tween_property(_abafa, ^"cutoff_hz", ABAFADO, segundos)
+	elif _abafa:
+		_abafa_tw = create_tween()
+		_abafa_tw.tween_property(_abafa, ^"cutoff_hz", 20000.0, segundos)
+		_abafa_tw.tween_callback(_tirar_abafa)
+
+
+func _tirar_abafa() -> void:
+	if _abafa == null:
+		return
+	for i in AudioServer.get_bus_effect_count(0):
+		if AudioServer.get_bus_effect(0, i) == _abafa:
+			AudioServer.remove_bus_effect(0, i)
+			break
+	_abafa = null
+
+
+func _exit_tree() -> void:
+	# O filtro é do bus, não da fase: não pode ficar depois dela.
+	_tirar_abafa()
 
 
 func _tremer(forca: float) -> void:

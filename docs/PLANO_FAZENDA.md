@@ -885,6 +885,39 @@ no meio da sessão; o trabalho foi retomado e terminado na seguinte.)
   de dentro e sai pela porteira.
   Commit `a5475f6`.
 
+## O som conta (2026-10-22): a noite do telhado
+Pedido: *"precisamos construir a narrativa dos fatos de uma forma mais envolvente.
+Creio que o astro aqui deva ser os efeitos sonoros."* Decidido com o usuário: começar
+pela noite do telhado; o texto da carta fica **depois do som, como eco**.
+
+Antes, a frase da carta vinha primeiro e o som a ilustrava ("subiu", "luta",
+"cheiro" e "correram" apareciam antes do que contavam). Agora cada fato acontece
+primeiro só em som, de onde vem e por onde anda, e a frase aparece depois
+(`NoiteTelhado._eco`, `ECO`):
+- ✅ **O cochilo abafa o mundo:** enquanto as pálpebras pesam, um passa-baixa no bus
+  Master desce até `ABAFADO` (650 Hz) — os grilos, o fogo, o relógio cada vez mais de
+  longe —, e o baque o devolve nítido de uma vez (`_abafar`; sai do bus no fim, no
+  `pular` e no `_exit_tree`).
+- ✅ **Os grilos param de uma vez** (antes, um esmaecer de 1,2 s): só o relógio; o
+  rosnado baixo de Hércules lá fora.
+- ✅ **O baque**, a poeira, um silêncio, e só então *"pousou"*.
+- ✅ **Os cães disparam** latindo em volta da casa, e *"correram"* vem depois.
+- ✅ **O que sobe:** o pulo na beira do puxado, as unhas correndo pelo forro de lá para
+  cá, a poeira caindo quando passam por cima do escritório; *"subiu"* no meio.
+- ✅ **A luta e o zumbido:** o som primeiro; no auge do zumbido, os cães lá embaixo se
+  calam de uma vez (`Matilha.mudos`), e voltam. *"luta"* quando já se ouviu.
+- ✅ **O cheiro:** a imagem turva e o fôlego curto antes da frase.
+- ✅ **As balas:** os latidos param de uma vez, um silêncio de um segundo e meio, e o
+  primeiro tiro; a vidraça, e *"balas"* depois dela.
+- ✅ *"Apaguei a luz"* no escuro, depois de apagar; *"seteiras"* depois do primeiro
+  tiro; no fim, no silêncio dos latidos, o relógio do consolo chega mais perto e só
+  então *"Isso pareceu encerrar a coisa"*.
+- O teste de fumaça confere o abafamento no cochilo e o filtro fora do bus depois do
+  baque.
+- **Fica para depois** (se a noite convencer): o mesmo princípio no entardecer e na
+  preparação; uma tosse e uma respiração gravadas (não há CC0 boa de tosse em
+  `audio/foley/FONTES.md`).
+
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
   escritório, sem mãos (a recomendação, aceita). O rifle é o caso mais difícil

@@ -45,6 +45,20 @@ o que esperava.
 ## 0. Prioridade máxima: o que mudou desde o playtest 11
 **F4** leva direto à fazenda; **F2** lá pula a etapa em curso.
 
+### A noite do telhado contada pelo som (2026-10-22)
+Pedido: *"o astro aqui deva ser os efeitos sonoros."* Jogue com fones de ouvido. Cada
+fato acontece primeiro só em som, e a frase da carta vem depois, como eco.
+(`docs/PLANO_FAZENDA.md`, "O som conta".)
+- [ ] **O cochilo:** sentado na poltrona, o som vai abafando até quase sumir; o baque
+      no telhado o devolve de uma vez. Assustou, mas sem ser um susto barato?
+- [ ] **Os grilos que param de uma vez**, e o silêncio com só o relógio.
+- [ ] **O que sobe pelo telhado:** dá para seguir as unhas por cima da cabeça, de lá
+      para cá? A poeira cai quando passam?
+- [ ] **O zumbido**, e os cães que se calam de uma vez no auge dele.
+- [ ] **Antes do primeiro tiro**, os latidos param: o silêncio funciona?
+- [ ] **As frases da carta depois do som:** o tempo entre o som e a frase está bom
+      (cedo demais, tarde demais)? Alguma frase sobra?
+
 ### A conferência das animações (2026-10-22, os sete pedidos)
 (`docs/PLANO_FAZENDA.md`, "O playtest 12, depois".)
 - [ ] **Brutus** fica no cercado com os outros até a porteira abrir; só depois te segue.

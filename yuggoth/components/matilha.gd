@@ -68,6 +68,14 @@ var porteira_aberta := false
 ## Até onde a ração já caiu na gamela (x do mundo; ela enche de leste para oeste):
 ## a Rotina o move enquanto despeja. -INF: a gamela inteira.
 var racao_ate := -INF
+## Todos calados de uma vez (a noite do telhado: o instante antes de um tiro, o
+## zumbido). Só o ganido passa.
+var mudos := false:
+	set(v):
+		mudos = v
+		if v:
+			for c in caes():
+				c.calar_ja()
 ## O quintal, onde andam soltos à noite.
 @export var quintal := AABB(Vector3(-14, 0, -16), Vector3(36, 1, 30))
 ## Para onde fica a mata (o pântano e a Dark Mountain, a oeste).

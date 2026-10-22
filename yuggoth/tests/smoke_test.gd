@@ -1391,8 +1391,19 @@ func _noite(faz: Fazenda) -> void:
 	await _seconds(1.0)
 	_check(mirou and p.seated and Vector2(p.global_position.x - n.assento.x, p.global_position.z - n.assento.z).length() < 0.15,
 		"sentado na poltrona junto ao fogo, o rifle no colo")
+	# O som conta (playtest 12, depois): cochilando, o mundo abafa; o baque o devolve.
+	var abafado := func() -> float:
+		for i in AudioServer.get_bus_effect_count(0):
+			var fx := AudioServer.get_bus_effect(0, i)
+			if fx is AudioEffectLowPassFilter:
+				return (fx as AudioEffectLowPassFilter).cutoff_hz
+		return INF
+	await _until(func() -> bool: return abafado.call() < 2000.0 or n.etapa >= NoiteTelhado.Etapa.TELHADO, 90.0)
+	_check(abafado.call() < 2000.0, "cochilando, o mundo abafa (%.0f Hz)" % abafado.call())
 	await _until(func() -> bool: return n.etapa == NoiteTelhado.Etapa.TELHADO, 90.0)
 	_check(AudioDirector.get_ambience() == n.som_sem_grilos and faz.noite > 0.8, "os grilos param; passa da meia-noite; o baque no telhado")
+	await _seconds(1.0)
+	_check(abafado.call() == INF, "o baque devolve o som nítido (o filtro sai do bus)")
 	await _until(func() -> bool: return matilha.modo == Matilha.Modo.TELHADO, 20.0)
 	await _seconds(6.0)
 	var em_volta := matilha.caes().filter(func(c: CaoIA) -> bool:

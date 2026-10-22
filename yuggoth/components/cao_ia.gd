@@ -581,7 +581,7 @@ func _pose(p: Cao.Pose) -> void:
 ## `n` latidos em rajada (a mandíbula de cada um no seu som).
 func _latidos(n: int) -> void:
 	for i in n:
-		if not is_inside_tree() or matilha.latidos.is_empty():
+		if not is_inside_tree() or matilha.latidos.is_empty() or matilha.mudos:
 			return
 		if visual:
 			visual.latir()
@@ -590,9 +590,15 @@ func _latidos(n: int) -> void:
 
 
 func _som(s: AudioStream, db: float) -> void:
-	if s == null:
+	if s == null or (matilha and matilha.mudos and s != matilha.ganido):
 		return
 	_voz.stream = s
 	_voz.volume_db = db
 	_voz.pitch_scale = _rng.randf_range(0.92, 1.06) * (1.0 / clampf(visual.porte if visual else 1.0, 0.85, 1.15))
 	_voz.play()
+
+
+## Cala na hora (`Matilha.mudos`): o latido que soava para no meio.
+func calar_ja() -> void:
+	if _voz and _voz.playing and _voz.stream != matilha.ganido:
+		_voz.stop()
