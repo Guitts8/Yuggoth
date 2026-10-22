@@ -12,7 +12,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$godotDir = "C:\Users\raul.silva\Downloads\Godot_v4.7.2-stable_win64.exe"
+# Noutra máquina, aponte $env:GODOT_DIR para a pasta com os dois executáveis do Godot 4.7.2.
+$godotDir = if ($env:GODOT_DIR) { $env:GODOT_DIR } else { "C:\Users\raul.silva\Downloads\Godot_v4.7.2-stable_win64.exe" }
 $godot = Join-Path $godotDir "Godot_v4.7.2-stable_win64_console.exe"
 $godotJanela = Join-Path $godotDir "Godot_v4.7.2-stable_win64.exe"
 $raiz = $PSScriptRoot
@@ -118,6 +119,26 @@ function Save-Ver {
 	Write-Host "  feitos: $($feitos -join ', ')"
 	$respostas = $valores.Keys | Where-Object { $_ -match '^resposta_dia_\d$' } | ForEach-Object { "$_=$(Valor $valores[$_])" }
 	Write-Host "  tons das respostas: $($respostas -join ', ')"
+}
+
+# Um clone novo não tem yuggoth\.godot (fica fora do git): rodado direto, sem o editor, o
+# Godot não importa nada — sem sons, fontes e texturas, e sem o cache das class_name os
+# autoloads não compilam e o jogo não abre. Importa uma vez antes.
+function Garantir-Importado {
+	$cache = Join-Path $projeto ".godot\global_script_class_cache.cfg"
+	$importados = Join-Path $projeto ".godot\imported"
+	if ((Test-Path $cache) -and (Test-Path $importados)) { return }
+	Write-Host "Primeira vez nesta cópia: importando o projeto (uns 20 s)..." -ForegroundColor Cyan
+	Godot-Com-Limite @("--headless", "--path", ".", "--import") 300 "importar" | Out-Null
+}
+
+if ($acao -notin @("ajuda", "save-ver", "save-guardar", "save-listar", "save-usar", "save-apagar", "save-pasta", "log", "estado", "jogar-exportado")) {
+	if (-not (Test-Path $godot)) {
+		Write-Host "Não achei o Godot 4.7.2 em $godotDir" -ForegroundColor Red
+		Write-Host "Aponte para a pasta dele: `$env:GODOT_DIR = 'C:\caminho\da\pasta'"
+		exit 1
+	}
+	if ($acao -notin @("editor", "importar")) { Garantir-Importado }
 }
 
 switch ($acao) {

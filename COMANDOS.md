@@ -16,6 +16,13 @@ powershell -ExecutionPolicy Bypass -File .\comandos.ps1 jogar      # abre o jogo
 O `-ExecutionPolicy Bypass` é porque o Windows bloqueia scripts `.ps1` por padrão; vale
 só para aquele comando. A saída do Godot de cada ação fica em `.logs\` (fora do git).
 
+**Noutra máquina** (um clone novo): a pasta `yuggoth\.godot` (o que o Godot importou: sons,
+fontes, texturas e o cache das `class_name`) fica fora do git. Rodado direto, sem passar pelo
+editor, o Godot não importa nada — o jogo fica sem som e não abre (os autoloads não compilam).
+O `comandos.ps1` importa sozinho na primeira vez; à mão, abra o editor uma vez ou rode
+`--headless --path . --import`. Se o Godot estiver noutro lugar:
+`$env:GODOT_DIR = 'C:\pasta\do\Godot_v4.7.2-stable_win64.exe'`.
+
 | Ação | O que faz |
 |---|---|
 | `jogar` | Abre o jogo numa janela |
