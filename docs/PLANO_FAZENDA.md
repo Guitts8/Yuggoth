@@ -861,6 +861,7 @@ no meio da sessão; o trabalho foi retomado e terminado na seguinte.)
   A seteira da noite usa o mesmo lugar, um pouco mais para dentro. O `alcance_test`
   confere que o corpo cabe diante de cada janela (a 0,30 m e a 0,55 m da área),
   fecha cada uma e anda para longe dali.
+  Commit `a5475f6`.
 - ✅ *"Algumas árvores não estão encostando o chão"* — elas eram postas na curva de
   `_altura`, mas o chão de verdade é a malha da grade (células planas de 10 a 40 m
   longe da casa), e as duas se afastam metros. `_chao_em` dá a altura da malha, e
@@ -882,6 +883,7 @@ no meio da sessão; o trabalho foi retomado e terminado na seguinte.)
   a ração chegar ao seu lugar e ele sair dali (`Matilha.racao_ate`,
   `esperar_na_gamela`; vale também de fora). O teste de fumaça agora faz o bebedouro
   de dentro e sai pela porteira.
+  Commit `a5475f6`.
 
 ## Perguntas para o usuário (respondidas em 2026-10-10)
 - ✅ **As mãos: sem corpo.** Os objetos seguram-se diante da câmera, como a carta no
